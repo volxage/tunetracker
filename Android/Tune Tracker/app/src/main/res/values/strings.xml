@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">Tune Tracker</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_slideshow">Slideshow</string>
+
+
+    <string-array name="sort_keys">
+        <item>Title</item>
+        <item>Alternative title</item>
+        <item>Composer(s)</item>
+        <item>Form</item>
+        <item>Notable recordings</item>
+        <item>Keys</item>
+        <item>Styles</item>
+        <item>Tempi</item>
+        <item>Contrafacts</item>
+        <item>Playthroughs</item>
+        <item>Form confidence</item>
+        <item>Melody confidence</item>
+        <item>Solo confidence</item>
+        <item>Lyrics confidence</item>
+        <item>Played at</item>
+    </string-array>
+</resources>
