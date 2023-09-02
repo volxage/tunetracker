@@ -1,10 +1,11 @@
 package com.example.tunetracker;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Tune {
-    public Map<String, Object> map;
+    public HashMap<String, Object> map;
     private String sort_key = "title";
     private String subtitle;
     private final static ArrayList<String> backupArray = new ArrayList<String>();
@@ -22,7 +23,7 @@ public class Tune {
         this.subtitle = subtitle;
     }
 
-    public Tune(Map<String, Object> map) {
+    public Tune(HashMap<String, Object> map) {
         this.map = map;
         if(map.containsKey("title")){
             this.title = map.get("title").toString();

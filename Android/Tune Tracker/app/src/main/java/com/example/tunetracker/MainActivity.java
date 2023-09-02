@@ -1,6 +1,8 @@
 package com.example.tunetracker;
 
-
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.util.JsonReader;
@@ -11,19 +13,15 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 
-import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.navigation.NavigationView;
-
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentContainerView;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -70,6 +68,7 @@ public class MainActivity extends AppCompatActivity{
         spinnerTranslationMap.put("Lyrics confidence", "lyrics_confidence");
         spinnerTranslationMap.put("Played at", "played_at");
     }
+    ArrayList<Tune> tunelist = new ArrayList<>();
     private AppBarConfiguration mAppBarConfiguration;
 
     @Override
@@ -80,32 +79,27 @@ public class MainActivity extends AppCompatActivity{
         setContentView(R.layout.fragment_home);
 
         AssetManager assetManager = getAssets();
-        ArrayList<Tune> tunelist = new ArrayList<>();
         try{
             InputStream inputStream = assetManager.open("songs.json");
             ArrayList<HashMap<String, Object>> array = this.parseJson(inputStream);
             inputStream.close();
-            for(Map<String,Object> m : array){
+            for(HashMap<String,Object> m : array){
                 Tune tmptune = new Tune(m);
                 tunelist.add(tmptune);
             }
         }catch(IOException exception){
             Log.e("Test Err", exception.getMessage());
         }
-
         RecyclerView recyclerView = findViewById(R.id.recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        MyAdapter myAdapter = new MyAdapter(getApplicationContext(), tunelist);
+        MyAdapter myAdapter = new MyAdapter(getApplicationContext(), this.tunelist);
         recyclerView.setAdapter(myAdapter);
-
 
 
         Spinner spinner = (Spinner) findViewById(R.id.spinner);
         ArrayAdapter<CharSequence> arrayAdapter = ArrayAdapter.createFromResource(this, R.array.sort_keys, android.R.layout.simple_spinner_item);
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(arrayAdapter);
-
-
 
         final Button sort_button = findViewById(R.id.sortbutton);
         sort_button.setOnClickListener(new View.OnClickListener() {
@@ -115,6 +109,18 @@ public class MainActivity extends AppCompatActivity{
                 myAdapter.sort(spinnerTranslationMap.get(spinner.getSelectedItem()));
             }
         });
+        final Button edit_button = findViewById(R.id.editbutton);
+        edit_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                switchActivity();
+            }
+        });
+    }
+    public void switchActivity(){
+        Intent i = new Intent(this, EditActivity.class);
+        i.putExtra("tune_map", tunelist.get(0).map);
+        startActivity(i);
     }
     private HashMap<String, Object> parseJsonTune(JsonReader jsonReader){
         HashMap<String, Object> map = new HashMap<>();
