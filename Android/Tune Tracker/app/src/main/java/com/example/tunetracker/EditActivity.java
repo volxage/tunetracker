@@ -14,13 +14,14 @@ import java.util.List;
 import java.util.Map;
 
 public class EditActivity extends AppCompatActivity {
-    Map<String, String> tune_map;
+    Map<String, Object> tune_map;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         Intent intent = getIntent();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_slideshow);
-        tune_map = (HashMap<String, String>) intent.getSerializableExtra("tunelist");
+        tune_map = (HashMap<String, Object>) intent.getSerializableExtra("tune_map");
+        setContentView(R.layout.fragment_slideshow);
         RecyclerView recyclerView = findViewById(R.id.editrecycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         EditListAdapter myAdapter = new EditListAdapter(getApplicationContext(), tune_map);

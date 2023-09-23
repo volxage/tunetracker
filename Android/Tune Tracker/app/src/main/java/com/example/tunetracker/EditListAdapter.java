@@ -16,9 +16,9 @@ import java.util.Map;
 
 public class EditListAdapter extends RecyclerView.Adapter<EditViewHolder>{
     Context context;
-    Map<String, String> tune_map;
+    Map<String, Object> tune_map;
     String sort_key;
-    public EditListAdapter(Context context, Map<String, String> tune) {
+    public EditListAdapter(Context context, Map<String, Object> tune) {
         this.context = context;
         this.tune_map = tune;
     }
@@ -44,13 +44,17 @@ public class EditListAdapter extends RecyclerView.Adapter<EditViewHolder>{
         String key = (String)MainActivity.tuneTypeMap.keySet().toArray()[position];
         holder.keyView.setText(key);
         String val_type = (String)MainActivity.tuneTypeMap.values().toArray()[position];
-        switch(val_type){
-            case "int":
- //               holder.setInt(tune_map.get(key));
-            case "List":
-//                return R.layout.list_input_view;
-            default:
-//                return R.layout.string_input_view;
+        if(tune_map.containsKey(key)) {
+            switch (val_type) {
+                case "int":
+                    holder.setInt((int) tune_map.get(key));
+                    break;
+                case "List":
+                    holder.setList((List) tune_map.get(key));
+                    break;
+                default:
+                    holder.setString((String) tune_map.get(key));
+            }
         }
     }
 

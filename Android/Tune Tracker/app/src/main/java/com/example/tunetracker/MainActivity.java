@@ -119,13 +119,13 @@ public class MainActivity extends AppCompatActivity{
     }
     public void switchActivity(){
         Intent i = new Intent(this, EditActivity.class);
+        Map<String, Object> tn = tunelist.get(0).map;
         i.putExtra("tune_map", tunelist.get(0).map);
         startActivity(i);
     }
     private HashMap<String, Object> parseJsonTune(JsonReader jsonReader){
         HashMap<String, Object> map = new HashMap<>();
         try {
-            // jsonReader.beginArray(); //TEMPORARY! Shouldn't be here.
             while(jsonReader.hasNext()){
                 String key = jsonReader.nextName();
                 switch(tuneTypeMap.get(key)){
