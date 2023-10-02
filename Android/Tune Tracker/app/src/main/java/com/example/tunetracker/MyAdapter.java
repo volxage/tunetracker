@@ -37,7 +37,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder>{
         holder.titleView.setText(items.get(position).getTitle());
         holder.composersView.setText(items.get(position).getComposers());
         holder.subtitleView.setText(items.get(position).getSubtitle());
-        holder.titleView.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(context, EditActivity.class);

@@ -18,7 +18,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <Button
-            android:id="@+id/editbackbutton"
+            android:id="@+id/editdiscardbutton"
             style="@android:style/Widget.Holo.Light.Button.Inset"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
