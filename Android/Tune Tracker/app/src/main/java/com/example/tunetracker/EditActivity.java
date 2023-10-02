@@ -2,6 +2,7 @@ package com.example.tunetracker;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -20,6 +21,7 @@ public class EditActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         Intent intent = getIntent();
+        // Intent to return to MainActivity
         Intent main_intent = new Intent(this, MainActivity.class);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_slideshow);
@@ -37,11 +39,23 @@ public class EditActivity extends AppCompatActivity {
             }
         });
         Button saveButton = findViewById(R.id.editsavebutton);
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                updateValues(recyclerView, myAdapter);
+                startActivity(main_intent);
+            }
+        });
     }
-    void updateValues(){
-        for(String key: tune_map.keySet()){
-            switch(MainActivity.tuneTypeMap.get(key)){
+    void updateValues(RecyclerView recyclerView, EditListAdapter editListAdapter){
+        for(int i = 0; i < editListAdapter.getItemCount(); i++){
+            EditViewHolder vh = (EditViewHolder) recyclerView.findViewHolderForAdapterPosition(i);
+            if(vh != null) {
+                switch(editListAdapter.getItemViewType(i)){
 
+                }
+                String key = (String) vh.keyView.getText();
+                Log.i("Edit key ", key);
             }
         }
     }
