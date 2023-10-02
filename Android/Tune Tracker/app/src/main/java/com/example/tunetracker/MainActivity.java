@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity{
         }
         RecyclerView recyclerView = findViewById(R.id.recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        MyAdapter myAdapter = new MyAdapter(getApplicationContext(), this.tunelist);
+        MyAdapter myAdapter = new MyAdapter(this, this.tunelist);
         recyclerView.setAdapter(myAdapter);
 
 

@@ -41,11 +41,12 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder>{
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(context, EditActivity.class);
-                i.putExtra("tune_map", items.get(position).map);
+                i.putExtra("tune_map", items.get(holder.getAdapterPosition()).map);
                 context.startActivity(i);
             }
         });
     }
+
 
 
     @Override
