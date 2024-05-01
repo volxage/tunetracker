@@ -71,8 +71,8 @@ public class EditActivity extends AppCompatActivity {
                         post_cast = (int) pre_cast;
                     }
                     if(val != post_cast){
-                        tune_map.put(key, val);
-                        Log.i("INFO", "Setting val " + val + "for key " + key);
+                        tune_map.replace(key, val);
+                        Log.i("INFO", "Setting val " + val + " for key " + key);
                     }
                 }
                 else if(layout == R.layout.list_input_view){
@@ -85,7 +85,7 @@ public class EditActivity extends AppCompatActivity {
                         post_cast = new ArrayList<>();
                     }
                     if(!val.equals(post_cast)){
-                        tune_map.put(key, val);
+                        tune_map.replace(key, val);
                         Log.i("INFO", "Setting val " + val + "for key " + key);
                     }
                 }
@@ -97,7 +97,7 @@ public class EditActivity extends AppCompatActivity {
                         post_cast = (String) pre_cast;
                     }
                     if(!val.equals(post_cast)){
-                        tune_map.put(key, val);
+                        tune_map.replace(key, val);
                         Log.i("INFO", "Setting val " + val + "for key " + key);
                     }
                 }
