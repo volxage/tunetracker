@@ -16,6 +16,8 @@ from fuzzywuzzy import fuzz
 
 from pathlib import Path
 
+#TODO: Make code readable, make interface more legible, add search functionality
+
 type_dict = {
                     "title" : str,
                     "alternative_title" : str,
@@ -54,6 +56,12 @@ class TuneTracker(toga.App):
                     "lyrics_confidence" : -1,
                     "played_at" : [],
                     }
+        self.miniedit_keys = {
+                    "form_confidence" : -1,
+                    "melody_confidence" : -1,
+                    "solo_confidence" : -1,
+                    "lyrics_confidence" : -1,
+                }
         """
         Construct and show the Toga application.
 
@@ -66,6 +74,7 @@ class TuneTracker(toga.App):
         self.open_files()
         self._init_tune_dlist()
         self._init_editor()
+        self._init_miniedit()
         self._init_slist()
 
         self.main_window = toga.MainWindow(title=self.formal_name)
@@ -84,41 +93,54 @@ class TuneTracker(toga.App):
         self.selection = toga.Selection("sort_key_selection", items = selection_items, on_change=self._sort_key_selection_handler)
         source = TunelistSource(accessors=["icon", "title", "composers"], data=self.tunelist)
         source.set_subtitle_key("title")
-        self.tune_dlist = toga.DetailedList(style=Pack(flex=1), on_select = self._tune_dlist_selection_handler,data=source, primary_action="Delete", on_primary_action=self._delete_selected_handler, secondary_action="Action") #Size is explicit because of quirk of toga
+        self.tune_dlist = toga.DetailedList(
+                style=Pack(flex=1),
+                on_select = self._tune_dlist_selection_handler,
+                data=source,
+                primary_action="Delete (PERMANENT!)",
+                on_primary_action=self._are_you_sure,
+                secondary_action="Edit",
+                on_secondary_action=self._edit_handler)
         #self.tune_dlist = toga.DetailedList(data=self.tunelist, accessors=("title", "composers", "icon"), on_select=self._tune_dlist_selection_handler, missing_value="oops") #Size is explicit because of quirk of toga
+        bottom_box = toga.Box(style=Pack(direction="row"))
         obj_list = [
             self.selection,
             toga.TextInput(id="search_input", placeholder="Search", on_change=self.__search_handler__),
             self.tune_dlist,
-            toga.Button("I Just Played This!", on_press=self._played_handler),
-            toga.Button("Edit Tune", on_press=self.__edit_handler__), toga.Button("Import tune from JazzStandards.com", on_press=self.switch_to_standards),
-            toga.Button("Add Empty Tune", on_press=self._new_tune_handler),
-            toga.Button("Delete Tune (Permenant!)", on_press=self._delete_selected_handler),
         ]
         for obj in obj_list:
             self.main_box.add(obj)
+        bottom_box_obj_list = [
+            toga.Button("I Just Played This!", on_press=self._played_handler, style=Pack(flex=2)),
+            #toga.Button("Edit Tune", on_press=self._edit_handler)
+            toga.Button("Import tune from JazzStandards.com", on_press=self.switch_to_standards, style=Pack(flex=1)),
+            toga.Button("Add Empty Tune", on_press=self._new_tune_handler, style=Pack(flex=2)),
+            #toga.Button("Delete Tune (Permenant!)", on_press=self._delete_selected_handler),
+                ]
+        for obj in bottom_box_obj_list:
+            bottom_box.add(obj)
+        self.main_box.add(bottom_box)
         self.sort_tunelist(search)
     def _init_editor(self):
         self.editor= toga.ScrollContainer(style=Pack(padding=80))
-        self.editor_contents = toga.Box(style=Pack(direction="column"))
+        self.editor_contents = toga.Box(style=Pack(direction="row"))
         self.editor_contents.add(toga.Label("*: List format supported. Separate with a comma and space."))
         for key, val in self.default_tune.items():
-            if key != "icon" and key != "subtitle":
-                title = key.title()
-                title = title.replace("_", " ")
-                if type(val) == list:
-                    l = toga.Label("*"+title, id=key+"_label")
+            title = key.title()
+            title = title.replace("_", " ")
+            if type(val) == list:
+                l = toga.Label("*"+title, id=key+"_label")
+            else:
+                l = toga.Label(title, id=key+"_label")
+            self.editor_contents.add(l)
+            if type(val) == int:
+                if key.endswith("confidence"):
+                    i = toga.Slider(id=key+"_ninput", min=-1, max=100)
                 else:
-                    l = toga.Label(title, id=key+"_label")
-                self.editor_contents.add(l)
-                if type(val) == int:
-                    if key.endswith("confidence"):
-                        i = toga.Slider(id=key+"_ninput", min=-1, max=100)
-                    else:
-                        i = toga.NumberInput(id=key+"_ninput")
-                else:
-                    i = toga.TextInput(id=key+"_tinput")
-                self.editor_contents.add(i)
+                    i = toga.NumberInput(id=key+"_ninput")
+            else:
+                i = toga.TextInput(id=key+"_tinput")
+            self.editor_contents.add(i)
         bottom_box = toga.Box(style=Pack(direction="row"))
         bottom_box.add(toga.Button(text="Confirm edits", id="confirm_btn", on_press=self.switch_to_tunelist))
         bottom_box.add(toga.Button(text="Cancel edits", id="cancel_btn", on_press=self.switch_to_tunelist))
@@ -137,8 +159,23 @@ class TuneTracker(toga.App):
         bottom_box.add(toga.Button(text="Cancel import", id="import_cancel_btn", on_press=self.switch_to_tunelist))
         self.sl_box.add(bottom_box)
     def _init_miniedit(self):
-        self.miniedit_box = toga.Box()
-        self.miniedit_contents = []
+        self.minieditor = toga.ScrollContainer(style=Pack(padding=80))
+        self.miniedit_contents = toga.Box(style=Pack(direction="column"))
+
+        # Assume all keys correspond to confidence.
+        for key, val in self.miniedit_keys.items():
+            title = key.title()
+            title = title.replace("_", " ")
+            l = toga.Label(title, id=key+"_label")
+            self.miniedit_contents.add(l)
+            i = toga.Slider(id=key+"_ninput", min=-1, max=100)
+            self.miniedit_contents.add(i)
+        bottom_box = toga.Box(style=Pack(direction="row"))
+        bottom_box.add(toga.Button(text="Confirm edits", id="mini_confirm_btn", on_press=self.switch_to_tunelist))
+        bottom_box.add(toga.Button(text="Cancel edits", id="cancel_btn", on_press=self.switch_to_tunelist))
+        self.miniedit_contents.add(bottom_box)
+        self.minieditor.content = self.miniedit_contents
+
 
     def _prettify(self, data):
         if type(data) == list:
@@ -169,7 +206,15 @@ class TuneTracker(toga.App):
                         child.value = tune[key]
                     except:
                         child.value = -1
-                
+    def update_minieditor(self, tune):
+        content = self.miniedit_contents
+        for child in content.children:
+            if child.id.endswith("input"):
+                key = child.id.removesuffix("_ninput")
+                try:
+                    child.value = tune[key]
+                except:
+                    child.value = -1
     def _sort_key_selection_handler(self, widget):
         value = widget.value
         value = value.lower()
@@ -214,8 +259,8 @@ class TuneTracker(toga.App):
         tune_conversion["title"] = std["Title"]
         tune_conversion["composers"] = std["Composer(s)"]
         return tune_conversion
-    def update_tune(self):
-        content = self.editor_contents
+    def update_tune(self, content):
+        #content = self.editor_contents
         for child in content.children:
             if child.id.endswith("input"):
                 key = child.id.removesuffix("_tinput")
@@ -265,6 +310,7 @@ class TuneTracker(toga.App):
                 self.current_tune["played_at"].pop()
                 self.current_tune["playthroughs"] = int(self.current_tune["playthroughs"]) - 1
                 print(self.current_tune)
+                self.sort_tunelist()
             elif "played_at" not in self.current_tune or self.current_tune["played_at"] == []:
                 self.tune_dlist.selection.icon = toga.Icon("./resources/check-mark.png")
                 self.current_tune["played_at"] = []
@@ -273,25 +319,49 @@ class TuneTracker(toga.App):
                     self.current_tune["playthroughs"] = int(self.current_tune["playthroughs"]) + 1
                 else:
                     self.current_tune["playthroughs"] = 1
+                self._miniedit_handler(None)
             else:
                 self.tune_dlist.selection.icon = toga.Icon("./resources/check-mark.png")
                 if self.current_tune["played_at"][0] != date_str:
                     self.current_tune["played_at"].insert(0,date_str)
                     self.current_tune["playthroughs"] = int(self.current_tune["playthroughs"]) + 1
+                self._miniedit_handler(None)
         self.save()
-        self.sort_tunelist()
-    def __edit_handler__(self, widget: toga.Button, **kwargs):
+    def _edit_handler(self, widget: toga.Button, **kwargs):
         self.switch_to_editor(None)
         self.update_editor_contents(self.current_tune)
+    def _miniedit_handler(self, widget, **kwargs):
+        self.switch_to_minieditor(None)
+        self.update_minieditor(self.current_tune)
     def switch_to_editor(self, widget, **kwargs):
+        print(self.current_tune)
         self.main_window.content = self.editor
+    def switch_to_minieditor(self, widget, **kwargs):
+        self.main_window.content = self.minieditor
     def switch_to_tunelist(self, widget: toga.Button, **kwargs):
         if widget.id == "confirm_btn":
-            self.update_tune()
+            self.update_tune(self.editor_contents)
+        elif widget.id == "mini_confirm_btn":
+            self.update_tune(self.miniedit_contents)
+        elif widget.id == "confirm_delete_btn":
+            self._delete_selected_handler(widget)
         self.main_window.content = self.main_box
         self.sort_tunelist()
     def switch_to_standards(self, widget: toga.Button, **kwargs):
         self.main_window.content = self.sl_box
+    # Replaces Tune-List with "Are you sure you want to delete?"
+    def _are_you_sure(self, widget, **kwargs):
+        box = toga.Box(style=Pack(direction="column"))
+        title = self.current_tune.get("title", "this untitled song")
+        obj_list = [
+            toga.Label("Are you sure you want to delete {}? This is permanent!"
+                       .format(title)),
+            toga.Button(text="Yes, delete {}!".format(title), id="confirm_delete_btn", on_press=self.switch_to_tunelist),
+            toga.Button(text="Cancel".format(title), id=("cancel_btn"))
+        ]
+        for obj in obj_list:
+            box.add(obj)
+        self.main_window.content = box
     def open_files(self):
         src = Path(__file__).resolve()
         src_dir = src.parent
@@ -383,10 +453,10 @@ class TunelistSource(ListSource):
             self.notify("change", item=row)
     def _row_is_sortable(self, row):
         return (self.subtitle_key in getattr(row, "tune")) and (getattr(row, "tune")[self.subtitle_key] != [])
-    def _swap(self, left, right):
-        self._data[left], self._data[right] = self._data[right], self._data[left]
-        self.notify("change", item=self._data[left])
-        self.notify("change", item=self._data[right])
+#   def _swap(self, left, right):
+#       self._data[left], self._data[right] = self._data[right], self._data[left]
+#       self.notify("change", item=self._data[left])
+#       self.notify("change", item=self._data[right])
         #self.notify("insert", index=left, item=self[left])
 #       self.notify("remove", index=left, item=self[right])
 #       self.notify("insert", index=left, item=self[left])
@@ -395,18 +465,27 @@ class TunelistSource(ListSource):
     def sort(self, search=""):
         #print("Sorting by {}:".format(self.subtitle_key))
         #self._quicksort(0, len(self) - 1, self.subtitle_key)
-        print("Subtitle key is {}, type is {}.".format(self.subtitle_key, type_dict[self.subtitle_key]))
         values_for_sorting = [row for row in self._data if self._row_is_sortable(row)]
         end_values = [row for row in self._data if self.subtitle_key if not self._row_is_sortable(row)]
-        if type_dict[self.subtitle_key] is str:
-            self._data = sorted(values_for_sorting, key=lambda row: getattr(row,"tune").get(self.subtitle_key, "{Missing}").lower())
-        elif type_dict[self.subtitle_key] is List[str]:
-            self._data = sorted(values_for_sorting, key=lambda row: getattr(row,"tune").get(self.subtitle_key, ["{Missing}"])[0].lower())
-        elif type_dict[self.subtitle_key] is List[int]:
-            self._data = sorted(values_for_sorting, key=lambda row: int(getattr(row,"tune").get(self.subtitle_key, [-1])[0]))
-        elif type_dict[self.subtitle_key] is int:
-            self._data = sorted(values_for_sorting, key=lambda row: int(getattr(row,"tune").get(self.subtitle_key, "{Missing}")))
-        self._data.extend(end_values)
+        if search == "":
+            if type_dict[self.subtitle_key] is str:
+                self._data = sorted(values_for_sorting, key=lambda row: getattr(row,"tune").get(self.subtitle_key, "{Missing}").lower())
+            elif type_dict[self.subtitle_key] is List[str]:
+                self._data = sorted(values_for_sorting, key=lambda row: getattr(row,"tune").get(self.subtitle_key, ["{Missing}"])[0].lower())
+            elif type_dict[self.subtitle_key] is List[int]:
+                self._data = sorted(values_for_sorting, key=lambda row: int(getattr(row,"tune").get(self.subtitle_key, [-1])[0]))
+            elif type_dict[self.subtitle_key] is int:
+                self._data = sorted(values_for_sorting, key=lambda row: int(getattr(row,"tune").get(self.subtitle_key, "{Missing}")))
+            self._data.extend(end_values)
+        else:
+            if type_dict[self.subtitle_key] is str:
+                self._data = sorted(values_for_sorting, key=lambda row: getattr(row,"tune").get(self.subtitle_key, "{Missing}").lower())
+            elif type_dict[self.subtitle_key] is List[str]:
+                self._data = sorted(values_for_sorting, key=lambda row: getattr(row,"tune").get(self.subtitle_key, ["{Missing}"])[0].lower())
+            elif type_dict[self.subtitle_key] is List[int]:
+                self._data = sorted(values_for_sorting, key=lambda row: int(getattr(row,"tune").get(self.subtitle_key, [-1])[0]))
+            elif type_dict[self.subtitle_key] is int:
+                self._data = sorted(values_for_sorting, key=lambda row: int(getattr(row,"tune").get(self.subtitle_key, "{Missing}")))
         self.notify("clear")
         for i, row in enumerate(self._data):
             #print(getattr(row, "title"))
