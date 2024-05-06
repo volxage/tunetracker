@@ -91,7 +91,7 @@ class TuneTracker(toga.App):
         self.main_box = toga.Box(style=Pack(direction="column"))
         selection_items = self._prettify(list(self.default_tune.keys()))
         self.selection = toga.Selection("sort_key_selection", items = selection_items, on_change=self._sort_key_selection_handler)
-        source = TunelistSource(accessors=["icon", "title", "composers"], data=self.tunelist)
+        source = TunelistSource(accessors=["icon", "title", "subtitle"], data=self.tunelist)
         source.set_subtitle_key("title")
         self.tune_dlist = toga.DetailedList(
                 style=Pack(flex=1),
@@ -123,7 +123,7 @@ class TuneTracker(toga.App):
         self.sort_tunelist(search)
     def _init_editor(self):
         self.editor= toga.ScrollContainer(style=Pack(padding=80))
-        self.editor_contents = toga.Box(style=Pack(direction="row"))
+        self.editor_contents = toga.Box(style=Pack(direction="column"))
         self.editor_contents.add(toga.Label("*: List format supported. Separate with a comma and space."))
         for key, val in self.default_tune.items():
             title = key.title()
@@ -222,7 +222,7 @@ class TuneTracker(toga.App):
         self._subtitle_key = value
         getattr(self.tune_dlist.data, "set_subtitle_key")(value)
         #print("Sorting by {}".format(value))
-        self.sort_tunelist()
+        #self.sort_tunelist()
     def _tune_dlist_selection_handler(self, widget):
         if self.tune_dlist.selection:
             self.current_tune = getattr(self.tune_dlist.selection, "tune")
@@ -436,9 +436,9 @@ class TunelistSource(ListSource):
         print(sub_key)
         if sub_key == "title":
             sub_key = "composers"
-            self.subtitle_key = "composers"
+#            self.subtitle_key = "composers"
 #            self._accessors[2] = "composers"
-#        self.sort()
+        self.sort()
         for row in self._data:
             if sub_key in row.tune:
                 value = row.tune[sub_key]
@@ -465,6 +465,7 @@ class TunelistSource(ListSource):
     def sort(self, search=""):
         #print("Sorting by {}:".format(self.subtitle_key))
         #self._quicksort(0, len(self) - 1, self.subtitle_key)
+        search = search.lower()
         values_for_sorting = [row for row in self._data if self._row_is_sortable(row)]
         end_values = [row for row in self._data if self.subtitle_key if not self._row_is_sortable(row)]
         if search == "":
@@ -479,9 +480,9 @@ class TunelistSource(ListSource):
             self._data.extend(end_values)
         else:
             if type_dict[self.subtitle_key] is str:
-                self._data = sorted(values_for_sorting, key=lambda row: getattr(row,"tune").get(self.subtitle_key, "{Missing}").lower())
+                self._data = sorted(values_for_sorting, key=lambda row: fuzz.partial_ratio(getattr(row,"tune").get(self.subtitle_key, "{Missing}").lower(), search), reverse=True)
             elif type_dict[self.subtitle_key] is List[str]:
-                self._data = sorted(values_for_sorting, key=lambda row: getattr(row,"tune").get(self.subtitle_key, ["{Missing}"])[0].lower())
+                self._data = sorted(values_for_sorting, key=lambda row: fuzz.partial_ratio(getattr(row,"tune").get(self.subtitle_key, ["{Missing}"])[0].lower(), search), reverse=True)
             elif type_dict[self.subtitle_key] is List[int]:
                 self._data = sorted(values_for_sorting, key=lambda row: int(getattr(row,"tune").get(self.subtitle_key, [-1])[0]))
             elif type_dict[self.subtitle_key] is int:
@@ -578,6 +579,7 @@ class StandardslistSource(TunelistSource):
                 row.subtitle = str(row.standard[sub_key])
             else:
                 row.subtitle = "No " + sub_key + " provided!"
+        self.sort()
 
 
 
