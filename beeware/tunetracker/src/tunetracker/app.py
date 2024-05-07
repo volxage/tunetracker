@@ -1,5 +1,5 @@
 """
-My first application
+Tune Tracker
 """
 from types import NoneType
 from typing import Any, List
@@ -142,21 +142,21 @@ class TuneTracker(toga.App):
                 i = toga.TextInput(id=key+"_tinput")
             self.editor_contents.add(i)
         bottom_box = toga.Box(style=Pack(direction="row"))
-        bottom_box.add(toga.Button(text="Confirm edits", id="confirm_btn", on_press=self.switch_to_tunelist))
-        bottom_box.add(toga.Button(text="Cancel edits", id="cancel_btn", on_press=self.switch_to_tunelist))
+        bottom_box.add(toga.Button(text="Cancel edits", id="cancel_btn", on_press=self.switch_to_tunelist, style=Pack(flex=1)))
+        bottom_box.add(toga.Button(text="Confirm edits", id="confirm_btn", on_press=self.switch_to_tunelist, style=Pack(flex=1)))
         self.editor_contents.add(bottom_box)
         self.editor.content = self.editor_contents
     def _init_slist(self):
-        self.sl_box = toga.Box()
+        self.sl_box = toga.Box(style=Pack(direction="column"))
         self.sl_data = []
         self.sort_standards()
 #         self.prepare_standards()
         source = StandardslistSource(accessors=["icon", "title", "subtitle"], data=self.all_standards)
-        self.standards_list = toga.DetailedList(data=source, style=Pack(width=400, height=400))
+        self.standards_list = toga.DetailedList(data=source, style=Pack(flex=1))
         self.sl_box.add(self.standards_list)
         bottom_box = toga.Box(style=Pack(direction="row"))
-        bottom_box.add(toga.Button(text="Import standard", id="import_confirm_btn", on_press=self._import_standard_handler))
-        bottom_box.add(toga.Button(text="Cancel import", id="cancel_btn", on_press=self.switch_to_tunelist))
+        bottom_box.add(toga.Button(text="Cancel import", id="cancel_btn", on_press=self.switch_to_tunelist, style=Pack(flex=1)))
+        bottom_box.add(toga.Button(text="Import standard", id="import_confirm_btn", on_press=self._import_standard_handler, style=Pack(flex=1)))
         self.sl_box.add(bottom_box)
     def _init_miniedit(self):
         self.minieditor = toga.ScrollContainer(style=Pack(padding=80))
