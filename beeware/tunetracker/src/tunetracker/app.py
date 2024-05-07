@@ -156,7 +156,7 @@ class TuneTracker(toga.App):
         self.sl_box.add(self.standards_list)
         bottom_box = toga.Box(style=Pack(direction="row"))
         bottom_box.add(toga.Button(text="Import standard", id="import_confirm_btn", on_press=self._import_standard_handler))
-        bottom_box.add(toga.Button(text="Cancel import", id="import_cancel_btn", on_press=self.switch_to_tunelist))
+        bottom_box.add(toga.Button(text="Cancel import", id="cancel_btn", on_press=self.switch_to_tunelist))
         self.sl_box.add(bottom_box)
     def _init_miniedit(self):
         self.minieditor = toga.ScrollContainer(style=Pack(padding=80))
@@ -357,7 +357,7 @@ class TuneTracker(toga.App):
             toga.Label("Are you sure you want to delete {}? This is permanent!"
                        .format(title)),
             toga.Button(text="Yes, delete {}!".format(title), id="confirm_delete_btn", on_press=self.switch_to_tunelist),
-            toga.Button(text="Cancel".format(title), id=("cancel_btn"))
+            toga.Button(text="Cancel".format(title), id=("cancel_btn"), on_press=self.switch_to_tunelist)
         ]
         for obj in obj_list:
             box.add(obj)
@@ -375,7 +375,7 @@ class TuneTracker(toga.App):
          try:
              src = Path(__file__).resolve()
              src_dir = src.parent
-             with open(src_dir / "songs.json", "w") as f:
+             with open(src_dir / "./resources/songs.json", "w") as f:
                  json.dump(self.tunelist, f)
                  print("Wrote to ./songs.json")
 
@@ -438,7 +438,6 @@ class TunelistSource(ListSource):
             sub_key = "composers"
 #            self.subtitle_key = "composers"
 #            self._accessors[2] = "composers"
-        self.sort()
         for row in self._data:
             if sub_key in row.tune:
                 value = row.tune[sub_key]
@@ -451,6 +450,7 @@ class TunelistSource(ListSource):
             else:
                 row.subtitle = "No " + sub_key + " provided!"
             self.notify("change", item=row)
+        self.sort()
     def _row_is_sortable(self, row):
         return (self.subtitle_key in getattr(row, "tune")) and (getattr(row, "tune")[self.subtitle_key] != [])
 #   def _swap(self, left, right):
