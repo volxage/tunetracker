@@ -365,10 +365,10 @@ class TuneTracker(toga.App):
     def open_files(self):
         src = Path(__file__).resolve()
         src_dir = src.parent
-        with open(src_dir / "songs.json", "r+") as f:
+        with open(src_dir / "./resources/songs.json", "r+") as f:
             self.tunelist = json.load(f)
             self.tunelist: list[dict]
-        with open(src_dir / "JazzStandards.csv", "r") as standards_file:
+        with open(src_dir / "./resources/JazzStandards.csv", "r") as standards_file:
             self.all_standards = sorted(list(csv.DictReader(standards_file)), key=lambda tn: tn["Title"])
     def save(self):
 #        print("Save disabled")
