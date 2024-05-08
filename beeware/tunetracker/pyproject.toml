@@ -22,6 +22,7 @@ test_sources = [
 ]
 
 requires = [
+  "fuzzywuzzy",
 ]
 test_requires = [
     "pytest",
@@ -29,13 +30,13 @@ test_requires = [
 
 [tool.briefcase.app.tunetracker.macOS]
 requires = [
-    "toga-cocoa~=0.4.0",
+    "toga-cocoa~=0.4.3",
     "std-nslog~=1.0.0"
 ]
 
 [tool.briefcase.app.tunetracker.linux]
 requires = [
-    "toga-gtk~=0.4.0",
+    "toga-gtk~=0.4.3",
 ]
 
 [tool.briefcase.app.tunetracker.linux.system.debian]
@@ -131,25 +132,25 @@ flatpak_sdk = "org.gnome.Sdk"
 
 [tool.briefcase.app.tunetracker.windows]
 requires = [
-    "toga-winforms~=0.4.0",
+    "toga-winforms~=0.4.3",
 ]
 
 # Mobile deployments
 [tool.briefcase.app.tunetracker.iOS]
 requires = [
-    "toga-iOS~=0.4.0",
+    "toga-iOS~=0.4.3",
     "std-nslog~=1.0.0"
 ]
 
 [tool.briefcase.app.tunetracker.android]
 requires = [
-    "toga-android~=0.4.0"
+    "toga-android~=0.4.3"
 ]
 
 # Web deployments
 [tool.briefcase.app.tunetracker.web]
 requires = [
-    "toga-web~=0.4.0",
+    "toga-web~=0.4.3",
 ]
 base_theme = "Theme.MaterialComponents.Light.DarkActionBar"
 build_gradle_dependencies = [

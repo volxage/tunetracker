@@ -6,7 +6,6 @@ from typing import Any, List
 import toga
 from toga.sources.list_source import ListSource, Row
 from toga.style.pack import Pack
-from toga.style.pack import COLUMN, HIDDEN, ROW, VISIBLE
 
 import json
 import csv
@@ -103,9 +102,13 @@ class TuneTracker(toga.App):
                 on_secondary_action=self._edit_handler)
         #self.tune_dlist = toga.DetailedList(data=self.tunelist, accessors=("title", "composers", "icon"), on_select=self._tune_dlist_selection_handler, missing_value="oops") #Size is explicit because of quirk of toga
         bottom_box = toga.Box(style=Pack(direction="row"))
+        search_area = toga.Box(id="search_area", style=Pack(direction="row"))
+        self.search_input = toga.TextInput(id="search_input", placeholder="Search", style=Pack(flex=3))
+        search_area.add(self.search_input)
+        search_area.add(toga.Button(id="search_btn", text="Search", on_press=self.__search_handler__, style=Pack(flex=1)))
         obj_list = [
             self.selection,
-            toga.TextInput(id="search_input", placeholder="Search", on_change=self.__search_handler__),
+            search_area,
             self.tune_dlist,
         ]
         for obj in obj_list:
@@ -274,24 +277,24 @@ class TuneTracker(toga.App):
                     else:
                         self.current_tune[key] = val
                     if val == "title":
-                        setattr(self.tune_dlist.selection, "title", self.current_tune["title"])
+                        setattr(self.selection, "title", self.current_tune["title"])
                     if val == self._subtitle_key:
-                        setattr(self.tune_dlist.selection, "subtitle", self.current_tune[self._subtitle_key])
-                    self.tune_dlist.data.notify("change", item=self.tune_dlist.selection)
+                        setattr(self.selection, "subtitle", self.current_tune[self._subtitle_key])
+                    self.tune_dlist.data.notify("change", item=self.selection)
                 else:
                     if key in self.current_tune:
                         self.current_tune.pop(key)
         if "title" not in self.current_tune:
-            setattr(self.tune_dlist.selection, "title", "(No title supplied!)")
+            setattr(self.selection, "title", "(No title supplied!)")
         else:
-            setattr(self.tune_dlist.selection, "title", self.current_tune["title"])
+            setattr(self.selection, "title", self.current_tune["title"])
         if self._subtitle_key not in self.current_tune:
-            setattr(self.tune_dlist.selection, "subtitle", "(No " + self._subtitle_key + " supplied!)")
+            setattr(self.selection, "subtitle", "(No " + self._subtitle_key + " supplied!)")
         else:
             if isinstance(self.current_tune[self._subtitle_key], list):
-                setattr(self.tune_dlist.selection, "subtitle", ", ".join(self.current_tune[self._subtitle_key]))
+                setattr(self.selection, "subtitle", ", ".join(self.current_tune[self._subtitle_key]))
             else:
-                setattr(self.tune_dlist.selection, "subtitle", self.current_tune[self._subtitle_key])
+                setattr(self.selection, "subtitle", self.current_tune[self._subtitle_key])
         self.save()
     def _delete_selected_handler(self, widget: toga.Button, **kwargs):
         row = self.tune_dlist.selection
@@ -299,8 +302,8 @@ class TuneTracker(toga.App):
         if row:
             self.tune_dlist.data.remove(row)
             self.save()
-    def __search_handler__(self, widget):
-        self.sort_tunelist(search=widget.value)
+    def __search_handler__(self, widget: toga.Widget, **kwargs):
+        self.sort_tunelist(search=self.search_input.value)
     def _played_handler(self, widget: toga.Button, **kwargs):
         if self.tune_dlist.selection:
             date_str = date.today().isoformat()
@@ -327,9 +330,12 @@ class TuneTracker(toga.App):
                     self.current_tune["playthroughs"] = int(self.current_tune["playthroughs"]) + 1
                 self._miniedit_handler(None)
         self.save()
-    def _edit_handler(self, widget: toga.Button, **kwargs):
-        self.switch_to_editor(None)
+    def _edit_handler(self, widget: toga.Widget, **kwargs):
+        self.switch_to_editor(widget)
+        self.selection = self.tune_dlist.selection
         self.update_editor_contents(self.current_tune)
+        print("widget: {}".format(widget))
+        #TODO ENSURE THIS WORKS
     def _miniedit_handler(self, widget, **kwargs):
         self.switch_to_minieditor(None)
         self.update_minieditor(self.current_tune)
@@ -489,7 +495,7 @@ class TunelistSource(ListSource):
                 self._data = sorted(values_for_sorting, key=lambda row: int(getattr(row,"tune").get(self.subtitle_key, "{Missing}")))
         self.notify("clear")
         for i, row in enumerate(self._data):
-            #print(getattr(row, "title"))
+            print(getattr(row, "title"))
             self.notify("insert", index=i, item=row)
         #values_for_sorting = [row for row in self._data if self._row_is_sortable(row)]
         #end_values = [row for row in self._data if self.subtitle_key if not self._row_is_sortable(row)]
