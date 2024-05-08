@@ -89,7 +89,7 @@ class TuneTracker(toga.App):
         self._subtitle_key = "composers"
         self.main_box = toga.Box(style=Pack(direction="column"))
         selection_items = self._prettify(list(self.default_tune.keys()))
-        self.selection = toga.Selection("sort_key_selection", items = selection_items, on_change=self._sort_key_selection_handler)
+        self.selection = toga.Selection("sort_key_selection", items = selection_items, on_change=self._sort_key_selection_handler, style=Pack(flex=1))
         source = TunelistSource(accessors=["icon", "title", "subtitle"], data=self.tunelist)
         source.set_subtitle_key("title")
         self.tune_dlist = toga.DetailedList(
@@ -102,7 +102,7 @@ class TuneTracker(toga.App):
                 on_secondary_action=self._edit_handler)
         #self.tune_dlist = toga.DetailedList(data=self.tunelist, accessors=("title", "composers", "icon"), on_select=self._tune_dlist_selection_handler, missing_value="oops") #Size is explicit because of quirk of toga
         bottom_box = toga.Box(style=Pack(direction="row"))
-        search_area = toga.Box(id="search_area", style=Pack(direction="row"))
+        search_area = toga.Box(id="search_area", style=Pack(direction="row", flex=1))
         self.search_input = toga.TextInput(id="search_input", placeholder="Search", style=Pack(flex=3))
         search_area.add(self.search_input)
         search_area.add(toga.Button(id="search_btn", text="Search", on_press=self.__search_handler__, style=Pack(flex=1)))
@@ -138,11 +138,11 @@ class TuneTracker(toga.App):
             self.editor_contents.add(l)
             if type(val) == int:
                 if key.endswith("confidence"):
-                    i = toga.Slider(id=key+"_ninput", min=-1, max=100)
+                    i = toga.Slider(id=key+"_ninput", min=-1, max=100, style=Pack(flex=1))
                 else:
-                    i = toga.NumberInput(id=key+"_ninput")
+                    i = toga.NumberInput(id=key+"_ninput", style=Pack(flex=1))
             else:
-                i = toga.TextInput(id=key+"_tinput")
+                i = toga.TextInput(id=key+"_tinput", style=Pack(flex=1))
             self.editor_contents.add(i)
         bottom_box = toga.Box(style=Pack(direction="row"))
         bottom_box.add(toga.Button(text="Cancel edits", id="cancel_btn", on_press=self.switch_to_tunelist, style=Pack(flex=1)))
@@ -352,7 +352,7 @@ class TuneTracker(toga.App):
         elif widget.id == "confirm_delete_btn":
             self._delete_selected_handler(widget)
         self.main_window.content = self.main_box
-        self.sort_tunelist()
+        #self.sort_tunelist()
     def switch_to_standards(self, widget: toga.Button, **kwargs):
         self.main_window.content = self.sl_box
     # Replaces Tune-List with "Are you sure you want to delete?"
