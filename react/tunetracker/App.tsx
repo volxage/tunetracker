@@ -16,7 +16,8 @@ import {
 } from './Style.tsx'
 
 import LList from './components/Llist.tsx'
-import MiniEditor from './components/Editors.tsx'
+import Editor from './components/Editors.tsx'
+import MiniEditor from './components/MiniEditor.tsx'
 import {
   SafeAreaView,
   View,
@@ -50,15 +51,31 @@ const miniEditorPrettyAttrs = new Map<string, string>([
   ["solo_confidence", "Solo Confidence"],
   ["lyrics_confidence", "Lyrics Confidence"],
 ])
+const prettyAttrs = new Map<string, string>([
+  ["title", "Title"],
+  ["alternative_title", "Alternative Title"],
+  ["composers", "Composers"],
+  ["form", "Form"],
+  ["notable_recordings", "Notable Recordings"],
+  ["keys", "Keys"],
+  ["styles", "Styles"],
+  ["tempi", "Tempi"],
+  ["contrafacts", "Contrafacts"],
+  ["playthroughs", "Playthroughs"],
+  ["form_confidence", "Form Confidence"],
+  ["melody_confidence", "Melody Confidence"],
+  ["solo_confidence", "Solo Confidence"],
+  ["lyrics_confidence", "Lyrics Confidence"],
+])
 
 function App(): React.JSX.Element {
-  const [editing, setEditorVisible] = useState(false);
+  const [editing, setEditorVisible] = useState(0);
   return(
     <MainMenu editing={editing} setEditorVisible={setEditorVisible}></MainMenu>
   );
 }
 
-function MainMenu({editing, setEditorVisible}: {editing: boolean, setEditorVisible: Function}): React.JSX.Element {
+function MainMenu({editing, setEditorVisible}: {editing: number, setEditorVisible: Function}): React.JSX.Element {
   //const isDarkMode = useColorScheme() === 'dark';
   const isDarkMode = true;
   const [selectedTune, setSelectedTune] = useState(songs[0])
@@ -68,14 +85,15 @@ function MainMenu({editing, setEditorVisible}: {editing: boolean, setEditorVisib
   };
   let editPair = {editing:editing, setEditorVisible:setEditorVisible}
   
-  if(editing){
+  if(editing == 1){
     let entriesArr = Array.from(miniEditorPrettyAttrs.entries());
-    let arr = ((entriesArr as Array<Array<unknown>>) as Array<[string, string, number]>)
-    arr.forEach(value => {
-      value.push(0)
-    });
+    let arr = ((entriesArr as Array<Array<unknown>>) as Array<[string, string]>)
     return(
-      <MiniEditor editPair={editPair} songMiniAttrs={arr} selectedTune={selectedTune}/>
+      <Editor editPair={editPair} prettyAttrs={arr} selectedTune={selectedTune}/>
+    );
+  }else if(editing == 2){
+    return(
+      <Editor editPair={editPair} prettyAttrs={Array.from(prettyAttrs.entries())} selectedTune={selectedTune}/>
     );
   }else{
     return (

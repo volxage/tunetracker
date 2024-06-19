@@ -35,6 +35,14 @@ const SubText = styled.Text`
 `;
 const TextInput = styled.TextInput`
   border-width: 1px;
+  font-size: 20px;
+  font-weight: 250;
   color: white;
 `;
-export {Text, SubText, TextInput, styles};
+const DeleteButton = styled.Button`
+  font-size: 20px;
+  backgroundColor: red;
+  color: white;
+  font-weight: 250;
+`
+export {Text, SubText, TextInput, styles, DeleteButton};

@@ -1,17 +1,10 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React, {isValidElement, useState} from 'react';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import {
   Text,
-  TextInput,
   styles
 } from '../Style.tsx'
+import TypeField from './TypeField.tsx';
 import {
   SafeAreaView,
   FlatList,
@@ -24,7 +17,6 @@ type editPair = {
   editing: number;
   setEditorVisible: Function;
 }
-import TypeField from './TypeField.tsx';
 
 type tune = {
   "title"?: string
@@ -43,11 +35,11 @@ type tune = {
   "lyrics_confidence"?: number
   "played_at"?: string[]
 }
-function Editor({prettyAttrs, editPair, selectedTune}: {prettyAttrs: Array<[string, string]>, editPair: editPair, selectedTune: tune}): React.JSX.Element {
+function MiniEditor({songMiniAttrs, editPair, selectedTune}: {songMiniAttrs: Array<[string, string]>, editPair: editPair, selectedTune: tune}): React.JSX.Element {
   return (
     <SafeAreaView>
       <FlatList
-        data={prettyAttrs}
+        data={songMiniAttrs}
         renderItem={({item, index, separators}) => (
           //Why is this a TouchableHighlight and not a regular view?
           <TouchableHighlight
@@ -55,18 +47,21 @@ function Editor({prettyAttrs, editPair, selectedTune}: {prettyAttrs: Array<[stri
             onShowUnderlay={separators.highlight}
             style={styles.bordered}
             onHideUnderlay={separators.unhighlight}>
-            <TypeField attr={selectedTune[item[0] as keyof tune]} attrKey={item[0] as keyof tune} attrName={item[1]} />
+            <View style={{backgroundColor: 'black', padding: 8}}>
+              <TypeField 
+                attr={selectedTune[(item[0]) as keyof tune] as number}
+                attrKey={item[0] as keyof tune}
+                attrName={item[1]}
+              />
+            </View>
           </TouchableHighlight>
-
       )}
-      ListFooterComponent={
-        <Button
-          title="Save"
-          onPress={() => editPair.setEditorVisible(!editPair.editing)}
-        />
-      }
+    />
+    <Button
+      title="Save"
+      onPress={() => editPair.setEditorVisible(!editPair.editing)}
     />
   </SafeAreaView>
   );
 }
-export default Editor;
+export default MiniEditor;

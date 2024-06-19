@@ -85,7 +85,7 @@ return(
 );
 }
 type editPair = {
-  editing: boolean;
+  editing: number;
   setEditorVisible: Function;
 }
 export default function LList({songs, editPair, setSelectedTune}: {songs: Array<tune>, editPair: editPair, setSelectedTune: Function}){
@@ -102,7 +102,8 @@ export default function LList({songs, editPair, setSelectedTune}: {songs: Array<
       renderItem={({item, index, separators}) => (
         <TouchableHighlight
           key={item.title}
-          onPress={() => {editPair.setEditorVisible(!editPair.editing); setSelectedTune(item)}}
+          onPress={() => {editPair.setEditorVisible(1); setSelectedTune(item)}}
+          onLongPress={() => {editPair.setEditorVisible(2); setSelectedTune(item)}}
           onShowUnderlay={separators.highlight}
           style={styles.bordered}
           onHideUnderlay={separators.unhighlight}>
