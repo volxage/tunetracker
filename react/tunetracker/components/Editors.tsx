@@ -43,7 +43,12 @@ type tune = {
   "lyrics_confidence"?: number
   "played_at"?: string[]
 }
-function Editor({prettyAttrs, editPair, selectedTune}: {prettyAttrs: Array<[string, string]>, editPair: editPair, selectedTune: tune}): React.JSX.Element {
+function Editor({prettyAttrs, editPair, selectedTune, setSelectedTune}:
+{prettyAttrs: Array<[string, string]>, editPair: editPair, selectedTune: tune, setSelectedTune: Function}): React.JSX.Element {
+  function handleSetSelectedTune(attr_key: keyof tune, value: undefined){
+    selectedTune[attr_key] = value
+    setSelectedTune(selectedTune)
+  }
   return (
     <SafeAreaView>
       <FlatList
@@ -55,14 +60,14 @@ function Editor({prettyAttrs, editPair, selectedTune}: {prettyAttrs: Array<[stri
             onShowUnderlay={separators.highlight}
             style={styles.bordered}
             onHideUnderlay={separators.unhighlight}>
-            <TypeField attr={selectedTune[item[0] as keyof tune]} attrKey={item[0] as keyof tune} attrName={item[1]} />
+            <TypeField attr={selectedTune[item[0] as keyof tune]} attrKey={item[0] as keyof tune} attrName={item[1]} handleSetSelectedTune={handleSetSelectedTune}/>
           </TouchableHighlight>
 
       )}
       ListFooterComponent={
         <Button
           title="Save"
-          onPress={() => editPair.setEditorVisible(!editPair.editing)}
+          onPress={() => {console.log(selectedTune); editPair.setEditorVisible(!editPair.editing)}}
         />
       }
     />

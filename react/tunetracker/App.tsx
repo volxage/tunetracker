@@ -89,11 +89,11 @@ function MainMenu({editing, setEditorVisible}: {editing: number, setEditorVisibl
     let entriesArr = Array.from(miniEditorPrettyAttrs.entries());
     let arr = ((entriesArr as Array<Array<unknown>>) as Array<[string, string]>)
     return(
-      <Editor editPair={editPair} prettyAttrs={arr} selectedTune={selectedTune}/>
+      <Editor editPair={editPair} prettyAttrs={arr} selectedTune={selectedTune} setSelectedTune={setSelectedTune}/>
     );
   }else if(editing == 2){
     return(
-      <Editor editPair={editPair} prettyAttrs={Array.from(prettyAttrs.entries())} selectedTune={selectedTune}/>
+      <Editor editPair={editPair} prettyAttrs={Array.from(prettyAttrs.entries())} selectedTune={selectedTune} setSelectedTune={setSelectedTune}/>
     );
   }else{
     return (

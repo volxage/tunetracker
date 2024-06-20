@@ -48,7 +48,7 @@ const tuneDefaults = {
   "played_at": []
 }
 
-function TypeField({attr, attrKey, attrName}: {attr: unknown, attrKey: keyof tune, attrName: string}){
+function TypeField({attr, attrKey, attrName, handleSetSelectedTune}: {attr: unknown, attrKey: keyof tune, attrName: string, handleSetSelectedTune: Function}){
   if(attr == null){
     attr = tuneDefaults[attrKey]
   }
@@ -56,7 +56,9 @@ function TypeField({attr, attrKey, attrName}: {attr: unknown, attrKey: keyof tun
     return(
       <View style={{backgroundColor: 'black', padding: 8}}>
         <Text>{attrName}</Text>
-        <TextInput placeholder={attr} />
+        <TextInput placeholder={attr}
+          onChangeText={(text) => handleSetSelectedTune(attrKey, text)}
+        />
       </View>
     );
   }else if (typeof attr == "number"){
@@ -67,13 +69,22 @@ function TypeField({attr, attrKey, attrName}: {attr: unknown, attrKey: keyof tun
           min={0}
           max={100}
           values={[attr as number]}
-          onValuesChangeFinish={(values) => attr = values[0]}
+          onValuesChangeFinish={(values) => handleSetSelectedTune(attrKey, values[0])}
         />
       </View>
     );
   }else if (Array.isArray(attr)){
     const [arrAttr, setarrAttr] = useState(attr)
     //    console.log(arrAttr)
+
+    function handleReplace(value: string, index: number){
+      const newArrAttr = arrAttr.map((c, i) => {
+        return i === index ? value : c;
+      });
+      setarrAttr(newArrAttr)
+      handleSetSelectedTune(attrKey, arrAttr)
+    }
+
     return(
       <View style={{backgroundColor: 'black', padding: 8}}>
         <Text>{attrName}</Text>
@@ -82,7 +93,7 @@ function TypeField({attr, attrKey, attrName}: {attr: unknown, attrKey: keyof tun
           renderItem={({item, index, separators}) => (
             <View style={{flexDirection: 'row'}}>
               <View style={{flex: 4}}>
-                <TextInput placeholder={item} placeholderTextColor={"grey"}/>
+                <TextInput placeholder={item} placeholderTextColor={"grey"} onChangeText={(text) => handleReplace(text, index)}/>
               </View>
               <View style={{flex:1, alignContent: 'flex-end'}}>
                 <DeleteButton title={"Delete"} onPress={() => setarrAttr((arrAttr as string[]).filter((a) => {return a !== item})) } />
@@ -95,4 +106,5 @@ function TypeField({attr, attrKey, attrName}: {attr: unknown, attrKey: keyof tun
     )
   }
 }
+
 export default TypeField;
