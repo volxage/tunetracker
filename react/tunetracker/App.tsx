@@ -16,8 +16,7 @@ import {
 } from './Style.tsx'
 
 import LList from './components/Llist.tsx'
-import Editor from './components/Editors.tsx'
-import MiniEditor from './components/MiniEditor.tsx'
+import Editor from './components/Editor.tsx'
 import {
   SafeAreaView,
   View,

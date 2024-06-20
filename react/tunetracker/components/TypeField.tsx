@@ -56,7 +56,7 @@ function TypeField({attr, attrKey, attrName, handleSetSelectedTune}: {attr: unkn
     return(
       <View style={{backgroundColor: 'black', padding: 8}}>
         <Text>{attrName}</Text>
-        <TextInput placeholder={attr}
+        <TextInput defaultValue={attr} placeholderTextColor={"grey"}
           onChangeText={(text) => handleSetSelectedTune(attrKey, text)}
         />
       </View>
@@ -93,7 +93,7 @@ function TypeField({attr, attrKey, attrName, handleSetSelectedTune}: {attr: unkn
           renderItem={({item, index, separators}) => (
             <View style={{flexDirection: 'row'}}>
               <View style={{flex: 4}}>
-                <TextInput placeholder={item} placeholderTextColor={"grey"} onChangeText={(text) => handleReplace(text, index)}/>
+                <TextInput placeholder={"Type new value here"} placeholderTextColor={"grey"} defaultValue={item} onChangeText={(text) => handleReplace(text, index)}/>
               </View>
               <View style={{flex:1, alignContent: 'flex-end'}}>
                 <DeleteButton title={"Delete"} onPress={() => setarrAttr((arrAttr as string[]).filter((a) => {return a !== item})) } />
