@@ -40,11 +40,9 @@ type tune = {
   "lyrics_confidence"?: number
   "played_at"?: string[]
 }
-function Editor({prettyAttrs, editPair, selectedTune, setSelectedTune}:
-{prettyAttrs: Array<[string, string]>, editPair: editPair, selectedTune: tune, setSelectedTune: Function}): React.JSX.Element {
-  const [currentTune, setCurrentTune] = useState(selectedTune) //Intentional copy to allow cancelling of edits
-  console.log("From Editor:")
-  console.log(currentTune)
+function Editor({prettyAttrs, editPair, selectedTune, replaceSelectedTune}:
+{prettyAttrs: Array<[string, string]>, editPair: editPair, selectedTune: tune, replaceSelectedTune: Function}): React.JSX.Element {
+  const [currentTune, setCurrentTune] = useState(JSON.parse(JSON.stringify(selectedTune)) as tune) //Intentional copy to allow cancelling of edits
   function handleSetCurrentTune(attr_key: keyof tune, value: undefined){
     currentTune[attr_key] = value
     setCurrentTune(currentTune)
@@ -68,7 +66,7 @@ function Editor({prettyAttrs, editPair, selectedTune, setSelectedTune}:
         <View style={{flexDirection: "row"}}>
           <Button
             title="Save"
-            onPress={() => {setSelectedTune(currentTune); editPair.setEditorVisible(!editPair.editing); console.log("Save Button updated selected tune")}}
+            onPress={() => {replaceSelectedTune(selectedTune, currentTune); editPair.setEditorVisible(!editPair.editing);}}
           />
           <Button
             title="Cancel Changes"

@@ -68,19 +68,22 @@ const prettyAttrs = new Map<string, string>([
 ])
 
 function App(): React.JSX.Element {
-  const [selectedTune, setSelectedTune] = useState(songs[0])
-  console.log("App init selected tune set to:")
-  console.log(selectedTune)
   return(
-    <MainMenu selectedTune={selectedTune} setSelectedTune={setSelectedTune}></MainMenu>
+    <MainMenu></MainMenu>
   );
 }
 
-function MainMenu({selectedTune, setSelectedTune}:
-                  {selectedTune: tune, setSelectedTune: Function}): React.JSX.Element {
+function MainMenu(): React.JSX.Element {
   //const isDarkMode = useColorScheme() === 'dark';
+  const [selectedTune, setSelectedTune] = useState(songs[0])
   const [editing, setEditorVisible] = useState(0);
   const isDarkMode = true;
+  function replaceSelectedTune(selectedTune:tune, newTune:tune){
+    const i = songs.indexOf(selectedTune)
+    console.log(songs[i])
+    songs[i] = newTune
+    console.log(songs[i])
+  }
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -92,12 +95,12 @@ function MainMenu({selectedTune, setSelectedTune}:
     let entriesArr = Array.from(miniEditorPrettyAttrs.entries());
     let arr = ((entriesArr as Array<Array<unknown>>) as Array<[string, string]>)
     return(
-      <Editor editPair={editPair} prettyAttrs={arr} selectedTune={selectedTune} setSelectedTune={setSelectedTune}/>
+      <Editor editPair={editPair} prettyAttrs={arr} selectedTune={selectedTune} replaceSelectedTune={replaceSelectedTune}/>
     );
   }else if(editing === 2){
     console.log("Edit2" + selectedTune)
     return(
-      <Editor editPair={editPair} prettyAttrs={Array.from(prettyAttrs.entries())} selectedTune={selectedTune} setSelectedTune={setSelectedTune}/>
+      <Editor editPair={editPair} prettyAttrs={Array.from(prettyAttrs.entries())} selectedTune={selectedTune} replaceSelectedTune={replaceSelectedTune}/>
     );
   }else{
     return (
