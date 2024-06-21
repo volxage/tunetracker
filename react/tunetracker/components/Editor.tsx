@@ -1,15 +1,12 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
+ * Tunetracker
+ * https://github.com/volxage/tunetracker
  *
  * @format
  */
 
 import React, {isValidElement, useState} from 'react';
-import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import {
-  Text,
-  TextInput,
   styles
 } from '../Style.tsx'
 import {
@@ -45,9 +42,12 @@ type tune = {
 }
 function Editor({prettyAttrs, editPair, selectedTune, setSelectedTune}:
 {prettyAttrs: Array<[string, string]>, editPair: editPair, selectedTune: tune, setSelectedTune: Function}): React.JSX.Element {
-  function handleSetSelectedTune(attr_key: keyof tune, value: undefined){
-    selectedTune[attr_key] = value
-    setSelectedTune(selectedTune)
+  const [currentTune, setCurrentTune] = useState(selectedTune) //Intentional copy to allow cancelling of edits
+  console.log("From Editor:")
+  console.log(currentTune)
+  function handleSetCurrentTune(attr_key: keyof tune, value: undefined){
+    currentTune[attr_key] = value
+    setCurrentTune(currentTune)
   }
   return (
     <SafeAreaView>
@@ -60,15 +60,21 @@ function Editor({prettyAttrs, editPair, selectedTune, setSelectedTune}:
             onShowUnderlay={separators.highlight}
             style={styles.bordered}
             onHideUnderlay={separators.unhighlight}>
-            <TypeField attr={selectedTune[item[0] as keyof tune]} attrKey={item[0] as keyof tune} attrName={item[1]} handleSetSelectedTune={handleSetSelectedTune}/>
+            <TypeField attr={currentTune[item[0] as keyof tune]} attrKey={item[0] as keyof tune} attrName={item[1]} handleSetCurrentTune={handleSetCurrentTune}/>
           </TouchableHighlight>
 
       )}
       ListFooterComponent={
-        <Button
-          title="Save"
-          onPress={() => {console.log(selectedTune); editPair.setEditorVisible(!editPair.editing)}}
-        />
+        <View style={{flexDirection: "row"}}>
+          <Button
+            title="Save"
+            onPress={() => {setSelectedTune(currentTune); editPair.setEditorVisible(!editPair.editing); console.log("Save Button updated selected tune")}}
+          />
+          <Button
+            title="Cancel Changes"
+            onPress={() => {editPair.setEditorVisible(!editPair.editing)}}
+          />
+        </View>
       }
     />
   </SafeAreaView>

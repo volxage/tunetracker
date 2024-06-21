@@ -97,13 +97,13 @@ export default function LList({songs, editPair, setSelectedTune}: {songs: Array<
       data={songs}
       extraData={selectedAttr}
       ListHeaderComponent={
-      <LListHeader listReversed={listReversed} toggleListReversed={toggleListReversed as Function} updateSelectedAttr={updateSelectedAttr} />
+        <LListHeader listReversed={listReversed} toggleListReversed={toggleListReversed as Function} updateSelectedAttr={updateSelectedAttr} />
       }
       renderItem={({item, index, separators}) => (
         <TouchableHighlight
           key={item.title}
-          onPress={() => {editPair.setEditorVisible(1); setSelectedTune(item)}}
-          onLongPress={() => {editPair.setEditorVisible(2); setSelectedTune(item)}}
+          onPress={() => {setSelectedTune(item); editPair.setEditorVisible(1);}}
+          onLongPress={() => {setSelectedTune(item); editPair.setEditorVisible(2);}}
           onShowUnderlay={separators.highlight}
           style={styles.bordered}
           onHideUnderlay={separators.unhighlight}>

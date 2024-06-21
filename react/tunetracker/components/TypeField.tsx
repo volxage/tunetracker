@@ -48,7 +48,7 @@ const tuneDefaults = {
   "played_at": []
 }
 
-function TypeField({attr, attrKey, attrName, handleSetSelectedTune}: {attr: unknown, attrKey: keyof tune, attrName: string, handleSetSelectedTune: Function}){
+function TypeField({attr, attrKey, attrName, handleSetCurrentTune}: {attr: unknown, attrKey: keyof tune, attrName: string, handleSetCurrentTune: Function}){
   if(attr == null){
     attr = tuneDefaults[attrKey]
   }
@@ -57,7 +57,7 @@ function TypeField({attr, attrKey, attrName, handleSetSelectedTune}: {attr: unkn
       <View style={{backgroundColor: 'black', padding: 8}}>
         <Text>{attrName}</Text>
         <TextInput defaultValue={attr} placeholderTextColor={"grey"}
-          onChangeText={(text) => handleSetSelectedTune(attrKey, text)}
+          onChangeText={(text) => handleSetCurrentTune(attrKey, text)}
         />
       </View>
     );
@@ -69,7 +69,7 @@ function TypeField({attr, attrKey, attrName, handleSetSelectedTune}: {attr: unkn
           min={0}
           max={100}
           values={[attr as number]}
-          onValuesChangeFinish={(values) => handleSetSelectedTune(attrKey, values[0])}
+          onValuesChangeFinish={(values) => handleSetCurrentTune(attrKey, values[0])}
         />
       </View>
     );
@@ -82,7 +82,7 @@ function TypeField({attr, attrKey, attrName, handleSetSelectedTune}: {attr: unkn
         return i === index ? value : c;
       });
       setarrAttr(newArrAttr)
-      handleSetSelectedTune(attrKey, arrAttr)
+      handleSetCurrentTune(attrKey, arrAttr)
     }
 
     return(
