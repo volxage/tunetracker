@@ -64,14 +64,18 @@ function Editor({prettyAttrs, editPair, selectedTune, replaceSelectedTune}:
       )}
       ListFooterComponent={
         <View style={{flexDirection: "row"}}>
-          <Button
-            title="Save"
-            onPress={() => {replaceSelectedTune(selectedTune, currentTune); editPair.setEditorVisible(!editPair.editing);}}
-          />
-          <Button
-            title="Cancel Changes"
-            onPress={() => {editPair.setEditorVisible(!editPair.editing)}}
-          />
+          <View style={{flex: 1}}>
+            <Button
+              title="Save"
+              onPress={() => {replaceSelectedTune(selectedTune, currentTune); editPair.setEditorVisible(!editPair.editing);}}
+              />
+          </View>
+          <View style={{flex: 1}}>
+            <Button
+              title="Cancel Changes"
+              onPress={() => {editPair.setEditorVisible(!editPair.editing)}}
+            />
+          </View>
         </View>
       }
     />
