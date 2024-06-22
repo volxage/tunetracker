@@ -57,6 +57,12 @@ const prettyAttrs = new Map<string, string>([
   ["played_at", "Played At"],
 ]);
 
+function prettyPrint(object: unknown): string{
+  if (typeof object == "string") return object as string;
+  if (typeof object == "number") return JSON.stringify(object);
+  if (Array.isArray(object)) return object.join(", ");
+  return "yuh"
+}
 
 function LListHeader({listReversed, toggleListReversed, updateSelectedAttr}:
                      {listReversed: boolean | undefined, toggleListReversed: Function, updateSelectedAttr: Function}){
@@ -109,7 +115,7 @@ export default function LList({songs, editPair, setSelectedTune}: {songs: Array<
           onHideUnderlay={separators.unhighlight}>
           <View style={{backgroundColor: 'black', padding: 8}}>
             <Text>{item.title}</Text>
-            <SubText>{selectedAttr != "title" ? JSON.stringify(item[selectedAttr as keyof tune]) : item["composers"]}</SubText>
+            <SubText>{selectedAttr != "title" ? prettyPrint(item[selectedAttr as keyof tune]) : prettyPrint(item["composers"])}</SubText>
           </View>
         </TouchableHighlight>
     )}

@@ -2,6 +2,8 @@ import {
   Text,
   TextInput,
   DeleteButton,
+  ButtonText,
+  Button,
   styles
 } from '../Style.tsx'
 import React, {isValidElement, useState} from 'react';
@@ -11,7 +13,6 @@ import {
   FlatList,
   View,
   TouchableHighlight,
-  Button,
 } from 'react-native';
 type tune = {
   "title"?: string
@@ -87,21 +88,31 @@ function TypeField({attr, attrKey, attrName, handleSetCurrentTune}: {attr: unkno
 
     return(
       <View style={{backgroundColor: 'black', padding: 8}}>
-        <Text>{attrName}</Text>
+        <View style={{flexDirection: 'row'}}>
+          <View style={{flex: 3}}>
+            <Text>{attrName}</Text>
+          </View>
+          <View style={{alignContent: 'flex-end', flex: 1}}>
+            <Button onPress={() => setarrAttr((arrAttr as string[]).concat(["New item"]))}>
+              <ButtonText>New</ButtonText>
+            </Button>
+          </View>
+        </View>
         <FlatList
           data={arrAttr}
           renderItem={({item, index, separators}) => (
             <View style={{flexDirection: 'row'}}>
-              <View style={{flex: 4}}>
+              <View style={{flex: 3}}>
                 <TextInput placeholder={"Type new value here"} placeholderTextColor={"grey"} defaultValue={item} onChangeText={(text) => handleReplace(text, index)}/>
               </View>
               <View style={{flex:1, alignContent: 'flex-end'}}>
-                <DeleteButton title={"Delete"} onPress={() => setarrAttr((arrAttr as string[]).filter((a) => {return a !== item})) } />
+                <DeleteButton onPress={() => setarrAttr((arrAttr as string[]).filter((a) => {return a !== item})) } >
+                  <ButtonText>Delete</ButtonText>
+                </DeleteButton>
               </View>
             </View>
           )}
         />
-        <Button title={"Add new item"} onPress={() => setarrAttr((arrAttr as string[]).concat(["New item"]))}/>
       </View>
     )
   }

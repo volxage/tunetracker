@@ -89,7 +89,6 @@ function MainMenu(): React.JSX.Element {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
   let editPair = {editing:editing, setEditorVisible:setEditorVisible}
-  
   if(editing === 1){
     console.log("Edit1" + selectedTune)
     let entriesArr = Array.from(miniEditorPrettyAttrs.entries());

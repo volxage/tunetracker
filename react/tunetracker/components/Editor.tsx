@@ -7,14 +7,18 @@
 
 import React, {isValidElement, useState} from 'react';
 import {
-  styles
+  styles,
+  Button,
+  DeleteButton,
+  ButtonText,
+  Text,
+  SubText,
 } from '../Style.tsx'
 import {
   SafeAreaView,
   FlatList,
   View,
   TouchableHighlight,
-  Button,
 } from 'react-native';
 
 type editPair = {
@@ -48,7 +52,7 @@ function Editor({prettyAttrs, editPair, selectedTune, replaceSelectedTune}:
     setCurrentTune(currentTune)
   }
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{flex: 1}}>
       <FlatList
         data={prettyAttrs}
         renderItem={({item, index, separators}) => (
@@ -63,18 +67,16 @@ function Editor({prettyAttrs, editPair, selectedTune, replaceSelectedTune}:
 
       )}
       ListFooterComponent={
-        <View style={{flexDirection: "row"}}>
+        <View style={{flexDirection: "row", backgroundColor: "black"}}>
           <View style={{flex: 1}}>
             <Button
-              title="Save"
               onPress={() => {replaceSelectedTune(selectedTune, currentTune); editPair.setEditorVisible(!editPair.editing);}}
-              />
+            ><ButtonText>Save</ButtonText></Button>
           </View>
           <View style={{flex: 1}}>
-            <Button
-              title="Cancel Changes"
+            <DeleteButton
               onPress={() => {editPair.setEditorVisible(!editPair.editing)}}
-            />
+            ><ButtonText>Cancel Changes</ButtonText></DeleteButton>
           </View>
         </View>
       }

@@ -23,6 +23,28 @@ const styles = StyleSheet.create({ //TODO: replaced with styled components and d
     borderWidth: 1,
   }
 });
+
+const Button = styled.Pressable`
+  align-items: 'center';
+  justify-content: 'center';
+  padding-vertical: 12px;
+  padding-horizontal: 36px;
+  border-radius: 4px;
+  elevation: 3;
+  background-color: cadetblue;
+  margin: 8px;
+`
+const DeleteButton = styled.Pressable`
+  align-items: 'center';
+  justify-content: 'center';
+  padding-vertical: 12px;
+  padding-horizontal: 36px;
+  border-radius: 4px;
+  elevation: 3;
+  font-size: 20px;
+  background-color: darkred;
+  margin: 8px;
+`
 const Text = styled.Text`
   font-size: 24px;
   color: white;
@@ -33,16 +55,17 @@ const SubText = styled.Text`
   color: white;
   font-weight: 250;
 `;
+const ButtonText = styled.Text`
+  font-size: 20px;
+  color: white;
+  line-height: 21px;
+  font-weight: 500;
+  text-align: center;
+`
 const TextInput = styled.TextInput`
   border-width: 1px;
   font-size: 20px;
   font-weight: 250;
   color: white;
 `;
-const DeleteButton = styled.Button`
-  font-size: 20px;
-  backgroundColor: red;
-  color: white;
-  font-weight: 250;
-`
-export {Text, SubText, TextInput, styles, DeleteButton};
+export {Text, SubText, TextInput, styles, DeleteButton, Button, ButtonText};
