@@ -61,7 +61,7 @@ function prettyPrint(object: unknown): string{
   if (typeof object == "string") return object as string;
   if (typeof object == "number") return JSON.stringify(object);
   if (Array.isArray(object)) return object.join(", ");
-  return "yuh"
+  return "(Empty)"
 }
 
 function LListHeader({listReversed, toggleListReversed, updateSelectedAttr}:
