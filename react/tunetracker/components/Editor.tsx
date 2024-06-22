@@ -54,7 +54,7 @@ function Editor({prettyAttrs, editPair, selectedTune, replaceSelectedTune}:
     setCurrentTune(cpy)
   }
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: "black"}}>
       <FlatList
         data={prettyAttrs}
         renderItem={({item, index, separators}) => (

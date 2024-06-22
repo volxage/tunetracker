@@ -45,6 +45,7 @@ type tune = {
   "played_at"?: string[]
 }
 const miniEditorPrettyAttrs = new Map<string, string>([
+  ["title", "Title"],
   ["form_confidence", "Form Confidence"],
   ["melody_confidence", "Melody Confidence"],
   ["solo_confidence", "Solo Confidence"],
