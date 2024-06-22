@@ -48,8 +48,10 @@ function Editor({prettyAttrs, editPair, selectedTune, replaceSelectedTune}:
 {prettyAttrs: Array<[string, string]>, editPair: editPair, selectedTune: tune, replaceSelectedTune: Function}): React.JSX.Element {
   const [currentTune, setCurrentTune] = useState(JSON.parse(JSON.stringify(selectedTune)) as tune) //Intentional copy to allow cancelling of edits
   function handleSetCurrentTune(attr_key: keyof tune, value: undefined){
-    currentTune[attr_key] = value
-    setCurrentTune(currentTune)
+    //Inefficient solution, but there are no Map functions such as "filter" in mapped types
+    const cpy = JSON.parse(JSON.stringify(selectedTune)) as tune
+    cpy[attr_key] = value
+    setCurrentTune(cpy)
   }
   return (
     <SafeAreaView style={{flex: 1}}>
