@@ -59,7 +59,7 @@ const DeleteButton = styled.Pressable`
 const Title = styled.Text`
   font-size: 30px;
   color: white;
-  font-weight: 200;
+  font-weight: 400;
 `
 const Text = styled.Text`
   font-size: 24px;
@@ -79,8 +79,8 @@ const ButtonText = styled.Text`
 `
 const TextInput = styled.TextInput`
   border-width: 1px;
-  font-size: 20px;
-  font-weight: 250;
+  font-size: 18px;
+  font-weight: 200;
   color: white;
 `;
 const RNPickerSelect = styled(OriginalRNPickerSelect)`
