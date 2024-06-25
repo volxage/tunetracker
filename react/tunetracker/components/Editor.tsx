@@ -13,6 +13,7 @@ import {
   ButtonText,
   Text,
   SubText,
+  
 } from '../Style.tsx'
 import {
   SafeAreaView,
@@ -78,7 +79,7 @@ function Editor({prettyAttrs, editPair, selectedTune, replaceSelectedTune}:
           <View style={{flex: 1}}>
             <DeleteButton
               onPress={() => {editPair.setEditorVisible(!editPair.editing)}}
-            ><ButtonText>Cancel Changes</ButtonText></DeleteButton>
+            ><ButtonText>Cancel</ButtonText></DeleteButton>
           </View>
         </View>
       }

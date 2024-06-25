@@ -6,7 +6,6 @@
  */
 
 import React, {isValidElement, useState} from 'react';
-import RNPickerSelect from 'react-native-picker-select';
 import {
   FlatList,
   Switch,
@@ -18,7 +17,8 @@ import {
   Text,
   SubText,
   TextInput,
-  styles
+  styles,
+  RNPickerSelect,
 } from '../Style.tsx'
 import tuneSort from '../tuneSort.tsx'
 
@@ -78,6 +78,7 @@ return(
   <RNPickerSelect
   onValueChange={(value) => updateSelectedAttr(value)}
   items={selectedAttrItems as Array<any>} // THIS IS SO STUPID
+  useNativeAndroidPickerStyle={false}
   />
   </View>
   <View style={{alignItems: "flex-end"}}>

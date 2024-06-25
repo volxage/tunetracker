@@ -4,8 +4,10 @@ import {
   DeleteButton,
   ButtonText,
   Button,
-  styles
+  styles,
+  Title,
 } from '../Style.tsx'
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import React, {isValidElement, useState} from 'react';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import {
@@ -56,7 +58,7 @@ function TypeField({attr, attrKey, attrName, handleSetCurrentTune}: {attr: unkno
   if (typeof attr == "string"){
     return(
       <View style={{backgroundColor: 'black', padding: 8}}>
-        <Text>{attrName}</Text>
+        <Title>{attrName.toUpperCase()}</Title>
         <TextInput defaultValue={attr} placeholderTextColor={"grey"}
           onChangeText={(text) => handleSetCurrentTune(attrKey, text)}
         />
@@ -65,7 +67,7 @@ function TypeField({attr, attrKey, attrName, handleSetCurrentTune}: {attr: unkno
   }else if (typeof attr == "number"){
     return(
       <View style={{backgroundColor: 'black', padding: 8}}>
-        <Text>{attrName}</Text>
+        <Title>{attrName.toUpperCase()}</Title>
         <MultiSlider
           min={0}
           max={100}
@@ -90,11 +92,11 @@ function TypeField({attr, attrKey, attrName, handleSetCurrentTune}: {attr: unkno
       <View style={{backgroundColor: 'black', padding: 8}}>
         <View style={{flexDirection: 'row'}}>
           <View style={{flex: 3}}>
-            <Text>{attrName}</Text>
+            <Title>{attrName.toUpperCase()}</Title>
           </View>
           <View style={{alignContent: 'flex-end', flex: 1}}>
             <Button onPress={() => setarrAttr((arrAttr as string[]).concat(["New item"]))}>
-              <ButtonText>New</ButtonText>
+              <ButtonText><Icon name="plus" size={30}/></ButtonText>
             </Button>
           </View>
         </View>
@@ -107,7 +109,7 @@ function TypeField({attr, attrKey, attrName, handleSetCurrentTune}: {attr: unkno
               </View>
               <View style={{flex:1, alignContent: 'flex-end'}}>
                 <DeleteButton onPress={() => setarrAttr((arrAttr as string[]).filter((a) => {return a !== item})) } >
-                  <ButtonText>Delete</ButtonText>
+                  <ButtonText><Icon name="close" size={30}/></ButtonText>
                 </DeleteButton>
               </View>
             </View>
