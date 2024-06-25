@@ -69,7 +69,7 @@ const Text = styled.Text`
 const SubText = styled.Text`
   font-size: 20px;
   color: white;
-  font-weight: 250;
+  font-weight: 200;
 `;
 const ButtonText = styled.Text`
   font-size: 20px;
@@ -83,7 +83,4 @@ const TextInput = styled.TextInput`
   font-weight: 200;
   color: white;
 `;
-const RNPickerSelect = styled(OriginalRNPickerSelect)`
-  color: white;
-`;
-export {Text, Title, SubText, TextInput, styles, DeleteButton, Button, ButtonText, RNPickerSelect};
+export {Text, Title, SubText, TextInput, styles, DeleteButton, Button, ButtonText};

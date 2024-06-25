@@ -18,9 +18,9 @@ import {
   SubText,
   TextInput,
   styles,
-  RNPickerSelect,
 } from '../Style.tsx'
 import tuneSort from '../tuneSort.tsx'
+import RNPickerSelect from 'react-native-picker-select';
 
 type tune = {
   "title"?: string
@@ -64,8 +64,8 @@ function prettyPrint(object: unknown): string{
   return "(Empty)"
 }
 
-function LListHeader({listReversed, toggleListReversed, updateSelectedAttr}:
-                     {listReversed: boolean | undefined, toggleListReversed: Function, updateSelectedAttr: Function}){
+function LListHeader({listReversed, setListReversed, updateSelectedAttr}:
+                     {listReversed: boolean | undefined, setListReversed: Function, updateSelectedAttr: Function}){
   const selectedAttrItems = Array.from(prettyAttrs.entries()).map((x) => {return {label: x[1], value: x[0]}});
 return(
   <View>
@@ -74,18 +74,19 @@ return(
   placeholderTextColor={"white"}
   />
   <View style={{flexDirection: 'row', alignItems: 'center'}}>
-  <View style={{flex: 1}}>
+  <View style={{flex: 2}}>
   <RNPickerSelect
   onValueChange={(value) => updateSelectedAttr(value)}
   items={selectedAttrItems as Array<any>} // THIS IS SO STUPID
   useNativeAndroidPickerStyle={false}
+  style={{inputAndroid: {backgroundColor: 'transparent', color: 'white', fontSize: 18, fontWeight: "300"}}}
   />
   </View>
   <View style={{alignItems: "flex-end"}}>
   <SubText>{"Reverse sort:"}</SubText>
   </View>
   <View style={{flex: 1, alignItems: "center"}}>
-  <Switch value={listReversed} onValueChange={() => toggleListReversed()}/>
+  <Switch value={listReversed} onValueChange={() => setListReversed(!listReversed)}/>
   </View>
   </View>
   </View>
@@ -96,7 +97,7 @@ type editPair = {
   setEditorVisible: Function;
 }
 export default function LList({songs, editPair, setSelectedTune}: {songs: Array<tune>, editPair: editPair, setSelectedTune: Function}){
-  const [listReversed, toggleListReversed] = useState(false);
+  const [listReversed, setListReversed] = useState(false);
   const [selectedAttr, updateSelectedAttr] = useState("title");
   tuneSort(songs, selectedAttr, listReversed);
   return (
@@ -104,7 +105,7 @@ export default function LList({songs, editPair, setSelectedTune}: {songs: Array<
       data={songs}
       extraData={selectedAttr}
       ListHeaderComponent={
-        <LListHeader listReversed={listReversed} toggleListReversed={toggleListReversed as Function} updateSelectedAttr={updateSelectedAttr} />
+        <LListHeader listReversed={listReversed} setListReversed={setListReversed} updateSelectedAttr={updateSelectedAttr} />
       }
       renderItem={({item, index, separators}) => (
         <TouchableHighlight
