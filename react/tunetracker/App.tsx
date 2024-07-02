@@ -5,8 +5,7 @@
  * @format
  */
 
-import React, {isValidElement, useState} from 'react';
-import songsJson from './songs.json';
+import React, {isValidElement, useEffect, useState} from 'react';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import {
   Text,
@@ -25,8 +24,9 @@ import {
 import {
   Colors,
 } from 'react-native/Libraries/NewAppScreen';
-const songs: Array<tune> = songsJson
-
+import defaultSongsJson from './songs.json';
+import RNFS from 'react-native-fs'
+const songsFilePath = RNFS.DocumentDirectoryPath + "/songs.json"
 type tune = {
   "title"?: string
   "alternative_title"?: string
@@ -68,22 +68,59 @@ const prettyAttrs = new Map<string, string>([
   ["lyrics_confidence", "Lyrics Confidence"],
 ])
 
+function writeToSongsJson(tuneList=defaultSongsJson as tune[], setSongs: Function){
+  // TODO: Try await for better readability
+  const stringified = JSON.stringify(tuneList);
+  console.log(songsFilePath)
+  RNFS.writeFile(songsFilePath, stringified)
+    .then(() => setSongs(tuneList))
+    .then(() => console.log(tuneList))
+}
+
 function App(): React.JSX.Element {
+  //TODO: Fix infinite render loop
+  // TRY PUTTING SONGS STATE IN THE MAIN MENU, KEEP EFFECT IN APP FN
+  //
+  // Why is RNFS not saving the file properly? Or why is the android emulator not persisting the data?
+  const [songs, setSongs] = useState(defaultSongsJson)
+  useEffect(() => {
+    RNFS.readFile(songsFilePath)
+      .then((results) => {
+        setSongs(JSON.parse(results))
+        console.log(JSON.parse(results))
+      })
+      .catch((reason) => {
+        console.log("ERROR CAUGHT BELOW:")
+        console.log(reason)
+        console.log("Assuming file doesn't exist, creating one:")
+        RNFS.writeFile(songsFilePath, JSON.stringify(defaultSongsJson))
+      })
+  }, []);
+  console.log("Rerendered main")
+
+
   return(
-    <MainMenu></MainMenu>
+    <MainMenu songs={songs} setSongs={setSongs}/>
   );
 }
 
-function MainMenu(): React.JSX.Element {
+function MainMenu({songs, setSongs}:
+  {songs: Array<tune>, setSongs: Function}): React.JSX.Element {
+
   //const isDarkMode = useColorScheme() === 'dark';
   const [selectedTune, setSelectedTune] = useState(songs[0])
   const [editing, setEditorVisible] = useState(0);
   const isDarkMode = true;
-  function replaceSelectedTune(selectedTune:tune, newTune:tune){
-    const i = songs.indexOf(selectedTune)
-    console.log(songs[i])
-    songs[i] = newTune
-    console.log(songs[i])
+  function replaceSelectedTune(oldTune:tune, newTune:tune){
+    function ifSelectedTuneReplace(value: tune, index: number, array: tune[]){
+      if(value === oldTune){
+        return newTune;
+      }
+      else{
+        return value;
+      }
+    }
+    writeToSongsJson(songs.map(ifSelectedTuneReplace), setSongs)
   }
 
   const backgroundStyle = {
