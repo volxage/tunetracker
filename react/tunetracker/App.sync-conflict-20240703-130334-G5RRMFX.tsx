@@ -14,9 +14,8 @@ import {
   styles
 } from './Style.tsx'
 
-import LList from './components/Llist.tsx';
-import Editor from './components/Editor.tsx';
-import Importer from './components/Importer.tsx';
+import LList from './components/Llist.tsx'
+import Editor from './components/Editor.tsx'
 import {
   SafeAreaView,
   View,
@@ -26,10 +25,7 @@ import {
   Colors,
 } from 'react-native/Libraries/NewAppScreen';
 import defaultSongsJson from './songs.json';
-import jazzStandards from './jazzstandards.json';
-
-import RNFS from 'react-native-fs';
-
+import RNFS from 'react-native-fs'
 const songsFilePath = RNFS.DocumentDirectoryPath + "/songs.json"
 type tune = {
   "title"?: string
@@ -82,15 +78,12 @@ function writeToSongsJson(tuneList=defaultSongsJson as tune[], setSongs: Functio
 }
 
 function App(): React.JSX.Element {
-  //TODO: Fix infinite render loop
-  // TRY PUTTING SONGS STATE IN THE MAIN MENU, KEEP EFFECT IN APP FN
-  //
-  // Why is RNFS not saving the file properly? Or why is the android emulator not persisting the data?
   const [songs, setSongs] = useState(defaultSongsJson)
   useEffect(() => {
     RNFS.readFile(songsFilePath)
       .then((results) => {
         setSongs(JSON.parse(results))
+        console.log(JSON.parse(results))
       })
       .catch((reason) => {
         console.log("ERROR CAUGHT BELOW:")
@@ -112,7 +105,7 @@ function MainMenu({songs, setSongs}:
 
   //const isDarkMode = useColorScheme() === 'dark';
   const [selectedTune, setSelectedTune] = useState(songs[0])
-  const [viewing, setViewing] = useState(3);
+  const [editing, setEditorVisible] = useState(0);
   const isDarkMode = true;
   function replaceSelectedTune(oldTune:tune, newTune:tune){
     function ifSelectedTuneReplace(value: tune, index: number, array: tune[]){
@@ -129,29 +122,24 @@ function MainMenu({songs, setSongs}:
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
-  let viewingPair = {viewing:viewing, setViewing:setViewing}
-  if(viewing === 1){ //MiniEditor (Just Editor with less attrs)
+  let editPair = {editing:editing, setEditorVisible:setEditorVisible}
+  if(editing === 1){
     console.log("Edit1" + selectedTune)
     let entriesArr = Array.from(miniEditorPrettyAttrs.entries());
     let arr = ((entriesArr as Array<Array<unknown>>) as Array<[string, string]>)
     return(
-      <Editor viewingPair={viewingPair} prettyAttrs={arr} selectedTune={selectedTune} replaceSelectedTune={replaceSelectedTune}/>
+      <Editor editPair={editPair} prettyAttrs={arr} selectedTune={selectedTune} replaceSelectedTune={replaceSelectedTune}/>
     );
-  }else if(viewing === 2){ //Editor
+  }else if(editing === 2){
     console.log("Edit2" + selectedTune)
     return(
-      <Editor viewingPair={viewingPair} prettyAttrs={Array.from(prettyAttrs.entries())} selectedTune={selectedTune} replaceSelectedTune={replaceSelectedTune}/>
+      <Editor editPair={editPair} prettyAttrs={Array.from(prettyAttrs.entries())} selectedTune={selectedTune} replaceSelectedTune={replaceSelectedTune}/>
     );
-  }else if (viewing == 3){ //TuneImporter
-    return(
-      <Importer standards={jazzStandards} viewingPair={viewingPair} setSelectedTune={setSelectedTune} />
-    )
-  }
-  else{
+  }else{
     return (
       <SafeAreaView style={backgroundStyle}>
         <View>
-          <LList songs={songs} viewingPair={viewingPair} setSelectedTune={setSelectedTune}/>
+          <LList songs={songs} editPair={editPair} setSelectedTune={setSelectedTune}/>
         </View>
         </SafeAreaView>
       );

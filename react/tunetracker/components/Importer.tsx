@@ -47,6 +47,14 @@ const standardAttrs = new Map<string, string>([
   ["Lyricist(s)", "Lyricist(s)"],
 ]);
 
+export type standard = {
+  "Rank": string
+  "Title": string
+  "Year": string
+  "Composer(s)": string
+  "Lyricist(s)": string
+}
+
 function prettyPrint(object: unknown): string{
   if (typeof object == "string") return object as string;
   if (typeof object == "number") return JSON.stringify(object);
@@ -86,9 +94,9 @@ type viewingPair = {
   viewing: number;
   setViewing: Function;
 }
-export default function LList({standards, viewingPair, setSelectedTune}: {standards: Array<tune>, viewingPair: viewingPair, setSelectedTune: Function}){
+export default function Importer({standards, viewingPair, setSelectedTune}: {standards: Array<standard>, viewingPair: viewingPair, setSelectedTune: Function}){
   const [listReversed, setListReversed] = useState(false);
-  const [selectedAttr, updateSelectedAttr] = useState("title");
+  const [selectedAttr, updateSelectedAttr] = useState("Title");
   tuneSort(standards, selectedAttr, listReversed);
   //TODO: Consider ramifications of using [selectedTune, setSelectedTune] on different type
   return (
@@ -100,15 +108,15 @@ export default function LList({standards, viewingPair, setSelectedTune}: {standa
       }
       renderItem={({item, index, separators}) => (
         <TouchableHighlight
-          key={item.title}
+          key={item.Title}
           onPress={() => {setSelectedTune(item); viewingPair.setViewing(1);}}
           onLongPress={() => {setSelectedTune(item); viewingPair.setViewing(2);}}
           onShowUnderlay={separators.highlight}
           style={styles.bordered}
           onHideUnderlay={separators.unhighlight}>
           <View style={{backgroundColor: 'black', padding: 8}}>
-            <Text>{item.title}</Text>
-            <SubText>{selectedAttr != "title" ? prettyPrint(item[selectedAttr as keyof tune]) : prettyPrint(item["composers"])}</SubText>
+            <Text>{item.Title}</Text>
+            <SubText>{selectedAttr != "Title" ? prettyPrint(item[selectedAttr as keyof standard]) : prettyPrint(item["Composer(s)"])}</SubText>
           </View>
         </TouchableHighlight>
     )}

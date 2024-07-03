@@ -1,3 +1,4 @@
+import { standard } from "./components/Importer";
 type tune = {
   "title"?: string
   "alternative_title"?: string
@@ -15,7 +16,7 @@ type tune = {
   "lyrics_confidence"?: number
   "played_at"?: string[]
 }
-function tuneSort(songs: Array<tune>, selected: string, reversed: boolean){
+function tuneSort(songs: Array<tune | standard>, selected: string, reversed: boolean){
   let reverse_null_multiplier = 1;
   let reversed_multiplier = reversed ? -1 : 1;
   if (selected.endsWith("confidence") || selected == "playthroughs") reverse_null_multiplier = -1 * reversed_multiplier;
