@@ -22,9 +22,9 @@ import {
   TouchableHighlight,
 } from 'react-native';
 
-type editPair = {
-  editing: number;
-  setEditorVisible: Function;
+type viewingPair = {
+  viewing: number;
+  setViewing: Function;
 }
 import TypeField from './TypeField.tsx';
 
@@ -45,8 +45,8 @@ type tune = {
   "lyrics_confidence"?: number
   "played_at"?: string[]
 }
-function Editor({prettyAttrs, editPair, selectedTune, replaceSelectedTune}:
-{prettyAttrs: Array<[string, string]>, editPair: editPair, selectedTune: tune, replaceSelectedTune: Function}): React.JSX.Element {
+function Editor({prettyAttrs, viewingPair, selectedTune, replaceSelectedTune}:
+{prettyAttrs: Array<[string, string]>, viewingPair: viewingPair, selectedTune: tune, replaceSelectedTune: Function}): React.JSX.Element {
   const [currentTune, setCurrentTune] = useState(JSON.parse(JSON.stringify(selectedTune)) as tune) //Intentional copy to allow cancelling of edits
   function handleSetCurrentTune(attr_key: keyof tune, value: undefined){
     //Inefficient solution, but there are no Map functions such as "filter" in mapped types
@@ -73,12 +73,12 @@ function Editor({prettyAttrs, editPair, selectedTune, replaceSelectedTune}:
         <View style={{flexDirection: "row", backgroundColor: "black"}}>
           <View style={{flex: 1}}>
             <Button
-              onPress={() => {replaceSelectedTune(selectedTune, currentTune); editPair.setEditorVisible(!editPair.editing);}}
+              onPress={() => {replaceSelectedTune(selectedTune, currentTune); viewingPair.setViewing(!viewingPair.viewing);}}
             ><ButtonText>Save</ButtonText></Button>
           </View>
           <View style={{flex: 1}}>
             <DeleteButton
-              onPress={() => {editPair.setEditorVisible(!editPair.editing)}}
+              onPress={() => {viewingPair.setViewing(!viewingPair.viewing)}}
             ><ButtonText>Cancel</ButtonText></DeleteButton>
           </View>
         </View>

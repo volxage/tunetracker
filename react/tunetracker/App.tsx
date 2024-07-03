@@ -109,7 +109,7 @@ function MainMenu({songs, setSongs}:
 
   //const isDarkMode = useColorScheme() === 'dark';
   const [selectedTune, setSelectedTune] = useState(songs[0])
-  const [editing, setEditorVisible] = useState(0);
+  const [viewing, setViewing] = useState(0);
   const isDarkMode = true;
   function replaceSelectedTune(oldTune:tune, newTune:tune){
     function ifSelectedTuneReplace(value: tune, index: number, array: tune[]){
@@ -126,24 +126,24 @@ function MainMenu({songs, setSongs}:
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
-  let editPair = {editing:editing, setEditorVisible:setEditorVisible}
-  if(editing === 1){
+  let viewingPair = {viewing:viewing, setViewing:setViewing}
+  if(viewing === 1){
     console.log("Edit1" + selectedTune)
     let entriesArr = Array.from(miniEditorPrettyAttrs.entries());
     let arr = ((entriesArr as Array<Array<unknown>>) as Array<[string, string]>)
     return(
-      <Editor editPair={editPair} prettyAttrs={arr} selectedTune={selectedTune} replaceSelectedTune={replaceSelectedTune}/>
+      <Editor viewingPair={viewingPair} prettyAttrs={arr} selectedTune={selectedTune} replaceSelectedTune={replaceSelectedTune}/>
     );
-  }else if(editing === 2){
+  }else if(viewing === 2){
     console.log("Edit2" + selectedTune)
     return(
-      <Editor editPair={editPair} prettyAttrs={Array.from(prettyAttrs.entries())} selectedTune={selectedTune} replaceSelectedTune={replaceSelectedTune}/>
+      <Editor viewingPair={viewingPair} prettyAttrs={Array.from(prettyAttrs.entries())} selectedTune={selectedTune} replaceSelectedTune={replaceSelectedTune}/>
     );
   }else{
     return (
       <SafeAreaView style={backgroundStyle}>
         <View>
-          <LList songs={songs} editPair={editPair} setSelectedTune={setSelectedTune}/>
+          <LList songs={songs} viewingPair={viewingPair} setSelectedTune={setSelectedTune}/>
         </View>
         </SafeAreaView>
       );

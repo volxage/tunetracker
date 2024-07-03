@@ -92,11 +92,11 @@ return(
   </View>
 );
 }
-type editPair = {
-  editing: number;
-  setEditorVisible: Function;
+type viewingPair = {
+  viewing: number;
+  setViewing: Function;
 }
-export default function LList({songs, editPair, setSelectedTune}: {songs: Array<tune>, editPair: editPair, setSelectedTune: Function}){
+export default function LList({songs, viewingPair, setSelectedTune}: {songs: Array<tune>, viewingPair: viewingPair, setSelectedTune: Function}){
   const [listReversed, setListReversed] = useState(false);
   const [selectedAttr, updateSelectedAttr] = useState("title");
   tuneSort(songs, selectedAttr, listReversed);
@@ -110,8 +110,8 @@ export default function LList({songs, editPair, setSelectedTune}: {songs: Array<
       renderItem={({item, index, separators}) => (
         <TouchableHighlight
           key={item.title}
-          onPress={() => {setSelectedTune(item); editPair.setEditorVisible(1);}}
-          onLongPress={() => {setSelectedTune(item); editPair.setEditorVisible(2);}}
+          onPress={() => {setSelectedTune(item); viewingPair.setViewing(1);}}
+          onLongPress={() => {setSelectedTune(item); viewingPair.setViewing(2);}}
           onShowUnderlay={separators.highlight}
           style={styles.bordered}
           onHideUnderlay={separators.unhighlight}>
