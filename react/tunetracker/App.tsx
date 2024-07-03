@@ -25,7 +25,10 @@ import {
   Colors,
 } from 'react-native/Libraries/NewAppScreen';
 import defaultSongsJson from './songs.json';
-import RNFS from 'react-native-fs'
+import jazzStandards from './jazzstandards.json';
+
+import RNFS from 'react-native-fs';
+
 const songsFilePath = RNFS.DocumentDirectoryPath + "/songs.json"
 type tune = {
   "title"?: string
@@ -87,7 +90,6 @@ function App(): React.JSX.Element {
     RNFS.readFile(songsFilePath)
       .then((results) => {
         setSongs(JSON.parse(results))
-        console.log(JSON.parse(results))
       })
       .catch((reason) => {
         console.log("ERROR CAUGHT BELOW:")
@@ -127,19 +129,22 @@ function MainMenu({songs, setSongs}:
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
   let viewingPair = {viewing:viewing, setViewing:setViewing}
-  if(viewing === 1){
+  if(viewing === 1){ //MiniEditor (Just Editor with less attrs)
     console.log("Edit1" + selectedTune)
     let entriesArr = Array.from(miniEditorPrettyAttrs.entries());
     let arr = ((entriesArr as Array<Array<unknown>>) as Array<[string, string]>)
     return(
       <Editor viewingPair={viewingPair} prettyAttrs={arr} selectedTune={selectedTune} replaceSelectedTune={replaceSelectedTune}/>
     );
-  }else if(viewing === 2){
+  }else if(viewing === 2){ //Editor
     console.log("Edit2" + selectedTune)
     return(
       <Editor viewingPair={viewingPair} prettyAttrs={Array.from(prettyAttrs.entries())} selectedTune={selectedTune} replaceSelectedTune={replaceSelectedTune}/>
     );
-  }else{
+  }else if (viewing == 3){ //TuneImporter
+    
+  }
+  else{
     return (
       <SafeAreaView style={backgroundStyle}>
         <View>
