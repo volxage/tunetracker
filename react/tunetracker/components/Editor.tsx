@@ -50,7 +50,7 @@ function Editor({prettyAttrs, viewingPair, selectedTune, replaceSelectedTune, de
   const [currentTune, setCurrentTune] = useState(JSON.parse(JSON.stringify(selectedTune)) as tune) //Intentional copy to allow cancelling of edits
   function handleSetCurrentTune(attr_key: keyof tune, value: undefined){
     //Inefficient solution, but there are no Map functions such as "filter" in mapped types
-    const cpy = JSON.parse(JSON.stringify(selectedTune)) as tune
+    const cpy = JSON.parse(JSON.stringify(currentTune)) as tune
     cpy[attr_key] = value
     setCurrentTune(cpy)
   }
