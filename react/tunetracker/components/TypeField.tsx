@@ -72,7 +72,7 @@ function TypeField({attr, attrKey, attrName, handleSetCurrentTune}: {attr: unkno
           min={0}
           max={100}
           values={[attr as number]}
-          onValuesChangeFinish={(values) => handleSetCurrentTune(attrKey, values[0])}
+          onValuesChangeFinish={(values) => {handleSetCurrentTune(attrKey, values[0])}}
         />
       </View>
     );
@@ -87,7 +87,6 @@ function TypeField({attr, attrKey, attrName, handleSetCurrentTune}: {attr: unkno
       setarrAttr(newArrAttr)
       handleSetCurrentTune(attrKey, arrAttr)
     }
-
     return(
       <View style={{backgroundColor: 'black', padding: 8}}>
         <View style={{flexDirection: 'row'}}>

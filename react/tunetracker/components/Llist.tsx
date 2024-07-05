@@ -18,9 +18,12 @@ import {
   SubText,
   TextInput,
   styles,
+  Button,
+  ButtonText
 } from '../Style.tsx'
 import tuneSort from '../tuneSort.tsx'
 import RNPickerSelect from 'react-native-picker-select';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 
 type tune = {
   "title"?: string
@@ -64,8 +67,8 @@ function prettyPrint(object: unknown): string{
   return "(Empty)"
 }
 
-function LListHeader({listReversed, setListReversed, updateSelectedAttr}:
-                     {listReversed: boolean | undefined, setListReversed: Function, updateSelectedAttr: Function}){
+function LListHeader({listReversed, setListReversed, updateSelectedAttr, setViewing}:
+{listReversed: boolean | undefined, setListReversed: Function, updateSelectedAttr: Function, setViewing:Function}){
   const selectedAttrItems = Array.from(prettyAttrs.entries()).map((x) => {return {label: x[1], value: x[0]}});
 return(
   <View>
@@ -88,6 +91,9 @@ return(
   <View style={{flex: 1, alignItems: "center"}}>
   <Switch value={listReversed} onValueChange={() => setListReversed(!listReversed)}/>
   </View>
+  <Button onPress={() => setViewing(3)}>
+    <ButtonText><Icon name="plus" size={30}/></ButtonText>
+  </Button>
   </View>
   </View>
 );
@@ -105,7 +111,7 @@ export default function LList({songs, viewingPair, setSelectedTune}: {songs: Arr
       data={songs}
       extraData={selectedAttr}
       ListHeaderComponent={
-        <LListHeader listReversed={listReversed} setListReversed={setListReversed} updateSelectedAttr={updateSelectedAttr} />
+        <LListHeader listReversed={listReversed} setListReversed={setListReversed} updateSelectedAttr={updateSelectedAttr} setViewing={viewingPair.setViewing} />
       }
       renderItem={({item, index, separators}) => (
         <TouchableHighlight

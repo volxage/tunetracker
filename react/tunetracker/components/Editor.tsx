@@ -45,8 +45,8 @@ type tune = {
   "lyrics_confidence"?: number
   "played_at"?: string[]
 }
-function Editor({prettyAttrs, viewingPair, selectedTune, replaceSelectedTune}:
-{prettyAttrs: Array<[string, string]>, viewingPair: viewingPair, selectedTune: tune, replaceSelectedTune: Function}): React.JSX.Element {
+function Editor({prettyAttrs, viewingPair, selectedTune, replaceSelectedTune, deleteTune}:
+{prettyAttrs: Array<[string, string]>, viewingPair: viewingPair, selectedTune: tune, replaceSelectedTune: Function, deleteTune: Function}): React.JSX.Element {
   const [currentTune, setCurrentTune] = useState(JSON.parse(JSON.stringify(selectedTune)) as tune) //Intentional copy to allow cancelling of edits
   function handleSetCurrentTune(attr_key: keyof tune, value: undefined){
     //Inefficient solution, but there are no Map functions such as "filter" in mapped types
@@ -60,6 +60,7 @@ function Editor({prettyAttrs, viewingPair, selectedTune, replaceSelectedTune}:
         data={prettyAttrs}
         renderItem={({item, index, separators}) => (
           //Why is this a TouchableHighlight and not a regular view?
+          <View>
           <TouchableHighlight
             key={item[0]}
             onShowUnderlay={separators.highlight}
@@ -67,21 +68,28 @@ function Editor({prettyAttrs, viewingPair, selectedTune, replaceSelectedTune}:
             onHideUnderlay={separators.unhighlight}>
             <TypeField attr={currentTune[item[0] as keyof tune]} attrKey={item[0] as keyof tune} attrName={item[1]} handleSetCurrentTune={handleSetCurrentTune}/>
           </TouchableHighlight>
-
+        </View>
       )}
       ListFooterComponent={
-        <View style={{flexDirection: "row", backgroundColor: "black"}}>
-          <View style={{flex: 1}}>
-            <Button
-              onPress={() => {replaceSelectedTune(selectedTune, currentTune); viewingPair.setViewing(!viewingPair.viewing);}}
-            ><ButtonText>Save</ButtonText></Button>
-          </View>
+        <View>
+          <DeleteButton
+            onLongPress={() => {deleteTune(selectedTune); viewingPair.setViewing(0);}} >
+            <ButtonText>DELETE TUNE (CAN'T UNDO! Press and hold)</ButtonText>
+          </DeleteButton>
+          <View style={{flexDirection: "row", backgroundColor: "black"}}>
+            <View style={{flex: 1}}>
+              <Button
+                onPress={() => {replaceSelectedTune(selectedTune, currentTune); viewingPair.setViewing(!viewingPair.viewing);}}
+              ><ButtonText>Save</ButtonText>
+              </Button>
+            </View>
           <View style={{flex: 1}}>
             <DeleteButton
               onPress={() => {viewingPair.setViewing(!viewingPair.viewing)}}
-            ><ButtonText>Cancel</ButtonText></DeleteButton>
+            ><ButtonText>Cancel Edit</ButtonText></DeleteButton>
           </View>
         </View>
+      </View>
       }
     />
   </SafeAreaView>

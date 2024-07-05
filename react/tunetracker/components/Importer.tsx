@@ -18,8 +18,11 @@ import {
   SubText,
   TextInput,
   styles,
+  DeleteButton,
+  ButtonText,
 } from '../Style.tsx'
 import tuneSort from '../tuneSort.tsx'
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import RNPickerSelect from 'react-native-picker-select';
 
 type tune = {
@@ -55,6 +58,7 @@ export type standard = {
   "Lyricist(s)": string
 }
 
+
 function prettyPrint(object: unknown): string{
   if (typeof object == "string") return object as string;
   if (typeof object == "number") return JSON.stringify(object);
@@ -62,8 +66,8 @@ function prettyPrint(object: unknown): string{
   return "(Empty)"
 }
 
-function ImporterHeader({listReversed, setListReversed, updateSelectedAttr}:
-                     {listReversed: boolean | undefined, setListReversed: Function, updateSelectedAttr: Function}){
+function ImporterHeader({listReversed, setListReversed, updateSelectedAttr, setViewing}:
+{listReversed: boolean | undefined, setListReversed: Function, updateSelectedAttr: Function, setViewing: Function}){
   const selectedAttrItems = Array.from(standardAttrs.entries()).map((x) => {return {label: x[1], value: x[0]}});
 return(
   <View>
@@ -87,6 +91,9 @@ return(
   <Switch value={listReversed} onValueChange={() => setListReversed(!listReversed)}/>
   </View>
   </View>
+  <DeleteButton onPress={() => setViewing(0)}>
+    <ButtonText>Cancel import</ButtonText>
+  </DeleteButton>
   </View>
 );
 }
@@ -94,23 +101,29 @@ type viewingPair = {
   viewing: number;
   setViewing: Function;
 }
-export default function Importer({standards, viewingPair, setSelectedTune}: {standards: Array<standard>, viewingPair: viewingPair, setSelectedTune: Function}){
+export default function Importer({standards, viewingPair, setSelectedTune, addNewTune}:
+{standards: Array<standard>, viewingPair: viewingPair, setSelectedTune: Function, addNewTune: Function}){
   const [listReversed, setListReversed] = useState(false);
   const [selectedAttr, updateSelectedAttr] = useState("Title");
   tuneSort(standards, selectedAttr, listReversed);
-  //TODO: Consider ramifications of using [selectedTune, setSelectedTune] on different type
   return (
     <FlatList
       data={standards}
       extraData={selectedAttr}
       ListHeaderComponent={
-        <ImporterHeader listReversed={listReversed} setListReversed={setListReversed} updateSelectedAttr={updateSelectedAttr} />
+        <ImporterHeader listReversed={listReversed} setListReversed={setListReversed} updateSelectedAttr={updateSelectedAttr} setViewing={viewingPair.setViewing}/>
       }
       renderItem={({item, index, separators}) => (
         <TouchableHighlight
           key={item.Title}
-          onPress={() => {setSelectedTune(item); viewingPair.setViewing(1);}}
-          onLongPress={() => {setSelectedTune(item); viewingPair.setViewing(2);}}
+          onPress={() => {
+            const tn: tune = {};
+            tn.title = item.Title;
+            tn.composers = item['Composer(s)'].split(", ");
+            addNewTune(tn);
+            setSelectedTune(tn);
+            viewingPair.setViewing(1);
+          }}
           onShowUnderlay={separators.highlight}
           style={styles.bordered}
           onHideUnderlay={separators.unhighlight}>

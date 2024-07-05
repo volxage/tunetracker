@@ -112,11 +112,13 @@ function MainMenu({songs, setSongs}:
 
   //const isDarkMode = useColorScheme() === 'dark';
   const [selectedTune, setSelectedTune] = useState(songs[0])
-  const [viewing, setViewing] = useState(3);
+  const [viewing, setViewing] = useState(0);
   const isDarkMode = true;
   function replaceSelectedTune(oldTune:tune, newTune:tune){
+    let oldPresent = false;
     function ifSelectedTuneReplace(value: tune, index: number, array: tune[]){
       if(value === oldTune){
+        oldPresent = true;
         return newTune;
       }
       else{
@@ -124,6 +126,13 @@ function MainMenu({songs, setSongs}:
       }
     }
     writeToSongsJson(songs.map(ifSelectedTuneReplace), setSongs)
+  }
+  function addNewTune(tune:tune){
+    writeToSongsJson(songs.concat(tune), setSongs)
+  }
+  function deleteTune(tune:tune){
+    const i = songs.indexOf(tune);
+    writeToSongsJson( (songs.slice(0, i)).concat(songs.slice(i + 1)), setSongs );
   }
 
   const backgroundStyle = {
@@ -135,16 +144,18 @@ function MainMenu({songs, setSongs}:
     let entriesArr = Array.from(miniEditorPrettyAttrs.entries());
     let arr = ((entriesArr as Array<Array<unknown>>) as Array<[string, string]>)
     return(
-      <Editor viewingPair={viewingPair} prettyAttrs={arr} selectedTune={selectedTune} replaceSelectedTune={replaceSelectedTune}/>
+      <Editor viewingPair={viewingPair} prettyAttrs={arr} selectedTune={selectedTune} replaceSelectedTune={replaceSelectedTune} deleteTune={deleteTune} />
     );
   }else if(viewing === 2){ //Editor
     console.log("Edit2" + selectedTune)
     return(
-      <Editor viewingPair={viewingPair} prettyAttrs={Array.from(prettyAttrs.entries())} selectedTune={selectedTune} replaceSelectedTune={replaceSelectedTune}/>
+      <Editor viewingPair={viewingPair} prettyAttrs={Array.from(prettyAttrs.entries())} selectedTune={selectedTune} replaceSelectedTune={replaceSelectedTune} deleteTune={deleteTune}/>
     );
   }else if (viewing == 3){ //TuneImporter
     return(
-      <Importer standards={jazzStandards} viewingPair={viewingPair} setSelectedTune={setSelectedTune} />
+      <SafeAreaView style={backgroundStyle}>
+        <Importer standards={jazzStandards} viewingPair={viewingPair} setSelectedTune={setSelectedTune} addNewTune={addNewTune}/>
+      </SafeAreaView>
     )
   }
   else{
