@@ -24,6 +24,8 @@ import {
 import tuneSort from '../tuneSort.tsx'
 import RNPickerSelect from 'react-native-picker-select';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import Fuse from 'fuse.js';
+
 
 type tune = {
   "title"?: string
@@ -67,14 +69,15 @@ function prettyPrint(object: unknown): string{
   return "(Empty)"
 }
 
-function LListHeader({listReversed, setListReversed, updateSelectedAttr, setViewing}:
-{listReversed: boolean | undefined, setListReversed: Function, updateSelectedAttr: Function, setViewing:Function}){
+function LListHeader({listReversed, setListReversed, updateSelectedAttr, setViewing, setSearch}:
+{listReversed: boolean | undefined, setListReversed: Function, updateSelectedAttr: Function, setViewing: Function, setSearch: Function}){
   const selectedAttrItems = Array.from(prettyAttrs.entries()).map((x) => {return {label: x[1], value: x[0]}});
 return(
   <View>
   <TextInput
   placeholder={"Search"}
   placeholderTextColor={"white"}
+  onTextInput={() => {}}
   />
   <View style={{flexDirection: 'row', alignItems: 'center'}}>
   <View style={{flex: 2}}>
@@ -102,16 +105,26 @@ type viewingPair = {
   viewing: number;
   setViewing: Function;
 }
-export default function LList({songs, viewingPair, setSelectedTune}: {songs: Array<tune>, viewingPair: viewingPair, setSelectedTune: Function}){
+export default function LList({songs, viewingPair, setSelectedTune, fuse}:
+{songs: Array<tune>, viewingPair: viewingPair, setSelectedTune: Function, fuse: Fuse<tune>}){
   const [listReversed, setListReversed] = useState(false);
   const [selectedAttr, updateSelectedAttr] = useState("title");
+  const [search, setSearch] = useState("");
+
   tuneSort(songs, selectedAttr, listReversed);
   return (
     <FlatList
       data={songs}
+      //data={search == "" ? songs : fuse.search(search)}
+      //TODO: fuse.search needs to be interpreted as an array for FlatList to understand!
       extraData={selectedAttr}
       ListHeaderComponent={
-        <LListHeader listReversed={listReversed} setListReversed={setListReversed} updateSelectedAttr={updateSelectedAttr} setViewing={viewingPair.setViewing} />
+        <LListHeader 
+          listReversed={listReversed}
+          setListReversed={setListReversed}
+          updateSelectedAttr={updateSelectedAttr}
+          setViewing={viewingPair.setViewing}
+          setSearch={setSearch}/>
       }
       renderItem={({item, index, separators}) => (
         <TouchableHighlight

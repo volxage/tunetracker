@@ -22,7 +22,27 @@ import defaultSongsJson from './songs.json';
 import jazzStandards from './jazzstandards.json';
 
 import RNFS from 'react-native-fs';
+import Fuse from 'fuse.js';
 
+const fuseOptions = { // For finetuning the search algorithm
+	// isCaseSensitive: false,
+	// includeScore: false,
+	// shouldSort: true,
+	// includeMatches: false,
+	// findAllMatches: false,
+	// minMatchCharLength: 1,
+	// location: 0,
+	// threshold: 0.6,
+	// distance: 100,
+	// useExtendedSearch: false,
+	// ignoreLocation: false,
+	// ignoreFieldNorm: false,
+	// fieldNormWeight: 1,
+	keys: [
+		"title",
+		"composers"
+	]
+};
 const songsFilePath = RNFS.DocumentDirectoryPath + "/songs.json"
 type tune = {
   "title"?: string
@@ -99,6 +119,7 @@ function MainMenu({songs, setSongs}:
   const [selectedTune, setSelectedTune] = useState(songs[0])
   const [viewing, setViewing] = useState(0);
   const isDarkMode = true;
+  const fuse = new Fuse(songs, fuseOptions);
   function replaceSelectedTune(oldTune:tune, newTune:tune){
     function ifSelectedTuneReplace(value: tune, index: number, array: tune[]){
       if(value === oldTune){
@@ -143,7 +164,7 @@ function MainMenu({songs, setSongs}:
     return (
       <SafeAreaView style={backgroundStyle}>
         <View>
-          <LList songs={songs} viewingPair={viewingPair} setSelectedTune={setSelectedTune}/>
+          <LList songs={songs} viewingPair={viewingPair} setSelectedTune={setSelectedTune} fuse={fuse}/>
         </View>
         </SafeAreaView>
       );
