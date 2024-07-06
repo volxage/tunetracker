@@ -53,7 +53,7 @@ const DeleteButton = styled.Pressable`
   border-radius: 4px;
   elevation: 3;
   font-size: 20px;
-  background-color: darkred;
+  background-color: maroon;
   margin: 8px;
 `
 const Title = styled.Text`

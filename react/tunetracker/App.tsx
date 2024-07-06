@@ -75,10 +75,8 @@ const prettyAttrs = new Map<string, string>([
 function writeToSongsJson(tuneList=defaultSongsJson as tune[], setSongs: Function){
   // TODO: Try await for better readability
   const stringified = JSON.stringify(tuneList);
-  console.log(songsFilePath)
   RNFS.writeFile(songsFilePath, stringified)
     .then(() => setSongs(tuneList))
-    .then(() => console.log(tuneList))
 }
 
 function App(): React.JSX.Element {
@@ -99,7 +97,6 @@ function App(): React.JSX.Element {
         RNFS.writeFile(songsFilePath, JSON.stringify(defaultSongsJson))
       })
   }, []);
-  console.log("Rerendered main")
 
 
   return(
@@ -140,14 +137,12 @@ function MainMenu({songs, setSongs}:
   };
   let viewingPair = {viewing:viewing, setViewing:setViewing}
   if(viewing === 1){ //MiniEditor (Just Editor with less attrs)
-    console.log("Edit1" + selectedTune)
     let entriesArr = Array.from(miniEditorPrettyAttrs.entries());
     let arr = ((entriesArr as Array<Array<unknown>>) as Array<[string, string]>)
     return(
       <Editor viewingPair={viewingPair} prettyAttrs={arr} selectedTune={selectedTune} replaceSelectedTune={replaceSelectedTune} deleteTune={deleteTune} />
     );
   }else if(viewing === 2){ //Editor
-    console.log("Edit2" + selectedTune)
     return(
       <Editor viewingPair={viewingPair} prettyAttrs={Array.from(prettyAttrs.entries())} selectedTune={selectedTune} replaceSelectedTune={replaceSelectedTune} deleteTune={deleteTune}/>
     );

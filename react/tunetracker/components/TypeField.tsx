@@ -8,8 +8,8 @@ import {
   Title,
 } from '../Style.tsx'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import React, {isValidElement, useState} from 'react';
-import MultiSlider from '@ptomasroos/react-native-multi-slider';
+import React, {isValidElement, useEffect, useState} from 'react';
+import MultiSlider from '@react-native-community/slider';
 import {
   SafeAreaView,
   FlatList,
@@ -50,7 +50,6 @@ const tuneDefaults = {
   "lyrics_confidence": 0,
   "played_at": []
 }
-
 function TypeField({attr, attrKey, attrName, handleSetCurrentTune}: {attr: unknown, attrKey: keyof tune, attrName: string, handleSetCurrentTune: Function}){
   if(attr == null){
     attr = tuneDefaults[attrKey]
@@ -65,20 +64,29 @@ function TypeField({attr, attrKey, attrName, handleSetCurrentTune}: {attr: unkno
       </View>
     );
   }else if (typeof attr == "number"){
+    const [icon, setIcon] = useState();
+
+    useEffect(() => {
+      Icon.getImageSource('circle', 26, 'white')
+        .then(setIcon);
+    }, []);
     return(
       <View style={{backgroundColor: 'black', padding: 8}}>
         <Title>{attrName.toUpperCase()}</Title>
         <MultiSlider
-          min={0}
-          max={100}
-          values={[attr as number]}
-          onValuesChangeFinish={(values) => {handleSetCurrentTune(attrKey, values[0])}}
+          minimumValue={0}
+          maximumValue={100}
+          value={attr as number}
+          onSlidingComplete={(value) => {handleSetCurrentTune(attrKey, value)}}
+          thumbImage={icon}
+          style={{marginVertical: 20}}
+          minimumTrackTintColor='cadetblue'
+          maximumTrackTintColor='gray'
         />
       </View>
     );
   }else if (Array.isArray(attr)){
     const [arrAttr, setarrAttr] = useState(attr)
-    //    console.log(arrAttr)
 
     function handleReplace(value: string, index: number){
       const newArrAttr = arrAttr.map((c, i) => {
