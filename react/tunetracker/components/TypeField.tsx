@@ -9,13 +9,14 @@ import {
 } from '../Style.tsx'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import React, {isValidElement, useEffect, useState} from 'react';
-import MultiSlider from '@react-native-community/slider';
+import Slider from '@react-native-community/slider';
 import {
   SafeAreaView,
   FlatList,
   View,
   TouchableHighlight,
 } from 'react-native';
+import Fuse from 'fuse.js';
 type tune = {
   "title"?: string
   "alternative_title"?: string
@@ -73,9 +74,10 @@ function TypeField({attr, attrKey, attrName, handleSetCurrentTune}: {attr: unkno
     return(
       <View style={{backgroundColor: 'black', padding: 8}}>
         <Title>{attrName.toUpperCase()}</Title>
-        <MultiSlider
+        <Slider
           minimumValue={0}
           maximumValue={100}
+          step={1}
           value={attr as number}
           onSlidingComplete={(value) => {handleSetCurrentTune(attrKey, value)}}
           thumbImage={icon}

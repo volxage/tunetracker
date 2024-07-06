@@ -1,18 +1,11 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
+ * Tune Tracker
+ * https://github.com/volxage/tunetracker
  *
  * @format
  */
 
 import React, {isValidElement, useEffect, useState} from 'react';
-import MultiSlider from '@ptomasroos/react-native-multi-slider';
-import {
-  Text,
-  SubText,
-  TextInput,
-  styles
-} from './Style.tsx'
 
 import LList from './components/Llist.tsx';
 import Editor from './components/Editor.tsx';
@@ -73,17 +66,12 @@ const prettyAttrs = new Map<string, string>([
 ])
 
 function writeToSongsJson(tuneList=defaultSongsJson as tune[], setSongs: Function){
-  // TODO: Try await for better readability
   const stringified = JSON.stringify(tuneList);
   RNFS.writeFile(songsFilePath, stringified)
     .then(() => setSongs(tuneList))
 }
 
 function App(): React.JSX.Element {
-  //TODO: Fix infinite render loop
-  // TRY PUTTING SONGS STATE IN THE MAIN MENU, KEEP EFFECT IN APP FN
-  //
-  // Why is RNFS not saving the file properly? Or why is the android emulator not persisting the data?
   const [songs, setSongs] = useState(defaultSongsJson)
   useEffect(() => {
     RNFS.readFile(songsFilePath)
@@ -112,10 +100,8 @@ function MainMenu({songs, setSongs}:
   const [viewing, setViewing] = useState(0);
   const isDarkMode = true;
   function replaceSelectedTune(oldTune:tune, newTune:tune){
-    let oldPresent = false;
     function ifSelectedTuneReplace(value: tune, index: number, array: tune[]){
       if(value === oldTune){
-        oldPresent = true;
         return newTune;
       }
       else{
