@@ -27,6 +27,25 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import Fuse from 'fuse.js';
 
 
+const fuseOptions = { // For finetuning the search algorithm
+	// isCaseSensitive: false,
+	// includeScore: false,
+	// shouldSort: true,
+	// includeMatches: false,
+	// findAllMatches: false,
+	// minMatchCharLength: 1,
+	// location: 0,
+	// threshold: 0.6,
+	// distance: 100,
+	// useExtendedSearch: false,
+	// ignoreLocation: false,
+	// ignoreFieldNorm: false,
+	// fieldNormWeight: 1,
+	keys: [
+		"title",
+		"composers"
+	]
+};
 type tune = {
   "title"?: string
   "alternative_title"?: string
@@ -105,13 +124,14 @@ type viewingPair = {
   viewing: number;
   setViewing: Function;
 }
-export default function LList({songs, viewingPair, setSelectedTune, fuse}:
-{songs: Array<tune>, viewingPair: viewingPair, setSelectedTune: Function, fuse: Fuse<tune>}){
+export default function LList({songs, viewingPair, setSelectedTune}:
+{songs: Array<tune>, viewingPair: viewingPair, setSelectedTune: Function}){
   const [listReversed, setListReversed] = useState(false);
   const [selectedAttr, updateSelectedAttr] = useState("title");
   const [search, setSearch] = useState("");
 
   let displaySongs = songs
+  const fuse = new Fuse(songs, fuseOptions);
   if(search === ""){
     tuneSort(displaySongs, selectedAttr, listReversed);
   }else{

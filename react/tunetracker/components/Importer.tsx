@@ -22,8 +22,8 @@ import {
   ButtonText,
 } from '../Style.tsx'
 import tuneSort from '../tuneSort.tsx'
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import RNPickerSelect from 'react-native-picker-select';
+import Fuse from 'fuse.js';
 
 type tune = {
   "title"?: string
@@ -58,6 +58,26 @@ export type standard = {
   "Lyricist(s)": string
 }
 
+const fuseOptions = { // For finetuning the search algorithm
+	// isCaseSensitive: false,
+	// includeScore: false,
+	// shouldSort: true,
+	// includeMatches: false,
+	// findAllMatches: false,
+	// minMatchCharLength: 1,
+	// location: 0,
+	// threshold: 0.6,
+	// distance: 100,
+	// useExtendedSearch: false,
+	// ignoreLocation: false,
+	// ignoreFieldNorm: false,
+	// fieldNormWeight: 1,
+	keys: [
+		"Title",
+		"Composer(s)",
+    "Lyricist(s)"
+	]
+};
 
 function prettyPrint(object: unknown): string{
   if (typeof object == "string") return object as string;
@@ -66,14 +86,15 @@ function prettyPrint(object: unknown): string{
   return "(Empty)"
 }
 
-function ImporterHeader({listReversed, setListReversed, updateSelectedAttr, setViewing}:
-{listReversed: boolean | undefined, setListReversed: Function, updateSelectedAttr: Function, setViewing: Function}){
+function ImporterHeader({listReversed, setListReversed, updateSelectedAttr, setViewing, setSearch}:
+{listReversed: boolean | undefined, setListReversed: Function, updateSelectedAttr: Function, setViewing: Function, setSearch: Function}){
   const selectedAttrItems = Array.from(standardAttrs.entries()).map((x) => {return {label: x[1], value: x[0]}});
 return(
   <View>
   <TextInput
   placeholder={"Search"}
   placeholderTextColor={"white"}
+  onChangeText={(text) => setSearch(text)}
   />
   <View style={{flexDirection: 'row', alignItems: 'center'}}>
   <View style={{flex: 2}}>
@@ -105,13 +126,27 @@ export default function Importer({standards, viewingPair, setSelectedTune, addNe
 {standards: Array<standard>, viewingPair: viewingPair, setSelectedTune: Function, addNewTune: Function}){
   const [listReversed, setListReversed] = useState(false);
   const [selectedAttr, updateSelectedAttr] = useState("Title");
-  tuneSort(standards, selectedAttr, listReversed);
+  const [search, setSearch] = useState("");
+  let displayStandards = standards
+  const fuse = new Fuse(standards, fuseOptions);
+  if(search === ""){
+    tuneSort(displayStandards, selectedAttr, listReversed);
+  }else{
+    displayStandards = fuse.search(search)
+      .map(function(value, index){
+        return value.item;
+      })
+  }
   return (
     <FlatList
-      data={standards}
+      data={displayStandards}
       extraData={selectedAttr}
       ListHeaderComponent={
-        <ImporterHeader listReversed={listReversed} setListReversed={setListReversed} updateSelectedAttr={updateSelectedAttr} setViewing={viewingPair.setViewing}/>
+        <ImporterHeader listReversed={listReversed}
+          setListReversed={setListReversed}
+          updateSelectedAttr={updateSelectedAttr}
+          setViewing={viewingPair.setViewing}
+          setSearch={setSearch}/>
       }
       renderItem={({item, index, separators}) => (
         <TouchableHighlight

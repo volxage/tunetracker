@@ -79,7 +79,7 @@ const ButtonText = styled.Text`
 `
 const TextInput = styled.TextInput`
   border-width: 1px;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 200;
   color: white;
 `;
