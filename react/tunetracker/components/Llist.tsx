@@ -77,7 +77,7 @@ return(
   <TextInput
   placeholder={"Search"}
   placeholderTextColor={"white"}
-  onTextInput={() => {}}
+  onChangeText={(text) => {setSearch(text)}}
   />
   <View style={{flexDirection: 'row', alignItems: 'center'}}>
   <View style={{flex: 2}}>
@@ -111,11 +111,19 @@ export default function LList({songs, viewingPair, setSelectedTune, fuse}:
   const [selectedAttr, updateSelectedAttr] = useState("title");
   const [search, setSearch] = useState("");
 
-  tuneSort(songs, selectedAttr, listReversed);
+  let displaySongs = songs
+  if(search === ""){
+    tuneSort(displaySongs, selectedAttr, listReversed);
+  }else{
+    displaySongs = fuse.search(search)
+      .map(function(value, index){
+        return value.item;
+      })
+  }
+  
   return (
     <FlatList
-      data={songs}
-      //data={search == "" ? songs : fuse.search(search)}
+      data={displaySongs}
       //TODO: fuse.search needs to be interpreted as an array for FlatList to understand!
       extraData={selectedAttr}
       ListHeaderComponent={
