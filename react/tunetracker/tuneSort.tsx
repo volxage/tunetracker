@@ -20,10 +20,18 @@ function tuneSort(songs: Array<tune | standard>, selected: string, reversed: boo
   let reverse_null_multiplier = 1;
   let reversed_multiplier = reversed ? -1 : 1;
   if (selected.endsWith("confidence") || selected == "playthroughs") reverse_null_multiplier = -1 * reversed_multiplier;
-  
   songs.sort(function(a_song, b_song){
     let a = a_song[selected as keyof typeof a_song] as unknown;
     let b = b_song[selected as keyof typeof b_song] as unknown;
+    if(selected === "Rank" || selected === "Year"){
+      if (Number(a) < Number(b)){
+        return -1 * reversed_multiplier;
+      }
+      else if (Number(a) > Number(b)){
+        return 1 * reversed_multiplier;
+      }
+      return 0;
+    }
 
 
     if (a == null) return 1 * reverse_null_multiplier;

@@ -127,11 +127,23 @@ function MainMenu({songs, setSongs}:
     let entriesArr = Array.from(miniEditorPrettyAttrs.entries());
     let arr = ((entriesArr as Array<Array<unknown>>) as Array<[string, string]>)
     return(
-      <Editor viewingPair={viewingPair} prettyAttrs={arr} selectedTune={selectedTune} replaceSelectedTune={replaceSelectedTune} deleteTune={deleteTune} />
+      <Editor
+      viewingPair={viewingPair}
+      prettyAttrs={arr}
+      selectedTune={selectedTune}
+      replaceSelectedTune={replaceSelectedTune}
+      deleteTune={deleteTune}
+      />
     );
   }else if(viewing === 2){ //Editor
     return(
-      <Editor viewingPair={viewingPair} prettyAttrs={Array.from(prettyAttrs.entries())} selectedTune={selectedTune} replaceSelectedTune={replaceSelectedTune} deleteTune={deleteTune}/>
+      <Editor
+      viewingPair={viewingPair}
+      prettyAttrs={Array.from(prettyAttrs.entries())}
+      selectedTune={selectedTune}
+      replaceSelectedTune={replaceSelectedTune}
+      deleteTune={deleteTune}
+      />
     );
   }else if (viewing == 3){ //TuneImporter
     return(
@@ -140,11 +152,11 @@ function MainMenu({songs, setSongs}:
       </SafeAreaView>
     )
   }
-  else{
+  else{ //Llist
     return (
       <SafeAreaView style={backgroundStyle}>
         <View>
-          <LList songs={songs} viewingPair={viewingPair} setSelectedTune={setSelectedTune}/>
+          <LList songs={songs} viewingPair={viewingPair} setSelectedTune={setSelectedTune} addNewTune={addNewTune}/>
         </View>
         </SafeAreaView>
       );

@@ -88,35 +88,47 @@ function prettyPrint(object: unknown): string{
   return "(Empty)"
 }
 
-function LListHeader({listReversed, setListReversed, updateSelectedAttr, setViewing, setSearch}:
-{listReversed: boolean | undefined, setListReversed: Function, updateSelectedAttr: Function, setViewing: Function, setSearch: Function}){
+function LListHeader({listReversed, setListReversed, updateSelectedAttr, setViewing, setSearch, addNewTune, setSelectedTune}:
+{listReversed: boolean | undefined,
+      setListReversed: Function,
+      updateSelectedAttr: Function,
+      setViewing: Function,
+      setSearch: Function,
+      addNewTune: Function
+      setSelectedTune: Function}){
+
   const selectedAttrItems = Array.from(prettyAttrs.entries()).map((x) => {return {label: x[1], value: x[0]}});
-return(
+  return(
   <View>
-  <TextInput
-  placeholder={"Search"}
-  placeholderTextColor={"white"}
-  onChangeText={(text) => {setSearch(text)}}
-  />
-  <View style={{flexDirection: 'row', alignItems: 'center'}}>
-  <View style={{flex: 2}}>
-  <RNPickerSelect
-  onValueChange={(value) => updateSelectedAttr(value)}
-  items={selectedAttrItems as Array<any>} // THIS IS SO STUPID
-  useNativeAndroidPickerStyle={false}
-  style={{inputAndroid: {backgroundColor: 'transparent', color: 'white', fontSize: 18, fontWeight: "300"}}}
-  />
-  </View>
-  <View style={{alignItems: "flex-end"}}>
-  <SubText>{"Reverse sort:"}</SubText>
-  </View>
-  <View style={{flex: 1, alignItems: "center"}}>
-  <Switch value={listReversed} onValueChange={() => setListReversed(!listReversed)}/>
-  </View>
-  <Button onPress={() => setViewing(3)}>
-    <ButtonText><Icon name="plus" size={30}/></ButtonText>
-  </Button>
-  </View>
+    <TextInput
+    placeholder={"Search"}
+    placeholderTextColor={"white"}
+    onChangeText={(text) => {setSearch(text)}}
+    />
+      <View style={{flexDirection: 'row', alignItems: 'center'}}>
+        <View style={{flex: 2}}>
+          <RNPickerSelect
+          onValueChange={(value) => updateSelectedAttr(value)}
+          items={selectedAttrItems as Array<any>} // THIS IS SO STUPID
+          useNativeAndroidPickerStyle={false}
+          style={{inputAndroid: {backgroundColor: 'transparent', color: 'white', fontSize: 18, fontWeight: "300"}}}
+          />
+        </View>
+        <View style={{alignItems: "flex-end"}}>
+          <SubText>{"Reverse sort:"}</SubText>
+        </View>
+        <View style={{flex: 1, alignItems: "center"}}>
+          <Switch value={listReversed} onValueChange={() => setListReversed(!listReversed)}/>
+        </View>
+      <Button onPress={() => setViewing(3)} onLongPress={() => {
+            const tn: tune = {};
+            addNewTune(tn);
+            setSelectedTune(tn);
+            setViewing(2);
+      }}>
+        <ButtonText><Icon name="plus" size={30}/></ButtonText>
+      </Button>
+    </View>
   </View>
 );
 }
@@ -124,8 +136,8 @@ type viewingPair = {
   viewing: number;
   setViewing: Function;
 }
-export default function LList({songs, viewingPair, setSelectedTune}:
-{songs: Array<tune>, viewingPair: viewingPair, setSelectedTune: Function}){
+export default function LList({songs, viewingPair, setSelectedTune, addNewTune}:
+{songs: Array<tune>, viewingPair: viewingPair, setSelectedTune: Function, addNewTune: Function}){
   const [listReversed, setListReversed] = useState(false);
   const [selectedAttr, updateSelectedAttr] = useState("title");
   const [search, setSearch] = useState("");
@@ -152,7 +164,10 @@ export default function LList({songs, viewingPair, setSelectedTune}:
           setListReversed={setListReversed}
           updateSelectedAttr={updateSelectedAttr}
           setViewing={viewingPair.setViewing}
-          setSearch={setSearch}/>
+          setSearch={setSearch}
+          addNewTune={addNewTune}
+          setSelectedTune={setSelectedTune}
+        />
       }
       renderItem={({item, index, separators}) => (
         <TouchableHighlight
