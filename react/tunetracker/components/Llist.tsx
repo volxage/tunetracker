@@ -69,7 +69,7 @@ function prettyPrint(object: unknown): string{
   if (typeof object == "string") return object as string;
   if (typeof object == "number") return JSON.stringify(object);
   if (Array.isArray(object)) return object.join(", ");
-  return "(Empty)"
+  return "(Empty)";
 }
 
 function LListHeader({listReversed, setListReversed, updateSelectedAttr, setViewing, setSearch, addNewTune, setSelectedTune}:
@@ -126,7 +126,7 @@ export default function LList({songs, viewingPair, setSelectedTune, addNewTune}:
   const [selectedAttr, updateSelectedAttr] = useState("title");
   const [search, setSearch] = useState("");
 
-  let displaySongs = songs
+  let displaySongs = songs;
   const fuse = new Fuse(songs, fuseOptions);
   if(search === ""){
     tuneSort(displaySongs, selectedAttr, listReversed);
@@ -134,7 +134,7 @@ export default function LList({songs, viewingPair, setSelectedTune, addNewTune}:
     displaySongs = fuse.search(search)
       .map(function(value, index){
         return value.item;
-      })
+      });
   }
   
   return (

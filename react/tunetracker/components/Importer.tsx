@@ -78,7 +78,7 @@ function prettyPrint(object: unknown): string{
   if (typeof object == "string") return object as string;
   if (typeof object == "number") return JSON.stringify(object);
   if (Array.isArray(object)) return object.join(", ");
-  return "(Empty)"
+  return "(Empty)";
 }
 
 function ImporterHeader({listReversed, setListReversed, updateSelectedAttr, setViewing, setSearch}:
@@ -122,7 +122,7 @@ export default function Importer({standards, viewingPair, setSelectedTune, addNe
   const [listReversed, setListReversed] = useState(false);
   const [selectedAttr, updateSelectedAttr] = useState("Title");
   const [search, setSearch] = useState("");
-  let displayStandards = standards
+  let displayStandards = standards;
   const fuse = new Fuse(standards, fuseOptions);
   if(search === ""){
     tuneSort(displayStandards, selectedAttr, listReversed);
@@ -130,7 +130,7 @@ export default function Importer({standards, viewingPair, setSelectedTune, addNe
     displayStandards = fuse.search(search)
       .map(function(value, index){
         return value.item;
-      })
+      });
   }
   return (
     <FlatList

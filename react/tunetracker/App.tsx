@@ -24,7 +24,7 @@ import jazzStandards from './jazzstandards.json';
 import RNFS from 'react-native-fs';
 
 //TODO: Implement playlists
-const playlistsPath = RNFS.DocumentDirectoryPath + "/playlists.json"
+const playlistsPath = RNFS.DocumentDirectoryPath + "/playlists.json";
 import { tune } from './types.tsx';
 import SongsList from './SongsList.tsx';
 
@@ -56,7 +56,7 @@ const prettyAttrs = new Map<string, string>([
 
 function App(): React.JSX.Element {
   const [songs, setSongs] = useState(defaultSongsJson);
-  const songsList = new SongsList(songs, setSongs)
+  const songsList = new SongsList(songs, setSongs);
   useEffect(() => {
     //The below function may also create a "template" songs.json if none is present.
     songsList.readFromSongsJson();
@@ -72,17 +72,17 @@ function MainMenu({songs, setSongs, songsList}:
   {songs: Array<tune>, setSongs: Function, songsList:SongsList}): React.JSX.Element {
 
   //const isDarkMode = useColorScheme() === 'dark';
-  const [selectedTune, setSelectedTune] = useState(songs[0])
+  const [selectedTune, setSelectedTune] = useState(songs[0]);
   const [viewing, setViewing] = useState(0);
   const isDarkMode = true;
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
-  let viewingPair = {viewing:viewing, setViewing:setViewing}
+  let viewingPair = {viewing:viewing, setViewing:setViewing};
   if(viewing === 1){ //MiniEditor (Just Editor with less attrs)
     let entriesArr = Array.from(miniEditorPrettyAttrs.entries());
-    let arr = ((entriesArr as Array<Array<unknown>>) as Array<[string, string]>)
+    let arr = ((entriesArr as Array<Array<unknown>>) as Array<[string, string]>);
     return(
       <Editor
       viewingPair={viewingPair}

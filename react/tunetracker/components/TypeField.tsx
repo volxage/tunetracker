@@ -1,22 +1,17 @@
 import {
-  Text,
   TextInput,
   DeleteButton,
   ButtonText,
   Button,
-  styles,
   Title,
 } from '../Style.tsx'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import React, {isValidElement, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Slider from '@react-native-community/slider';
 import {
-  SafeAreaView,
   FlatList,
   View,
-  TouchableHighlight,
 } from 'react-native';
-import Fuse from 'fuse.js';
 import { tune } from '../types.tsx';
 const tuneDefaults = {
   "title": "New song",
@@ -33,11 +28,12 @@ const tuneDefaults = {
   "melody_confidence": 0,
   "solo_confidence": 0,
   "lyrics_confidence": 0,
-  "played_at": []
+  "played_at": [], 
+  "id": "THIS SHOULD NOT BE HERE" // If the user sees this text at any point, there's an error in the program
 }
 function TypeField({attr, attrKey, attrName, handleSetCurrentTune}: {attr: unknown, attrKey: keyof tune, attrName: string, handleSetCurrentTune: Function}){
   if(attr == null){
-    attr = tuneDefaults[attrKey]
+    attr = tuneDefaults[attrKey];
   }
   if (typeof attr == "string"){
     return(
@@ -72,14 +68,14 @@ function TypeField({attr, attrKey, attrName, handleSetCurrentTune}: {attr: unkno
       </View>
     );
   }else if (Array.isArray(attr)){
-    const [arrAttr, setarrAttr] = useState(attr)
+    const [arrAttr, setarrAttr] = useState(attr);
 
     function handleReplace(value: string, index: number){
       const newArrAttr = arrAttr.map((c, i) => {
         return i === index ? value : c;
       });
-      setarrAttr(newArrAttr)
-      handleSetCurrentTune(attrKey, arrAttr)
+      setarrAttr(newArrAttr);
+      handleSetCurrentTune(attrKey, arrAttr);
     }
     return(
       <View style={{backgroundColor: 'black', padding: 8}}>
