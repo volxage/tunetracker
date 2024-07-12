@@ -27,27 +27,11 @@ type viewingPair = {
   setViewing: Function;
 }
 import TypeField from './TypeField.tsx';
+import SongsList from '../SongsList.tsx';
+import { tune } from '../types.tsx';
 
-type tune = {
-  "title"?: string
-  "alternative_title"?: string
-  "composers"?: string[]
-  "form"?: string
-  "notable_recordings"?: string[]
-  "keys"?: string[]
-  "styles"?: string[]
-  "tempi"?: string[]
-  "contrafacts"?: string[] // In the future, these could link to other tunes
-  "playthroughs"?: number
-  "form_confidence"?: number
-  "melody_confidence"?: number
-  "solo_confidence"?: number
-  "lyrics_confidence"?: number
-  "played_at"?: string[]
-  "id"?: string
-}
-function Editor({prettyAttrs, viewingPair, selectedTune, replaceSelectedTune, deleteTune}:
-{prettyAttrs: Array<[string, string]>, viewingPair: viewingPair, selectedTune: tune, replaceSelectedTune: Function, deleteTune: Function}): React.JSX.Element {
+function Editor({prettyAttrs, viewingPair, selectedTune, songsList}:
+{prettyAttrs: Array<[string, string]>, viewingPair: viewingPair, selectedTune: tune, songsList: SongsList}): React.JSX.Element {
   const [currentTune, setCurrentTune] = useState(JSON.parse(JSON.stringify(selectedTune)) as tune) //Intentional copy to allow cancelling of edits
   function handleSetCurrentTune(attr_key: keyof tune, value: undefined){
     //Inefficient solution, but there are no Map functions such as "filter" in mapped types
@@ -74,13 +58,13 @@ function Editor({prettyAttrs, viewingPair, selectedTune, replaceSelectedTune, de
       ListFooterComponent={
         <View>
           <DeleteButton
-            onLongPress={() => {deleteTune(selectedTune); viewingPair.setViewing(0);}} >
+            onLongPress={() => {songsList.deleteTune(selectedTune); viewingPair.setViewing(0);}} >
             <ButtonText>DELETE TUNE (CAN'T UNDO! Press and hold)</ButtonText>
           </DeleteButton>
           <View style={{flexDirection: "row", backgroundColor: "black"}}>
             <View style={{flex: 1}}>
               <Button
-                onPress={() => {replaceSelectedTune(selectedTune, currentTune); viewingPair.setViewing(!viewingPair.viewing);}}
+                onPress={() => {songsList.replaceSelectedTune(selectedTune, currentTune); viewingPair.setViewing(!viewingPair.viewing);}}
               ><ButtonText>Save</ButtonText>
               </Button>
             </View>

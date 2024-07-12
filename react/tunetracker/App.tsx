@@ -22,29 +22,13 @@ import defaultSongsJson from './songs.json';
 import jazzStandards from './jazzstandards.json';
 
 import RNFS from 'react-native-fs';
-import Fuse from 'fuse.js';
-import uuid from 'react-native-uuid';
 
-const songsFilePath = RNFS.DocumentDirectoryPath + "/songs.json"
+//TODO: Implement playlists
 const playlistsPath = RNFS.DocumentDirectoryPath + "/playlists.json"
-type tune = {
-  "title"?: string
-  "alternative_title"?: string
-  "composers"?: string[]
-  "form"?: string
-  "notable_recordings"?: string[]
-  "keys"?: string[]
-  "styles"?: string[]
-  "tempi"?: string[]
-  "contrafacts"?: string[] // In the future, these could link to other tunes
-  "playthroughs"?: number
-  "form_confidence"?: number
-  "melody_confidence"?: number
-  "solo_confidence"?: number
-  "lyrics_confidence"?: number
-  "id"?: string
-  "played_at"?: string[]
-}
+import { tune } from './types.tsx';
+import SongsList from './SongsList.tsx';
+
+//PrettyAttrs function as both as "prettifiers" and lists of attrs to display in corresponding editors
 const miniEditorPrettyAttrs = new Map<string, string>([
   ["title", "Title"],
   ["form_confidence", "Form Confidence"],
@@ -69,69 +53,28 @@ const prettyAttrs = new Map<string, string>([
   ["lyrics_confidence", "Lyrics Confidence"],
 ])
 
-function writeToSongsJson(tuneList=defaultSongsJson as tune[], setSongs: Function){
-  const stringified = JSON.stringify(tuneList);
-  RNFS.writeFile(songsFilePath, stringified)
-    .then(() => setSongs(tuneList))
-}
-function writeToPlaylistsJson(playlists: String[]=[]){
-  const stringified = JSON.stringify(playlists);
-  RNFS.writeFile(songsFilePath, stringified);
-}
 
 function App(): React.JSX.Element {
-  const [songs, setSongs] = useState(defaultSongsJson)
+  const [songs, setSongs] = useState(defaultSongsJson);
+  const songsList = new SongsList(songs, setSongs)
   useEffect(() => {
-    RNFS.readFile(songsFilePath)
-      .then((results) => {
-        setSongs(JSON.parse(results))
-      })
-      .catch((reason) => {
-        console.log("ERROR CAUGHT BELOW:")
-        console.log(reason)
-        console.log("Assuming file doesn't exist, creating one:")
-        RNFS.writeFile(songsFilePath, JSON.stringify(defaultSongsJson))
-      })
+    //The below function may also create a "template" songs.json if none is present.
+    songsList.readFromSongsJson();
   }, []);
 
 
   return(
-    <MainMenu songs={songs} setSongs={setSongs}/>
+    <MainMenu songs={songs} setSongs={setSongs} songsList={songsList}/>
   );
 }
 
-function MainMenu({songs, setSongs}:
-  {songs: Array<tune>, setSongs: Function}): React.JSX.Element {
+function MainMenu({songs, setSongs, songsList}:
+  {songs: Array<tune>, setSongs: Function, songsList:SongsList}): React.JSX.Element {
 
   //const isDarkMode = useColorScheme() === 'dark';
   const [selectedTune, setSelectedTune] = useState(songs[0])
   const [viewing, setViewing] = useState(0);
   const isDarkMode = true;
-  function replaceSelectedTune(oldTune:tune, newTune:tune){
-    if(oldTune.id === undefined){
-      const new_id = uuid.v4() as string;
-      console.log("New id: " + new_id)
-      newTune.id = new_id
-    }else{
-      console.log("Id: " + oldTune.id)
-    }
-    function ifSelectedTuneReplace(value: tune, index: number, array: tune[]){
-      if(value === oldTune){
-        return newTune;
-      }
-      else{
-        return value;
-      }
-    }
-    writeToSongsJson(songs.map(ifSelectedTuneReplace), setSongs)
-  }
-  function addNewTune(tune:tune){
-    writeToSongsJson(songs.concat(tune), setSongs)
-  }
-  function deleteTune(tune:tune){
-    const i = songs.indexOf(tune);
-    writeToSongsJson( (songs.slice(0, i)).concat(songs.slice(i + 1)), setSongs );
-  }
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -145,8 +88,7 @@ function MainMenu({songs, setSongs}:
       viewingPair={viewingPair}
       prettyAttrs={arr}
       selectedTune={selectedTune}
-      replaceSelectedTune={replaceSelectedTune}
-      deleteTune={deleteTune}
+      songsList={songsList}
       />
     );
   }else if(viewing === 2){ //Editor
@@ -155,14 +97,13 @@ function MainMenu({songs, setSongs}:
       viewingPair={viewingPair}
       prettyAttrs={Array.from(prettyAttrs.entries())}
       selectedTune={selectedTune}
-      replaceSelectedTune={replaceSelectedTune}
-      deleteTune={deleteTune}
+      songsList={songsList}
       />
     );
   }else if (viewing == 3){ //TuneImporter
     return(
       <SafeAreaView style={backgroundStyle}>
-        <Importer standards={jazzStandards} viewingPair={viewingPair} setSelectedTune={setSelectedTune} addNewTune={addNewTune}/>
+        <Importer standards={jazzStandards} viewingPair={viewingPair} setSelectedTune={setSelectedTune} addNewTune={songsList.addNewTune}/>
       </SafeAreaView>
     )
   }
@@ -170,7 +111,7 @@ function MainMenu({songs, setSongs}:
     return (
       <SafeAreaView style={backgroundStyle}>
         <View>
-          <LList songs={songs} viewingPair={viewingPair} setSelectedTune={setSelectedTune} addNewTune={addNewTune}/>
+          <LList songs={songs} viewingPair={viewingPair} setSelectedTune={setSelectedTune} addNewTune={songsList.addNewTune}/>
         </View>
         </SafeAreaView>
       );
