@@ -23,8 +23,10 @@ import jazzStandards from './jazzstandards.json';
 
 import RNFS from 'react-native-fs';
 import Fuse from 'fuse.js';
+import uuid from 'react-native-uuid';
 
 const songsFilePath = RNFS.DocumentDirectoryPath + "/songs.json"
+const playlistsPath = RNFS.DocumentDirectoryPath + "/playlists.json"
 type tune = {
   "title"?: string
   "alternative_title"?: string
@@ -40,6 +42,7 @@ type tune = {
   "melody_confidence"?: number
   "solo_confidence"?: number
   "lyrics_confidence"?: number
+  "id"?: string
   "played_at"?: string[]
 }
 const miniEditorPrettyAttrs = new Map<string, string>([
@@ -71,6 +74,10 @@ function writeToSongsJson(tuneList=defaultSongsJson as tune[], setSongs: Functio
   RNFS.writeFile(songsFilePath, stringified)
     .then(() => setSongs(tuneList))
 }
+function writeToPlaylistsJson(playlists: String[]=[]){
+  const stringified = JSON.stringify(playlists);
+  RNFS.writeFile(songsFilePath, stringified);
+}
 
 function App(): React.JSX.Element {
   const [songs, setSongs] = useState(defaultSongsJson)
@@ -101,6 +108,13 @@ function MainMenu({songs, setSongs}:
   const [viewing, setViewing] = useState(0);
   const isDarkMode = true;
   function replaceSelectedTune(oldTune:tune, newTune:tune){
+    if(oldTune.id === undefined){
+      const new_id = uuid.v4() as string;
+      console.log("New id: " + new_id)
+      newTune.id = new_id
+    }else{
+      console.log("Id: " + oldTune.id)
+    }
     function ifSelectedTuneReplace(value: tune, index: number, array: tune[]){
       if(value === oldTune){
         return newTune;

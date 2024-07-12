@@ -44,6 +44,7 @@ type tune = {
   "solo_confidence"?: number
   "lyrics_confidence"?: number
   "played_at"?: string[]
+  "id"?: string
 }
 function Editor({prettyAttrs, viewingPair, selectedTune, replaceSelectedTune, deleteTune}:
 {prettyAttrs: Array<[string, string]>, viewingPair: viewingPair, selectedTune: tune, replaceSelectedTune: Function, deleteTune: Function}): React.JSX.Element {

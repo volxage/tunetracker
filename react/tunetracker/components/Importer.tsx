@@ -41,6 +41,7 @@ type tune = {
   "solo_confidence"?: number
   "lyrics_confidence"?: number
   "played_at"?: string[]
+  "id"?: string
 }
 const standardAttrs = new Map<string, string>([
   ["Rank", "JazzStandards.com ranking"],
