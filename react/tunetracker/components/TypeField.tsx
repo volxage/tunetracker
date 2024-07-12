@@ -17,24 +17,7 @@ import {
   TouchableHighlight,
 } from 'react-native';
 import Fuse from 'fuse.js';
-type tune = {
-  "title"?: string
-  "alternative_title"?: string
-  "composers"?: string[]
-  "form"?: string
-  "notable_recordings"?: string[]
-  "keys"?: string[]
-  "styles"?: string[]
-  "tempi"?: string[]
-  "contrafacts"?: string[] // In the future, these could link to other tunes
-  "playthroughs"?: number
-  "form_confidence"?: number
-  "melody_confidence"?: number
-  "solo_confidence"?: number
-  "lyrics_confidence"?: number
-  "played_at"?: string[]
-  "id"?: string
-}
+import { tune } from '../types.tsx';
 const tuneDefaults = {
   "title": "New song",
   "alternative_title": "",
@@ -44,7 +27,7 @@ const tuneDefaults = {
   "keys": [],
   "styles": [],
   "tempi": [],
-  "contrafacts": [], // In the future, these could link to other tunes
+  "contrafacts": [], 
   "playthroughs": 0,
   "form_confidence": 0,
   "melody_confidence": 0,
