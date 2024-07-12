@@ -51,13 +51,7 @@ const standardAttrs = new Map<string, string>([
   ["Lyricist(s)", "Lyricist(s)"],
 ]);
 
-export type standard = {
-  "Rank": string
-  "Title": string
-  "Year": string
-  "Composer(s)": string
-  "Lyricist(s)": string
-}
+import { standard } from '../types.tsx';
 
 const fuseOptions = { // For finetuning the search algorithm
 	// isCaseSensitive: false,
