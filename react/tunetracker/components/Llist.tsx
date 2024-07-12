@@ -46,23 +46,7 @@ const fuseOptions = { // For finetuning the search algorithm
 		"composers"
 	]
 };
-type tune = {
-  "title"?: string
-  "alternative_title"?: string
-  "composers"?: string[]
-  "form"?: string
-  "notable_recordings"?: string[]
-  "keys"?: string[]
-  "styles"?: string[]
-  "tempi"?: string[]
-  "contrafacts"?: string[] // In the future, these could link to other tunes
-  "playthroughs"?: number
-  "form_confidence"?: number
-  "melody_confidence"?: number
-  "solo_confidence"?: number
-  "lyrics_confidence"?: number
-  "played_at"?: string[]
-}
+import { tune } from '../types.tsx';
 const prettyAttrs = new Map<string, string>([
   ["title", "Title"],
   ["alternative_title", "Alternative Title"],
