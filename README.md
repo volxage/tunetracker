@@ -11,3 +11,6 @@ I have some lofty goals for the future of this project. I want to add the abilit
 ## Impementations/History
 Tune Tracker was originally implemented in NCurses for the terminal, and was then reimplemented in Python for an attempt at a cross-platform solution. This didn't work out, so I tried implementing Tune Tracker with Android's and iOS's own code infrastructure, but this also didn't work out. Finally, I have settled on React Native, which allows me to develop effectively and swiftly for Android and iOS, and potentially for the browser as well.
 Happy tracking!
+
+## Note for potential employers
+You may have noticed that the contributions are split between hillia45 and volxage. Both of these accounts are mine, this is a solo project unless anyone else would to contribute!
