@@ -27,6 +27,7 @@ import RNFS from 'react-native-fs';
 const playlistsPath = RNFS.DocumentDirectoryPath + "/playlists.json";
 import { tune } from './types.tsx';
 import SongsList from './SongsList.tsx';
+import Playlists from './Playlists.tsx';
 
 //PrettyAttrs function as both as "prettifiers" and lists of attrs to display in corresponding editors
 const miniEditorPrettyAttrs = new Map<string, string>([
@@ -57,11 +58,12 @@ const prettyAttrs = new Map<string, string>([
 function App(): React.JSX.Element {
   const [songs, setSongs] = useState(defaultSongsJson);
   const songsList = new SongsList(songs, setSongs);
+  const playlists = new Playlists();
   useEffect(() => {
-    //The below function may also create a "template" songs.json if none is present.
+    //The below functions may also create "template" json files if either is not present.
     songsList.readFromSongsJson();
+    playlists.readFromPlaylistsJson();
   }, []);
-
 
   return(
     <MainMenu songs={songs} setSongs={setSongs} songsList={songsList}/>
