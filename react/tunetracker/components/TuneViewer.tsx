@@ -150,7 +150,7 @@ type viewingPair = {
   viewing: number;
   setViewing: Function;
 }
-export default function LList({songs, viewingPair, setSelectedTune, addNewTune, playlists}:
+export default function TuneViewer({songs, viewingPair, setSelectedTune, addNewTune, playlists}:
 {songs: Array<tune>, viewingPair: viewingPair, setSelectedTune: Function, addNewTune: Function, playlists: Playlists}){
   const [listReversed, setListReversed] = useState(false);
   const [selectedAttr, updateSelectedAttr] = useState("title");
