@@ -22,6 +22,7 @@ import {
   ButtonText
 } from '../Style.tsx'
 import tuneSort from '../tuneSort.tsx'
+import Playlists from '../Playlists.tsx'
 import RNPickerSelect from 'react-native-picker-select';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import Fuse from 'fuse.js';
@@ -46,7 +47,7 @@ const fuseOptions = { // For finetuning the search algorithm
 		"composers"
 	]
 };
-import { tune } from '../types.tsx';
+import { tune, playlist } from '../types.tsx';
 const prettyAttrs = new Map<string, string>([
   ["title", "Title"],
   ["alternative_title", "Alternative Title"],
@@ -72,38 +73,67 @@ function prettyPrint(object: unknown): string{
   return "(Empty)";
 }
 
-function LListHeader({listReversed, setListReversed, updateSelectedAttr, setViewing, setSearch, addNewTune, setSelectedTune}:
+function LListHeader({listReversed, setListReversed, setViewing, setSearch, addNewTune, setSelectedAttr, setSelectedTune, setSelectedPlaylist, playlists}:
 {listReversed: boolean | undefined,
       setListReversed: Function,
-      updateSelectedAttr: Function,
       setViewing: Function,
       setSearch: Function,
       addNewTune: Function
-      setSelectedTune: Function}){
+      setSelectedAttr: Function,
+      setSelectedTune: Function,
+      setSelectedPlaylist: Function,
+      playlists: Playlists}){
 
-  const selectedAttrItems = Array.from(prettyAttrs.entries()).map((x) => {return {label: x[1], value: x[0]}});
+  const selectedAttrItems = Array.from(prettyAttrs.entries()).map(
+    (entry) => {return {label: entry[1], value: entry[0]}}
+  );
+
+  const selectedPlaylistItems = Array.from(playlists.getPlaylists().map(
+    (playlist) => {return {label: playlist.title, value: playlist.id}}
+  ));
+  selectedPlaylistItems.push(
+    {
+      label: "No playlist (Show all songs)",
+      value: ""
+    }
+  )
+
   return(
   <View>
-    <TextInput
-    placeholder={"Search"}
-    placeholderTextColor={"white"}
-    onChangeText={(text) => {setSearch(text)}}
-    />
-      <View style={{flexDirection: 'row', alignItems: 'center'}}>
-        <View style={{flex: 2}}>
-          <RNPickerSelect
-          onValueChange={(value) => updateSelectedAttr(value)}
-          items={selectedAttrItems as Array<any>} // THIS IS SO STUPID
+    <View style={{flexDirection: 'row'}}>
+      <View style={{flex:1}}>
+        <TextInput
+          placeholder={"Search"}
+          placeholderTextColor={"white"}
+          onChangeText={(text) => {setSearch(text)}}
+        />
+      </View>
+      <View style={{flex:1}}>
+        <RNPickerSelect
+          onValueChange={(value) => setSelectedPlaylist(value)}
+          items={selectedPlaylistItems}
           useNativeAndroidPickerStyle={false}
+          placeholder={{label: "Select a playlist", value: ""}}
           style={{inputAndroid: {backgroundColor: 'transparent', color: 'white', fontSize: 18, fontWeight: "300"}}}
-          />
-        </View>
-        <View style={{alignItems: "flex-end"}}>
-          <SubText>{"Reverse sort:"}</SubText>
-        </View>
-        <View style={{flex: 1, alignItems: "center"}}>
-          <Switch value={listReversed} onValueChange={() => setListReversed(!listReversed)}/>
-        </View>
+        />
+      </View>
+    </View>
+    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+      <View style={{flex: 2}}>
+        <RNPickerSelect
+          onValueChange={(value) => setSelectedAttr(value)}
+          items={selectedAttrItems as Array<{label:string, value:string}>}
+          useNativeAndroidPickerStyle={false}
+          placeholder={{label: "Select an attribute to view", value: "title"}}
+          style={{inputAndroid: {backgroundColor: 'transparent', color: 'white', fontSize: 18, fontWeight: "300"}}}
+        />
+      </View>
+      <View style={{alignItems: "flex-end"}}>
+        <SubText>{"Reverse sort:"}</SubText>
+      </View>
+      <View style={{flex: 1, alignItems: "center"}}>
+        <Switch value={listReversed} onValueChange={() => setListReversed(!listReversed)}/>
+      </View>
       <Button onPress={() => setViewing(3)} onLongPress={() => {
             const tn: tune = {};
             addNewTune(tn);
@@ -120,14 +150,23 @@ type viewingPair = {
   viewing: number;
   setViewing: Function;
 }
-export default function LList({songs, viewingPair, setSelectedTune, addNewTune}:
-{songs: Array<tune>, viewingPair: viewingPair, setSelectedTune: Function, addNewTune: Function}){
+export default function LList({songs, viewingPair, setSelectedTune, addNewTune, playlists}:
+{songs: Array<tune>, viewingPair: viewingPair, setSelectedTune: Function, addNewTune: Function, playlists: Playlists}){
   const [listReversed, setListReversed] = useState(false);
   const [selectedAttr, updateSelectedAttr] = useState("title");
+  const [selectedPlaylist, setSelectedPlaylist] = useState("");
   const [search, setSearch] = useState("");
 
   let displaySongs = songs;
-  const fuse = new Fuse(songs, fuseOptions);
+  if(selectedPlaylist !== ""){
+    const playlist = playlists.getPlaylist(selectedPlaylist)
+    if(typeof playlist !== "undefined"){
+      displaySongs = songs.filter(
+        (tune) => {return typeof tune.id !== "undefined" && tune.id in playlist.tunes}
+      )
+    }
+  }
+  const fuse = new Fuse(displaySongs, fuseOptions);
   if(search === ""){
     tuneSort(displaySongs, selectedAttr, listReversed);
   }else{
@@ -146,11 +185,13 @@ export default function LList({songs, viewingPair, setSelectedTune, addNewTune}:
         <LListHeader 
           listReversed={listReversed}
           setListReversed={setListReversed}
-          updateSelectedAttr={updateSelectedAttr}
           setViewing={viewingPair.setViewing}
           setSearch={setSearch}
           addNewTune={addNewTune}
+          setSelectedAttr={updateSelectedAttr}
           setSelectedTune={setSelectedTune}
+          setSelectedPlaylist={setSelectedPlaylist}
+          playlists={playlists}
         />
       }
       renderItem={({item, index, separators}) => (

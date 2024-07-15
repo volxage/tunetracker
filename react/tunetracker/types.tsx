@@ -24,7 +24,7 @@ export type standard = {
   "Lyricist(s)": string
 }
 export type playlist = {
-  "title"?: string
+  "title": string
   "description"?: string
   "id": string
   "tunes": string[]

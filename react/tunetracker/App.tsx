@@ -23,7 +23,6 @@ import jazzStandards from './jazzstandards.json';
 
 import RNFS from 'react-native-fs';
 
-//TODO: Implement playlists
 const playlistsPath = RNFS.DocumentDirectoryPath + "/playlists.json";
 import { tune } from './types.tsx';
 import SongsList from './SongsList.tsx';
@@ -66,12 +65,12 @@ function App(): React.JSX.Element {
   }, []);
 
   return(
-    <MainMenu songs={songs} setSongs={setSongs} songsList={songsList}/>
+    <MainMenu songs={songs} setSongs={setSongs} songsList={songsList} playlists={playlists}/>
   );
 }
 
-function MainMenu({songs, setSongs, songsList}:
-  {songs: Array<tune>, setSongs: Function, songsList:SongsList}): React.JSX.Element {
+function MainMenu({songs, setSongs, songsList, playlists}:
+  {songs: Array<tune>, setSongs: Function, songsList: SongsList, playlists: Playlists}): React.JSX.Element {
 
   //const isDarkMode = useColorScheme() === 'dark';
   const [selectedTune, setSelectedTune] = useState(songs[0]);
@@ -113,7 +112,12 @@ function MainMenu({songs, setSongs, songsList}:
     return (
       <SafeAreaView style={backgroundStyle}>
         <View>
-          <LList songs={songs} viewingPair={viewingPair} setSelectedTune={setSelectedTune} addNewTune={songsList.addNewTune}/>
+          <LList songs={songs}
+            viewingPair={viewingPair}
+            setSelectedTune={setSelectedTune}
+            addNewTune={songsList.addNewTune}
+            playlists={playlists}
+            />
         </View>
         </SafeAreaView>
       );

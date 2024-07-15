@@ -28,6 +28,9 @@ class Playlists{
         RNFS.writeFile(playlistsFilePath, "[]")
       });
   }
+  getPlaylists(){
+    return this.playlists;
+  }
   addNewTune(tune:tune, playlistId:string){
     const playList = this.getPlaylist(playlistId)
     if(typeof tune.id === 'undefined'){
