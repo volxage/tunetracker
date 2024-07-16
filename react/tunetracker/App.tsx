@@ -45,12 +45,12 @@ const prettyAttrs = new Map<string, string>([
   ["styles", "Styles"],
   ["tempi", "Tempi"],
   ["contrafacts", "Contrafacts"],
+  ["playlists", "Playlits"],
   ["playthroughs", "Playthroughs"],
   ["form_confidence", "Form Confidence"],
   ["melody_confidence", "Melody Confidence"],
   ["solo_confidence", "Solo Confidence"],
-  ["lyrics_confidence", "Lyrics Confidence"],
-  ["playlists", "Playlits"]
+  ["lyrics_confidence", "Lyrics Confidence"]
 ])
 
 
@@ -86,10 +86,11 @@ function MainMenu({songs, setSongs, songsList, playlists}:
     let arr = ((entriesArr as Array<Array<unknown>>) as Array<[string, string]>);
     return(
       <Editor
-      viewingPair={viewingPair}
-      prettyAttrs={arr}
-      selectedTune={selectedTune}
-      songsList={songsList}
+        viewingPair={viewingPair}
+        prettyAttrs={arr}
+        selectedTune={selectedTune}
+        songsList={songsList}
+        playlists={playlists}
       />
     );
   }else if(viewing === 2){ //Editor

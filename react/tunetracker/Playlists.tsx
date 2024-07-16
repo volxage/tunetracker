@@ -49,15 +49,15 @@ class Playlists{
   getPlaylists(){
     return this.playlists;
   }
-  addTune(tune:tune, playlistId:string){
+  addTune(tuneId:keyof tune, playlistId:string){
     const playList = this.getPlaylist(playlistId)
-    if(typeof tune.id === 'undefined'){
+    if(typeof tuneId === 'undefined'){
       console.error("Id-less tune attempted to add to playlist (This shouldn't be possible)")
     }else if(typeof playList === 'undefined'){
       console.error("Id-less playlist attempted to add tune to (This shouldn't be possible)")
     }
-    else if(!(tune.id in playList)){
-      playList.tunes.push(tune.id)
+    else if(!(tuneId in playList)){
+      playList.tunes.push(tuneId)
       this.writeToPlaylistsJson(this.playlists)
     }
   }

@@ -36,20 +36,27 @@ const tuneDefaults = {
   "id": "THIS SHOULD NOT BE HERE" // If the user sees this text at any point, there's an error in the program
 }
 
-function AddPlaylistField({newPlaylist, playlists}:
-                          {newPlaylist:boolean, playlists: playlist[]}){
+function AddPlaylistField({newPlaylist, tunePlaylists, playlists, setTunePlaylists, id}:
+                          {newPlaylist:boolean, tunePlaylists: playlist[], setTunePlaylists: Function, playlists: Playlists, id: keyof tune}){
+  const [newPlaylistTitle, setNewPlaylistTitle] = useState("")
   if(newPlaylist){
     return(
-      <View style={{flexDirection: "row"}}>
+      <View style={{padding: 8, flexDirection: "row"}}>
         <View style={{flex: 3}}>
           <TextInput
             placeholder='Enter New Playlist Name'
             placeholderTextColor={"grey"}
-            onChangeText={(text) => {}}
+            onChangeText={setNewPlaylistTitle}
           />
         </View>
         <View style={{alignContent: 'flex-end', flex: 1}}>
-          <Button>
+          <Button onPress={() => {
+            const tmpPlaylist = playlists.addPlaylist(newPlaylistTitle);
+            if(typeof tmpPlaylist !== "undefined"){
+              setTunePlaylists(tunePlaylists.concat(tmpPlaylist))
+              console.log(tunePlaylists)
+            }
+          }}>
             <ButtonText><Icon name="plus" size={30}/></ButtonText>
           </Button>
         </View>
@@ -73,17 +80,18 @@ function TypeField({id, attr, attrKey, attrName, handleSetCurrentTune, playlists
   if(attr == null){
     attr = tuneDefaults[attrKey];
   }
-  const [newPlaylistOpen, setNewPlaylistOpen] = useState(false)
   if (attrKey === "playlists" as keyof tune){ //Playlists are NOT an attribute of a tune
-    let tunePlaylists: playlist[] = []
-    if (typeof id !== "undefined"){ //If there's no id, it's impossible that the tune has been assigned playlists already.
-      tunePlaylists = playlists.getTunePlaylists(id)
-
-    }
+    const [newPlaylistOpen, setNewPlaylistOpen] = useState(false)
+    const [tunePlaylists, setTunePlaylists]: [playlist[], Function] = useState([])
+    useEffect(() => {
+      if (typeof id !== "undefined"){ //If there's no id, it's impossible that the tune has been assigned playlists already.
+        setTunePlaylists(playlists.getTunePlaylists(id))
+      }
+    }, [])
     //TODO:
     // Delete Button
-    // RNPicker Items
     // RNPicker onValueChange
+    console.log("Rerender playlist field")
     return(
       <View style={{padding: 8}}>
         <Title>PLAYLISTS</Title>
@@ -92,7 +100,7 @@ function TypeField({id, attr, attrKey, attrName, handleSetCurrentTune, playlists
           renderItem={({item, index, separators}) => (
             <View>
               <View style={{flexDirection: 'row'}}>
-                <Title>{item.title}</Title>
+                <Text>{item.title}</Text>
                 <DeleteButton>
                   <ButtonText><Icon name="close" size={30}/></ButtonText>
                 </DeleteButton>
@@ -105,7 +113,13 @@ function TypeField({id, attr, attrKey, attrName, handleSetCurrentTune, playlists
             <Switch value={newPlaylistOpen} onValueChange={setNewPlaylistOpen}/>
           <Text>New playlist</Text>
         </View>
-        <AddPlaylistField playlists={tunePlaylists} newPlaylist={newPlaylistOpen}/>
+        <AddPlaylistField
+          tunePlaylists={tunePlaylists}
+          playlists={playlists}
+          newPlaylist={newPlaylistOpen}
+          id={id}
+          setTunePlaylists={setTunePlaylists}
+        />
       </View>
     );
   }
