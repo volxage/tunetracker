@@ -13,4 +13,4 @@ Tune Tracker was originally implemented in NCurses for the terminal, and was the
 Happy tracking!
 
 ## Note for potential employers
-You may have noticed that the contributions are split between hillia45 and volxage. Both of these accounts are mine, this is a solo project unless anyone else would to contribute!
+You may have noticed that the contributions are split between hillia45 and volxage. Both of these accounts are mine, this is a solo project unless anyone else would like to contribute!
