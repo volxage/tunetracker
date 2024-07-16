@@ -8,8 +8,11 @@ class Playlists{
   constructor(playlists: playlist[] = []){
     this.playlists = playlists;
   }
-  getPlaylist(id: string): playlist | undefined{
-    return this.playlists.find((playlist) => {playlist.id === id})
+  getPlaylist(playlist_id: string): playlist | undefined{
+    return this.playlists.find((playlist) => {playlist.id === playlist_id})
+  }
+  getTunePlaylists(tune_id: string): playlist[]{
+    return this.getPlaylists().filter((playlist) => {return tune_id in playlist})
   }
   writeToPlaylistsJson(playlists: playlist[] = []){
     const stringified = JSON.stringify(playlists);
@@ -31,7 +34,7 @@ class Playlists{
   getPlaylists(){
     return this.playlists;
   }
-  addNewTune(tune:tune, playlistId:string){
+  addTune(tune:tune, playlistId:string){
     const playList = this.getPlaylist(playlistId)
     if(typeof tune.id === 'undefined'){
       console.error("Id-less tune attempted to add to playlist (This shouldn't be possible)")

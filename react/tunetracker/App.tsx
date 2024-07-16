@@ -23,7 +23,6 @@ import jazzStandards from './jazzstandards.json';
 
 import RNFS from 'react-native-fs';
 
-const playlistsPath = RNFS.DocumentDirectoryPath + "/playlists.json";
 import { tune } from './types.tsx';
 import SongsList from './SongsList.tsx';
 import Playlists from './Playlists.tsx';
@@ -51,6 +50,7 @@ const prettyAttrs = new Map<string, string>([
   ["melody_confidence", "Melody Confidence"],
   ["solo_confidence", "Solo Confidence"],
   ["lyrics_confidence", "Lyrics Confidence"],
+  ["playlists", "Playlits"]
 ])
 
 
@@ -99,6 +99,7 @@ function MainMenu({songs, setSongs, songsList, playlists}:
       prettyAttrs={Array.from(prettyAttrs.entries())}
       selectedTune={selectedTune}
       songsList={songsList}
+      playlists={playlists}
       />
     );
   }else if (viewing == 3){ //TuneImporter

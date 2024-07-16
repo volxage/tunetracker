@@ -1,4 +1,4 @@
-import { standard } from "./components/Importer";
+import { standard } from "./types";
 type tune = {
   "title"?: string
   "alternative_title"?: string

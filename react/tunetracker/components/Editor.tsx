@@ -28,10 +28,11 @@ type viewingPair = {
 }
 import TypeField from './TypeField.tsx';
 import SongsList from '../SongsList.tsx';
+import Playlists from '../Playlists.tsx';
 import { tune } from '../types.tsx';
 
-function Editor({prettyAttrs, viewingPair, selectedTune, songsList}:
-{prettyAttrs: Array<[string, string]>, viewingPair: viewingPair, selectedTune: tune, songsList: SongsList}): React.JSX.Element {
+function Editor({prettyAttrs, viewingPair, selectedTune, songsList, playlists}:
+{prettyAttrs: Array<[string, string]>, viewingPair: viewingPair, selectedTune: tune, songsList: SongsList, playlists: Playlists}): React.JSX.Element {
   const [currentTune, setCurrentTune] = useState(JSON.parse(JSON.stringify(selectedTune)) as tune) //Intentional copy to allow cancelling of edits
   function handleSetCurrentTune(attr_key: keyof tune, value: undefined){
     //Inefficient solution, but there are no Map functions such as "filter" in mapped types
@@ -44,16 +45,21 @@ function Editor({prettyAttrs, viewingPair, selectedTune, songsList}:
       <FlatList
         data={prettyAttrs}
         renderItem={({item, index, separators}) => (
-          //Why is this a TouchableHighlight and not a regular view?
           <View>
-          <TouchableHighlight
-            key={item[0]}
-            onShowUnderlay={separators.highlight}
-            style={styles.bordered}
-            onHideUnderlay={separators.unhighlight}>
-            <TypeField attr={currentTune[item[0] as keyof tune]} attrKey={item[0] as keyof tune} attrName={item[1]} handleSetCurrentTune={handleSetCurrentTune}/>
-          </TouchableHighlight>
-        </View>
+            <TouchableHighlight
+              key={item[0]}
+              onShowUnderlay={separators.highlight}
+              style={styles.bordered}
+              onHideUnderlay={separators.unhighlight}>
+              <TypeField
+              id={selectedTune.id}
+              attr={currentTune[item[0] as keyof tune]}
+              attrKey={item[0] as keyof tune}
+              attrName={item[1]}
+              handleSetCurrentTune={handleSetCurrentTune}
+              playlists={playlists}/>
+            </TouchableHighlight>
+          </View>
       )}
       ListFooterComponent={
         <View>
