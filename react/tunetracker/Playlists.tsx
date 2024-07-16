@@ -18,6 +18,21 @@ class Playlists{
     const stringified = JSON.stringify(playlists);
     RNFS.writeFile(playlistsFilePath, stringified);
   }
+  addPlaylist(playlistName: string){
+    if(this.playlists.some((playlist) => {return playlist.title === playlistName})){
+      //TODO: Generate visible "Error" on screen for user using return value
+      console.log("Duplicate name, not creating new playlist")
+      return(undefined);
+    }else{
+      const plist: playlist = {
+        title: playlistName,
+        id: uuid.v4() as string,
+        tunes: []
+      }
+      this.playlists.push(plist)
+      return(plist);
+    }
+  }
   readFromPlaylistsJson(){
     //TODO: FIX
     RNFS.readFile(playlistsFilePath)
