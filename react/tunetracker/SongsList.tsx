@@ -31,20 +31,20 @@ class SongsList{
   replaceSelectedTune(oldTune:tune, newTune:tune){
     if(oldTune.id === undefined){
       const new_id = uuid.v4() as string;
-      console.log("New id: " + new_id);
       newTune.id = new_id;
     }else{
-      console.log("Id: " + oldTune.id);
       newTune.id = oldTune.id;
     }
-    this.writeToSongsJson(this.songsList.map( (value: tune, index: number, array: tune[]) => {
+    const result = this.songsList.map( (value: tune, index: number, array: tune[]) => {
       if(value === oldTune){
         return newTune;
       }
       else{
         return value;
       }
-    }));
+    });
+    this.writeToSongsJson(result)
+    this.updateSongs(result)
     if(!("id" in newTune)){
       console.error("Tune-ID failed to transfer to updated tune")
     }
