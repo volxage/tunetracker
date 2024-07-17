@@ -9,7 +9,7 @@ class Playlists{
     this.playlists = playlists;
   }
   getPlaylist(playlist_id: string): playlist | undefined{
-    return this.playlists.find((playlist) => {playlist.id === playlist_id})
+    return this.playlists.find((playlist) => {return playlist.id === playlist_id})
   }
   getTunePlaylists(tune_id: string): playlist[]{
     return this.getPlaylists().filter((playlist) => {return tune_id in playlist})
@@ -59,6 +59,10 @@ class Playlists{
     }
     else if(typeof playList === 'undefined'){
       console.error("Playlist lookup failed (playlistId invalid?)");
+      console.error("Playlists:");
+      console.error(this.playlists);
+      console.error("Searched playlist id:");
+      console.error(playlistId);
     }
     else if(!(tuneId in playList)){
       playList.tunes.push(tuneId)
