@@ -48,7 +48,7 @@ class SongsList{
     if(!("id" in newTune)){
       console.error("Tune-ID failed to transfer to updated tune")
     }
-    return newTune.id as keyof tune;
+    return newTune.id as string;
   }
   addNewTune(tune:tune){
     this.writeToSongsJson(this.songsList.concat(tune))

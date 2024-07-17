@@ -57,7 +57,9 @@ const prettyAttrs = new Map<string, string>([
 function App(): React.JSX.Element {
   const [songs, setSongs] = useState(defaultSongsJson);
   const songsList = new SongsList(songs, setSongs);
-  const playlists = new Playlists();
+  const [rawPlaylists, setRawPlaylists] = useState([])
+
+  const playlists = new Playlists(rawPlaylists, setRawPlaylists);
   useEffect(() => {
     //The below functions may also create "template" json files if either is not present.
     songsList.readFromSongsJson();

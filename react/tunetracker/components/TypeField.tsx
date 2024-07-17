@@ -5,6 +5,7 @@ import {
   Button,
   Title,
   Text,
+  SubText
 } from '../Style.tsx'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import React, {useEffect, useState} from 'react';
@@ -54,7 +55,6 @@ function AddPlaylistField({newPlaylist, tunePlaylists, playlists, setTunePlaylis
             const tmpPlaylist = playlists.addPlaylist(newPlaylistTitle);
             if(typeof tmpPlaylist !== "undefined"){
               setTunePlaylists(tunePlaylists.concat(tmpPlaylist))
-              console.log(tunePlaylists)
             }
           }}>
             <ButtonText><Icon name="plus" size={30}/></ButtonText>
@@ -64,11 +64,10 @@ function AddPlaylistField({newPlaylist, tunePlaylists, playlists, setTunePlaylis
     );
   }else{
     let availablePlaylists = playlists.getPlaylists().filter((playlist) => {return !(tunePlaylists.includes(playlist))})
-    console.log("Available playlists" + availablePlaylists)
     return (
       <RNPickerSelect
         onValueChange={
-          // When the component rerenders, onValueChange is called with a value of "".
+          // When the component rerenders, onValueChange is called with a value of "", this must be ignored
           (value) => {value !== "" && setTunePlaylists(tunePlaylists.concat(value))}
         }
         items={availablePlaylists.map((playlist) => {return {label:playlist.title, value: playlist}})}
@@ -80,33 +79,29 @@ function AddPlaylistField({newPlaylist, tunePlaylists, playlists, setTunePlaylis
   }
 }
 
-function TypeField({id, attr, attrKey, attrName, handleSetCurrentTune, playlists}:
-                   {id: string | undefined, attr: unknown, attrKey: keyof tune, attrName: string, handleSetCurrentTune: Function, playlists: Playlists}){
+function TypeField({id, attr, attrKey, attrName, handleSetCurrentTune, playlists, tunePlaylists, setTunePlaylists}:
+                   {id: string | undefined, attr: unknown, attrKey: keyof tune, attrName: string, handleSetCurrentTune: Function, playlists: Playlists, tunePlaylists: playlist[], setTunePlaylists: Function}){
   if(attr == null){
     attr = tuneDefaults[attrKey];
   }
   if (attrKey === "playlists" as keyof tune){ //Playlists are NOT an attribute of a tune
     const [newPlaylistOpen, setNewPlaylistOpen] = useState(false)
-    const [tunePlaylists, setTunePlaylists]: [playlist[], Function] = useState([])
-    useEffect(() => {
-      if (typeof id !== "undefined"){ //If there's no id, it's impossible that the tune has been assigned playlists already.
-        setTunePlaylists(playlists.getTunePlaylists(id))
-      }
-    }, [])
     //TODO:
     // Delete Button
     // RNPicker onValueChange
-    console.log("Rerender playlist field")
-    console.log("Tune playlists:" + tunePlaylists)
     return(
       <View style={{padding: 8}}>
-        <Title>PLAYLISTS</Title>
+        <View style={{paddingBottom:20}}>
+          <Title>PLAYLISTS</Title>
+        </View>
         <FlatList
           data={tunePlaylists}
           renderItem={({item, index, separators}) => (
-            <View>
-              <View style={{flexDirection: 'row'}}>
-                <Text>{item.title}</Text>
+            <View style={{flexDirection: 'row'}}>
+              <View style={{flex:4}}>
+                <SubText>{item.title}</SubText>
+              </View>
+              <View style={{flex:1}}>
                 <DeleteButton>
                   <ButtonText><Icon name="close" size={30}/></ButtonText>
                 </DeleteButton>

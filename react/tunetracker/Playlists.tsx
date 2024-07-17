@@ -1,18 +1,21 @@
 import RNFS from 'react-native-fs'
-const playlistsFilePath = RNFS.DocumentDirectoryPath + "/songs.json"
+const playlistsFilePath = RNFS.DocumentDirectoryPath + "/playlists.json"
 import { tune, playlist } from "./types";
 import uuid from 'react-native-uuid'
 
 class Playlists{
-  playlists: playlist[];
-  constructor(playlists: playlist[] = []){
+  readonly playlists: playlist[];
+  setRawPlaylists: Function;
+  constructor(playlists: playlist[] = [], setRawPlaylists: Function){
     this.playlists = playlists;
+    this.setRawPlaylists = setRawPlaylists;
   }
   getPlaylist(playlist_id: string): playlist | undefined{
     return this.playlists.find((playlist) => {return playlist.id === playlist_id})
   }
   getTunePlaylists(tune_id: string): playlist[]{
-    return this.getPlaylists().filter((playlist) => {return tune_id in playlist})
+    const result = this.playlists.filter((playlist) => {console.log(playlist.tunes.includes(tune_id)); return playlist.tunes.includes(tune_id)})
+    return result
   }
   writeToPlaylistsJson(playlists: playlist[] = []){
     const stringified = JSON.stringify(playlists);
@@ -21,7 +24,7 @@ class Playlists{
   addPlaylist(playlistName: string){
     if(this.playlists.some((playlist) => {return playlist.title === playlistName})){
       //TODO: Generate visible "Error" on screen for user using return value
-      console.log("Duplicate name, not creating new playlist")
+      console.error("Duplicate name, not creating new playlist")
       return(undefined);
     }else{
       const plist: playlist = {
@@ -29,7 +32,8 @@ class Playlists{
         id: uuid.v4() as string,
         tunes: []
       }
-      this.playlists.push(plist)
+      this.setRawPlaylists(this.playlists.concat(plist))
+      console.log("New playlist added")
       return(plist);
     }
   }
@@ -46,10 +50,24 @@ class Playlists{
         RNFS.writeFile(playlistsFilePath, "[]")
       });
   }
+  replacePlaylist(oldPlaylist:playlist, newPlaylist:playlist){
+    newPlaylist.id = oldPlaylist.id;
+    const result = this.playlists.map( (value: playlist) => {
+      if(value === oldPlaylist){
+        return newPlaylist;
+      }
+      else{
+        return value;
+      }
+    });
+    this.writeToPlaylistsJson(result);
+    this.updatePlaylists(result)
+    return newPlaylist.id;
+  }
   getPlaylists(){
     return this.playlists;
   }
-  addTune(tuneId:keyof tune, playlistId:string){
+  addTune(tuneId:string, playlistId:string){
     const playList = this.getPlaylist(playlistId)
     if(typeof tuneId === 'undefined'){
       console.error("Id-less tune attempted to add to playlist (This shouldn't be possible)");
@@ -65,8 +83,12 @@ class Playlists{
       console.error(playlistId);
     }
     else if(!(tuneId in playList)){
-      playList.tunes.push(tuneId)
+      const cpy = JSON.parse(JSON.stringify(playList)) as playlist;
+      cpy.tunes.push(tuneId)
+      this.replacePlaylist(playList, cpy)
       this.writeToPlaylistsJson(this.playlists)
+      console.log("Playlists after adding tune:")
+      console.log(this.playlists)
     }
   }
   deleteTune(tune:tune, playlistId: string){
@@ -81,7 +103,7 @@ class Playlists{
     }
   }
   updatePlaylists(playlists: playlist[]){
-    this.playlists = playlists
+    this.setRawPlaylists(playlists)
   }
 }
 export default Playlists
