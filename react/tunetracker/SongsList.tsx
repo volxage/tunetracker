@@ -35,6 +35,7 @@ class SongsList{
       newTune.id = new_id;
     }else{
       console.log("Id: " + oldTune.id);
+      newTune.id = oldTune.id;
     }
     this.writeToSongsJson(this.songsList.map( (value: tune, index: number, array: tune[]) => {
       if(value === oldTune){
@@ -44,6 +45,10 @@ class SongsList{
         return value;
       }
     }));
+    if(!("id" in newTune)){
+      console.error("Tune-ID failed to transfer to updated tune")
+    }
+    return newTune.id as keyof tune;
   }
   addNewTune(tune:tune){
     this.writeToSongsJson(this.songsList.concat(tune))
