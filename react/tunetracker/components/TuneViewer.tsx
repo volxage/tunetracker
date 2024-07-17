@@ -91,10 +91,10 @@ function LListHeader({listReversed, setListReversed, setViewing, setSearch, addN
   const selectedPlaylistItems = Array.from(playlists.getPlaylists().map(
     (playlist) => {return {label: playlist.title, value: playlist.id}}
   ));
-  selectedPlaylistItems.push(
+  selectedPlaylistItems.unshift(
     {
       label: "No playlist (Show all songs)",
-      value: ""
+      value: " "
     }
   )
 
@@ -158,11 +158,11 @@ export default function TuneViewer({songs, viewingPair, setSelectedTune, addNewT
   const [search, setSearch] = useState("");
 
   let displaySongs = songs;
-  if(selectedPlaylist !== ""){
+  if(selectedPlaylist !== " "){
     const playlist = playlists.getPlaylist(selectedPlaylist)
     if(typeof playlist !== "undefined"){
       displaySongs = songs.filter(
-        (tune) => {return typeof tune.id !== "undefined" && tune.id in playlist.tunes}
+        (tune) => {return typeof tune.id !== "undefined" && playlist.tunes.includes(tune.id)}
       )
     }
   }
