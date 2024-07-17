@@ -35,12 +35,13 @@ function Editor({prettyAttrs, viewingPair, selectedTune, songsList, playlists}:
 {prettyAttrs: Array<[string, string]>, viewingPair: viewingPair, selectedTune: tune, songsList: SongsList, playlists: Playlists}): React.JSX.Element {
   const [currentTune, setCurrentTune] = useState(JSON.parse(JSON.stringify(selectedTune)) as tune) //Intentional copy to allow cancelling of edits
   const [tunePlaylists, setTunePlaylists]: [playlist[], Function] = useState([])
+  const [originalPlaylistsSet, setOriginalPlaylistsSet]: [Set<playlist>, Function] = useState(new Set())
   useEffect(() => {
     if (typeof selectedTune.id !== "undefined"){ //If there's no id, it's impossible that the tune has been assigned playlists already.
-      setTunePlaylists(playlists.getTunePlaylists(selectedTune.id))
+      const tmpTunesPlaylist = playlists.getTunePlaylists(selectedTune.id);
+      setTunePlaylists(tmpTunesPlaylist);
+      setOriginalPlaylistsSet(new Set(tmpTunesPlaylist));
     }
-    console.log("Tune playlists:")
-    console.log(tunePlaylists)
   }, [])
   function handleSetCurrentTune(attr_key: keyof tune, value: undefined){
     //Inefficient solution, but there are no Map functions such as "filter" in mapped types
@@ -83,11 +84,27 @@ function Editor({prettyAttrs, viewingPair, selectedTune, songsList, playlists}:
             <View style={{flex: 1}}>
               <Button
                 onPress={() => {
+                  //SAVE BUTTON
+                  //TODO: Use sets/unions to find difference between original playlists and new ones
+                  //Remove the deleted ones, add the new ones
+
                   const tune_id = songsList.replaceSelectedTune(selectedTune, currentTune);
-                  console.log("Added tune_id:")
+                  const newPlaylistSet = new Set(tunePlaylists);
+                  const removedPlaylists = [...originalPlaylistsSet].filter((oldPlaylist) => {return !newPlaylistSet.has(oldPlaylist)});
+                  const updatedPlaylists = [...newPlaylistSet].filter((newPlaylist) => {return !originalPlaylistsSet.has(newPlaylist)});
+                  console.log("updatedPlaylists:");
+                  console.log(updatedPlaylists);
+                  console.log("removedPlaylists");
+                  console.log(removedPlaylists);
+                  console.log("Tune ID:")
                   console.log(tune_id)
-                  for(var playlist of tunePlaylists){
+                  for(var playlist of updatedPlaylists){
+                    console.log("Adding tune to " + playlist.title)
                     playlists.addTune(tune_id, playlist.id)
+                  }
+                  for(var playlist of removedPlaylists){
+                    console.log("Removing tune from " + playlist.title)
+                    playlists.removeTune(tune_id, playlist.id)
                   }
                   viewingPair.setViewing(!viewingPair.viewing);
                 }}

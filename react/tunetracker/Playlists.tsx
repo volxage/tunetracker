@@ -41,7 +41,10 @@ class Playlists{
     //TODO: FIX
     RNFS.readFile(playlistsFilePath)
       .then((results) => {
-        this.updatePlaylists(JSON.parse(results))
+        console.log("Initial playlists read:");
+        console.log(JSON.parse(results));
+        this.updatePlaylists(JSON.parse(results));
+        this.setRawPlaylists(JSON.parse(results));
       })
       .catch((reason) => {
         console.log("ERROR CAUGHT BELOW:")
@@ -86,20 +89,23 @@ class Playlists{
       const cpy = JSON.parse(JSON.stringify(playList)) as playlist;
       cpy.tunes.push(tuneId)
       this.replacePlaylist(playList, cpy)
-      this.writeToPlaylistsJson(this.playlists)
       console.log("Playlists after adding tune:")
       console.log(this.playlists)
     }
   }
-  deleteTune(tune:tune, playlistId: string){
+  removeTune(tuneId:string, playlistId: string){
     const playList = this.getPlaylist(playlistId)
     if(typeof playList === 'undefined'){
       console.error("Id-less playlist attempted to be deleted from(This shouldn't be possible)")
-    }else if(typeof tune.id === 'undefined'){
+    }else if(typeof tuneId === 'undefined'){
       console.error("Tune delete from playlist attempt without ID (This shouldn't be possible)")
     }else{
-      const i = playList.tunes.indexOf(tune.id);
-      this.writeToPlaylistsJson(this.playlists)
+      this.replacePlaylist(playList, {
+        title: playList.title,
+        id: playList.id,
+        description: playList.description,
+        tunes: playList.tunes.filter(id => id !== tuneId)
+      })
     }
   }
   updatePlaylists(playlists: playlist[]){

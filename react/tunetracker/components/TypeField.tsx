@@ -88,7 +88,6 @@ function TypeField({id, attr, attrKey, attrName, handleSetCurrentTune, playlists
     const [newPlaylistOpen, setNewPlaylistOpen] = useState(false)
     //TODO:
     // Delete Button
-    // RNPicker onValueChange
     return(
       <View style={{padding: 8}}>
         <View style={{paddingBottom:20}}>
@@ -102,7 +101,7 @@ function TypeField({id, attr, attrKey, attrName, handleSetCurrentTune, playlists
                 <SubText>{item.title}</SubText>
               </View>
               <View style={{flex:1}}>
-                <DeleteButton>
+                <DeleteButton onPress={() => setTunePlaylists(tunePlaylists.filter(playlist => {return playlist !== item}))}>
                   <ButtonText><Icon name="close" size={30}/></ButtonText>
                 </DeleteButton>
               </View>
