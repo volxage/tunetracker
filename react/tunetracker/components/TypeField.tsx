@@ -36,8 +36,8 @@ const tuneDefaults = {
   "id": "THIS SHOULD NOT BE HERE" // If the user sees this text at any point, there's an error in the program
 }
 
-function AddPlaylistField({newPlaylist, tunePlaylists, playlists, setTunePlaylists, id}:
-                          {newPlaylist:boolean, tunePlaylists: playlist[], setTunePlaylists: Function, playlists: Playlists, id: keyof tune}){
+function AddPlaylistField({newPlaylist, tunePlaylists, playlists, setTunePlaylists}:
+                          {newPlaylist:boolean, tunePlaylists: playlist[], setTunePlaylists: Function, playlists: Playlists}){
   const [newPlaylistTitle, setNewPlaylistTitle] = useState("")
   if(newPlaylist){
     return(
@@ -63,10 +63,15 @@ function AddPlaylistField({newPlaylist, tunePlaylists, playlists, setTunePlaylis
       </View>
     );
   }else{
+    let availablePlaylists = playlists.getPlaylists().filter((playlist) => {return !(tunePlaylists.includes(playlist))})
+    console.log("Available playlists" + availablePlaylists)
     return (
       <RNPickerSelect
-        onValueChange={(value) => {}}
-        items={[]}
+        onValueChange={
+          // When the component rerenders, onValueChange is called with a value of "".
+          (value) => {value !== "" && setTunePlaylists(tunePlaylists.concat(value))}
+        }
+        items={availablePlaylists.map((playlist) => {return {label:playlist.title, value: playlist}})}
         useNativeAndroidPickerStyle={false}
         placeholder={{label: "Select a playlist to insert tune into", value: ""}}
         style={{inputAndroid: {backgroundColor: 'transparent', color: 'white', fontSize: 18, fontWeight: "300"}}}
@@ -92,6 +97,7 @@ function TypeField({id, attr, attrKey, attrName, handleSetCurrentTune, playlists
     // Delete Button
     // RNPicker onValueChange
     console.log("Rerender playlist field")
+    console.log("Tune playlists:" + tunePlaylists)
     return(
       <View style={{padding: 8}}>
         <Title>PLAYLISTS</Title>
@@ -117,7 +123,6 @@ function TypeField({id, attr, attrKey, attrName, handleSetCurrentTune, playlists
           tunePlaylists={tunePlaylists}
           playlists={playlists}
           newPlaylist={newPlaylistOpen}
-          id={id}
           setTunePlaylists={setTunePlaylists}
         />
       </View>
