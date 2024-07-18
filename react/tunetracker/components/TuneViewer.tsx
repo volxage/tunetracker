@@ -48,6 +48,7 @@ const fuseOptions = { // For finetuning the search algorithm
 	]
 };
 import { tune, playlist } from '../types.tsx';
+import SongsList from '../SongsList.tsx';
 const prettyAttrs = new Map<string, string>([
   ["title", "Title"],
   ["alternative_title", "Alternative Title"],
@@ -73,12 +74,12 @@ function prettyPrint(object: unknown): string{
   return "(Empty)";
 }
 
-function LListHeader({listReversed, setListReversed, setViewing, setSearch, addNewTune, setSelectedAttr, setSelectedTune, setSelectedPlaylist, playlists}:
+function LListHeader({listReversed, setListReversed, setViewing, setSearch, songsList, setSelectedAttr, setSelectedTune, setSelectedPlaylist, playlists}:
 {listReversed: boolean | undefined,
       setListReversed: Function,
       setViewing: Function,
       setSearch: Function,
-      addNewTune: Function
+      songsList: SongsList,
       setSelectedAttr: Function,
       setSelectedTune: Function,
       setSelectedPlaylist: Function,
@@ -136,7 +137,7 @@ function LListHeader({listReversed, setListReversed, setViewing, setSearch, addN
       </View>
       <Button onPress={() => setViewing(3)} onLongPress={() => {
             const tn: tune = {};
-            addNewTune(tn);
+            songsList.addNewTune(tn);
             setSelectedTune(tn);
             setViewing(2);
       }}>
@@ -150,8 +151,8 @@ type viewingPair = {
   viewing: number;
   setViewing: Function;
 }
-export default function TuneViewer({songs, viewingPair, setSelectedTune, addNewTune, playlists}:
-{songs: Array<tune>, viewingPair: viewingPair, setSelectedTune: Function, addNewTune: Function, playlists: Playlists}){
+export default function TuneViewer({songs, viewingPair, setSelectedTune, songsList, playlists}:
+{songs: Array<tune>, viewingPair: viewingPair, setSelectedTune: Function, songsList: SongsList, playlists: Playlists}){
   const [listReversed, setListReversed] = useState(false);
   const [selectedAttr, updateSelectedAttr] = useState("title");
   const [selectedPlaylist, setSelectedPlaylist] = useState("");
@@ -187,7 +188,7 @@ export default function TuneViewer({songs, viewingPair, setSelectedTune, addNewT
           setListReversed={setListReversed}
           setViewing={viewingPair.setViewing}
           setSearch={setSearch}
-          addNewTune={addNewTune}
+          songsList={songsList}
           setSelectedAttr={updateSelectedAttr}
           setSelectedTune={setSelectedTune}
           setSelectedPlaylist={setSelectedPlaylist}
