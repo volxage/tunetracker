@@ -4,8 +4,8 @@ import { tune, playlist } from "./types";
 import uuid from 'react-native-uuid'
 
 class Playlists{
-  readonly playlists: playlist[];
-  setRawPlaylists: Function;
+  playlists: playlist[];
+  readonly setRawPlaylists: Function;
   constructor(playlists: playlist[] = [], setRawPlaylists: Function){
     this.playlists = playlists;
     this.setRawPlaylists = setRawPlaylists;
@@ -89,8 +89,6 @@ class Playlists{
       const cpy = JSON.parse(JSON.stringify(playList)) as playlist;
       cpy.tunes.push(tuneId)
       this.replacePlaylist(playList, cpy)
-      console.log("Playlists after adding tune:")
-      console.log(this.playlists)
     }
   }
   removeTune(tuneId:string, playlistId: string){
@@ -100,16 +98,26 @@ class Playlists{
     }else if(typeof tuneId === 'undefined'){
       console.error("Tune delete from playlist attempt without ID (This shouldn't be possible)")
     }else{
-      this.replacePlaylist(playList, {
+       this.replacePlaylist(playList, {
         title: playList.title,
         id: playList.id,
         description: playList.description,
         tunes: playList.tunes.filter(id => id !== tuneId)
       })
+      const newPlaylist = this.getPlaylist(playlistId);
+      if(typeof newPlaylist !== 'undefined'){
+        if(newPlaylist.tunes.length === 0){
+          const playlistsWithoutEmpty = this.playlists.filter((playlist) => {return playlist.id != playlistId})
+          console.log("Empty playlist deleted.");
+          this.updatePlaylists(playlistsWithoutEmpty);
+          this.writeToPlaylistsJson(playlistsWithoutEmpty);
+        }
+      }
     }
   }
   updatePlaylists(playlists: playlist[]){
     this.setRawPlaylists(playlists)
+    this.playlists = playlists
   }
 }
 export default Playlists

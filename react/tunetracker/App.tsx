@@ -58,8 +58,8 @@ function App(): React.JSX.Element {
   const [songs, setSongs] = useState(defaultSongsJson);
   const songsList = new SongsList(songs, setSongs);
   const [rawPlaylists, setRawPlaylists] = useState([])
-
   const playlists = new Playlists(rawPlaylists, setRawPlaylists);
+
   useEffect(() => {
     //The below functions may also create "template" json files if either is not present.
     songsList.readFromSongsJson();
@@ -118,7 +118,7 @@ function MainMenu({songs, setSongs, songsList, playlists}:
   }else if (viewing == 3){ //TuneImporter
     return(
       <SafeAreaView style={backgroundStyle}>
-        <Importer standards={jazzStandards} viewingPair={viewingPair} setSelectedTune={setSelectedTune} addNewTune={songsList.addNewTune}/>
+        <Importer standards={jazzStandards} viewingPair={viewingPair} setSelectedTune={setSelectedTune} songsList={songsList}/>
       </SafeAreaView>
     )
   }
@@ -129,7 +129,7 @@ function MainMenu({songs, setSongs, songsList, playlists}:
           <TuneViewer songs={songs}
             viewingPair={viewingPair}
             setSelectedTune={setSelectedTune}
-            addNewTune={songsList.addNewTune}
+            songsList={songsList}
             playlists={playlists}
             />
         </View>

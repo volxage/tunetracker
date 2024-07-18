@@ -94,7 +94,7 @@ function LListHeader({listReversed, setListReversed, setViewing, setSearch, song
   ));
   selectedPlaylistItems.unshift(
     {
-      label: "No playlist (Show all songs)",
+      label: "All Songs",
       value: " "
     }
   )
@@ -125,7 +125,7 @@ function LListHeader({listReversed, setListReversed, setViewing, setSearch, song
           onValueChange={(value) => setSelectedAttr(value)}
           items={selectedAttrItems as Array<{label:string, value:string}>}
           useNativeAndroidPickerStyle={false}
-          placeholder={{label: "Select an attribute to view", value: "title"}}
+          placeholder={{label: "Sort by...", value: "title"}}
           style={{inputAndroid: {backgroundColor: 'transparent', color: 'white', fontSize: 18, fontWeight: "300"}}}
         />
       </View>

@@ -5,7 +5,7 @@ import defaultSongsJson from './songs.json'
 import uuid from 'react-native-uuid'
 
 class SongsList{
-  songsList: tune[];
+  readonly songsList: tune[];
   readonly setSongs: Function;
   constructor(songsList: tune[], setSongs: Function){
     this.songsList = songsList;

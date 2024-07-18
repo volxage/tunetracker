@@ -76,9 +76,10 @@ function Editor({prettyAttrs, viewingPair, selectedTune, songsList, playlists}:
       )}
       ListFooterComponent={
         <View>
+          <SubText style={{fontSize: 16, color:'grey', alignSelf: 'center'}}>Press and hold if you're sure</SubText>
           <DeleteButton
             onLongPress={() => {songsList.deleteTune(selectedTune); viewingPair.setViewing(0);}} >
-            <ButtonText>DELETE TUNE (CAN'T UNDO! Press and hold)</ButtonText>
+            <ButtonText>DELETE TUNE (CAN'T UNDO!)</ButtonText>
           </DeleteButton>
           <View style={{flexDirection: "row", backgroundColor: "black"}}>
             <View style={{flex: 1}}>

@@ -52,6 +52,7 @@ const standardAttrs = new Map<string, string>([
 ]);
 
 import { standard } from '../types.tsx';
+import SongsList from '../SongsList.tsx';
 
 const fuseOptions = { // For finetuning the search algorithm
 	// isCaseSensitive: false,
@@ -117,8 +118,8 @@ type viewingPair = {
   viewing: number;
   setViewing: Function;
 }
-export default function Importer({standards, viewingPair, setSelectedTune, addNewTune}:
-{standards: Array<standard>, viewingPair: viewingPair, setSelectedTune: Function, addNewTune: Function}){
+export default function Importer({standards, viewingPair, setSelectedTune, songsList}:
+{standards: Array<standard>, viewingPair: viewingPair, setSelectedTune: Function, songsList: SongsList}){
   const [listReversed, setListReversed] = useState(false);
   const [selectedAttr, updateSelectedAttr] = useState("Title");
   const [search, setSearch] = useState("");
@@ -150,7 +151,7 @@ export default function Importer({standards, viewingPair, setSelectedTune, addNe
             const tn: tune = {};
             tn.title = item.Title;
             tn.composers = item['Composer(s)'].split(", ");
-            addNewTune(tn);
+            songsList.addNewTune(tn);
             setSelectedTune(tn);
             viewingPair.setViewing(1);
           }}
