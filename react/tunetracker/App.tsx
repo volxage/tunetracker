@@ -11,6 +11,7 @@ import TuneViewer from './components/TuneViewer.tsx';
 import Editor from './components/Editor.tsx';
 import Importer from './components/Importer.tsx';
 import {
+  BackHandler,
   SafeAreaView,
   View,
 } from 'react-native';
@@ -53,7 +54,6 @@ const prettyAttrs = new Map<string, string>([
   ["lyrics_confidence", "Lyrics Confidence"]
 ])
 
-
 function App(): React.JSX.Element {
   const [songs, setSongs] = useState(defaultSongsJson);
   const songsList = new SongsList(songs, setSongs);
@@ -78,6 +78,16 @@ function MainMenu({songs, setSongs, songsList, playlists}:
   const [selectedTune, setSelectedTune] = useState(songs[0]);
   const [viewing, setViewing] = useState(0);
   const isDarkMode = true;
+  function backToMain(){
+    setViewing(0);
+    return true;
+  }
+  useEffect(() => {
+    BackHandler.addEventListener('hardwareBackPress', backToMain)
+    return () => {
+      BackHandler.removeEventListener('hardwareBackPress', backToMain)
+    }
+  }, []);
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -98,11 +108,11 @@ function MainMenu({songs, setSongs, songsList, playlists}:
   }else if(viewing === 2){ //Editor
     return(
       <Editor
-      viewingPair={viewingPair}
-      prettyAttrs={Array.from(prettyAttrs.entries())}
-      selectedTune={selectedTune}
-      songsList={songsList}
-      playlists={playlists}
+        viewingPair={viewingPair}
+        prettyAttrs={Array.from(prettyAttrs.entries())}
+        selectedTune={selectedTune}
+        songsList={songsList}
+        playlists={playlists}
       />
     );
   }else if (viewing == 3){ //TuneImporter
