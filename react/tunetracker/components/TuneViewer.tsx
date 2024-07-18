@@ -17,7 +17,6 @@ import {
   Text,
   SubText,
   TextInput,
-  styles,
   Button,
   ButtonText
 } from '../Style.tsx'
@@ -74,17 +73,27 @@ function prettyPrint(object: unknown): string{
   return "(Empty)";
 }
 
-function LListHeader({listReversed, setListReversed, setViewing, setSearch, songsList, setSelectedAttr, setSelectedTune, setSelectedPlaylist, playlists}:
-{listReversed: boolean | undefined,
-      setListReversed: Function,
-      setViewing: Function,
-      setSearch: Function,
-      songsList: SongsList,
-      setSelectedAttr: Function,
-      setSelectedTune: Function,
-      setSelectedPlaylist: Function,
-      playlists: Playlists}){
-
+function LListHeader({
+  listReversed,
+  setListReversed,
+  setViewing,
+  setSearch,
+  songsList,
+  setSelectedAttr,
+  setSelectedTune,
+  setSelectedPlaylist,
+  playlists
+}: {
+  listReversed: boolean | undefined,
+  setListReversed: Function,
+  setViewing: Function,
+  setSearch: Function,
+  songsList: SongsList,
+  setSelectedAttr: Function,
+  setSelectedTune: Function,
+  setSelectedPlaylist: Function,
+  playlists: Playlists
+}){
   const selectedAttrItems = Array.from(prettyAttrs.entries()).map(
     (entry) => {return {label: entry[1], value: entry[0]}}
   );
@@ -115,7 +124,9 @@ function LListHeader({listReversed, setListReversed, setViewing, setSearch, song
           items={selectedPlaylistItems}
           useNativeAndroidPickerStyle={false}
           placeholder={{label: "Select a playlist", value: ""}}
-          style={{inputAndroid: {backgroundColor: 'transparent', color: 'white', fontSize: 18, fontWeight: "300"}}}
+          style={{inputAndroid:
+            {backgroundColor: 'transparent', color: 'white', fontSize: 18, fontWeight: "300"}
+          }}
         />
       </View>
     </View>
@@ -126,7 +137,9 @@ function LListHeader({listReversed, setListReversed, setViewing, setSearch, song
           items={selectedAttrItems as Array<{label:string, value:string}>}
           useNativeAndroidPickerStyle={false}
           placeholder={{label: "Sort by...", value: "title"}}
-          style={{inputAndroid: {backgroundColor: 'transparent', color: 'white', fontSize: 18, fontWeight: "300"}}}
+          style={{inputAndroid:
+            {backgroundColor: 'transparent', color: 'white', fontSize: 18, fontWeight: "300"}
+          }}
         />
       </View>
       <View style={{alignItems: "flex-end"}}>
@@ -151,8 +164,19 @@ type viewingPair = {
   viewing: number;
   setViewing: Function;
 }
-export default function TuneViewer({songs, viewingPair, setSelectedTune, songsList, playlists}:
-{songs: Array<tune>, viewingPair: viewingPair, setSelectedTune: Function, songsList: SongsList, playlists: Playlists}){
+export default function TuneViewer({
+  songs,
+  viewingPair,
+  setSelectedTune,
+  songsList,
+  playlists
+}: {
+  songs: Array<tune>,
+  viewingPair: viewingPair,
+  setSelectedTune: Function,
+  songsList: SongsList,
+  playlists: Playlists
+}){
   const [listReversed, setListReversed] = useState(false);
   const [selectedAttr, updateSelectedAttr] = useState("title");
   const [selectedPlaylist, setSelectedPlaylist] = useState("");
@@ -163,7 +187,7 @@ export default function TuneViewer({songs, viewingPair, setSelectedTune, songsLi
     const playlist = playlists.getPlaylist(selectedPlaylist)
     if(typeof playlist !== "undefined"){
       displaySongs = songs.filter(
-        (tune) => {return typeof tune.id !== "undefined" && playlist.tunes.includes(tune.id)}
+        tune => typeof tune.id !== "undefined" && playlist.tunes.includes(tune.id)
       )
     }
   }
@@ -201,11 +225,12 @@ export default function TuneViewer({songs, viewingPair, setSelectedTune, songsLi
           onPress={() => {setSelectedTune(item); viewingPair.setViewing(1);}}
           onLongPress={() => {setSelectedTune(item); viewingPair.setViewing(2);}}
           onShowUnderlay={separators.highlight}
-          style={styles.bordered}
           onHideUnderlay={separators.unhighlight}>
           <View style={{backgroundColor: 'black', padding: 8}}>
             <Text>{item.title}</Text>
-            <SubText>{selectedAttr != "title" ? prettyPrint(item[selectedAttr as keyof tune]) : prettyPrint(item["composers"])}</SubText>
+            <SubText>{selectedAttr != "title"
+              ? prettyPrint(item[selectedAttr as keyof tune])
+              : prettyPrint(item["composers"])}</SubText>
           </View>
         </TouchableHighlight>
     )}

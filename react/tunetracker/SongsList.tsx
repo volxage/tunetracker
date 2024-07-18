@@ -35,7 +35,7 @@ class SongsList{
     }else{
       newTune.id = oldTune.id;
     }
-    const result = this.songsList.map( (value: tune, index: number, array: tune[]) => {
+    const result = this.songsList.map((value: tune) => {
       if(value === oldTune){
         return newTune;
       }
@@ -51,11 +51,12 @@ class SongsList{
     return newTune.id as string;
   }
   addNewTune(tune:tune){
-    this.writeToSongsJson(this.songsList.concat(tune))
+    this.writeToSongsJson(this.songsList.concat(tune));
   }
   deleteTune(tune:tune){
-    const i = this.songsList.indexOf(tune);
-    this.writeToSongsJson((this.songsList.slice(0, i)).concat(this.songsList.slice(i + 1)));
+    const songsWithoutTune = this.songsList.filter(currentTune => currentTune != tune);
+    this.writeToSongsJson(songsWithoutTune);
+    this.updateSongs(songsWithoutTune);
   }
   updateSongs(songsList: tune[]){
     this.setSongs(songsList)

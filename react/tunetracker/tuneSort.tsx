@@ -19,7 +19,9 @@ type tune = {
 function tuneSort(songs: Array<tune | standard>, selected: string, reversed: boolean){
   let reverse_null_multiplier = 1;
   let reversed_multiplier = reversed ? -1 : 1;
-  if (selected.endsWith("confidence") || selected == "playthroughs") reverse_null_multiplier = -1 * reversed_multiplier;
+  if (selected.endsWith("confidence") || selected == "playthroughs"){
+    reverse_null_multiplier = -1 * reversed_multiplier;
+  }
   songs.sort(function(a_song, b_song){
     let a = a_song[selected as keyof typeof a_song] as unknown;
     let b = b_song[selected as keyof typeof b_song] as unknown;

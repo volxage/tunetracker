@@ -14,7 +14,9 @@ class Playlists{
     return this.playlists.find((playlist) => {return playlist.id === playlist_id})
   }
   getTunePlaylists(tune_id: string): playlist[]{
-    const result = this.playlists.filter((playlist) => {console.log(playlist.tunes.includes(tune_id)); return playlist.tunes.includes(tune_id)})
+    const result = this.playlists.filter((playlist) => {
+      return playlist.tunes.includes(tune_id)
+    })
     return result
   }
   writeToPlaylistsJson(playlists: playlist[] = []){
@@ -22,7 +24,7 @@ class Playlists{
     RNFS.writeFile(playlistsFilePath, stringified);
   }
   addPlaylist(playlistName: string){
-    if(this.playlists.some((playlist) => {return playlist.title === playlistName})){
+    if(this.playlists.some(playlist => playlist.title === playlistName)){
       //TODO: Generate visible "Error" on screen for user using return value
       console.error("Duplicate name, not creating new playlist")
       return(undefined);
@@ -94,7 +96,7 @@ class Playlists{
   removeTune(tuneId:string, playlistId: string){
     const playList = this.getPlaylist(playlistId)
     if(typeof playList === 'undefined'){
-      console.error("Id-less playlist attempted to be deleted from(This shouldn't be possible)")
+      console.error("Id-less playlist attempted to be deleted from (This shouldn't be possible)")
     }else if(typeof tuneId === 'undefined'){
       console.error("Tune delete from playlist attempt without ID (This shouldn't be possible)")
     }else{
@@ -107,8 +109,8 @@ class Playlists{
       const newPlaylist = this.getPlaylist(playlistId);
       if(typeof newPlaylist !== 'undefined'){
         if(newPlaylist.tunes.length === 0){
-          const playlistsWithoutEmpty = this.playlists.filter((playlist) => {return playlist.id != playlistId})
-          console.log("Empty playlist deleted.");
+          const playlistsWithoutEmpty = this.playlists.filter(playlist => playlist.id != playlistId)
+          console.log("Empty playlist " + newPlaylist.title + " deleted.");
           this.updatePlaylists(playlistsWithoutEmpty);
           this.writeToPlaylistsJson(playlistsWithoutEmpty);
         }

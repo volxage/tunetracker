@@ -35,6 +35,7 @@ const miniEditorPrettyAttrs = new Map<string, string>([
   ["melody_confidence", "Melody Confidence"],
   ["solo_confidence", "Solo Confidence"],
   ["lyrics_confidence", "Lyrics Confidence"],
+  ["just_played", "'I Just Played This'"],
 ])
 const prettyAttrs = new Map<string, string>([
   ["title", "Title"],
@@ -46,7 +47,7 @@ const prettyAttrs = new Map<string, string>([
   ["styles", "Styles"],
   ["tempi", "Tempi"],
   ["contrafacts", "Contrafacts"],
-  ["playlists", "Playlits"],
+  ["playlists", "Playlists"],
   ["playthroughs", "Playthroughs"],
   ["form_confidence", "Form Confidence"],
   ["melody_confidence", "Melody Confidence"],
@@ -67,13 +68,21 @@ function App(): React.JSX.Element {
   }, []);
 
   return(
-    <MainMenu songs={songs} setSongs={setSongs} songsList={songsList} playlists={playlists}/>
+    <MainMenu
+      songs={songs}
+      songsList={songsList}
+      playlists={playlists}
+    />
   );
 }
 
-function MainMenu({songs, setSongs, songsList, playlists}:
-  {songs: Array<tune>, setSongs: Function, songsList: SongsList, playlists: Playlists}): React.JSX.Element {
-
+function MainMenu({
+  songs, songsList, playlists
+}: {
+  songs: Array<tune>,
+  songsList: SongsList,
+  playlists: Playlists
+}): React.JSX.Element {
   //const isDarkMode = useColorScheme() === 'dark';
   const [selectedTune, setSelectedTune] = useState(songs[0]);
   const [viewing, setViewing] = useState(0);
@@ -118,7 +127,12 @@ function MainMenu({songs, setSongs, songsList, playlists}:
   }else if (viewing == 3){ //TuneImporter
     return(
       <SafeAreaView style={backgroundStyle}>
-        <Importer standards={jazzStandards} viewingPair={viewingPair} setSelectedTune={setSelectedTune} songsList={songsList}/>
+        <Importer
+          standards={jazzStandards}
+          viewingPair={viewingPair}
+          setSelectedTune={setSelectedTune}
+          songsList={songsList}
+        />
       </SafeAreaView>
     )
   }
@@ -131,7 +145,7 @@ function MainMenu({songs, setSongs, songsList, playlists}:
             setSelectedTune={setSelectedTune}
             songsList={songsList}
             playlists={playlists}
-            />
+          />
         </View>
         </SafeAreaView>
       );

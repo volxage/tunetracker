@@ -17,7 +17,6 @@ import {
   Text,
   SubText,
   TextInput,
-  styles,
   DeleteButton,
   ButtonText,
 } from '../Style.tsx'
@@ -82,44 +81,65 @@ function prettyPrint(object: unknown): string{
   return "(Empty)";
 }
 
-function ImporterHeader({listReversed, setListReversed, updateSelectedAttr, setViewing, setSearch}:
-{listReversed: boolean | undefined, setListReversed: Function, updateSelectedAttr: Function, setViewing: Function, setSearch: Function}){
-  const selectedAttrItems = Array.from(standardAttrs.entries()).map((x) => {return {label: x[1], value: x[0]}});
-return(
-  <View>
-  <TextInput
-  placeholder={"Search"}
-  placeholderTextColor={"white"}
-  onChangeText={(text) => setSearch(text)}
-  />
-  <View style={{flexDirection: 'row', alignItems: 'center'}}>
-  <View style={{flex: 2}}>
-  <RNPickerSelect
-  onValueChange={(value) => updateSelectedAttr(value)}
-  items={selectedAttrItems as Array<any>} // THIS IS SO STUPID
-  useNativeAndroidPickerStyle={false}
-  style={{inputAndroid: {backgroundColor: 'transparent', color: 'white', fontSize: 18, fontWeight: "300"}}}
-  />
-  </View>
-  <View style={{alignItems: "flex-end"}}>
-  <SubText>{"Reverse sort:"}</SubText>
-  </View>
-  <View style={{flex: 1, alignItems: "center"}}>
-  <Switch value={listReversed} onValueChange={() => setListReversed(!listReversed)}/>
-  </View>
-  </View>
-  <DeleteButton onPress={() => setViewing(0)}>
-    <ButtonText>Cancel import</ButtonText>
-  </DeleteButton>
-  </View>
-);
+function ImporterHeader({
+  listReversed,
+  setListReversed,
+  updateSelectedAttr,
+  setViewing,
+  setSearch
+}: {
+    listReversed: boolean | undefined,
+    setListReversed: Function,
+    updateSelectedAttr: Function,
+    setViewing: Function,
+    setSearch: Function
+}){
+  const selectedAttrItems = Array.from(standardAttrs.entries())
+    .map((x) => {return {label: x[1], value: x[0]}});
+  return(
+    <View>
+      <TextInput
+        placeholder={"Search"}
+        placeholderTextColor={"white"}
+        onChangeText={(text) => setSearch(text)}
+      />
+    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+      <View style={{flex: 2}}>
+        <RNPickerSelect
+          onValueChange={(value) => updateSelectedAttr(value)}
+          items={selectedAttrItems as Array<any>} // THIS IS SO STUPID
+          useNativeAndroidPickerStyle={false}
+          style={{inputAndroid: {backgroundColor: 'transparent', color: 'white', fontSize: 18, fontWeight: "300"}}}
+        />
+      </View>
+      <View style={{alignItems: "flex-end"}}>
+      <SubText>{"Reverse sort:"}</SubText>
+      </View>
+      <View style={{flex: 1, alignItems: "center"}}>
+        <Switch value={listReversed} onValueChange={() => setListReversed(!listReversed)}/>
+      </View>
+    </View>
+    <DeleteButton onPress={() => setViewing(0)}>
+      <ButtonText>Cancel import</ButtonText>
+    </DeleteButton>
+    </View>
+  );
 }
 type viewingPair = {
   viewing: number;
   setViewing: Function;
 }
-export default function Importer({standards, viewingPair, setSelectedTune, songsList}:
-{standards: Array<standard>, viewingPair: viewingPair, setSelectedTune: Function, songsList: SongsList}){
+export default function Importer({
+  standards,
+  viewingPair,
+  setSelectedTune,
+  songsList
+}: {
+  standards: Array<standard>,
+  viewingPair: viewingPair,
+  setSelectedTune: Function,
+  songsList: SongsList
+}){
   const [listReversed, setListReversed] = useState(false);
   const [selectedAttr, updateSelectedAttr] = useState("Title");
   const [search, setSearch] = useState("");
@@ -129,7 +149,7 @@ export default function Importer({standards, viewingPair, setSelectedTune, songs
     tuneSort(displayStandards, selectedAttr, listReversed);
   }else{
     displayStandards = fuse.search(search)
-      .map(function(value, index){
+      .map(function(value){
         return value.item;
       });
   }
@@ -156,11 +176,14 @@ export default function Importer({standards, viewingPair, setSelectedTune, songs
             viewingPair.setViewing(1);
           }}
           onShowUnderlay={separators.highlight}
-          style={styles.bordered}
           onHideUnderlay={separators.unhighlight}>
           <View style={{backgroundColor: 'black', padding: 8}}>
             <Text>{item.Title}</Text>
-            <SubText>{selectedAttr != "Title" ? prettyPrint(item[selectedAttr as keyof standard]) : prettyPrint(item["Composer(s)"])}</SubText>
+            <SubText>
+              {selectedAttr != "Title"
+                ? prettyPrint(item[selectedAttr as keyof standard])
+                : prettyPrint(item["Composer(s)"])}
+            </SubText>
           </View>
         </TouchableHighlight>
     )}

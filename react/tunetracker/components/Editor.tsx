@@ -7,11 +7,9 @@
 
 import React, {isValidElement, useEffect, useState} from 'react';
 import {
-  styles,
   Button,
   DeleteButton,
   ButtonText,
-  Text,
   SubText,
   
 } from '../Style.tsx'
@@ -31,13 +29,26 @@ import SongsList from '../SongsList.tsx';
 import Playlists from '../Playlists.tsx';
 import { tune, playlist } from '../types.tsx';
 
-function Editor({prettyAttrs, viewingPair, selectedTune, songsList, playlists}:
-{prettyAttrs: Array<[string, string]>, viewingPair: viewingPair, selectedTune: tune, songsList: SongsList, playlists: Playlists}): React.JSX.Element {
-  const [currentTune, setCurrentTune] = useState(JSON.parse(JSON.stringify(selectedTune)) as tune) //Intentional copy to allow cancelling of edits
+function Editor({
+  prettyAttrs, 
+  viewingPair,
+  selectedTune,
+  songsList,
+  playlists
+}: {
+  prettyAttrs: Array<[string, string]>,
+  viewingPair: viewingPair,
+  selectedTune: tune,
+  songsList: SongsList,
+  playlists: Playlists
+}): React.JSX.Element {
+  //Intentional copy to allow cancelling of edits
+  const [currentTune, setCurrentTune] = useState(JSON.parse(JSON.stringify(selectedTune)) as tune)
   const [tunePlaylists, setTunePlaylists]: [playlist[], Function] = useState([])
   const [originalPlaylistsSet, setOriginalPlaylistsSet]: [Set<playlist>, Function] = useState(new Set())
   useEffect(() => {
-    if (typeof selectedTune.id !== "undefined"){ //If there's no id, it's impossible that the tune has been assigned playlists already.
+    //If there's no id, it's impossible that the tune has been assigned playlists already.
+    if (typeof selectedTune.id !== "undefined"){ 
       const tmpTunesPlaylist = playlists.getTunePlaylists(selectedTune.id);
       setTunePlaylists(tmpTunesPlaylist);
       setOriginalPlaylistsSet(new Set(tmpTunesPlaylist));
@@ -58,11 +69,9 @@ function Editor({prettyAttrs, viewingPair, selectedTune, songsList, playlists}:
             <TouchableHighlight
               key={item[0]}
               onShowUnderlay={separators.highlight}
-              style={styles.bordered}
               onHideUnderlay={separators.unhighlight}
             >
               <TypeField
-                id={selectedTune.id}
                 attr={currentTune[item[0] as keyof tune]}
                 attrKey={item[0] as keyof tune}
                 attrName={item[1]}
@@ -76,9 +85,14 @@ function Editor({prettyAttrs, viewingPair, selectedTune, songsList, playlists}:
       )}
       ListFooterComponent={
         <View>
-          <SubText style={{fontSize: 16, color:'grey', alignSelf: 'center'}}>Press and hold if you're sure</SubText>
+          <SubText style={{fontSize: 16, color:'grey', alignSelf: 'center'}}>
+            Press and hold if you're sure
+          </SubText>
           <DeleteButton
-            onLongPress={() => {songsList.deleteTune(selectedTune); viewingPair.setViewing(0);}} >
+            onLongPress={() => {
+              songsList.deleteTune(selectedTune);
+              viewingPair.setViewing(0);
+            }}>
             <ButtonText>DELETE TUNE (CAN'T UNDO!)</ButtonText>
           </DeleteButton>
           <View style={{flexDirection: "row", backgroundColor: "black"}}>
@@ -86,13 +100,13 @@ function Editor({prettyAttrs, viewingPair, selectedTune, songsList, playlists}:
               <Button
                 onPress={() => {
                   //SAVE BUTTON
-                  //TODO: Use sets/unions to find difference between original playlists and new ones
-                  //Remove the deleted ones, add the new ones
 
                   const tune_id = songsList.replaceSelectedTune(selectedTune, currentTune);
                   const newPlaylistSet = new Set(tunePlaylists);
-                  const removedPlaylists = [...originalPlaylistsSet].filter((oldPlaylist) => {return !newPlaylistSet.has(oldPlaylist)});
-                  const updatedPlaylists = [...newPlaylistSet].filter((newPlaylist) => {return !originalPlaylistsSet.has(newPlaylist)});
+                  const removedPlaylists = [...originalPlaylistsSet]
+                    .filter(oldPlaylist => !newPlaylistSet.has(oldPlaylist));
+                  const updatedPlaylists = [...newPlaylistSet]
+                    .filter(newPlaylist => !originalPlaylistsSet.has(newPlaylist));
                   console.log("updatedPlaylists:");
                   console.log(updatedPlaylists);
                   console.log("removedPlaylists");

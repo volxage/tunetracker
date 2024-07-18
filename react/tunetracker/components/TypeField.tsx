@@ -37,8 +37,17 @@ const tuneDefaults = {
   "id": "THIS SHOULD NOT BE HERE" // If the user sees this text at any point, there's an error in the program
 }
 
-function AddPlaylistField({newPlaylist, tunePlaylists, playlists, setTunePlaylists}:
-                          {newPlaylist:boolean, tunePlaylists: playlist[], setTunePlaylists: Function, playlists: Playlists}){
+function AddPlaylistField({
+  newPlaylist,
+  tunePlaylists,
+  playlists,
+  setTunePlaylists
+}: {
+  newPlaylist:boolean,
+  tunePlaylists: playlist[],
+  setTunePlaylists: Function,
+  playlists: Playlists
+}){
   const [newPlaylistTitle, setNewPlaylistTitle] = useState("")
   if(newPlaylist){
     return(
@@ -54,7 +63,7 @@ function AddPlaylistField({newPlaylist, tunePlaylists, playlists, setTunePlaylis
           <Button onPress={() => {
             const tmpPlaylist = playlists.addPlaylist(newPlaylistTitle);
             if(typeof tmpPlaylist !== "undefined"){
-              setTunePlaylists(tunePlaylists.concat(tmpPlaylist))
+              setTunePlaylists(tunePlaylists.concat(tmpPlaylist));
             }
           }}>
             <ButtonText><Icon name="plus" size={30}/></ButtonText>
@@ -63,24 +72,46 @@ function AddPlaylistField({newPlaylist, tunePlaylists, playlists, setTunePlaylis
       </View>
     );
   }else{
-    let availablePlaylists = playlists.getPlaylists().filter((playlist) => {return !(tunePlaylists.includes(playlist))})
+    let availablePlaylists = playlists.getPlaylists()
+      .filter(playlist => !(tunePlaylists.includes(playlist)));
     return (
       <RNPickerSelect
         onValueChange={
-          // When the component rerenders, onValueChange is called with a value of "", this must be ignored
+          // When the component rerenders, onValueChange is called with a value of "".
           (value) => {value !== "" && setTunePlaylists(tunePlaylists.concat(value))}
         }
-        items={availablePlaylists.map((playlist) => {return {label:playlist.title, value: playlist}})}
+        items={
+          availablePlaylists
+            .map((playlist) => {return {label:playlist.title, value: playlist}})
+        }
         useNativeAndroidPickerStyle={false}
         placeholder={{label: "Select a playlist to insert tune into", value: ""}}
-        style={{inputAndroid: {backgroundColor: 'transparent', color: 'white', fontSize: 18, fontWeight: "300"}}}
+        style={{inputAndroid:
+          {backgroundColor: 'transparent', color: 'white', fontSize: 18, fontWeight: "300"}
+        }}
       />
     );
   }
 }
 
-function TypeField({id, attr, attrKey, attrName, handleSetCurrentTune, playlists, tunePlaylists, setTunePlaylists}:
-                   {id: string | undefined, attr: unknown, attrKey: keyof tune, attrName: string, handleSetCurrentTune: Function, playlists: Playlists, tunePlaylists: playlist[], setTunePlaylists: Function}){
+//TODO: Refactor, there should not be this many props
+function TypeField({
+  attr,
+  attrKey,
+  attrName,
+  handleSetCurrentTune,
+  playlists,
+  tunePlaylists,
+  setTunePlaylists
+}: {
+  attr: unknown,
+  attrKey: keyof tune,
+  attrName: string,
+  handleSetCurrentTune: Function,
+  playlists: Playlists,
+  tunePlaylists: playlist[],
+  setTunePlaylists: Function
+}){
   if(attr == null){
     attr = tuneDefaults[attrKey];
   }
@@ -95,13 +126,16 @@ function TypeField({id, attr, attrKey, attrName, handleSetCurrentTune, playlists
         </View>
         <FlatList
           data={tunePlaylists}
-          renderItem={({item, index, separators}) => (
+          renderItem={({item}) => (
             <View style={{flexDirection: 'row'}}>
               <View style={{flex:4}}>
                 <SubText>{item.title}</SubText>
               </View>
               <View style={{flex:1}}>
-                <DeleteButton onPress={() => setTunePlaylists(tunePlaylists.filter(playlist => {return playlist !== item}))}>
+                <DeleteButton onPress={
+                  () => {setTunePlaylists(tunePlaylists
+                                         .filter(playlist => playlist !== item))}
+                }>
                   <ButtonText><Icon name="close" size={30}/></ButtonText>
                 </DeleteButton>
               </View>
@@ -181,10 +215,16 @@ function TypeField({id, attr, attrKey, attrName, handleSetCurrentTune, playlists
           renderItem={({item, index, separators}) => (
             <View style={{flexDirection: 'row'}}>
               <View style={{flex: 3}}>
-                <TextInput placeholder={"Type new value here"} placeholderTextColor={"grey"} defaultValue={item} onChangeText={(text) => handleReplace(text, index)}/>
+                <TextInput
+                  placeholder={"Type new value here"}
+                  placeholderTextColor={"grey"}
+                  defaultValue={item}
+                  onChangeText={(text) => handleReplace(text, index)}/>
               </View>
               <View style={{flex:1, alignContent: 'flex-end'}}>
-                <DeleteButton onPress={() => setarrAttr((arrAttr as string[]).filter((a) => {return a !== item})) } >
+                <DeleteButton onPress={
+                  () => setarrAttr((arrAttr as string[]).filter(a => a !== item))
+                }>
                   <ButtonText><Icon name="close" size={30}/></ButtonText>
                 </DeleteButton>
               </View>
