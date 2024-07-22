@@ -1,21 +1,4 @@
-import { standard } from "./types";
-type tune = {
-  "title"?: string
-  "alternative_title"?: string
-  "composers"?: string[]
-  "form"?: string
-  "notable_recordings"?: string[]
-  "keys"?: string[]
-  "styles"?: string[]
-  "tempi"?: string[]
-  "contrafacts"?: string[] // In the future, these could link to other tunes
-  "playthroughs"?: number
-  "form_confidence"?: number
-  "melody_confidence"?: number
-  "solo_confidence"?: number
-  "lyrics_confidence"?: number
-  "played_at"?: string[]
-}
+import { tune, standard } from "./types";
 function tuneSort(songs: Array<tune | standard>, selected: string, reversed: boolean){
   let reverse_null_multiplier = 1;
   let reversed_multiplier = reversed ? -1 : 1;
