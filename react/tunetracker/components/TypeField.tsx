@@ -18,11 +18,12 @@ import {
 } from 'react-native';
 import { playlist, tune } from '../types.tsx';
 import Playlists from '../Playlists.tsx';
+//TODO: Replace with tune[attr] === string and exception list
 const tuneDefaults = {
   "title": "New song",
   "alternative_title": "",
   "composers": [],
-  "form": [],
+  "form": "",
   "notable_recordings": [],
   "keys": [],
   "styles": [],
@@ -36,7 +37,9 @@ const tuneDefaults = {
   "played_at": [], 
   "id": "THIS SHOULD NOT BE HERE" // If the user sees this text at any point, there's an error in the program
 }
-
+const tuneAttrExceptions = new Set([
+  "id",
+])
 function AddPlaylistField({
   newPlaylist,
   tunePlaylists,
@@ -113,6 +116,7 @@ function TypeField({
   setTunePlaylists: Function
 }){
   if(attr == null){
+    //    attr = tuneDefaults[attrKey];
     attr = tuneDefaults[attrKey];
   }
   if (attrKey === "playlists" as keyof tune){ //Playlists are NOT an attribute of a tune

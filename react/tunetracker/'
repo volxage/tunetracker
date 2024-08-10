@@ -1,0 +1,12 @@
+import { Model } from '@nozbe/watermelondb'
+
+export default class Tune extends Model {
+  static table = 'tunes';
+  static associations= {
+    tunes: { type: 'belongs_to', key: 'contrafact_id' }
+  }
+
+  @text('title') title
+  @text('alternative_title') alternative_title
+  @text('form') form
+}

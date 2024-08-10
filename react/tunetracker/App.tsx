@@ -20,14 +20,42 @@ import {
   Colors,
 } from 'react-native/Libraries/NewAppScreen';
 import defaultSongsJson from './songs.json';
-import jazzStandards from './jazzstandards.json';
 
 import RNFS from 'react-native-fs';
 
-import { tune } from './types.tsx';
+import { tune, standard } from './types.tsx';
 import SongsList from './SongsList.tsx';
 import Playlists from './Playlists.tsx';
+import {ScreenView} from './Style.tsx';
 
+import LocalDb from './LocalDb.tsx';
+
+LocalDb
+
+let ttdb = [];
+fetch("https://api.jhilla.org/tunetracker/tunes", {
+  method: 'GET',
+  headers: {
+    'Content-Type': 'application/json',
+  }
+}).then(
+  (response) => {
+    console.log('response');
+    if(response.ok){
+      console.log("response ok!");
+      response.json().then(json => {
+        ttdb = json as standard[];
+        console.log(ttdb);
+      }).catch(reason => {
+        console.error("ERROR:");
+        console.error(reason);
+      });
+    }else{
+      console.log("response not ok");
+      console.log(response.status);
+    }
+  }
+);
 //PrettyAttrs function as both as "prettifiers" and lists of attrs to display in corresponding editors
 const miniEditorPrettyAttrs = new Map<string, string>([
   ["title", "Title"],
@@ -60,7 +88,6 @@ function App(): React.JSX.Element {
   const songsList = new SongsList(songs, setSongs);
   const [rawPlaylists, setRawPlaylists] = useState([])
   const playlists = new Playlists(rawPlaylists, setRawPlaylists);
-
   useEffect(() => {
     //The below functions may also create "template" json files if either is not present.
     songsList.readFromSongsJson();
@@ -68,11 +95,13 @@ function App(): React.JSX.Element {
   }, []);
 
   return(
-    <MainMenu
-      songs={songs}
-      songsList={songsList}
-      playlists={playlists}
-    />
+    <ScreenView>
+      <MainMenu
+        songs={songs}
+        songsList={songsList}
+        playlists={playlists}
+      />
+    </ScreenView>
   );
 }
 
@@ -98,9 +127,9 @@ function MainMenu({
     }
   }, []);
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+//const backgroundStyle = {
+//  backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+//};
   let viewingPair = {viewing:viewing, setViewing:setViewing};
   if(viewing === 1){ //MiniEditor (Just Editor with less attrs)
     let entriesArr = Array.from(miniEditorPrettyAttrs.entries());
@@ -126,9 +155,8 @@ function MainMenu({
     );
   }else if (viewing == 3){ //TuneImporter
     return(
-      <SafeAreaView style={backgroundStyle}>
+      <SafeAreaView style={{flex: 1}}>
         <Importer
-          standards={jazzStandards}
           viewingPair={viewingPair}
           setSelectedTune={setSelectedTune}
           songsList={songsList}
@@ -138,7 +166,7 @@ function MainMenu({
   }
   else{ //TuneViewer
     return (
-      <SafeAreaView style={backgroundStyle}>
+      <SafeAreaView style={{flex: 1}}>
         <View>
           <TuneViewer songs={songs}
             viewingPair={viewingPair}
