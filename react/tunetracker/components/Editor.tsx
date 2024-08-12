@@ -44,6 +44,7 @@ function Editor({
 }): React.JSX.Element {
   //Intentional copy to allow cancelling of edits
   const [currentTune, setCurrentTune] = useState(JSON.parse(JSON.stringify(selectedTune)) as tune)
+  console.log("Current tune rerendered to: " + JSON.stringify(currentTune));
   const [tunePlaylists, setTunePlaylists]: [playlist[], Function] = useState([])
   const [originalPlaylistsSet, setOriginalPlaylistsSet]: [Set<playlist>, Function] = useState(new Set())
   useEffect(() => {
@@ -100,7 +101,6 @@ function Editor({
               <Button
                 onPress={() => {
                   //SAVE BUTTON
-
                   const tune_id = songsList.replaceSelectedTune(selectedTune, currentTune);
                   const newPlaylistSet = new Set(tunePlaylists);
                   const removedPlaylists = [...originalPlaylistsSet]

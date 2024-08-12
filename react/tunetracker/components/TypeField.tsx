@@ -189,14 +189,14 @@ function TypeField({
       </View>
     );
   }else if (Array.isArray(attr)){
-    const [arrAttr, setarrAttr] = useState(attr);
+//    const [arrAttr, setarrAttr] = useState(attr);
 
     function handleReplace(value: string, index: number){
-      const newArrAttr = arrAttr.map((c, i) => {
+      const newArrAttr = (attr as string[]).map((c, i) => {
         return i === index ? value : c;
       });
-      setarrAttr(newArrAttr);
-      handleSetCurrentTune(attrKey, arrAttr);
+      handleSetCurrentTune(attrKey, newArrAttr);
+      //setarrAttr(newArrAttr); handeSetCurrentTune causes a rerender, indirectly updating arrAttr.
     }
     return(
       <View style={{backgroundColor: 'black', padding: 8}}>
@@ -205,13 +205,13 @@ function TypeField({
             <Title>{attrName.toUpperCase()}</Title>
           </View>
           <View style={{alignContent: 'flex-end', flex: 1}}>
-            <Button onPress={() => setarrAttr((arrAttr as string[]).concat(["New item"]))}>
+            <Button onPress={() => handleSetCurrentTune(attrKey, (attr as string[]).concat(["New item"]))}>
               <ButtonText><Icon name="plus" size={30}/></ButtonText>
             </Button>
           </View>
         </View>
         <FlatList
-          data={arrAttr}
+          data={attr}
           renderItem={({item, index, separators}) => (
             <View style={{flexDirection: 'row'}}>
               <View style={{flex: 3}}>
@@ -223,7 +223,7 @@ function TypeField({
               </View>
               <View style={{flex:1, alignContent: 'flex-end'}}>
                 <DeleteButton onPress={
-                  () => setarrAttr((arrAttr as string[]).filter(a => a !== item))
+                    () => handleSetCurrentTune(attrKey, (attr as string[]).filter((a, i) => i !== index))
                 }>
                   <ButtonText><Icon name="close" size={30}/></ButtonText>
                 </DeleteButton>

@@ -28,7 +28,7 @@ const standardAttrs = new Map<string, string>([
   ["title", "Title"],
   ["alternative_title", "Alternative Title"],
   ["form", "Form"],
-  ["bio", "Bio"],
+  //  ["bio", "Bio"],
   ["year", "Year"],
 ]);
 
@@ -50,7 +50,8 @@ const fuseOptions = { // For finetuning the search algorithm
 	// ignoreFieldNorm: false,
 	// fieldNormWeight: 1,
 	keys: [
-		"title",
+    "title",
+    "Composers.name"
 	]
 };
 
@@ -77,7 +78,7 @@ function ImporterHeader({
   const selectedAttrItems = Array.from(standardAttrs.entries())
     .map((x) => {return {label: x[1], value: x[0]}});
   return(
-    <View>
+    <View style={{backgroundColor: "#222"}}>
       <TextInput
         placeholder={"Search"}
         placeholderTextColor={"white"}
