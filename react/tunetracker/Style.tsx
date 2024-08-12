@@ -42,6 +42,7 @@ const ButtonText = styled.Text`
   text-align: center;
 `
 const TextInput = styled.TextInput`
+  border-width: 1px;
   font-size: 20px;
   font-weight: 200;
   color: white;

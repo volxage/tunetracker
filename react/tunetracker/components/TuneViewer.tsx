@@ -111,46 +111,44 @@ function LListHeader({
   return(
     <View style={{backgroundColor: "#222"}}>
     <View style={{flexDirection: 'row'}}>
-      <View style={{flex:1, borderBottomWidth:1}}>
+      <View style={{flex:1}}>
         <TextInput
           placeholder={"Search"}
           placeholderTextColor={"white"}
           onChangeText={(text) => {setSearch(text)}}
         />
       </View>
-      <View style={{flex:1, borderBottomWidth:1}}>
+      <View style={{flex:1}}>
         <RNPickerSelect
           onValueChange={(value) => setSelectedPlaylist(value)}
           items={selectedPlaylistItems}
           useNativeAndroidPickerStyle={false}
           placeholder={{label: "Select a playlist", value: ""}}
           style={{inputAndroid:
-            {
-            backgroundColor: 'transparent', color: 'white', fontSize: 20, fontWeight: "300"
-            }
+            {backgroundColor: 'transparent', color: 'white', fontSize: 18, fontWeight: "300"}
           }}
         />
       </View>
     </View>
     <View style={{flexDirection: 'row', alignItems: 'center'}}>
-      <View style={{flex: 4}}>
+      <View style={{flex: 2}}>
         <RNPickerSelect
           onValueChange={(value) => setSelectedAttr(value)}
           items={selectedAttrItems as Array<{label:string, value:string}>}
           useNativeAndroidPickerStyle={false}
           placeholder={{label: "Sort by...", value: "title"}}
           style={{inputAndroid:
-            {backgroundColor: 'transparent', color: 'white', fontSize: 20, fontWeight: "300"}
+            {backgroundColor: 'transparent', color: 'white', fontSize: 18, fontWeight: "300"}
           }}
         />
       </View>
-      <View style={{flex:2}}>
-        <SubText style={{color: 'grey'}}>{"Reverse:"}</SubText>
+      <View style={{alignItems: "flex-end"}}>
+        <SubText>{"Reverse sort:"}</SubText>
       </View>
-      <View style={{flex: 1}}>
+      <View style={{flex: 1, alignItems: "center"}}>
         <Switch value={listReversed} onValueChange={() => setListReversed(!listReversed)}/>
       </View>
-      <Button style={{flex:1}} onPress={() => setViewing(3)} onLongPress={() => {
+      <Button onPress={() => setViewing(3)} onLongPress={() => {
             const tn: tune = {};
             songsList.addNewTune(tn);
             setSelectedTune(tn);
