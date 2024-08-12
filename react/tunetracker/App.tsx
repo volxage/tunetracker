@@ -20,7 +20,6 @@ import {
   Colors,
 } from 'react-native/Libraries/NewAppScreen';
 import defaultSongsJson from './songs.json';
-import jazzStandards from './jazzstandards.json';
 
 import RNFS from 'react-native-fs';
 
@@ -68,11 +67,13 @@ function App(): React.JSX.Element {
   }, []);
 
   return(
-    <MainMenu
-      songs={songs}
-      songsList={songsList}
-      playlists={playlists}
-    />
+    <View style={{flex: 1, backgroundColor: "black"}}>
+      <MainMenu
+        songs={songs}
+        songsList={songsList}
+        playlists={playlists}
+      />
+    </View>
   );
 }
 
@@ -126,9 +127,8 @@ function MainMenu({
     );
   }else if (viewing == 3){ //TuneImporter
     return(
-      <SafeAreaView style={backgroundStyle}>
+      <SafeAreaView style={{flex: 1}}>
         <Importer
-          standards={jazzStandards}
           viewingPair={viewingPair}
           setSelectedTune={setSelectedTune}
           songsList={songsList}

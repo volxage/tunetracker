@@ -5,7 +5,7 @@
  * @format
  */
 
-import React, {isValidElement, useState} from 'react';
+import React, {isValidElement, useEffect, useState} from 'react';
 import {
   FlatList,
   Switch,
@@ -25,11 +25,11 @@ import RNPickerSelect from 'react-native-picker-select';
 import Fuse from 'fuse.js';
 
 const standardAttrs = new Map<string, string>([
-  ["Rank", "JazzStandards.com ranking"],
-  ["Title", "Title"],
-  ["Year", "Year"],
-  ["Composer(s)", "Composer(s)"],
-  ["Lyricist(s)", "Lyricist(s)"],
+  ["title", "Title"],
+  ["alternative_title", "Alternative Title"],
+  ["form", "Form"],
+  ["bio", "Bio"],
+  ["year", "Year"],
 ]);
 
 import { tune, standard } from '../types.tsx';
@@ -50,9 +50,7 @@ const fuseOptions = { // For finetuning the search algorithm
 	// ignoreFieldNorm: false,
 	// fieldNormWeight: 1,
 	keys: [
-		"Title",
-		"Composer(s)",
-    "Lyricist(s)"
+		"title",
 	]
 };
 
@@ -112,12 +110,10 @@ type viewingPair = {
   setViewing: Function;
 }
 export default function Importer({
-  standards,
   viewingPair,
   setSelectedTune,
   songsList
 }: {
-  standards: Array<standard>,
   viewingPair: viewingPair,
   setSelectedTune: Function,
   songsList: SongsList
@@ -125,6 +121,38 @@ export default function Importer({
   const [listReversed, setListReversed] = useState(false);
   const [selectedAttr, updateSelectedAttr] = useState("Title");
   const [search, setSearch] = useState("");
+  const [standards, setStandards] = useState([] as Array<standard>);
+  useEffect(() => {
+    //The below functions may also create "template" json files if either is not present.
+    fetch("https://api.jhilla.org/tunetracker/tunes", {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    }).then(
+      (response) => {
+        console.log('response');
+        if(response.ok){
+          console.log("response ok!");
+          response.json().then(json => {
+            setStandards(json as standard[]);
+            console.log("Standards:");
+            console.log(standards);
+          }).catch(reason => {
+            console.error("ERROR:");
+            console.error(reason);
+          });
+        }else{
+          console.log("response not ok");
+          console.log(response.status);
+        }
+      }
+    ).catch(reason => {
+      console.error("ERROR on sending http request");
+      console.error(reason);
+    });
+  }, []);
+
   let displayStandards = standards;
   const fuse = new Fuse(standards, fuseOptions);
   if(search === ""){
@@ -136,6 +164,7 @@ export default function Importer({
       });
   }
   return (
+    standards.length ?
     <FlatList
       data={displayStandards}
       extraData={selectedAttr}
@@ -148,27 +177,38 @@ export default function Importer({
       }
       renderItem={({item, index, separators}) => (
         <TouchableHighlight
-          key={item.Title}
+          key={item.title}
           onPress={() => {
             const tn: tune = {};
-            tn.title = item.Title;
-            tn.composers = item['Composer(s)'].split(", ");
+            tn.title = item.title;
+            tn.composers = item['Composers'].map(comp => comp.name);
             songsList.addNewTune(tn);
             setSelectedTune(tn);
             viewingPair.setViewing(1);
           }}
+          onLongPress={() => {
+            const tn: tune = {};
+            tn.title = item.title;
+            tn.composers = item['Composers'].map(comp => comp.name);
+            songsList.addNewTune(tn);
+            setSelectedTune(tn);
+            viewingPair.setViewing(2);
+          }}
           onShowUnderlay={separators.highlight}
           onHideUnderlay={separators.unhighlight}>
           <View style={{backgroundColor: 'black', padding: 8}}>
-            <Text>{item.Title}</Text>
+            <Text>{item.title}</Text>
             <SubText>
               {selectedAttr != "Title"
                 ? prettyPrint(item[selectedAttr as keyof standard])
-                : prettyPrint(item["Composer(s)"])}
+                : prettyPrint(item["Composers"].map(comp => comp.name).join(", "))}
             </SubText>
           </View>
         </TouchableHighlight>
     )}
   />
+  : <View style={{flex: 1, display: "flex", justifyContent: "center", alignItems: "center"}}>
+    <Text>Loading... (Your internet or the server may be down. Email jhilla@jhilla.org if you believe the server is down.)</Text>
+  </View>
   );
 }

@@ -16,12 +16,20 @@ export type tune = {
   "id"?: string
   "played_at"?: string[]
 }
+export type composer = {
+  "name": string
+  "bio": string
+  "birth": string
+  "death": string
+}
 export type standard = {
-  "Rank": string
-  "Title": string
-  "Year": string
-  "Composer(s)": string
-  "Lyricist(s)": string
+  "title": string
+  "alternative_title": string
+  "form": string
+  "bio": string
+  "year": string
+  "id": string
+  "Composers": composer[]
 }
 export type playlist = {
   "title": string
