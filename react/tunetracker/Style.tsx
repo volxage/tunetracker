@@ -46,8 +46,4 @@ const TextInput = styled.TextInput`
   font-weight: 200;
   color: white;
 `;
-const ScreenView = styled.View`
-  flex: 1;
-  background-color: black;
-`;
-export {Text, Title, SubText, TextInput, DeleteButton, Button, ButtonText, ScreenView};
+export {Text, Title, SubText, TextInput, DeleteButton, Button, ButtonText};

@@ -5,7 +5,7 @@
  * @format
  */
 
-import React, {isValidElement, useEffect, useState} from 'react';
+import React, {isValidElement, useState} from 'react';
 import {
   FlatList,
   Switch,
@@ -19,21 +19,20 @@ import {
   TextInput,
   DeleteButton,
   ButtonText,
-  ScreenView
 } from '../Style.tsx'
 import tuneSort from '../tuneSort.tsx'
 import RNPickerSelect from 'react-native-picker-select';
 import Fuse from 'fuse.js';
 
 const standardAttrs = new Map<string, string>([
-  ["title", "Title"],
-  ["alternative_title", "Alternative Title"],
-  ["form", "Form"],
-  ["bio", "Bio"],
-  ["year", "Year"],
+  ["Rank", "JazzStandards.com ranking"],
+  ["Title", "Title"],
+  ["Year", "Year"],
+  ["Composer(s)", "Composer(s)"],
+  ["Lyricist(s)", "Lyricist(s)"],
 ]);
 
-import { tune, standard, composer} from '../types.tsx';
+import { tune, standard } from '../types.tsx';
 import SongsList from '../SongsList.tsx';
 
 const fuseOptions = { // For finetuning the search algorithm
@@ -51,9 +50,9 @@ const fuseOptions = { // For finetuning the search algorithm
 	// ignoreFieldNorm: false,
 	// fieldNormWeight: 1,
 	keys: [
-		"title",
-    //		"Composer(s)",
-    //    "Lyricist(s)"
+		"Title",
+		"Composer(s)",
+    "Lyricist(s)"
 	]
 };
 
@@ -80,7 +79,7 @@ function ImporterHeader({
   const selectedAttrItems = Array.from(standardAttrs.entries())
     .map((x) => {return {label: x[1], value: x[0]}});
   return(
-    <View style={{backgroundColor: "#222"}}>
+    <View>
       <TextInput
         placeholder={"Search"}
         placeholderTextColor={"white"}
@@ -113,48 +112,19 @@ type viewingPair = {
   setViewing: Function;
 }
 export default function Importer({
+  standards,
   viewingPair,
   setSelectedTune,
   songsList
 }: {
+  standards: Array<standard>,
   viewingPair: viewingPair,
   setSelectedTune: Function,
   songsList: SongsList
 }){
   const [listReversed, setListReversed] = useState(false);
-  const [selectedAttr, updateSelectedAttr] = useState("title");
+  const [selectedAttr, updateSelectedAttr] = useState("Title");
   const [search, setSearch] = useState("");
-  const [standards, setStandards] = useState([] as Array<standard>);
-  useEffect(() => {
-    //The below functions may also create "template" json files if either is not present.
-    fetch("https://api.jhilla.org/tunetracker/tunes", {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    }).then(
-      (response) => {
-        console.log('response');
-        if(response.ok){
-          console.log("response ok!");
-          response.json().then(json => {
-            setStandards(json as standard[]);
-            console.log("Standards:");
-            console.log(standards);
-          }).catch(reason => {
-            console.error("ERROR:");
-            console.error(reason);
-          });
-        }else{
-          console.log("response not ok");
-          console.log(response.status);
-        }
-      }
-    ).catch(reason => {
-      console.error("ERROR on sending http request");
-      console.error(reason);
-    });
-  }, []);
   let displayStandards = standards;
   const fuse = new Fuse(standards, fuseOptions);
   if(search === ""){
@@ -166,7 +136,6 @@ export default function Importer({
       });
   }
   return (
-    standards.length ?
     <FlatList
       data={displayStandards}
       extraData={selectedAttr}
@@ -179,44 +148,27 @@ export default function Importer({
       }
       renderItem={({item, index, separators}) => (
         <TouchableHighlight
-          key={item.title}
+          key={item.Title}
           onPress={() => {
-            //TODO: Refactor
             const tn: tune = {};
-            tn.title = item.title;
-            tn.composers = item['Composers'].map(comp => comp.name);
-            tn.form = item['form'];
-            //            tn.lyricists = item['Lyricists'].map(lyr => lyr.name);
+            tn.title = item.Title;
+            tn.composers = item['Composer(s)'].split(", ");
             songsList.addNewTune(tn);
             setSelectedTune(tn);
             viewingPair.setViewing(1);
           }}
-          onLongPress={() => {
-            const tn: tune = {};
-            tn.title = item.title;
-            tn.composers = item['Composers'].map(comp => comp.name);
-            tn.form = item['form'];
-            songsList.addNewTune(tn);
-            setSelectedTune(tn);
-            viewingPair.setViewing(2);
-          }}
           onShowUnderlay={separators.highlight}
           onHideUnderlay={separators.unhighlight}>
           <View style={{backgroundColor: 'black', padding: 8}}>
-            <Text>{item.title}</Text>
-            <SubText>{item.Composers.map(comp => comp.name).join(", ")}</SubText>
+            <Text>{item.Title}</Text>
+            <SubText>
+              {selectedAttr != "Title"
+                ? prettyPrint(item[selectedAttr as keyof standard])
+                : prettyPrint(item["Composer(s)"])}
+            </SubText>
           </View>
         </TouchableHighlight>
     )}
   />
-  :<View style={{flex: 1, display: "flex", justifyContent: "center", alignItems: "center"}}>
-    <Text>Loading... (Your internet or the server may be down. Email jhilla@jhilla.org if you believe the server is down.)</Text>
-  </View>
-    //Note the terenary operator above
   );
 }
-//          <SubText>
-//            {selectedAttr != "title"
-//              ? prettyPrint(item[selectedAttr as keyof standard])
-//              : prettyPrint(item["Composer(s)"])}
-//          </SubText>

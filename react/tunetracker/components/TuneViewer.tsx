@@ -109,7 +109,7 @@ function LListHeader({
   )
 
   return(
-    <View style={{backgroundColor: "#222"}}>
+  <View>
     <View style={{flexDirection: 'row'}}>
       <View style={{flex:1, borderBottomWidth:1}}>
         <TextInput
