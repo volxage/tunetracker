@@ -23,6 +23,7 @@ import {
 import tuneSort from '../tuneSort.tsx'
 import RNPickerSelect from 'react-native-picker-select';
 import Fuse from 'fuse.js';
+import OnlineDB from '../OnlineDB.tsx';
 
 const standardAttrs = new Map<string, string>([
   ["title", "Title"],
@@ -124,37 +125,7 @@ export default function Importer({
   const [listReversed, setListReversed] = useState(false);
   const [selectedAttr, updateSelectedAttr] = useState("Title");
   const [search, setSearch] = useState("");
-  const [standards, setStandards] = useState([] as Array<standard>);
-  useEffect(() => {
-    //The below functions may also create "template" json files if either is not present.
-    fetch("https://api.jhilla.org/tunetracker/tunes", {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    }).then(
-      (response) => {
-        console.log('response');
-        if(response.ok){
-          console.log("response ok!");
-          response.json().then(json => {
-            setStandards(json as standard[]);
-            console.log("Standards:");
-            console.log(standards);
-          }).catch(reason => {
-            console.error("ERROR:");
-            console.error(reason);
-          });
-        }else{
-          console.log("response not ok");
-          console.log(response.status);
-        }
-      }
-    ).catch(reason => {
-      console.error("ERROR on sending http request");
-      console.error(reason);
-    });
-  }, []);
+  const standards = OnlineDB.getStandards();
 
   let displayStandards = standards;
   const fuse = new Fuse(standards, fuseOptions);
@@ -214,7 +185,8 @@ export default function Importer({
     )}
   />
   : <View style={{flex: 1, display: "flex", justifyContent: "center", alignItems: "center"}}>
-    <Text>Loading... (Your internet or the server may be down. Email jhilla@jhilla.org if you believe the server is down.)</Text>
+    <SubText>Loading... (Your internet or the server may be down. Email jhilla@jhilla.org if you believe the server is down.)</SubText>
+    <DeleteButton onPress={() => {viewingPair.setViewing(0)}}><ButtonText>Cancel import</ButtonText></DeleteButton>
   </View>
   );
 }

@@ -24,6 +24,7 @@ import defaultSongsJson from './songs.json';
 import { tune } from './types.tsx';
 import SongsList from './SongsList.tsx';
 import Playlists from './Playlists.tsx';
+import OnlineDB from './OnlineDB.tsx';
 
 //PrettyAttrs function as both as "prettifiers" and lists of attrs to display in corresponding editors
 const miniEditorPrettyAttrs = new Map<string, string>([
@@ -62,6 +63,7 @@ function App(): React.JSX.Element {
     //The below functions may also create "template" json files if either is not present.
     songsList.readFromSongsJson();
     playlists.readFromPlaylistsJson();
+    OnlineDB.update();
   }, []);
 
   return(
