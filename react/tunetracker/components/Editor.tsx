@@ -11,7 +11,6 @@ import {
   DeleteButton,
   ButtonText,
   SubText,
-  
 } from '../Style.tsx'
 import {
   SafeAreaView,
@@ -34,17 +33,20 @@ function Editor({
   viewingPair,
   selectedTune,
   songsList,
-  playlists
+  playlists,
+  newTune,
+  setNewTune
 }: {
   prettyAttrs: Array<[string, string]>,
   viewingPair: viewingPair,
   selectedTune: tune,
   songsList: SongsList,
-  playlists: Playlists
+  playlists: Playlists,
+  newTune: boolean,
+  setNewTune: Function
 }): React.JSX.Element {
   //Intentional copy to allow cancelling of edits
   const [currentTune, setCurrentTune] = useState(JSON.parse(JSON.stringify(selectedTune)) as tune)
-  console.log("Current tune rerendered to: " + JSON.stringify(currentTune));
   const [tunePlaylists, setTunePlaylists]: [playlist[], Function] = useState([])
   const [originalPlaylistsSet, setOriginalPlaylistsSet]: [Set<playlist>, Function] = useState(new Set())
   useEffect(() => {
@@ -89,47 +91,72 @@ function Editor({
           <SubText style={{fontSize: 16, color:'grey', alignSelf: 'center'}}>
             Press and hold if you're sure
           </SubText>
-          <DeleteButton
-            onLongPress={() => {
-              songsList.deleteTune(selectedTune);
-              viewingPair.setViewing(0);
-            }}>
-            <ButtonText>DELETE TUNE (CAN'T UNDO!)</ButtonText>
-          </DeleteButton>
+          {
+            !newTune && 
+            <DeleteButton
+              onLongPress={() => {
+                songsList.deleteTune(selectedTune);
+                viewingPair.setViewing(0);
+              }}>
+              <ButtonText>DELETE TUNE (CAN'T UNDO!)</ButtonText>
+            </DeleteButton>
+          }
           <View style={{flexDirection: "row", backgroundColor: "black"}}>
             <View style={{flex: 1}}>
-              <Button
-                onPress={() => {
-                  //SAVE BUTTON
-                  const tune_id = songsList.replaceSelectedTune(selectedTune, currentTune);
-                  const newPlaylistSet = new Set(tunePlaylists);
-                  const removedPlaylists = [...originalPlaylistsSet]
-                    .filter(oldPlaylist => !newPlaylistSet.has(oldPlaylist));
-                  const updatedPlaylists = [...newPlaylistSet]
-                    .filter(newPlaylist => !originalPlaylistsSet.has(newPlaylist));
-                  console.log("updatedPlaylists:");
-                  console.log(updatedPlaylists);
-                  console.log("removedPlaylists");
-                  console.log(removedPlaylists);
-                  console.log("Tune ID:")
-                  console.log(tune_id)
-                  for(var playlist of updatedPlaylists){
-                    console.log("Adding tune to " + playlist.title)
-                    playlists.addTune(tune_id, playlist.id)
-                  }
-                  for(var playlist of removedPlaylists){
-                    console.log("Removing tune from " + playlist.title)
-                    playlists.removeTune(tune_id, playlist.id)
-                  }
-                  viewingPair.setViewing(!viewingPair.viewing);
-                }}
-              ><ButtonText>Save</ButtonText>
-              </Button>
+              
+              {
+              }
+        {
+          // newTune ? save new tune : update existing tune
+          !newTune &&
+          <Button
+            onPress={() => {
+              //TODO: ABSTRACT
+              //Save to existing tune
+              const tune_id = songsList.replaceSelectedTune(selectedTune, currentTune);
+              const newPlaylistSet = new Set(tunePlaylists);
+              const removedPlaylists = [...originalPlaylistsSet]
+                .filter(oldPlaylist => !newPlaylistSet.has(oldPlaylist));
+              const updatedPlaylists = [...newPlaylistSet]
+                .filter(newPlaylist => !originalPlaylistsSet.has(newPlaylist));
+              for(var playlist of updatedPlaylists){
+                console.log("Adding tune to " + playlist.title)
+                playlists.addTune(tune_id, playlist.id)
+              }
+              for(var playlist of removedPlaylists){
+                console.log("Removing tune from " + playlist.title)
+                playlists.removeTune(tune_id, playlist.id)
+              }
+              viewingPair.setViewing(!viewingPair.viewing);
+            }}
+          ><ButtonText>Save</ButtonText>
+          </Button>
+        }
+        {
+          newTune &&
+            <Button
+              onPress={() => {
+                //Save to new tune
+                const tune_id = songsList.addNewTune(currentTune);
+                const newPlaylistSet = new Set(tunePlaylists);
+                const addedPlaylists = [...newPlaylistSet]
+                  .filter(newPlaylist => !originalPlaylistsSet.has(newPlaylist));
+                for(var playlist of addedPlaylists){
+                  console.log("Adding tune to " + playlist.title)
+                  playlists.addTune(tune_id, playlist.id)
+                }
+                viewingPair.setViewing(!viewingPair.viewing);
+                setNewTune(false);
+              }}
+            ><ButtonText>Save</ButtonText>
+          </Button>
+        }
+            
             </View>
           <View style={{flex: 1}}>
-            <DeleteButton
-              onPress={() => {viewingPair.setViewing(!viewingPair.viewing)}}
-            ><ButtonText>Cancel Edit</ButtonText></DeleteButton>
+              <DeleteButton
+                onPress={() => {viewingPair.setViewing(!viewingPair.viewing); setNewTune(false);}}
+              ><ButtonText>Cancel Edit</ButtonText></DeleteButton>
           </View>
         </View>
       </View>

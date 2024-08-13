@@ -113,11 +113,13 @@ type viewingPair = {
 export default function Importer({
   viewingPair,
   setSelectedTune,
-  songsList
+  songsList,
+  setNewTune
 }: {
   viewingPair: viewingPair,
   setSelectedTune: Function,
-  songsList: SongsList
+  songsList: SongsList,
+  setNewTune: Function
 }){
   const [listReversed, setListReversed] = useState(false);
   const [selectedAttr, updateSelectedAttr] = useState("Title");
@@ -180,19 +182,22 @@ export default function Importer({
         <TouchableHighlight
           key={item.title}
           onPress={() => {
+            //TODO: Abstract into function
             const tn: tune = {};
             tn.title = item.title;
             tn.composers = item['Composers'].map(comp => comp.name);
-            songsList.addNewTune(tn);
+            //songsList.addNewTune(tn);
             setSelectedTune(tn);
+            setNewTune(true);
             viewingPair.setViewing(1);
           }}
           onLongPress={() => {
             const tn: tune = {};
             tn.title = item.title;
             tn.composers = item['Composers'].map(comp => comp.name);
-            songsList.addNewTune(tn);
+            //songsList.addNewTune(tn);
             setSelectedTune(tn);
+            setNewTune(true);
             viewingPair.setViewing(2);
           }}
           onShowUnderlay={separators.highlight}

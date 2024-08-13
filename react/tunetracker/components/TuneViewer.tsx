@@ -82,7 +82,8 @@ function LListHeader({
   setSelectedAttr,
   setSelectedTune,
   setSelectedPlaylist,
-  playlists
+  playlists,
+  setNewTune
 }: {
   listReversed: boolean | undefined,
   setListReversed: Function,
@@ -92,7 +93,8 @@ function LListHeader({
   setSelectedAttr: Function,
   setSelectedTune: Function,
   setSelectedPlaylist: Function,
-  playlists: Playlists
+  playlists: Playlists,
+  setNewTune: Function
 }){
   const selectedAttrItems = Array.from(prettyAttrs.entries()).map(
     (entry) => {return {label: entry[1], value: entry[0]}}
@@ -152,8 +154,8 @@ function LListHeader({
       </View>
       <Button style={{flex:1}} onPress={() => setViewing(3)} onLongPress={() => {
             const tn: tune = {};
-            songsList.addNewTune(tn);
             setSelectedTune(tn);
+            setNewTune(true);
             setViewing(2);
       }}>
         <ButtonText><Icon name="plus" size={30}/></ButtonText>
@@ -171,13 +173,15 @@ export default function TuneViewer({
   viewingPair,
   setSelectedTune,
   songsList,
-  playlists
+  playlists,
+  setNewTune
 }: {
   songs: Array<tune>,
   viewingPair: viewingPair,
   setSelectedTune: Function,
   songsList: SongsList,
-  playlists: Playlists
+  playlists: Playlists,
+  setNewTune: Function
 }){
   const [listReversed, setListReversed] = useState(false);
   const [selectedAttr, updateSelectedAttr] = useState("title");
@@ -219,6 +223,7 @@ export default function TuneViewer({
           setSelectedTune={setSelectedTune}
           setSelectedPlaylist={setSelectedPlaylist}
           playlists={playlists}
+          setNewTune={setNewTune}
         />
       }
       renderItem={({item, index, separators}) => (

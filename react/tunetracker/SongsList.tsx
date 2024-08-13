@@ -51,7 +51,14 @@ class SongsList{
     return newTune.id as string;
   }
   addNewTune(tune:tune){
-    this.writeToSongsJson(this.songsList.concat(tune));
+    if(tune.id === undefined){
+      const new_id = uuid.v4() as string;
+      tune.id = new_id;
+    }
+    const songsWithNewTune = this.songsList.concat(tune);
+    this.updateSongs(songsWithNewTune);
+    this.writeToSongsJson(songsWithNewTune);
+    return tune.id
   }
   deleteTune(tune:tune){
     const songsWithoutTune = this.songsList.filter(currentTune => currentTune != tune);

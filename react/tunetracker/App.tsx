@@ -21,8 +21,6 @@ import {
 } from 'react-native/Libraries/NewAppScreen';
 import defaultSongsJson from './songs.json';
 
-import RNFS from 'react-native-fs';
-
 import { tune } from './types.tsx';
 import SongsList from './SongsList.tsx';
 import Playlists from './Playlists.tsx';
@@ -86,6 +84,7 @@ function MainMenu({
 }): React.JSX.Element {
   //const isDarkMode = useColorScheme() === 'dark';
   const [selectedTune, setSelectedTune] = useState(songs[0]);
+  const [newTune, setNewTune] = useState(false);
   const [viewing, setViewing] = useState(0);
   const isDarkMode = true;
   function backToMain(){
@@ -113,6 +112,8 @@ function MainMenu({
         selectedTune={selectedTune}
         songsList={songsList}
         playlists={playlists}
+        newTune={newTune}
+        setNewTune={setNewTune}
       />
     );
   }else if(viewing === 2){ //Editor
@@ -123,6 +124,8 @@ function MainMenu({
         selectedTune={selectedTune}
         songsList={songsList}
         playlists={playlists}
+        newTune={newTune}
+        setNewTune={setNewTune}
       />
     );
   }else if (viewing == 3){ //TuneImporter
@@ -132,6 +135,7 @@ function MainMenu({
           viewingPair={viewingPair}
           setSelectedTune={setSelectedTune}
           songsList={songsList}
+          setNewTune={setNewTune}
         />
       </SafeAreaView>
     )
@@ -145,6 +149,7 @@ function MainMenu({
             setSelectedTune={setSelectedTune}
             songsList={songsList}
             playlists={playlists}
+            setNewTune={setNewTune}
           />
         </View>
         </SafeAreaView>
