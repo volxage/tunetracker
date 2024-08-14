@@ -7,7 +7,7 @@
 
 import React, {isValidElement, useEffect, useState} from 'react';
 
-import TuneViewer from './components/TuneViewer.tsx';
+import TuneListDisplay from './components/TuneListDisplay.tsx';
 import Editor from './components/Editor.tsx';
 import Importer from './components/Importer.tsx';
 import {
@@ -142,11 +142,11 @@ function MainMenu({
       </SafeAreaView>
     )
   }
-  else{ //TuneViewer
+  else{ //TuneListDisplay
     return (
       <SafeAreaView style={backgroundStyle}>
         <View>
-          <TuneViewer songs={songs}
+          <TuneListDisplay songs={songs}
             viewingPair={viewingPair}
             setSelectedTune={setSelectedTune}
             songsList={songsList}
