@@ -26,6 +26,7 @@ import SongsList from './SongsList.tsx';
 import Playlists from './Playlists.tsx';
 import OnlineDB from './OnlineDB.tsx';
 
+
 //PrettyAttrs function as both as "prettifiers" and lists of attrs to display in corresponding editors
 const miniEditorPrettyAttrs = new Map<string, string>([
   ["title", "Title"],

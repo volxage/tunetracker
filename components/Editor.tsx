@@ -27,6 +27,7 @@ import TypeField from './TypeField.tsx';
 import SongsList from '../SongsList.tsx';
 import Playlists from '../Playlists.tsx';
 import { tune, playlist } from '../types.tsx';
+import reactotron from 'reactotron-react-native';
 
 function Editor({
   prettyAttrs, 
@@ -49,6 +50,7 @@ function Editor({
   const [currentTune, setCurrentTune] = useState(JSON.parse(JSON.stringify(selectedTune)) as tune)
   const [tunePlaylists, setTunePlaylists]: [playlist[], Function] = useState([])
   const [originalPlaylistsSet, setOriginalPlaylistsSet]: [Set<playlist>, Function] = useState(new Set())
+    const bench = reactotron.benchmark("Editor benchmark");
   useEffect(() => {
     //If there's no id, it's impossible that the tune has been assigned playlists already.
     if (typeof selectedTune.id !== "undefined"){ 
@@ -56,6 +58,7 @@ function Editor({
       setTunePlaylists(tmpTunesPlaylist);
       setOriginalPlaylistsSet(new Set(tmpTunesPlaylist));
     }
+    bench.stop("Post-render")
   }, [])
   function handleSetCurrentTune(attr_key: keyof tune, value: undefined){
     //Inefficient solution, but there are no Map functions such as "filter" in mapped types
@@ -63,6 +66,7 @@ function Editor({
     cpy[attr_key] = value;
     setCurrentTune(cpy);
   }
+  bench.step("Prerender")
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: "black"}}>
       <FlatList
@@ -85,7 +89,7 @@ function Editor({
                   setTunePlaylists={setTunePlaylists}
                 />
               </TouchableHighlight>
-            }
+            }{typeof bench.step("Item render") === "undefined"}
           </View>
       )}
       ListFooterComponent={

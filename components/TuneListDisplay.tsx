@@ -5,7 +5,7 @@
  * @format
  */
 
-import React, {isValidElement, useState} from 'react';
+import React, {isValidElement, useEffect, useState} from 'react';
 import {
   FlatList,
   Switch,
@@ -49,6 +49,7 @@ const fuseOptions = { // For finetuning the search algorithm
 import { tune, playlist } from '../types.tsx';
 import SongsList from '../SongsList.tsx';
 import Slider from '@react-native-community/slider';
+import reactotron from 'reactotron-react-native';
 const prettyAttrs = new Map<string, string>([
   ["title", "Title"],
   ["alternative_title", "Alternative Title"],
@@ -182,6 +183,8 @@ export default function TuneListDisplay({
   playlists: Playlists,
   setNewTune: Function
 }){
+  useEffect(() => {bench.stop("Full render")})
+  const bench = reactotron.benchmark("TuneListDisplay benchmark");
   const [listReversed, setListReversed] = useState(false);
   const [selectedAttr, updateSelectedAttr] = useState("title");
   const [selectedPlaylist, setSelectedPlaylist] = useState("");
@@ -205,7 +208,7 @@ export default function TuneListDisplay({
         return value.item;
       });
   }
-  
+  bench.step("Pre-render")
   return (
     <FlatList
       data={displaySongs}
@@ -217,7 +220,6 @@ export default function TuneListDisplay({
           setListReversed={setListReversed}
           setViewing={viewingPair.setViewing}
           setSearch={setSearch}
-          songsList={songsList}
           setSelectedAttr={updateSelectedAttr}
           setSelectedTune={setSelectedTune}
           setSelectedPlaylist={setSelectedPlaylist}
@@ -283,6 +285,7 @@ export default function TuneListDisplay({
                 />
               </View>
             }
+          {typeof bench.step("Item render") === "undefined"}
           </View>
         </TouchableHighlight>
     )}
