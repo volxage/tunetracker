@@ -69,21 +69,23 @@ function Editor({
         data={prettyAttrs}
         renderItem={({item, index, separators}) => (
           <View>
-            <TouchableHighlight
-              key={item[0]}
-              onShowUnderlay={separators.highlight}
-              onHideUnderlay={separators.unhighlight}
-            >
-              <TypeField
-                attr={currentTune[item[0] as keyof tune]}
-                attrKey={item[0] as keyof tune}
-                attrName={item[1]}
-                handleSetCurrentTune={handleSetCurrentTune}
-                playlists={playlists}
-                tunePlaylists={tunePlaylists}
-                setTunePlaylists={setTunePlaylists}
-              />
-            </TouchableHighlight>
+            { (item[0] != "lyrics_confidence" || currentTune.has_lyrics) &&
+              <TouchableHighlight
+                key={item[0]}
+                onShowUnderlay={separators.highlight}
+                onHideUnderlay={separators.unhighlight}
+              >
+                <TypeField
+                  attr={currentTune[item[0] as keyof tune]}
+                  attrKey={item[0] as keyof tune}
+                  attrName={item[1]}
+                  handleSetCurrentTune={handleSetCurrentTune}
+                  playlists={playlists}
+                  tunePlaylists={tunePlaylists}
+                  setTunePlaylists={setTunePlaylists}
+                />
+              </TouchableHighlight>
+            }
           </View>
       )}
       ListFooterComponent={

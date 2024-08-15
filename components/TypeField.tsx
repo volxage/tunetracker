@@ -28,6 +28,7 @@ const tuneDefaults = {
   "styles": [],
   "tempi": [],
   "contrafacts": [], 
+  "has_lyrics": false,
   "playthroughs": 0,
   "form_confidence": 0,
   "melody_confidence": 0,
@@ -61,9 +62,11 @@ function AddPlaylistField({
         </View>
         <View style={{alignContent: 'flex-end', flex: 1}}>
           <Button onPress={() => {
-            const tmpPlaylist = playlists.addPlaylist(newPlaylistTitle);
-            if(typeof tmpPlaylist !== "undefined"){
-              setTunePlaylists(tunePlaylists.concat(tmpPlaylist));
+            if(newPlaylistTitle.trim().length != 0){
+              const tmpPlaylist = playlists.addPlaylist(newPlaylistTitle);
+              if(typeof tmpPlaylist !== "undefined"){
+                setTunePlaylists(tunePlaylists.concat(tmpPlaylist));
+              }
             }
           }}>
             <ButtonText><Icon name="plus" size={30}/></ButtonText>
@@ -144,7 +147,7 @@ function TypeField({
         />
         <View style={{flexDirection:"row", alignSelf: "center"}}>
           <Text>Existing playlist</Text>
-            <Switch value={newPlaylistOpen} onValueChange={setNewPlaylistOpen}/>
+          <Switch value={newPlaylistOpen} onValueChange={setNewPlaylistOpen}/>
           <Text>New playlist</Text>
         </View>
         <AddPlaylistField
@@ -188,7 +191,22 @@ function TypeField({
         />
       </View>
     );
-  }else if (Array.isArray(attr)){
+  }
+  else if (typeof attr === "boolean") {
+    const [bool, setBool] = useState(attr)
+    return(
+      <View style={{backgroundColor: 'black', padding: 8}}>
+        <Title>{attrName.toUpperCase()}</Title>
+        <View style={{flexDirection: "row"}}>
+          <Switch
+            onValueChange={(value) => {setBool(value); handleSetCurrentTune(attrKey, value)}}
+            value={bool}
+          />
+        </View>
+      </View>
+    );
+  }
+  else if (Array.isArray(attr)){
 //    const [arrAttr, setarrAttr] = useState(attr);
 
     function handleReplace(value: string, index: number){

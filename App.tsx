@@ -47,6 +47,7 @@ const prettyAttrs = new Map<string, string>([
   ["contrafacts", "Contrafacts"],
   ["playlists", "Playlists"],
   ["playthroughs", "Playthroughs"],
+  ["has_lyrics", "Has lyrics?"],
   ["form_confidence", "Form Confidence"],
   ["melody_confidence", "Melody Confidence"],
   ["solo_confidence", "Solo Confidence"],

@@ -79,7 +79,6 @@ function LListHeader({
   setListReversed,
   setViewing,
   setSearch,
-  songsList,
   setSelectedAttr,
   setSelectedTune,
   setSelectedPlaylist,
@@ -90,7 +89,6 @@ function LListHeader({
   setListReversed: Function,
   setViewing: Function,
   setSearch: Function,
-  songsList: SongsList,
   setSelectedAttr: Function,
   setSelectedTune: Function,
   setSelectedPlaylist: Function,
@@ -129,7 +127,7 @@ function LListHeader({
           placeholder={{label: "Select a playlist", value: ""}}
           style={{inputAndroid:
             {
-            backgroundColor: 'transparent', color: 'white', fontSize: 20, fontWeight: "300"
+            backgroundColor: 'transparent', color: 'white', fontSize: 20, fontWeight: "300",
             }
           }}
         />
@@ -148,7 +146,7 @@ function LListHeader({
         />
       </View>
       <View style={{flex:2}}>
-        <SubText style={{color: 'grey'}}>{"Reverse:"}</SubText>
+        <SubText style={{color: 'grey', textAlign: "left"}}>{"Reverse:"}</SubText>
       </View>
       <View style={{flex: 1}}>
         <Switch value={listReversed} onValueChange={() => setListReversed(!listReversed)}/>
