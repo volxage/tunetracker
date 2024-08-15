@@ -18,7 +18,7 @@ import {
   SubText,
   TextInput,
   Button,
-  ButtonText
+  ButtonText,
 } from '../Style.tsx'
 import tuneSort from '../tuneSort.tsx'
 import Playlists from '../Playlists.tsx'
@@ -48,6 +48,7 @@ const fuseOptions = { // For finetuning the search algorithm
 };
 import { tune, playlist } from '../types.tsx';
 import SongsList from '../SongsList.tsx';
+import Slider from '@react-native-community/slider';
 const prettyAttrs = new Map<string, string>([
   ["title", "Title"],
   ["alternative_title", "Alternative Title"],
@@ -168,7 +169,7 @@ type viewingPair = {
   viewing: number;
   setViewing: Function;
 }
-export default function TuneViewer({
+export default function TuneListDisplay({
   songs,
   viewingPair,
   setSelectedTune,
@@ -238,6 +239,52 @@ export default function TuneViewer({
             <SubText>{selectedAttr != "title"
               ? prettyPrint(item[selectedAttr as keyof tune])
               : prettyPrint(item["composers"])}</SubText>
+            <View style={{margin: -2}}>
+              <Slider
+                value={item.melody_confidence}
+                lowerLimit={item.melody_confidence}
+                upperLimit={item.melody_confidence}
+                minimumValue={0}
+                maximumValue={100}
+                minimumTrackTintColor='purple'
+                thumbTintColor='#00000000'
+              />
+            </View>
+            <View style={{margin: -2}}>
+              <Slider
+                value={item.form_confidence}
+                lowerLimit={item.form_confidence}
+                upperLimit={item.form_confidence}
+                minimumValue={0}
+                maximumValue={100}
+                minimumTrackTintColor='darkblue'
+                thumbTintColor='#00000000'
+              />
+            </View>
+            <View style={{margin: -2}}>
+              <Slider
+                value={item.solo_confidence}
+                lowerLimit={item.solo_confidence}
+                upperLimit={item.solo_confidence}
+                minimumValue={0}
+                maximumValue={100}
+                minimumTrackTintColor='darkcyan'
+                thumbTintColor='#00000000'
+              />
+            </View>
+            { item.has_lyrics &&
+              <View style={{margin: -2}}>
+                <Slider
+                  value={item.lyrics_confidence}
+                  lowerLimit={item.lyrics_confidence}
+                  upperLimit={item.lyrics_confidence}
+                  minimumValue={0}
+                  maximumValue={100}
+                  minimumTrackTintColor='green'
+                  thumbTintColor='#00000000'
+                />
+              </View>
+            }
           </View>
         </TouchableHighlight>
     )}

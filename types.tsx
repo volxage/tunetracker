@@ -13,6 +13,7 @@ export type tune = {
   "melody_confidence"?: number
   "solo_confidence"?: number
   "lyrics_confidence"?: number
+  "has_lyrics"?: boolean
   "id"?: string
   "played_at"?: string[]
 }
