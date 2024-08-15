@@ -75,26 +75,28 @@ function prettyPrint(object: unknown): string{
   return "(Empty)";
 }
 
+type HeaderInputStates = {
+  listReversed: boolean
+  setListReversed: Function
+  confidenceVisible: boolean
+  setConfidenceVisible: Function
+  setSearch: Function
+  setSelectedAttr: Function
+  setSelectedTune: Function
+  setSelectedPlaylist: Function
+}
 function LListHeader({
-  listReversed,
-  setListReversed,
+  headerInputStates,
   setViewing,
-  setSearch,
-  setSelectedAttr,
-  setSelectedTune,
-  setSelectedPlaylist,
   playlists,
-  setNewTune
+  setNewTune,
+  selectedAttr
 }: {
-  listReversed: boolean | undefined,
-  setListReversed: Function,
+  headerInputStates: HeaderInputStates
   setViewing: Function,
-  setSearch: Function,
-  setSelectedAttr: Function,
-  setSelectedTune: Function,
-  setSelectedPlaylist: Function,
   playlists: Playlists,
-  setNewTune: Function
+  setNewTune: Function,
+  selectedAttr: String
 }){
   const selectedAttrItems = Array.from(prettyAttrs.entries()).map(
     (entry) => {return {label: entry[1], value: entry[0]}}
@@ -112,17 +114,17 @@ function LListHeader({
 
   return(
   <View>
-    <View style={{flexDirection: 'row'}}>
-      <View style={{flex:1, borderBottomWidth:1}}>
+    <View style={{flexDirection: 'row', borderBottomWidth:1}}>
+      <View style={{flex:1}}>
         <TextInput
           placeholder={"Search"}
           placeholderTextColor={"white"}
-          onChangeText={(text) => {setSearch(text)}}
+          onChangeText={(text) => {headerInputStates.setSearch(text)}}
         />
       </View>
-      <View style={{flex:1, borderBottomWidth:1}}>
+      <View style={{flex:1}}>
         <RNPickerSelect
-          onValueChange={(value) => setSelectedPlaylist(value)}
+          onValueChange={(value) => headerInputStates.setSelectedPlaylist(value)}
           items={selectedPlaylistItems}
           useNativeAndroidPickerStyle={false}
           placeholder={{label: "Select a playlist", value: ""}}
@@ -134,10 +136,11 @@ function LListHeader({
         />
       </View>
     </View>
-    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+    <View style={{flexDirection: 'row', alignItems: 'center', borderBottomWidth:1}}>
       <View style={{flex: 4}}>
         <RNPickerSelect
-          onValueChange={(value) => setSelectedAttr(value)}
+          value={selectedAttr}
+          onValueChange={(value) => headerInputStates.setSelectedAttr(value)}
           items={selectedAttrItems as Array<{label:string, value:string}>}
           useNativeAndroidPickerStyle={false}
           placeholder={{label: "Sort by...", value: "title"}}
@@ -146,19 +149,86 @@ function LListHeader({
           }}
         />
       </View>
-      <View style={{flex:2}}>
-        <SubText style={{color: 'grey', textAlign: "left"}}>{"Reverse:"}</SubText>
-      </View>
-      <View style={{flex: 1}}>
-        <Switch value={listReversed} onValueChange={() => setListReversed(!listReversed)}/>
-      </View>
-      <Button style={{flex:1}} onPress={() => setViewing(3)} onLongPress={() => {
+      <Button
+        style={{
+          flex:1,
+            backgroundColor: "purple"
+        }}
+        onPress={() => {
+          headerInputStates.setSelectedAttr("melody_confidence");
+        }}>
+          <ButtonText>
+            <Icon name="music-clef-treble" size={30} />
+          </ButtonText>
+      </Button>
+      <Button
+        style={{
+          flex:1,
+            backgroundColor: "darkblue"
+        }}
+        onPress={() => {
+          headerInputStates.setSelectedAttr("form_confidence");
+        }}>
+          <ButtonText>
+            <Icon name="grid" size={30}/>
+          </ButtonText>
+      </Button>
+      <Button
+        style={{
+          flex:1,
+            backgroundColor: "darkcyan"
+        }}
+        onPress={() => {
+          headerInputStates.setSelectedAttr("solo_confidence");
+        }}>
+        <ButtonText><Icon name="alpha-s-circle-outline" size={30} /></ButtonText>
+      </Button>
+      <Button
+        style={{
+          flex:1,
+            backgroundColor: "darkgreen"
+        }}
+        onPress={() => {
+          headerInputStates.setSelectedAttr("lyrics_confidence");
+        }}>
+        <ButtonText><Icon name="script-text" size={30} /></ButtonText>
+      </Button>
+    </View>
+    <View style={{flexDirection: "row"}}>
+      <Button
+        style={{
+          flex:1,
+            backgroundColor: !headerInputStates.confidenceVisible
+            ? "darkgreen"
+            : "darkred",
+        }}
+        onPress={() => {
+          headerInputStates.setConfidenceVisible(!headerInputStates.confidenceVisible)
+        }}>
+        <ButtonText><Icon name="segment" size={30} /></ButtonText>
+      </Button>
+      <Button
+        style={{
+          flex:1,
+            backgroundColor: !headerInputStates.listReversed
+            ? "darkgreen"
+            : "darkred",
+        }}
+        onPress={() => {
+          headerInputStates.setListReversed(!headerInputStates.listReversed)
+        }}>
+        <ButtonText><Icon name="menu-swap" size={30} /></ButtonText>
+      </Button>
+      <Button style={{flex:1}} onPress={() => {
             const tn: tune = {};
-            setSelectedTune(tn);
+            headerInputStates.setSelectedTune(tn);
             setNewTune(true);
             setViewing(2);
       }}>
         <ButtonText><Icon name="plus" size={30}/></ButtonText>
+      </Button>
+      <Button style={{flex:1}} onPress={() => setViewing(3)}>
+        <ButtonText><Icon name="database-arrow-down" size={30}/></ButtonText>
       </Button>
     </View>
   </View>
@@ -172,23 +242,22 @@ export default function TuneListDisplay({
   songs,
   viewingPair,
   setSelectedTune,
-  songsList,
   playlists,
   setNewTune
 }: {
   songs: Array<tune>,
   viewingPair: viewingPair,
   setSelectedTune: Function,
-  songsList: SongsList,
   playlists: Playlists,
   setNewTune: Function
 }){
   useEffect(() => {bench.stop("Full render")})
   const bench = reactotron.benchmark("TuneListDisplay benchmark");
   const [listReversed, setListReversed] = useState(false);
-  const [selectedAttr, updateSelectedAttr] = useState("title");
+  const [selectedAttr, setSelectedAttr] = useState("title");
   const [selectedPlaylist, setSelectedPlaylist] = useState("");
   const [search, setSearch] = useState("");
+  const [confidenceVisible, setConfidenceVisible] = useState(false);
 
   let displaySongs = songs;
   if(selectedPlaylist !== " "){
@@ -209,6 +278,18 @@ export default function TuneListDisplay({
       });
   }
   bench.step("Pre-render")
+
+  const headerInputStates = 
+  {
+    listReversed: listReversed,
+    setListReversed: setListReversed,
+    confidenceVisible: confidenceVisible,
+    setConfidenceVisible: setConfidenceVisible,
+    setSearch: setSearch,
+    setSelectedAttr: setSelectedAttr,
+    setSelectedTune: setSelectedTune,
+    setSelectedPlaylist: setSelectedPlaylist
+  }
   return (
     <FlatList
       data={displaySongs}
@@ -216,15 +297,11 @@ export default function TuneListDisplay({
       extraData={selectedAttr}
       ListHeaderComponent={
         <LListHeader 
-          listReversed={listReversed}
-          setListReversed={setListReversed}
+          headerInputStates={headerInputStates}
           setViewing={viewingPair.setViewing}
-          setSearch={setSearch}
-          setSelectedAttr={updateSelectedAttr}
-          setSelectedTune={setSelectedTune}
-          setSelectedPlaylist={setSelectedPlaylist}
           playlists={playlists}
           setNewTune={setNewTune}
+          selectedAttr={selectedAttr}
         />
       }
       renderItem={({item, index, separators}) => (
@@ -234,11 +311,17 @@ export default function TuneListDisplay({
           onLongPress={() => {setSelectedTune(item); viewingPair.setViewing(2);}}
           onShowUnderlay={separators.highlight}
           onHideUnderlay={separators.unhighlight}>
+          {
           <View style={{backgroundColor: 'black', padding: 8}}>
             <Text>{item.title}</Text>
             <SubText>{selectedAttr != "title"
               ? prettyPrint(item[selectedAttr as keyof tune])
               : prettyPrint(item["composers"])}</SubText>
+
+            {
+              //CONFIDENCE
+              confidenceVisible && 
+            <View>
             <View style={{margin: -2}}>
               <Slider
                 value={item.melody_confidence}
@@ -285,8 +368,11 @@ export default function TuneListDisplay({
                 />
               </View>
             }
+          </View>
+        }
           {typeof bench.step("Item render") === "undefined"}
           </View>
+        }
         </TouchableHighlight>
     )}
   />
