@@ -71,6 +71,10 @@ export default {
   getStandards() {
     return standards;
   },
+  getStandardById(id: number) {
+    //TODO: Replace with API call
+    return standards.find((stand: standard) => stand.id === id);
+  },
   update() {
     fetchComposers();
     fetchTunes();

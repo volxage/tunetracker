@@ -15,6 +15,7 @@ export type tune = {
   "lyrics_confidence"?: number
   "has_lyrics"?: boolean
   "id"?: string
+  "db_id"?: number
   "played_at"?: string[]
 }
 export type composer = {
@@ -29,7 +30,7 @@ export type standard = {
   "form": string
   "bio": string
   "year": string
-  "id": string
+  "id": number
   "Composers": composer[]
 }
 export type playlist = {

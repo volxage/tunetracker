@@ -67,13 +67,13 @@ function ImporterHeader({
   listReversed,
   setListReversed,
   updateSelectedAttr,
-  setViewing,
+  navigation,
   setSearch
 }: {
     listReversed: boolean | undefined,
     setListReversed: Function,
     updateSelectedAttr: Function,
-    setViewing: Function,
+    navigation: any,
     setSearch: Function
 }){
   const selectedAttrItems = Array.from(standardAttrs.entries())
@@ -101,26 +101,18 @@ function ImporterHeader({
         <Switch value={listReversed} onValueChange={() => setListReversed(!listReversed)}/>
       </View>
     </View>
-    <DeleteButton onPress={() => setViewing(0)}>
+    <DeleteButton onPress={() => navigation.goBack()}>
       <ButtonText>Cancel import</ButtonText>
     </DeleteButton>
     </View>
   );
 }
-type viewingPair = {
-  viewing: number;
-  setViewing: Function;
-}
 export default function Importer({
-  viewingPair,
-  setSelectedTune,
-  songsList,
-  setNewTune
+  importFn,
+  navigation
 }: {
-  viewingPair: viewingPair,
-  setSelectedTune: Function,
-  songsList: SongsList,
-  setNewTune: Function
+  importFn: Function,
+  navigation: any
 }){
   const [listReversed, setListReversed] = useState(false);
   const [selectedAttr, updateSelectedAttr] = useState("Title");
@@ -146,7 +138,7 @@ export default function Importer({
         <ImporterHeader listReversed={listReversed}
           setListReversed={setListReversed}
           updateSelectedAttr={updateSelectedAttr}
-          setViewing={viewingPair.setViewing}
+          navigation={navigation}
           setSearch={setSearch}/>
       }
       renderItem={({item, index, separators}) => (
@@ -157,19 +149,13 @@ export default function Importer({
             const tn: tune = {};
             tn.title = item.title;
             tn.composers = item['Composers'].map(comp => comp.name);
-            //songsList.addNewTune(tn);
-            setSelectedTune(tn);
-            setNewTune(true);
-            viewingPair.setViewing(1);
+            importFn(tn);
           }}
           onLongPress={() => {
             const tn: tune = {};
             tn.title = item.title;
             tn.composers = item['Composers'].map(comp => comp.name);
-            //songsList.addNewTune(tn);
-            setSelectedTune(tn);
-            setNewTune(true);
-            viewingPair.setViewing(2);
+            importFn(tn);
           }}
           onShowUnderlay={separators.highlight}
           onHideUnderlay={separators.unhighlight}>
@@ -186,7 +172,7 @@ export default function Importer({
   />
   : <View style={{flex: 1, display: "flex", justifyContent: "center", alignItems: "center"}}>
     <SubText>Loading... (Your internet or the server may be down. Email jhilla@jhilla.org if you believe the server is down.)</SubText>
-    <DeleteButton onPress={() => {viewingPair.setViewing(0)}}><ButtonText>Cancel import</ButtonText></DeleteButton>
+    <DeleteButton onPress={() => {navigation.goBack()}}><ButtonText>Cancel import</ButtonText></DeleteButton>
   </View>
   );
 }

@@ -5,7 +5,10 @@
  * @format
  */
 
-import React, {isValidElement, useEffect, useState} from 'react';
+import React, {createContext, isValidElement, useEffect, useState} from 'react';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+
 
 import TuneListDisplay from './components/TuneListDisplay.tsx';
 import Editor from './components/Editor.tsx';
@@ -21,7 +24,7 @@ import {
 } from 'react-native/Libraries/NewAppScreen';
 import defaultSongsJson from './songs.json';
 
-import { tune } from './types.tsx';
+import { tune, standard } from './types.tsx';
 import SongsList from './SongsList.tsx';
 import Playlists from './Playlists.tsx';
 import OnlineDB from './OnlineDB.tsx';
@@ -37,8 +40,9 @@ const miniEditorPrettyAttrs = new Map<string, string>([
   ["just_played", "'I Just Played This'"],
 ])
 const prettyAttrs = new Map<string, string>([
+  ["db_id", "Database Connection"],
   ["title", "Title"],
-  ["alternative_title", "Alternative Title"],
+["alternative_title", "Alternative Title"],
   ["composers", "Composers"],
   ["form", "Form"],
   ["notable_recordings", "Notable Recordings"],
@@ -52,8 +56,10 @@ const prettyAttrs = new Map<string, string>([
   ["form_confidence", "Form Confidence"],
   ["melody_confidence", "Melody Confidence"],
   ["solo_confidence", "Solo Confidence"],
-  ["lyrics_confidence", "Lyrics Confidence"]
+  ["lyrics_confidence", "Lyrics Confidence"],
 ])
+
+const Stack = createNativeStackNavigator();
 
 function App(): React.JSX.Element {
   const [songs, setSongs] = useState(defaultSongsJson);
@@ -70,11 +76,13 @@ function App(): React.JSX.Element {
 
   return(
     <View style={{flex: 1, backgroundColor: "black"}}>
-      <MainMenu
-        songs={songs}
-        songsList={songsList}
-        playlists={playlists}
-      />
+      <NavigationContainer>
+          <MainMenu
+            songs={songs}
+            songsList={songsList}
+            playlists={playlists}
+          />
+      </NavigationContainer>
     </View>
   );
 }
@@ -105,59 +113,66 @@ function MainMenu({
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
-  let viewingPair = {viewing:viewing, setViewing:setViewing};
-  if(viewing === 1){ //MiniEditor (Just Editor with less attrs)
-    let entriesArr = Array.from(miniEditorPrettyAttrs.entries());
-    let arr = ((entriesArr as Array<Array<unknown>>) as Array<[string, string]>);
-    return(
-      <Editor
-        viewingPair={viewingPair}
-        prettyAttrs={arr}
-        selectedTune={selectedTune}
-        songsList={songsList}
-        playlists={playlists}
-        newTune={newTune}
-        setNewTune={setNewTune}
-      />
-    );
-  }else if(viewing === 2){ //Editor
-    return(
-      <Editor
-        viewingPair={viewingPair}
-        prettyAttrs={Array.from(prettyAttrs.entries())}
-        selectedTune={selectedTune}
-        songsList={songsList}
-        playlists={playlists}
-        newTune={newTune}
-        setNewTune={setNewTune}
-      />
-    );
-  }else if (viewing == 3){ //TuneImporter
-    return(
-      <SafeAreaView style={{flex: 1}}>
-        <Importer
-          viewingPair={viewingPair}
-          setSelectedTune={setSelectedTune}
+  let entriesArr = Array.from(miniEditorPrettyAttrs.entries());
+  let arr = ((entriesArr as Array<Array<unknown>>) as Array<[string, string]>);
+  return(
+    <Stack.Navigator
+      screenOptions={{headerShown: false}}
+      initialRouteName='TuneListDisplay'
+    >
+      <Stack.Screen name="MiniEditor">
+        {(props) => <Editor
+          prettyAttrs={arr}
+          selectedTune={selectedTune}
           songsList={songsList}
+          playlists={playlists}
+          newTune={newTune}
           setNewTune={setNewTune}
-        />
-      </SafeAreaView>
-    )
-  }
-  else{ //TuneListDisplay
-    return (
-      <SafeAreaView style={backgroundStyle}>
-        <View>
-          <TuneListDisplay songs={songs}
-            viewingPair={viewingPair}
-            setSelectedTune={setSelectedTune}
-            songsList={songsList}
-            playlists={playlists}
-            setNewTune={setNewTune}
-          />
-        </View>
+          navigation={props.navigation}
+        />}
+      </Stack.Screen>
+      <Stack.Screen name="Editor">
+        {(props) => <Editor
+          prettyAttrs={Array.from(prettyAttrs.entries())}
+          selectedTune={selectedTune}
+          songsList={songsList}
+          playlists={playlists}
+          newTune={newTune}
+          setNewTune={setNewTune}
+          navigation={props.navigation}
+        />}
+      </Stack.Screen>
+      <Stack.Screen name="Importer">
+        {(props) =>
+        <SafeAreaView style={{flex: 1}}>
+          <Importer
+            navigation={props.navigation}
+            importFn={function(stand: standard){
+              const tn: tune = {};
+              tn.title = stand.title;
+              tn.composers = stand['Composers'].map(comp => comp.name);
+              setSelectedTune(tn);
+              setNewTune(true);
+              props.navigation.goBack();
+            }}/>
+          </SafeAreaView>
+        }
+      </Stack.Screen>
+      <Stack.Screen name="TuneListDisplay">
+        {(props) =>
+        <SafeAreaView style={backgroundStyle}>
+          <View>
+            <TuneListDisplay songs={songs}
+              navigation={props.navigation}
+              setSelectedTune={setSelectedTune}
+              playlists={playlists}
+              setNewTune={setNewTune}
+            />
+          </View>
         </SafeAreaView>
-      );
-  }
+      }
+    </Stack.Screen>
+  </Stack.Navigator>
+);
 }
 export default App;

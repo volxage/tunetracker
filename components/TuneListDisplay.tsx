@@ -87,13 +87,13 @@ type HeaderInputStates = {
 }
 function LListHeader({
   headerInputStates,
-  setViewing,
+  navigation,
   playlists,
   setNewTune,
   selectedAttr
 }: {
   headerInputStates: HeaderInputStates
-  setViewing: Function,
+  navigation: any,
   playlists: Playlists,
   setNewTune: Function,
   selectedAttr: String
@@ -158,7 +158,7 @@ function LListHeader({
           headerInputStates.setSelectedAttr("melody_confidence");
         }}>
           <ButtonText>
-            <Icon name="music-clef-treble" size={30} />
+            <Icon name="music" size={30} />
           </ButtonText>
       </Button>
       <Button
@@ -170,7 +170,7 @@ function LListHeader({
           headerInputStates.setSelectedAttr("form_confidence");
         }}>
           <ButtonText>
-            <Icon name="grid" size={30}/>
+              <Icon name="file-music-outline" size={30}/>
           </ButtonText>
       </Button>
       <Button
@@ -223,30 +223,26 @@ function LListHeader({
             const tn: tune = {};
             headerInputStates.setSelectedTune(tn);
             setNewTune(true);
-            setViewing(2);
+            navigation.navigate("Editor");
       }}>
         <ButtonText><Icon name="plus" size={30}/></ButtonText>
       </Button>
-      <Button style={{flex:1}} onPress={() => setViewing(3)}>
+      <Button style={{flex:1}} onPress={() => navigation.navigate("Importer")}>
         <ButtonText><Icon name="database-arrow-down" size={30}/></ButtonText>
       </Button>
     </View>
   </View>
 );
 }
-type viewingPair = {
-  viewing: number;
-  setViewing: Function;
-}
 export default function TuneListDisplay({
   songs,
-  viewingPair,
+  navigation,
   setSelectedTune,
   playlists,
   setNewTune
 }: {
   songs: Array<tune>,
-  viewingPair: viewingPair,
+  navigation: any,
   setSelectedTune: Function,
   playlists: Playlists,
   setNewTune: Function
@@ -298,7 +294,7 @@ export default function TuneListDisplay({
       ListHeaderComponent={
         <LListHeader 
           headerInputStates={headerInputStates}
-          setViewing={viewingPair.setViewing}
+          navigation={navigation}
           playlists={playlists}
           setNewTune={setNewTune}
           selectedAttr={selectedAttr}
@@ -307,8 +303,8 @@ export default function TuneListDisplay({
       renderItem={({item, index, separators}) => (
         <TouchableHighlight
           key={item.title}
-          onPress={() => {setSelectedTune(item); viewingPair.setViewing(1);}}
-          onLongPress={() => {setSelectedTune(item); viewingPair.setViewing(2);}}
+          onPress={() => {setSelectedTune(item); navigation.navigate("MiniEditor");}}
+          onLongPress={() => {setSelectedTune(item); navigation.navigate("Editor");}}
           onShowUnderlay={separators.highlight}
           onHideUnderlay={separators.unhighlight}>
           {
