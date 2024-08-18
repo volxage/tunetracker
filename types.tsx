@@ -16,6 +16,8 @@ export type tune = {
   "has_lyrics"?: boolean
   "id"?: string
   "db_id"?: number
+  "bio"?: string
+  "year"?: number
   "played_at"?: string[]
 }
 export type composer = {
@@ -39,3 +41,31 @@ export type playlist = {
   "id": string
   "tunes": string[]
 }
+
+export const editorAttrs = [
+  ["db_id", "Database Connection"],
+  ["title", "Title"],
+  ["alternative_title", "Alternative Title"],
+  ["composers", "Composers"],
+  ["form", "Form"],
+  ["notable_recordings", "Notable Recordings"],
+  ["keys", "Keys"],
+  ["styles", "Styles"],
+  ["tempi", "Tempi"],
+  ["contrafacts", "Contrafacts"],
+  ["playlists", "Playlists"],
+  ["playthroughs", "Playthroughs"],
+  ["has_lyrics", "Has lyrics?"],
+  ["form_confidence", "Form Confidence"],
+  ["melody_confidence", "Melody Confidence"],
+  ["solo_confidence", "Solo Confidence"],
+  ["lyrics_confidence", "Lyrics Confidence"],
+];
+export const miniEditorAttrs = new Map<string, string>([
+  ["title", "Title"],
+  ["form_confidence", "Form Confidence"],
+  ["melody_confidence", "Melody Confidence"],
+  ["solo_confidence", "Solo Confidence"],
+  ["lyrics_confidence", "Lyrics Confidence"],
+  ["just_played", "'I Just Played This'"],
+])

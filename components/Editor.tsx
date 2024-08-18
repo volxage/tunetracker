@@ -27,6 +27,9 @@ import reactotron from 'reactotron-react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons.js';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Importer from './Importer.tsx';
+import {BackHandler} from 'react-native';
+import Compare from './Compare.tsx';
+import OnlineDB from '../OnlineDB.tsx';
 
 export default function Editor({
   prettyAttrs, 
@@ -51,6 +54,14 @@ export default function Editor({
   const [originalPlaylistsSet, setOriginalPlaylistsSet]: [Set<playlist>, Function] = useState(new Set())
   const bench = reactotron.benchmark("Editor benchmark");
   const Stack = createNativeStackNavigator();
+
+  useEffect(() => {
+    BackHandler.addEventListener('hardwareBackPress', navigation.goBack)
+    return () => {
+      BackHandler.removeEventListener('hardwareBackPress', navigation.goBack)
+    }
+  }, []);
+
   useEffect(() => {
     //If there's no id, it's impossible that the tune has been assigned playlists already.
     if (typeof selectedTune.id !== "undefined"){ 
@@ -68,8 +79,8 @@ export default function Editor({
   }
   bench.step("Prerender")
   return (
-    <Stack.Navigator>
-      <Stack.Screen name={"EditorUnwrapped"}>
+    <Stack.Navigator screenOptions={{headerShown: false}}>
+      <Stack.Screen name={"EditorUnwrapped"} >
         {props => <SafeAreaView style={{flex: 1, backgroundColor: "black"}}>
           <FlatList
             data={prettyAttrs}
@@ -89,7 +100,7 @@ export default function Editor({
                     playlists={playlists}
                     tunePlaylists={tunePlaylists}
                     setTunePlaylists={setTunePlaylists}
-                    toImporter={() => props.navigation.navigate("ImportID")}
+                    navigation={navigation}
                   />
                 </TouchableHighlight>
                 }{typeof bench.step("Item render") === "undefined"}
@@ -178,11 +189,22 @@ export default function Editor({
   <SafeAreaView style={{flex: 1}}>
     <Importer
       navigation={props.navigation}
+      importingId={false}
       importFn={function(stand: standard){
         handleSetCurrentTune("db_id", stand.id)
         props.navigation.goBack();
       }}/>
     </SafeAreaView>
+  }
+</Stack.Screen>
+<Stack.Screen name="Compare">
+  {props =>
+    //Logically, this screen will never appear if there is no standard, so we can guarantee that getStandardById will return a standard.
+    <Compare
+      currentTune={currentTune}
+      currentStandard={(currentTune.db_id ? OnlineDB.getStandardById(currentTune.db_id) : null) as standard}
+      navigation={props.navigation}
+    />
   }
 </Stack.Screen>
 </Stack.Navigator>

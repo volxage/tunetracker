@@ -46,4 +46,15 @@ const TextInput = styled.TextInput`
   font-weight: 200;
   color: white;
 `;
-export {Text, Title, SubText, TextInput, DeleteButton, Button, ButtonText};
+const SMarginView = styled.View`
+  background-color: black;
+  margin: 16px;
+`;
+const ConfidenceBarView = styled.View`
+  margin-vertical: -4px;
+  margin-horizontal: -12px;
+`;
+const BackgroundView = styled.View`
+  background-color: black;
+`
+export {Text, Title, SubText, TextInput, DeleteButton, Button, ButtonText, SMarginView, ConfidenceBarView, BackgroundView};

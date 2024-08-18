@@ -19,6 +19,7 @@ import {
   TextInput,
   Button,
   ButtonText,
+  ConfidenceBarView
 } from '../Style.tsx'
 import tuneSort from '../tuneSort.tsx'
 import Playlists from '../Playlists.tsx'
@@ -317,42 +318,42 @@ export default function TuneListDisplay({
             {
               //CONFIDENCE
               confidenceVisible && 
-            <View>
-            <View style={{margin: -2}}>
-              <Slider
-                value={item.melody_confidence}
-                lowerLimit={item.melody_confidence}
-                upperLimit={item.melody_confidence}
-                minimumValue={0}
-                maximumValue={100}
-                minimumTrackTintColor='purple'
-                thumbTintColor='#00000000'
-              />
-            </View>
-            <View style={{margin: -2}}>
-              <Slider
-                value={item.form_confidence}
-                lowerLimit={item.form_confidence}
-                upperLimit={item.form_confidence}
-                minimumValue={0}
-                maximumValue={100}
-                minimumTrackTintColor='darkblue'
-                thumbTintColor='#00000000'
-              />
-            </View>
-            <View style={{margin: -2}}>
-              <Slider
-                value={item.solo_confidence}
-                lowerLimit={item.solo_confidence}
-                upperLimit={item.solo_confidence}
-                minimumValue={0}
-                maximumValue={100}
-                minimumTrackTintColor='darkcyan'
-                thumbTintColor='#00000000'
-              />
-            </View>
-            { item.has_lyrics &&
-              <View style={{margin: -2}}>
+              <View>
+                <ConfidenceBarView>
+                  <Slider
+                    value={item.melody_confidence}
+                    lowerLimit={item.melody_confidence}
+                    upperLimit={item.melody_confidence}
+                    minimumValue={0}
+                    maximumValue={100}
+                    minimumTrackTintColor='purple'
+                    thumbTintColor='#00000000'
+                  />
+                </ConfidenceBarView>
+                <ConfidenceBarView>
+                  <Slider
+                    value={item.form_confidence}
+                    lowerLimit={item.form_confidence}
+                    upperLimit={item.form_confidence}
+                    minimumValue={0}
+                    maximumValue={100}
+                    minimumTrackTintColor='darkblue'
+                    thumbTintColor='#00000000'
+                  />
+                </ConfidenceBarView>
+                <ConfidenceBarView>
+                  <Slider
+                    value={item.solo_confidence}
+                    lowerLimit={item.solo_confidence}
+                    upperLimit={item.solo_confidence}
+                    minimumValue={0}
+                    maximumValue={100}
+                    minimumTrackTintColor='darkcyan'
+                    thumbTintColor='#00000000'
+                  />
+                </ConfidenceBarView>
+              { item.has_lyrics &&
+              <ConfidenceBarView>
                 <Slider
                   value={item.lyrics_confidence}
                   lowerLimit={item.lyrics_confidence}
@@ -362,7 +363,7 @@ export default function TuneListDisplay({
                   minimumTrackTintColor='green'
                   thumbTintColor='#00000000'
                 />
-              </View>
+              </ConfidenceBarView>
             }
           </View>
         }

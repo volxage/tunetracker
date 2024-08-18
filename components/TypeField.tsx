@@ -5,7 +5,8 @@ import {
   Button,
   Title,
   Text,
-  SubText
+  SubText,
+  SMarginView
 } from '../Style.tsx'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import React, {useEffect, useState} from 'react';
@@ -107,7 +108,7 @@ function TypeField({
   playlists,
   tunePlaylists,
   setTunePlaylists,
-  toImporter
+  navigation
 }: {
   attr: unknown,
   attrKey: keyof tune,
@@ -116,7 +117,7 @@ function TypeField({
   playlists: Playlists,
   tunePlaylists: playlist[],
   setTunePlaylists: Function,
-  toImporter: Function
+  navigation: any
 }){
   if(attr == null){
     attr = tuneDefaults[attrKey];
@@ -147,9 +148,11 @@ function TypeField({
           {
             (stand === null || typeof stand === "undefined") ?
             <View>
-              <SubText>You haven't connected this tune to the database yet! Connecting a tune allows you to request changes to the online copy of the tune, meaning other users can use your updated tune information, and new users can import more accurate information! It also gives you the ability to import changes from the database uploaded from other users.</SubText>
+              <SMarginView>
+                <SubText>You haven't connected this tune to the database yet! Connecting a tune allows you to request changes to the online copy of the tune, meaning other users can use your updated tune information, and new users can import more accurate information! It also gives you the ability to import changes from the database uploaded from other users.</SubText>
+              </SMarginView>
               <Button
-                onPress={() => {toImporter()}}
+                onPress={() => {navigation.navigate("ImportID")}}
               >
                 <ButtonText>Connect to a tune</ButtonText>
               </Button>
@@ -160,6 +163,9 @@ function TypeField({
               <SubText>Title: {stand.title}</SubText>
               <SubText>Bio: {stand.bio}</SubText>
               <SubText>Year: {stand.year}</SubText>
+              <Button onPress={() => {navigation.navigate("Compare")}}>
+                <ButtonText>Compare and Change</ButtonText>
+              </Button>
             </View>
           }
         </View>

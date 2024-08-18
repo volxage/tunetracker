@@ -42,7 +42,7 @@ const miniEditorPrettyAttrs = new Map<string, string>([
 const prettyAttrs = new Map<string, string>([
   ["db_id", "Database Connection"],
   ["title", "Title"],
-["alternative_title", "Alternative Title"],
+  ["alternative_title", "Alternative Title"],
   ["composers", "Composers"],
   ["form", "Form"],
   ["notable_recordings", "Notable Recordings"],
@@ -99,16 +99,6 @@ function MainMenu({
   const [newTune, setNewTune] = useState(false);
   const [viewing, setViewing] = useState(0);
   const isDarkMode = true;
-  function backToMain(){
-    setViewing(0);
-    return true;
-  }
-  useEffect(() => {
-    BackHandler.addEventListener('hardwareBackPress', backToMain)
-    return () => {
-      BackHandler.removeEventListener('hardwareBackPress', backToMain)
-    }
-  }, []);
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -144,16 +134,20 @@ function MainMenu({
       </Stack.Screen>
       <Stack.Screen name="Importer">
         {(props) =>
-        <SafeAreaView style={{flex: 1}}>
+        <SafeAreaView style={{flex: 1, backgroundColor: "black"}}>
           <Importer
             navigation={props.navigation}
-            importFn={function(stand: standard){
+            importingId={false}
+            importFn={function(stand: standard, mini=false){
               const tn: tune = {};
               tn.title = stand.title;
               tn.composers = stand['Composers'].map(comp => comp.name);
+              tn.db_id = stand['id'];
               setSelectedTune(tn);
               setNewTune(true);
               props.navigation.goBack();
+              mini ? props.navigation.navigate("MiniEditor")
+              :props.navigation.navigate("Editor")
             }}/>
           </SafeAreaView>
         }

@@ -11,6 +11,7 @@ import {
   Switch,
   View,
   TouchableHighlight,
+  BackHandler,
 } from 'react-native';
 
 import {
@@ -19,6 +20,7 @@ import {
   TextInput,
   DeleteButton,
   ButtonText,
+  SMarginView
 } from '../Style.tsx'
 import tuneSort from '../tuneSort.tsx'
 import RNPickerSelect from 'react-native-picker-select';
@@ -68,13 +70,15 @@ function ImporterHeader({
   setListReversed,
   updateSelectedAttr,
   navigation,
-  setSearch
+  setSearch,
+  importingId
 }: {
-    listReversed: boolean | undefined,
-    setListReversed: Function,
-    updateSelectedAttr: Function,
-    navigation: any,
-    setSearch: Function
+  listReversed: boolean | undefined,
+  setListReversed: Function,
+  updateSelectedAttr: Function,
+  navigation: any,
+  setSearch: Function,
+  importingId: boolean
 }){
   const selectedAttrItems = Array.from(standardAttrs.entries())
     .map((x) => {return {label: x[1], value: x[0]}});
@@ -109,11 +113,19 @@ function ImporterHeader({
 }
 export default function Importer({
   importFn,
-  navigation
+  navigation,
+  importingId
 }: {
   importFn: Function,
-  navigation: any
+  navigation: any,
+  importingId: boolean
 }){
+  useEffect(() => {
+    BackHandler.addEventListener('hardwareBackPress', navigation.goBack)
+    return () => {
+      BackHandler.removeEventListener('hardwareBackPress', navigation.goBack)
+    }
+  }, []);
   const [listReversed, setListReversed] = useState(false);
   const [selectedAttr, updateSelectedAttr] = useState("Title");
   const [search, setSearch] = useState("");
@@ -139,6 +151,7 @@ export default function Importer({
           setListReversed={setListReversed}
           updateSelectedAttr={updateSelectedAttr}
           navigation={navigation}
+          importingId={importingId}
           setSearch={setSearch}/>
       }
       renderItem={({item, index, separators}) => (
@@ -146,16 +159,10 @@ export default function Importer({
           key={item.title}
           onPress={() => {
             //TODO: Abstract into function
-            const tn: tune = {};
-            tn.title = item.title;
-            tn.composers = item['Composers'].map(comp => comp.name);
-            importFn(tn);
+            importFn(item, true);
           }}
           onLongPress={() => {
-            const tn: tune = {};
-            tn.title = item.title;
-            tn.composers = item['Composers'].map(comp => comp.name);
-            importFn(tn);
+            importFn(item);
           }}
           onShowUnderlay={separators.highlight}
           onHideUnderlay={separators.unhighlight}>
@@ -171,8 +178,15 @@ export default function Importer({
     )}
   />
   : <View style={{flex: 1, display: "flex", justifyContent: "center", alignItems: "center"}}>
-    <SubText>Loading... (Your internet or the server may be down. Email jhilla@jhilla.org if you believe the server is down.)</SubText>
-    <DeleteButton onPress={() => {navigation.goBack()}}><ButtonText>Cancel import</ButtonText></DeleteButton>
-  </View>
+    <SMarginView>
+      <View style={{alignItems: "center"}}>
+        <Text>Loading...</Text>
+      </View>
+      <SMarginView>
+        <SubText>Your internet or the server may be down. Email jhilla@jhilla.org if you believe the server is down.</SubText>
+      </SMarginView>
+      <DeleteButton onPress={() => {navigation.goBack()}}><ButtonText>Cancel import</ButtonText></DeleteButton>
+    </SMarginView>
+    </View>
   );
 }
