@@ -97,7 +97,6 @@ function MainMenu({
   //const isDarkMode = useColorScheme() === 'dark';
   const [selectedTune, setSelectedTune] = useState(songs[0]);
   const [newTune, setNewTune] = useState(false);
-  const [viewing, setViewing] = useState(0);
   const isDarkMode = true;
 
   const backgroundStyle = {
