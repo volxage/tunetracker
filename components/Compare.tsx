@@ -59,12 +59,13 @@ function stringify(value: any): string{
   }
   return "Unable to parse"
 }
-function CompareField({item, index, currentStandard, currentTune}:
+function CompareField({item, index, currentStandard, currentTune, handleReplaceAttr}:
 {
   item: string[],
   index: number,
   currentStandard: standard,
-  currentTune: tune
+  currentTune: tune,
+  handleReplaceAttr: Function
 }){
   const standardAttrPresent = (item[0] in currentStandard
             && !empty_equivalent.has(currentStandard[item[0] as keyof standard]
@@ -107,8 +108,12 @@ function CompareField({item, index, currentStandard, currentTune}:
                         backgroundColor: choice === 0 ? "#338" : "#222",
                         flex: 1
                       }}
-                      onPress={() => {setChoice(0)}}
-                    >
+                      onPress={() => {
+                        setChoice(0);
+                        handleReplaceAttr(item[0], currentStandard[item[0] as keyof standard], true);
+                        handleReplaceAttr(item[0], currentStandard[item[0] as keyof standard], false);
+                      }}
+                      >
                       <ButtonText><Icon name="database-arrow-up" size={30} /></ButtonText>
                     </Button>
                     :
@@ -123,7 +128,12 @@ function CompareField({item, index, currentStandard, currentTune}:
                     backgroundColor: choice === 1 ? "#338" : "#222",
                       flex: 1
                     }}
-                    onPress={() => {setChoice(1)}}
+                    onPress={() => {
+                      setChoice(1);
+                      // Reset both tune and standard
+                      handleReplaceAttr(item[0], currentTune[item[0] as keyof tune], false);
+                      handleReplaceAttr(item[0], currentStandard[item[0] as keyof standard], true);
+                    }}
                   >
                     <ButtonText><Icon name="dots-horizontal" size={30} /></ButtonText>
                   </Button>
@@ -131,7 +141,11 @@ function CompareField({item, index, currentStandard, currentTune}:
                     backgroundColor: choice === 2 ? "#338" : "#222",
                       flex: 1
                   }}
-                  onPress={() => {setChoice(2)}}
+                  onPress={() => {
+                    setChoice(2);
+                    handleReplaceAttr(item[0], currentTune[item[0] as keyof tune], false);
+                    handleReplaceAttr(item[0], currentTune[item[0] as keyof tune], true);
+                  }}
                   >
                     <ButtonText><Icon name="account-arrow-down" size={30} /></ButtonText>
                   </Button>
@@ -155,7 +169,18 @@ export default function Compare({
   currentStandard: standard,
   navigation: any
 }){
-  const comparedTuneDraft = useState({} as tune);
+  const [comparedDbDraft, setComparedDbDraft] = useState(currentStandard);
+  const [comparedTuneDraft, setComparedTuneDraft] = useState(currentTune);
+  function handleReplaceAttr(attrKey: keyof tune, value: any, onlineSelected: boolean){
+    //Inefficient solution, but there are no Map functions such as "filter" in mapped types
+    const cpy = JSON.parse(JSON.stringify(onlineSelected ? currentStandard : currentTune));
+    cpy[attrKey] = value;
+    if(onlineSelected){
+      setComparedDbDraft(cpy)
+    }else{
+      setComparedTuneDraft(cpy);
+    }
+  }
   return(
   <BackgroundView>
   <FlatList
@@ -166,10 +191,18 @@ export default function Compare({
       </SMarginView>
     )}
     renderItem={({item, index, separators}) => (
-      <CompareField item={item} index={index} currentTune={currentTune} currentStandard={currentStandard}/>
+      <CompareField item={item}
+        index={index}
+        currentTune={currentTune}
+        currentStandard={currentStandard}
+        handleReplaceAttr={handleReplaceAttr}/>
     )}
     ListFooterComponent={(props) => (
       <>
+        <Text>Tune draft:</Text>
+        <SubText>{JSON.stringify(comparedTuneDraft)}</SubText>
+        <Text>Online draft:</Text>
+        <SubText>{JSON.stringify(comparedDbDraft)}</SubText>
         <View>
           <Button style={{backgroundColor: "darkgreen"}}
           >
