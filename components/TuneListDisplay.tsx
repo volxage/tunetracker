@@ -1,9 +1,4 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+// Copyright 2024 Jonathan Hilliard
 
 import React, {isValidElement, useEffect, useState} from 'react';
 import {

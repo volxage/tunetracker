@@ -1,3 +1,4 @@
+// Copyright 2024 Jonathan Hilliard
 import styled from 'styled-components/native'
 import OriginalRNPickerSelect from 'react-native-picker-select';
 

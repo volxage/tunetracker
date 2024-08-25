@@ -1,3 +1,4 @@
+//Copyright 2024 Jonathan Hiliard
 import React, {isValidElement, useEffect, useState} from 'react';
 import {
   Button,

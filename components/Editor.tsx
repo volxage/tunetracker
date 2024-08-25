@@ -1,9 +1,4 @@
-/**
- * Tunetracker
- * https://github.com/volxage/tunetracker
- *
- * @format
- */
+// Copyright 2024 Jonathan Hilliard
 
 import React, {isValidElement, useEffect, useState} from 'react';
 import {

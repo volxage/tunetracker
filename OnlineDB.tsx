@@ -1,3 +1,4 @@
+// Copyright 2024 Jonathan Hilliard
 import { composer, standard} from "./types";
 let standards: standard[] = [];
 let composers: composer[] = [];

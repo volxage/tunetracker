@@ -1,3 +1,4 @@
+// Copyright 2024 Jonathan Hilliard
 import RNFS from 'react-native-fs'
 const playlistsFilePath = RNFS.DocumentDirectoryPath + "/playlists.json"
 import { tune, playlist } from "./types";

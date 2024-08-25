@@ -1,3 +1,4 @@
+//Copyright 2024 Jonathan Hilliard
 import { Model, relation} from '@nozbe/watermelondb'
 
 export default class Tune extends Model {

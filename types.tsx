@@ -1,3 +1,4 @@
+//Copyright 2024 Jonathan Hilliard
 export type tune = {
   "title"?: string
   "alternative_title"?: string

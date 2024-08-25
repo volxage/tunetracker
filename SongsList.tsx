@@ -1,3 +1,4 @@
+//Copyright 2024 Jonathan Hilliard
 import RNFS from 'react-native-fs'
 const songsFilePath = RNFS.DocumentDirectoryPath + "/songs.json"
 import { tune } from "./types";

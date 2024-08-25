@@ -1,3 +1,4 @@
+//Copyright 2024 Jonathan Hilliard
 import { Model } from '@nozbe/watermelondb'
 
 export default class Composer extends Model {

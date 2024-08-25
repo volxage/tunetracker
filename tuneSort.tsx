@@ -1,3 +1,4 @@
+// Copyright 2024 Jonathan Hilliard
 import { tune, standard } from "./types";
 function tuneSort(songs: Array<tune | standard>, selected: string, reversed: boolean){
   let reverse_null_multiplier = 1;

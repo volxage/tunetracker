@@ -1,3 +1,4 @@
+//Copyright 2024 Jonathan Hilliard
 import {
   TextInput,
   DeleteButton,
