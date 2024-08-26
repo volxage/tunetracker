@@ -1,5 +1,6 @@
 //Copyright 2024 Jonathan Hilliard
 import { Model, relation} from '@nozbe/watermelondb'
+import { field, text, children, lazy, writer} from '@nozbe/watermelondb/decorators'
 
 export default class Tune extends Model {
   static table = 'tunes';
@@ -10,13 +11,13 @@ export default class Tune extends Model {
 
   @lazy
   composers = this.collections
-    .get('users')
+    .get('composers')
     .query(Q.on('tune_composers', 'tune_id', this.id));
 
   @writer async changeAttr(attr, newValue){
     //TODO: Validate type. Import prettyAttrs?
     await this.update(tune => {
-      tune.get(attr) = newValue;
+      tune[attr] = newValue;
     });
   }
 
@@ -34,5 +35,4 @@ export default class Tune extends Model {
   @field('lyrics_confidence') lyricsConfidence
 
   @children('tunes') contrafacts
-  @relation('tunes', 'contrafact_of_id') contrafactOf
 }

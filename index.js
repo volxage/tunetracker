@@ -13,6 +13,9 @@ import { Database} from '@nozbe/watermelondb'
 import SQLiteAdapter from '@nozbe/watermelondb/adapters/sqlite'
 
 import schema from './model/schema'
+import Tune from './model/Tune';
+import Composer from './model/Composer';
+import TuneComposer from './model/TuneComposer';
 
 const adapter = new SQLiteAdapter({
   schema,
@@ -25,6 +28,10 @@ const adapter = new SQLiteAdapter({
     //TODO: Add error message screen to navigation stacks.
     console.error("Error on database load");
   }
+})
+
+const database = new Database({
+  modelClasses: [Tune, Composer, TuneComposer]
 })
 
 AppRegistry.registerComponent(appName, () => App);

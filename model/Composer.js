@@ -1,5 +1,6 @@
 //Copyright 2024 Jonathan Hilliard
 import { Model } from '@nozbe/watermelondb'
+import { text, lazy, date} from '@nozbe/watermelondb/decorators'
 
 export default class Composer extends Model {
   static table = 'composers';
@@ -10,8 +11,8 @@ export default class Composer extends Model {
 
   @lazy
   tunes = this.collections
-    .get('users')
-    .query(Q.on('post_authors', 'post_id', this.id));
+    .get('tunes')
+    .query(Q.on('tune_composers', 'copmoser_id', this.id));
 
   @text('name') name
   @date('birth') 

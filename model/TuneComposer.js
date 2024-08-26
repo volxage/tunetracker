@@ -1,6 +1,7 @@
 import { immutableRelation } from '@nozbe/watermelondb/decorators'
+import { field, text, children, lazy, writer} from '@nozbe/watermelondb/decorators'
 
-class TuneComposer extends Model {
+export default class TuneComposer extends Model {
   static table = 'tune_composers'
   static associations = {
     tunes: { type: 'belongs_to', key: 'tune_id' },
