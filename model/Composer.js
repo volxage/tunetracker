@@ -12,10 +12,10 @@ export default class Composer extends Model {
   @lazy
   tunes = this.collections
     .get('tunes')
-    .query(Q.on('tune_composers', 'copmoser_id', this.id));
+    .query(Q.on('tune_composers', 'composer_id', this.id));
 
   @text('name') name
-  @date('birth') 
-  @date('death')
+  @date('birth') birth
+  @date('death') death
   @text('bio') bio
 }

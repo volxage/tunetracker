@@ -1,5 +1,5 @@
-import { immutableRelation } from '@nozbe/watermelondb/decorators'
-import { field, text, children, lazy, writer} from '@nozbe/watermelondb/decorators'
+import { immutableRelation} from '@nozbe/watermelondb/decorators'
+import { Model } from '@nozbe/watermelondb'
 
 export default class TuneComposer extends Model {
   static table = 'tune_composers'
@@ -7,7 +7,7 @@ export default class TuneComposer extends Model {
     tunes: { type: 'belongs_to', key: 'tune_id' },
     composers: { type: 'belongs_to', key: 'composer_id' },
   }
-  @immutableRelation('tunes', 'tune_id') tune
-  @immutableRelation('composers', 'composer_id') composer
+  @immutableRelation('tunes', 'tune_id') tune;
+  @immutableRelation('composers', 'composer_id') composer;
 }
 

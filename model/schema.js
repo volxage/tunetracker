@@ -38,5 +38,12 @@ export default appSchema({
         {name: 'bio', type: 'string', isOptional: true},
       ]
     }),
+    tableSchema({
+      name: 'tune_composers',
+      columns: [
+        {name: 'tune_id', type: 'string', isIndexed: true},
+        {name: 'composer_id', type: 'string', isIndexed: true},
+      ]
+    }),
   ]
 })
