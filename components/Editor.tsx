@@ -26,6 +26,9 @@ import {BackHandler} from 'react-native';
 import Compare from './Compare.tsx';
 import OnlineDB from '../OnlineDB.tsx';
 
+import {database} from '../index.js';
+import TuneModel from '../model/Tune.js';
+
 export default function Editor({
   prettyAttrs, 
   navigation,
@@ -44,7 +47,20 @@ export default function Editor({
   setNewTune: Function
 }): React.JSX.Element {
   //Intentional copy to allow cancelling of edits
-  const [currentTune, setCurrentTune] = useState(JSON.parse(JSON.stringify(selectedTune)) as tune)
+  const tuneCopy: tune = {}
+  console.log(prettyAttrs);
+  for(var i = 0; i < prettyAttrs.length; i++){
+    let key = prettyAttrs[i][0] as keyof tune;
+
+    if(selectedTune[key]){
+
+    }
+//  if (typeof selectedTune[key] !== "undefined"){
+//    tuneCopy[key] = selectedTune[key];
+//  }
+  }
+  //console.log(tuneCopy);
+  const [currentTune, setCurrentTune] = useState(tuneCopy)
   const [tunePlaylists, setTunePlaylists]: [playlist[], Function] = useState([])
   const [originalPlaylistsSet, setOriginalPlaylistsSet]: [Set<playlist>, Function] = useState(new Set())
   const bench = reactotron.benchmark("Editor benchmark");
@@ -142,6 +158,11 @@ export default function Editor({
                       console.log("Removing tune from " + playlist.title)
                       playlists.removeTune(tune_id, playlist.id)
                     }
+                    database.write(async () => {database.get('tunes').create(tn => {
+                      (tn as TuneModel).title = currentTune.title;
+                    }).then(resultingModel => {
+                      console.log(resultingModel);
+                    })});
                     navigation.goBack();
                   }}
                 ><ButtonText>Save</ButtonText>

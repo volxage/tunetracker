@@ -5,14 +5,15 @@ import { field, text, children, lazy, writer} from '@nozbe/watermelondb/decorato
 export default class Tune extends Model {
   static table = 'tunes';
   static associations= {
-    //  tunes: { type: 'has_many', key: 'contrafact_id' }
+    tunes: { type: 'has_many', key: 'contrafact_id' },
     tune_composers: { type: 'has_many', foreignKey: "tune_id" },
   }
 
-  @lazy
-  composers = this.collections
-    .get('composers')
-    .query(Q.on('tune_composers', 'tune_id', this.id));
+//The below thing isn't working right now.
+//@lazy
+//composers = this.collections
+//  .get('composers')
+//  .query(Q.on('tune_composers', 'tune_id', this.id));
 
   @writer async changeAttr(attr, newValue){
     //TODO: Validate type. Import prettyAttrs?

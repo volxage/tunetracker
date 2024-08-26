@@ -4,6 +4,7 @@ const songsFilePath = RNFS.DocumentDirectoryPath + "/songs.json"
 import { tune } from "./types";
 import defaultSongsJson from './songs.json'
 import uuid from 'react-native-uuid'
+import {database} from '.';
 
 class SongsList{
   readonly songsList: tune[];
@@ -28,6 +29,9 @@ class SongsList{
         console.log("Assuming file doesn't exist, creating one:")
         RNFS.writeFile(songsFilePath, JSON.stringify(defaultSongsJson))
       })
+    database.get("tunes").query().fetch().then(tunes => {
+      this.setSongs(tunes);
+    });
   }
   replaceSelectedTune(oldTune:tune, newTune:tune){
     if(oldTune.id === undefined){
