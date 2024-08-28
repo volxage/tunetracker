@@ -12,6 +12,7 @@ export default appSchema({
         {name: 'title', type: 'string'},
         {name: 'alternative_title', type: 'string', isOptional: true},
 //        {composers, type: "string"},
+        {name: 'composer_placeholder', type: "string", isOptional: true},
         {name: 'form', type: "string", isOptional: true},
         {name: 'year', type: "number", isOptional: true},
         //      {notable_recordings, type: "string" },[]
@@ -26,6 +27,7 @@ export default appSchema({
         {name: 'melody_confidence', type: "number" },
         {name: 'solo_confidence', type: "number" },
         {name: 'lyrics_confidence', type: "number", isOptional: true},
+        {name: 'db_id', type: "number", isOptional: true},
         //      {played_at, type: "string" },[]
       ]
     }),

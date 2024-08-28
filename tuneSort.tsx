@@ -1,6 +1,7 @@
 // Copyright 2024 Jonathan Hilliard
-import { tune, standard } from "./types";
-function tuneSort(songs: Array<tune | standard>, selected: string, reversed: boolean){
+import Tune from "./model/Tune";
+import { standard } from "./types";
+function tuneSort(songs: Array<Tune | standard>, selected: string, reversed: boolean){
   let reverse_null_multiplier = 1;
   let reversed_multiplier = reversed ? -1 : 1;
   if (selected.endsWith("confidence") || selected == "playthroughs"){

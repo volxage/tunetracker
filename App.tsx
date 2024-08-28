@@ -36,12 +36,12 @@ import {
 import {
   Colors,
 } from 'react-native/Libraries/NewAppScreen';
-import defaultSongsJson from './songs.json';
 
-import { tune, standard } from './types.tsx';
+import {standard } from './types.tsx';
 import SongsList from './SongsList.tsx';
 import Playlists from './Playlists.tsx';
 import OnlineDB from './OnlineDB.tsx';
+import Tune from './model/Tune.js';
 
 
 //PrettyAttrs function as both as "prettifiers" and lists of attrs to display in corresponding editors
@@ -76,7 +76,7 @@ const prettyAttrs = new Map<string, string>([
 const Stack = createNativeStackNavigator();
 
 function App(): React.JSX.Element {
-  const [songs, setSongs] = useState(defaultSongsJson);
+  const [songs, setSongs] = useState([]);
   const songsList = new SongsList(songs, setSongs);
   const [rawPlaylists, setRawPlaylists] = useState([])
   const playlists = new Playlists(rawPlaylists, setRawPlaylists);
@@ -104,7 +104,7 @@ function App(): React.JSX.Element {
 function MainMenu({
   songs, songsList, playlists
 }: {
-  songs: Array<tune>,
+  songs: Array<Tune>,
   songsList: SongsList,
   playlists: Playlists
 }): React.JSX.Element {
@@ -152,15 +152,18 @@ function MainMenu({
             navigation={props.navigation}
             importingId={false}
             importFn={function(stand: standard, mini=false){
-              const tn: tune = {};
-              tn.title = stand.title;
-              tn.composers = stand['Composers'].map(comp => comp.name);
-              tn.db_id = stand['id'];
-              setSelectedTune(tn);
-              setNewTune(true);
-              props.navigation.goBack();
-              mini ? props.navigation.navigate("MiniEditor")
-              :props.navigation.navigate("Editor")
+              //TODO: IMPLEMENT WITH TUNEMODEL
+
+              // Create tune, fill with details, then save it.
+            //const tn: tune = {};
+            //tn.title = stand.title;
+            //tn.composers = stand['Composers'].map(comp => comp.name);
+            //tn.db_id = stand['id'];
+            //setSelectedTune(tn);
+            //setNewTune(true);
+            //props.navigation.goBack();
+            //mini ? props.navigation.navigate("MiniEditor")
+            //:props.navigation.navigate("Editor")
             }}/>
           </SafeAreaView>
         }

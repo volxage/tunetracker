@@ -42,10 +42,11 @@ const fuseOptions = { // For finetuning the search algorithm
 		"composers"
 	]
 };
-import { tune, playlist } from '../types.tsx';
+import {playlist } from '../types.tsx';
 import SongsList from '../SongsList.tsx';
 import Slider from '@react-native-community/slider';
 import reactotron from 'reactotron-react-native';
+import Tune from '../model/Tune.js';
 const prettyAttrs = new Map<string, string>([
   ["title", "Title"],
   ["alternative_title", "Alternative Title"],
@@ -237,7 +238,7 @@ export default function TuneListDisplay({
   playlists,
   setNewTune
 }: {
-  songs: Array<tune>,
+  songs: Array<Tune>,
   navigation: any,
   setSelectedTune: Function,
   playlists: Playlists,
@@ -307,18 +308,17 @@ export default function TuneListDisplay({
           <View style={{backgroundColor: 'black', padding: 8}}>
             <Text>{item.title}</Text>
             <SubText>{selectedAttr != "title"
-              ? prettyPrint(item[selectedAttr as keyof tune])
-              : prettyPrint(item["composers"])}</SubText>
-
+              ? prettyPrint(item[selectedAttr as keyof Tune])
+              : prettyPrint(item["composers" as keyof Tune])}</SubText>
             {
               //CONFIDENCE
               confidenceVisible && 
               <View>
                 <ConfidenceBarView>
                   <Slider
-                    value={item.melody_confidence}
-                    lowerLimit={item.melody_confidence}
-                    upperLimit={item.melody_confidence}
+                    value={item.melodyConfidence}
+                    lowerLimit={item.melodyConfidence}
+                    upperLimit={item.melodyConfidence}
                     minimumValue={0}
                     maximumValue={100}
                     minimumTrackTintColor='purple'
@@ -327,9 +327,9 @@ export default function TuneListDisplay({
                 </ConfidenceBarView>
                 <ConfidenceBarView>
                   <Slider
-                    value={item.form_confidence}
-                    lowerLimit={item.form_confidence}
-                    upperLimit={item.form_confidence}
+                    value={item.formConfidence}
+                    lowerLimit={item.formConfidence}
+                    upperLimit={item.formConfidence}
                     minimumValue={0}
                     maximumValue={100}
                     minimumTrackTintColor='darkblue'
@@ -338,21 +338,21 @@ export default function TuneListDisplay({
                 </ConfidenceBarView>
                 <ConfidenceBarView>
                   <Slider
-                    value={item.solo_confidence}
-                    lowerLimit={item.solo_confidence}
-                    upperLimit={item.solo_confidence}
+                    value={item.soloConfidence}
+                    lowerLimit={item.soloConfidence}
+                    upperLimit={item.soloConfidence}
                     minimumValue={0}
                     maximumValue={100}
                     minimumTrackTintColor='darkcyan'
                     thumbTintColor='#00000000'
                   />
                 </ConfidenceBarView>
-              { item.has_lyrics &&
+              { item.hasLyrics &&
               <ConfidenceBarView>
                 <Slider
-                  value={item.lyrics_confidence}
-                  lowerLimit={item.lyrics_confidence}
-                  upperLimit={item.lyrics_confidence}
+                  value={item.lyricsConfidence}
+                  lowerLimit={item.lyricsConfidence}
+                  upperLimit={item.lyricsConfidence}
                   minimumValue={0}
                   maximumValue={100}
                   minimumTrackTintColor='green'

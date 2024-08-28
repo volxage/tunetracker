@@ -23,8 +23,9 @@ export default class Tune extends Model {
   }
 
   @text('title') title
-  @text('alternative_title') alternative_title
+  @text('alternative_title') alternativeTitle
   @text('form') form
+  @text('composer_placeholder') composerPlaceholder
   @field('year') year
   @field('has_lyricts') hasLyricist
   @field('keys') keys // (Look into RxJS and @json to make json serialization that is observable)
@@ -34,6 +35,7 @@ export default class Tune extends Model {
   @field('melody_confidence') melodyConfidence
   @field('solo_confidence') soloConfidence
   @field('lyrics_confidence') lyricsConfidence
+  @field('db_id') dbId
 
   @children('tunes') contrafacts
 }

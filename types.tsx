@@ -1,25 +1,26 @@
 //Copyright 2024 Jonathan Hilliard
 export type tune = {
   "title"?: string
-  "alternative_title"?: string
+  "alternativeTitle"?: string
   "composers"?: string[]
+  "composerPlaceholder"?: string
   "form"?: string
-  "notable_recordings"?: string[]
+  "notableRecordings"?: string[]
   "keys"?: string[]
   "styles"?: string[]
   "tempi"?: string[]
   "contrafacts"?: string[] // In the future, these could link to other tunes
   "playthroughs"?: number
-  "form_confidence"?: number
-  "melody_confidence"?: number
-  "solo_confidence"?: number
-  "lyrics_confidence"?: number
-  "has_lyrics"?: boolean
+  "formConfidence"?: number
+  "melodyConfidence"?: number
+  "soloConfidence"?: number
+  "lyricsConfidence"?: number
+  "hasLyrics"?: boolean
   "id"?: string
-  "db_id"?: number
+  "dbId"?: number
   "bio"?: string
   "year"?: number
-  "played_at"?: string[]
+  "playedAt"?: string[]
 }
 export type composer = {
   "name": string
@@ -48,6 +49,7 @@ export const editorAttrs = [
   ["title", "Title"],
   ["alternative_title", "Alternative Title"],
   ["composers", "Composers"],
+  ["composer_placeholder", "Composers (Placeholder)"],
   ["form", "Form"],
   ["notable_recordings", "Notable Recordings"],
   ["keys", "Keys"],

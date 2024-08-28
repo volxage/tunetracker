@@ -30,8 +30,7 @@ const standardAttrs = new Map<string, string>([
   ["year", "Year"],
 ]);
 
-import { tune, standard } from '../types.tsx';
-import SongsList from '../SongsList.tsx';
+import { standard } from '../types.tsx';
 
 const fuseOptions = { // For finetuning the search algorithm
 	// isCaseSensitive: false,

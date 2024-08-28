@@ -40,20 +40,21 @@ export default function Editor({
 }: {
   prettyAttrs: Array<[string, string]>,
   navigation: any, //TODO: Find type of "navigation"
-  selectedTune: tune,
+  selectedTune: TuneModel,
   songsList: SongsList,
   playlists: Playlists,
   newTune: boolean,
   setNewTune: Function
 }): React.JSX.Element {
   //Intentional copy to allow cancelling of edits
+  console.log(selectedTune);
   const tuneCopy: tune = {}
-  console.log(prettyAttrs);
-  for(var i = 0; i < prettyAttrs.length; i++){
-    let key = prettyAttrs[i][0] as keyof tune;
+  //console.log(prettyAttrs);
+  for(let attr of prettyAttrs){
+    let key = attr[0] as keyof tune;
 
-    if(selectedTune[key]){
-
+    if(selectedTune[key as keyof TuneModel]){
+      tuneCopy[key] = selectedTune[key as keyof TuneModel]
     }
 //  if (typeof selectedTune[key] !== "undefined"){
 //    tuneCopy[key] = selectedTune[key];
@@ -84,7 +85,7 @@ export default function Editor({
   }, [])
   function handleSetCurrentTune(attr_key: keyof tune, value: any){
     //Inefficient solution, but there are no Map functions such as "filter" in mapped types
-    const cpy = JSON.parse(JSON.stringify(currentTune)) as tune;
+    const cpy = JSON.parse(JSON.stringify(currentTune)) as TuneModel;
     cpy[attr_key] = value;
     setCurrentTune(cpy);
   }
@@ -144,25 +145,31 @@ export default function Editor({
                   onPress={() => {
                     //TODO: ABSTRACT
                     //Save to existing tune
-                    const tune_id = songsList.replaceSelectedTune(selectedTune, currentTune);
-                    const newPlaylistSet = new Set(tunePlaylists);
-                    const removedPlaylists = [...originalPlaylistsSet]
-                      .filter(oldPlaylist => !newPlaylistSet.has(oldPlaylist));
-                    const updatedPlaylists = [...newPlaylistSet]
-                      .filter(newPlaylist => !originalPlaylistsSet.has(newPlaylist));
-                    for(var playlist of updatedPlaylists){
-                      console.log("Adding tune to " + playlist.title)
-                      playlists.addTune(tune_id, playlist.id)
+
+                 ///const tune_id = songsList.replaceSelectedTune(selectedTune, currentTune);
+                 ///const newPlaylistSet = new Set(tunePlaylists);
+                 ///const removedPlaylists = [...originalPlaylistsSet]
+                 ///  .filter(oldPlaylist => !newPlaylistSet.has(oldPlaylist));
+                 ///const updatedPlaylists = [...newPlaylistSet]
+                 ///  .filter(newPlaylist => !originalPlaylistsSet.has(newPlaylist));
+                 ///for(var playlist of updatedPlaylists){
+                 ///  console.log("Adding tune to " + playlist.title)
+                 ///  playlists.addTune(tune_id, playlist.id)
+                 ///}
+                    //TODO: Implement playlists
+                 // for(var playlist of removedPlaylists){
+                 //   console.log("Removing tune from " + playlist.title)
+                 //   playlists.removeTune(tune_id, playlist.id)
+                 // }
+                    console.log(typeof selectedTune);
+                    for(let attr of prettyAttrs){
+                      selectedTune.changeAttr(attr[0], currentTune[attr[0] as keyof tune]);
                     }
-                    for(var playlist of removedPlaylists){
-                      console.log("Removing tune from " + playlist.title)
-                      playlists.removeTune(tune_id, playlist.id)
-                    }
-                    database.write(async () => {database.get('tunes').create(tn => {
-                      (tn as TuneModel).title = currentTune.title;
-                    }).then(resultingModel => {
-                      console.log(resultingModel);
-                    })});
+///                 database.write(async () => {database.get('tunes').create(tn => {
+///                   (tn as TuneModel).title = currentTune.title;
+///                 }).then(resultingModel => {
+///                   console.log(resultingModel);
+///                 })});
                     navigation.goBack();
                   }}
                 ><ButtonText>Save</ButtonText>
