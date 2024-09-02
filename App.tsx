@@ -155,23 +155,20 @@ function MainMenu({
             navigation={props.navigation}
             importingId={false}
             importFn={function(stand: standard, mini=false){
-              //TODO: IMPLEMENT WITH TUNEMODEL
-
-            // Create tune, fill with details, then move to editor
-            const tn: tune_draft = {};
-            for(let attrPair of prettyAttrs){
-              if(attrPair[0] !== "id"){
-                tn[attrPair[0] as keyof tune_draft] = stand[attrPair[0] as keyof stand];
+              const tn: tune_draft = {};
+              for(let attrPair of prettyAttrs){
+                if(attrPair[0] !== "id"){
+                  tn[attrPair[0] as keyof tune_draft] = stand[attrPair[0] as keyof stand];
+                }
               }
-            }
-          //tn.title = stand.title;
-          //  //tn.composers = stand['Composers'].map(comp => comp.name);
-            tn.dbId = stand['id'];
-            setSelectedTune(tn);
-            setNewTune(true);
-            props.navigation.goBack();
-            mini ? props.navigation.navigate("MiniEditor")
-            :props.navigation.navigate("Editor")
+              tn.dbId = stand['id'];
+              console.log(tn.dbId);
+              tn.composerPlaceholder = stand["Composers"].map(comp => comp.name).join(", ");
+              setSelectedTune(tn);
+              setNewTune(true);
+              props.navigation.goBack();
+              mini ? props.navigation.navigate("MiniEditor")
+                :props.navigation.navigate("Editor")
             }}/>
           </SafeAreaView>
         }

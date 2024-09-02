@@ -309,7 +309,7 @@ export default function TuneListDisplay({
             <Text>{item.title}</Text>
             <SubText>{selectedAttr != "title"
               ? prettyPrint(item[selectedAttr as keyof Tune])
-              : prettyPrint(item["composers" as keyof Tune])}</SubText>
+              : prettyPrint(item["composerPlaceholder" as keyof Tune])}</SubText>
             {
               //CONFIDENCE
               confidenceVisible && 

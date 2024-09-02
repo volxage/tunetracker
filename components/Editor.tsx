@@ -63,7 +63,7 @@ function reducer(state: any, action: any){
             tune[key as keyof tune_draft] = attr[1]
           }
         }
-        tune.dbId = action["selectedTune"]["id"]
+        //tune.dbId = action["selectedTune"]["id"]
       }
       return {currentTune: tune};
     }

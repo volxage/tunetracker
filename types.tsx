@@ -31,6 +31,7 @@ export type composer = {
 export type standard = {
   "title": string
   "alternative_title": string
+  "Composers": object
   "form": string
   "bio": string
   "year": string
