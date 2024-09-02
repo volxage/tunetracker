@@ -215,9 +215,7 @@ export default function Editor({
                   //}
                     console.log("Saving to new tune");
                     database.write(async () => {database.get('tunes').create(tn => {
-                      for(let attr of prettyAttrs){
-                        (tn as TuneModel).changeAttr(attr[0], state["currentTune"][attr[0] as keyof TuneModel]);
-                      }
+                      (tn as TuneModel).replace(state["currentTune"])
                     }).then(resultingModel => {
                       console.log(resultingModel);
                       songsList.rereadDb();
