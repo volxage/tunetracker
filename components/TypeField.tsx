@@ -101,7 +101,7 @@ function TypeField({
   setTunePlaylists: Function,
   navigation: any
 }){
-  if (attrKey === "db_id" as keyof tune){
+  if (attrKey === "dbId" as keyof tune){
     const [connectTuneExpanded, setConnectTuneExpanded] = useState(false);
     let stand = null;
     if(typeof attr !== "undefined" && attr !== 0){

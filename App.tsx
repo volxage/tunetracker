@@ -48,19 +48,19 @@ import {database} from './index.js';
 //PrettyAttrs function as both as "prettifiers" and lists of attrs to display in corresponding editors
 const miniEditorPrettyAttrs = new Map<string, string>([
   ["title", "Title"],
-  ["has_lyrics", "Has lyrics?"],
-  ["form_confidence", "Form Confidence"],
-  ["melody_confidence", "Melody Confidence"],
-  ["solo_confidence", "Solo Confidence"],
-  ["lyrics_confidence", "Lyrics Confidence"],
+  ["hasLyrics", "Has lyrics?"],
+  ["formConfidence", "Form Confidence"],
+  ["melodyConfidence", "Melody Confidence"],
+  ["soloConfidence", "Solo Confidence"],
+  ["lyricsConfidence", "Lyrics Confidence"],
   //  ["just_played", "'I Just Played This'"],
 ])
 const prettyAttrs = new Map<string, string>([
-  ["db_id", "Database Connection"],
+  ["dbId", "Database Connection"],
   ["title", "Title"],
-  ["alternative_title", "Alternative Title"],
+  ["alternativeTitle", "Alternative Title"],
   //  ["composers", "Composers"],
-  ["composer_placeholder", "Composers"],
+  ["composerPlaceholder", "Composers"],
   ["form", "Form"],
   //  ["notable_recordings", "Notable Recordings"],
   ["keys", "Keys"],
@@ -69,11 +69,11 @@ const prettyAttrs = new Map<string, string>([
   //  ["contrafacts", "Contrafacts"],
   ["playlists", "Playlists"],
   ["playthroughs", "Playthroughs"],
-  ["has_lyrics", "Has lyrics?"],
-  ["form_confidence", "Form Confidence"],
-  ["melody_confidence", "Melody Confidence"],
-  ["solo_confidence", "Solo Confidence"],
-  ["lyrics_confidence", "Lyrics Confidence"],
+  ["hasLyrics", "Has lyrics?"],
+  ["formConfidence", "Form Confidence"],
+  ["melodyConfidence", "Melody Confidence"],
+  ["soloConfidence", "Solo Confidence"],
+  ["lyricsConfidence", "Lyrics Confidence"],
 ])
 
 const Stack = createNativeStackNavigator();

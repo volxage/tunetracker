@@ -3,21 +3,21 @@ export type tune_draft = {
   "title"?: string
   "alternativeTitle"?: string
   "composers"?: string[]
-  "composer_placeholder"?: string
+  "composerPlaceholder"?: string
   "form"?: string
-  "notable_recordings"?: string[]
+  "notableRecordings"?: string[]
   "keys"?: string[]
   "styles"?: string[]
   "tempi"?: string[]
 //  "contrafacts"?: string[] // In the future, these could link to other tunes
   "playthroughs"?: number
-  "form_confidence"?: number
-  "melody_confidence"?: number
-  "solo_confidence"?: number
-  "lyrics_confidence"?: number
-  "has_lyrics"?: boolean
+  "formConfidence"?: number
+  "melodyConfidence"?: number
+  "soloConfidence"?: number
+  "lyricsConfidence"?: number
+  "hasLyrics"?: boolean
   "id"?: string
-  "db_id"?: number
+  "dbId"?: number
   "bio"?: string
   "year"?: number
   //  "playedAt"?: string[]
@@ -45,11 +45,11 @@ export type playlist = {
 }
 
 export const editorAttrs = [
-  ["db_id", "Database Connection"],
+  ["dbId", "Database Connection"],
   ["title", "Title"],
-  ["alternative_title", "Alternative Title"],
+  ["alternativeTitle", "Alternative Title"],
   ["composers", "Composers"],
-  ["composer_placeholder", "Composers (Placeholder)"],
+  ["composerPlaceholder", "Composers (Placeholder)"],
   ["form", "Form"],
   //  ["notable_recordings", "Notable Recordings"],
   ["keys", "Keys"],
@@ -58,38 +58,38 @@ export const editorAttrs = [
   //  ["contrafacts", "Contrafacts"],
   ["playlists", "Playlists"],
   ["playthroughs", "Playthroughs"],
-  ["has_lyrics", "Has lyrics?"],
-  ["form_confidence", "Form Confidence"],
-  ["melody_confidence", "Melody Confidence"],
-  ["solo_confidence", "Solo Confidence"],
-  ["lyrics_confidence", "Lyrics Confidence"],
+  ["hasLyrics", "Has lyrics?"],
+  ["formConfidence", "Form Confidence"],
+  ["melodyConfidence", "Melody Confidence"],
+  ["soloConfidence", "Solo Confidence"],
+  ["lyricsConfidence", "Lyrics Confidence"],
 ];
 export const miniEditorAttrs = new Map<string, string>([
   ["title", "Title"],
-  ["form_confidence", "Form Confidence"],
-  ["melody_confidence", "Melody Confidence"],
-  ["solo_confidence", "Solo Confidence"],
-  ["lyrics_confidence", "Lyrics Confidence"],
-  ["just_played", "'I Just Played This'"],
+  ["formConfidence", "Form Confidence"],
+  ["melodyConfidence", "Melody Confidence"],
+  ["soloConfidence", "Solo Confidence"],
+  ["lyricsConfidence", "Lyrics Confidence"],
+  //  ["justPlayed", "'I Just Played This'"],
 ])
 export const tuneDefaults = new Map<string, any>([
   ["title", "New song"],
-  ["alternative_title", ""],
+  ["alternativeTitle", ""],
   ["composers", []],
-  ["composer_placeholder", ""],
+  ["composerPlaceholder", ""],
   ["form", ""],
-  ["notable_recordings", []],
+  ["notableRecordings", []],
   ["keys", []],
   ["styles", []],
   ["tempi", []],
   //  ["contrafacts", [],],
-  ["has_lyrics", false],
+  ["hasLyrics", false],
   ["playthroughs", 0],
-  ["form_confidence", 0],
-  ["melody_confidence", 0],
-  ["solo_confidence", 0],
-  ["lyrics_confidence", 0],
-  ["played_at", []],
-  ["db_id", 0]
+  ["formConfidence", 0],
+  ["melodyConfidence", 0],
+  ["soloConfidence", 0],
+  ["lyricsConfidence", 0],
+  //  ["played_at", []],
+  ["dbId", 0]
   //  ["id", "THIS SHOULD NOT BE HERE"] // If the user sees this text at any point, there's an error in the progra],
 ])

@@ -4,7 +4,7 @@ import { field, text, children, lazy, writer} from '@nozbe/watermelondb/decorato
 import {tuneDefaults} from '../types';
 
 
-export default class Tune extends Model {
+class Tune extends Model {
   static table = 'tunes';
   static associations= {
     tunes: { type: 'has_many', key: 'contrafact_id' },
@@ -22,6 +22,17 @@ export default class Tune extends Model {
     await this.update(tune => {
       tune[attr] = newValue;
     });
+  }
+  @writer async replace(newTune){
+    await this.update(tune => {
+      for(let attrPair of tuneDefaults){
+        if(attrPair[0] in newTune){
+          console.log(attrPair[0]);
+          tune[attrPair[0]] = newTune[attrPair[0]];
+        }
+      }
+    })
+    console.log(this.dbId);
   }
   *attrs(start = 0, end = Infinity, step = 1){
     for(let attrPair of tuneDefaults){
@@ -51,3 +62,4 @@ export default class Tune extends Model {
 
   @children('tunes') contrafacts
 }
+export default Tune

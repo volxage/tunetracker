@@ -32,19 +32,23 @@ function reducer(state: any, action: any){
   switch(action.type){
     case 'update_attr':
     {
+      console.log("Updating:");
+      console.log(action["attr"]);
+      console.log(action["value"]);
       const tuneCopy = JSON.parse(JSON.stringify(state["currentTune"]));
       tuneCopy[action["attr"]] = action["value"];
       return {currentTune: tuneCopy};
     }
     case 'set_to_selected':
     {
-      console.log("ORIGINAL TUNE:");
-      console.log(action["selectedTune"]);
       const tune: tune_draft = {}
       if(action["selectedTune"] instanceof TuneModel){
         for(let attr of tuneDefaults){
           let key = attr[0] as keyof TuneModel;
-          if(key in action["selectedTune"] && typeof action["selectedTune"][key] !== "undefined"){
+          if(key in action["selectedTune"]
+            && typeof action["selectedTune"][key] !== "undefined"
+            && action["selectedTune"][key] !== null
+          ){
             tune[key as keyof tune_draft] = action["selectedTune"][key as keyof TuneModel]
           }else{
             tune[key as keyof tune_draft] = attr[1]
@@ -59,10 +63,8 @@ function reducer(state: any, action: any){
             tune[key as keyof tune_draft] = attr[1]
           }
         }
-        tune.db_id = action["selectedTune"]["id"]
+        tune.dbId = action["selectedTune"]["id"]
       }
-      console.log("COPIED TUNE");
-      console.log(tune);
       return {currentTune: tune};
     }
   }
@@ -87,6 +89,7 @@ export default function Editor({
 }): React.JSX.Element {
   //Intentional copy to allow cancelling of edits
   //  const [currentTune, setCurrentTune] = useState()
+  console.log("Rerender Editor");
   const [state, dispatch] = useReducer(reducer, {currentTune: {}});
   const [tunePlaylists, setTunePlaylists]: [playlist[], Function] = useState([])
   const [originalPlaylistsSet, setOriginalPlaylistsSet]: [Set<playlist>, Function] = useState(new Set())
@@ -122,7 +125,7 @@ export default function Editor({
             data={prettyAttrs}
             renderItem={({item, index, separators}) => (
               <View>
-                { (item[0] !== "lyrics_confidence" || state["currentTune"]["has_lyrics"]) &&
+                { (item[0] !== "lyricsConfidence" || state["currentTune"]["hasLyrics"]) &&
                 <TouchableHighlight
                   key={item[0]}
                   onShowUnderlay={separators.highlight}
@@ -188,11 +191,10 @@ export default function Editor({
                  //   playlists.removeTune(tune_id, playlist.id)
                  // }
                     console.log("Saving to existing tune");
-                    for(let attr of prettyAttrs){
-                      (selectedTune as TuneModel).changeAttr(attr[0], state["currentTune"][attr[0] as keyof TuneModel]);
-                    }
-                    songsList.rereadDb();
-                    navigation.goBack();
+                    (selectedTune as TuneModel).replace(state["currentTune"]).then( () => {
+                      songsList.rereadDb();
+                      navigation.goBack();
+                    });
                   }}
                 ><ButtonText>Save</ButtonText>
               </Button>
@@ -246,7 +248,7 @@ export default function Editor({
       navigation={props.navigation}
       importingId={false}
       importFn={function(stand: standard, mini: boolean){
-        handleSetCurrentTune("db_id", stand.id)
+        handleSetCurrentTune("dbId", stand.id)
         props.navigation.goBack();
       }}/>
     </SafeAreaView>
