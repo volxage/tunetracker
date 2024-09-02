@@ -1,15 +1,15 @@
 //Copyright 2024 Jonathan Hilliard
-export type tune = {
+export type tune_draft = {
   "title"?: string
   "alternativeTitle"?: string
   "composers"?: string[]
-  "composerPlaceholder"?: string
+  "composer_placeholder"?: string
   "form"?: string
   "notableRecordings"?: string[]
   "keys"?: string[]
   "styles"?: string[]
   "tempi"?: string[]
-  "contrafacts"?: string[] // In the future, these could link to other tunes
+//  "contrafacts"?: string[] // In the future, these could link to other tunes
   "playthroughs"?: number
   "formConfidence"?: number
   "melodyConfidence"?: number
@@ -35,7 +35,7 @@ export type standard = {
   "bio": string
   "year": string
   "id": number
-  "Composers": composer[]
+  //  "Composers": composer[]
 }
 export type playlist = {
   "title": string
@@ -51,11 +51,11 @@ export const editorAttrs = [
   ["composers", "Composers"],
   ["composer_placeholder", "Composers (Placeholder)"],
   ["form", "Form"],
-  ["notable_recordings", "Notable Recordings"],
+  //  ["notable_recordings", "Notable Recordings"],
   ["keys", "Keys"],
   ["styles", "Styles"],
   ["tempi", "Tempi"],
-  ["contrafacts", "Contrafacts"],
+  //  ["contrafacts", "Contrafacts"],
   ["playlists", "Playlists"],
   ["playthroughs", "Playthroughs"],
   ["has_lyrics", "Has lyrics?"],
@@ -71,4 +71,23 @@ export const miniEditorAttrs = new Map<string, string>([
   ["solo_confidence", "Solo Confidence"],
   ["lyrics_confidence", "Lyrics Confidence"],
   ["just_played", "'I Just Played This'"],
+])
+export const tuneDefaults = new Map<string, any>([
+  ["title", "New song"],
+  ["alternative_title", ""],
+  ["composers", []],
+  ["form", ""],
+  ["notable_recordings", []],
+  ["keys", []],
+  ["styles", []],
+  ["tempi", []],
+  //  ["contrafacts", [],],
+  ["has_lyrics", false],
+  ["playthroughs", 0],
+  ["form_confidence", 0],
+  ["melody_confidence", 0],
+  ["solo_confidence", 0],
+  ["lyrics_confidence", 0],
+  ["played_at", [],],
+  ["id", "THIS SHOULD NOT BE HERE"] // If the user sees this text at any point, there's an error in the progra],
 ])

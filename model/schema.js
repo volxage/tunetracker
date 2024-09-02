@@ -2,7 +2,7 @@
 import { appSchema, tableSchema } from '@nozbe/watermelondb'
 
 export default appSchema({
-  // Incrrement version number after schema upgrade
+  // Increment version number after schema upgrade
   version: 1,
   // TODO: Add foreign keys, figure out json object
   tables: [

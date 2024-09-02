@@ -1,6 +1,8 @@
 //Copyright 2024 Jonathan Hilliard
 import { Model, relation} from '@nozbe/watermelondb'
 import { field, text, children, lazy, writer} from '@nozbe/watermelondb/decorators'
+import {tuneDefaults} from '../types';
+
 
 export default class Tune extends Model {
   static table = 'tunes';
@@ -21,6 +23,16 @@ export default class Tune extends Model {
       tune[attr] = newValue;
     });
   }
+  *attrs(start = 0, end = Infinity, step = 1){
+    for(let attrPair of tuneDefaults){
+      if(attrPair[0] in this){
+        yield this[attrPair[0]];
+      }else{
+        yield attrPair[1];
+      }
+    }
+  }
+
 
   @text('title') title
   @text('alternative_title') alternativeTitle

@@ -59,7 +59,7 @@ class SongsList{
 //    tune.id = new_id;
 //  }
     const songsWithNewTune = this.songsList.concat(tune);
-    this.updateSongs(songsWithNewTune);
+    //this.updateSongs(songsWithNewTune);
 //  this.writeToSongsJson(songsWithNewTune);
     return tune.id
   }
@@ -69,8 +69,8 @@ class SongsList{
   //this.writeToSongsJson(songsWithoutTune);
   //this.updateSongs(songsWithoutTune);
   }
-  updateSongs(songsList: TuneModel[]){
-    this.setSongs(songsList)
+  updateSongs(){
+    database.get('tunes').query().fetch().then(result => this.setSongs(result));
   }
 }
 export default SongsList

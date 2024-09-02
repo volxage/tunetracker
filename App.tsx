@@ -37,11 +37,12 @@ import {
   Colors,
 } from 'react-native/Libraries/NewAppScreen';
 
-import {standard } from './types.tsx';
+import {standard, tune} from './types.tsx';
 import SongsList from './SongsList.tsx';
 import Playlists from './Playlists.tsx';
 import OnlineDB from './OnlineDB.tsx';
 import Tune from './model/Tune.js';
+import {database} from './index.js';
 
 
 //PrettyAttrs function as both as "prettifiers" and lists of attrs to display in corresponding editors
@@ -63,7 +64,7 @@ const prettyAttrs = new Map<string, string>([
   ["keys", "Keys"],
   ["styles", "Styles"],
   ["tempi", "Tempi"],
-  ["contrafacts", "Contrafacts"],
+  //  ["contrafacts", "Contrafacts"],
   ["playlists", "Playlists"],
   ["playthroughs", "Playthroughs"],
   ["has_lyrics", "Has lyrics?"],
@@ -154,16 +155,21 @@ function MainMenu({
             importFn={function(stand: standard, mini=false){
               //TODO: IMPLEMENT WITH TUNEMODEL
 
-              // Create tune, fill with details, then save it.
-            //const tn: tune = {};
-            //tn.title = stand.title;
-            //tn.composers = stand['Composers'].map(comp => comp.name);
-            //tn.db_id = stand['id'];
-            //setSelectedTune(tn);
-            //setNewTune(true);
-            //props.navigation.goBack();
-            //mini ? props.navigation.navigate("MiniEditor")
-            //:props.navigation.navigate("Editor")
+            // Create tune, fill with details, then move to editor
+            const tn: tune = {};
+            for(let attrPair of prettyAttrs){
+              if(attrPair[0] !== "id"){
+                tn[attrPair[0]] = stand[attrPair[0] as keyof stand];
+              }
+            }
+          //tn.title = stand.title;
+          //  //tn.composers = stand['Composers'].map(comp => comp.name);
+            tn.dbId = stand['id'];
+            setSelectedTune(tn);
+            setNewTune(true);
+            props.navigation.goBack();
+            mini ? props.navigation.navigate("MiniEditor")
+            :props.navigation.navigate("Editor")
             }}/>
           </SafeAreaView>
         }

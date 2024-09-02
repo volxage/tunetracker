@@ -17,7 +17,7 @@ import {
 import TypeField from './TypeField.tsx';
 import SongsList from '../SongsList.tsx';
 import Playlists from '../Playlists.tsx';
-import { tune, standard, playlist } from '../types.tsx';
+import {tune_draft, standard, playlist } from '../types.tsx';
 import reactotron from 'reactotron-react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons.js';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -28,6 +28,7 @@ import OnlineDB from '../OnlineDB.tsx';
 
 import {database} from '../index.js';
 import TuneModel from '../model/Tune.js';
+import TuneDraft from '../TuneDraft.tsx';
 
 export default function Editor({
   prettyAttrs, 
@@ -40,7 +41,7 @@ export default function Editor({
 }: {
   prettyAttrs: Array<[string, string]>,
   navigation: any, //TODO: Find type of "navigation"
-  selectedTune: TuneModel,
+  selectedTune: TuneModel | tune_draft,
   songsList: SongsList,
   playlists: Playlists,
   newTune: boolean,
@@ -48,20 +49,9 @@ export default function Editor({
 }): React.JSX.Element {
   //Intentional copy to allow cancelling of edits
   console.log(selectedTune);
-  const tuneCopy: tune = {}
-  //console.log(prettyAttrs);
-  for(let attr of prettyAttrs){
-    let key = attr[0] as keyof tune;
+  const tuneDraft = new TuneDraft(selectedTune);
 
-    if(selectedTune[key as keyof TuneModel]){
-      tuneCopy[key] = selectedTune[key as keyof TuneModel]
-    }
-//  if (typeof selectedTune[key] !== "undefined"){
-//    tuneCopy[key] = selectedTune[key];
-//  }
-  }
-  //console.log(tuneCopy);
-  const [currentTune, setCurrentTune] = useState(tuneCopy)
+  const [currentTune, setCurrentTune] = useState(tuneDraft.td_t)
   const [tunePlaylists, setTunePlaylists]: [playlist[], Function] = useState([])
   const [originalPlaylistsSet, setOriginalPlaylistsSet]: [Set<playlist>, Function] = useState(new Set())
   const bench = reactotron.benchmark("Editor benchmark");
@@ -83,11 +73,10 @@ export default function Editor({
     }
     bench.stop("Post-render")
   }, [])
-  function handleSetCurrentTune(attr_key: keyof tune, value: any){
+  function handleSetCurrentTune(attr_key: keyof tune_draft, value: any){
     //Inefficient solution, but there are no Map functions such as "filter" in mapped types
-    const cpy = JSON.parse(JSON.stringify(currentTune)) as TuneModel;
-    cpy[attr_key] = value;
-    setCurrentTune(cpy);
+    tuneDraft.replaceAttr(attr_key, value);
+    setCurrentTune(tuneDraft.td_t);
   }
   bench.step("Prerender")
   return (
@@ -98,15 +87,15 @@ export default function Editor({
             data={prettyAttrs}
             renderItem={({item, index, separators}) => (
               <View>
-                { (item[0] != "lyrics_confidence" || currentTune.has_lyrics) &&
+                { (item[0] != "lyrics_confidence" || currentTune.hasLyrics) &&
                 <TouchableHighlight
                   key={item[0]}
                   onShowUnderlay={separators.highlight}
                   onHideUnderlay={separators.unhighlight}
                 >
                   <TypeField
-                    attr={currentTune[item[0] as keyof tune]}
-                    attrKey={item[0] as keyof tune}
+                    attr={tuneDraft.get(item[0] as keyof tune_draft)}
+                    attrKey={item[0]}
                     attrName={item[1]}
                     handleSetCurrentTune={handleSetCurrentTune}
                     playlists={playlists}
@@ -127,8 +116,13 @@ export default function Editor({
                 !newTune && 
                 <DeleteButton
                   onLongPress={() => {
-                    songsList.deleteTune(selectedTune);
-                    navigation.goBack();
+                    //TODO: Implement deletion in WatermelonDB
+//                  songsList.deleteTune(selectedTune);
+                    console.log("Attempt delete");
+                    database.write(async () => {
+                      (selectedTune as TuneModel).destroyPermanently();
+                    });
+                    navigation.goBack()
                   }}>
                     <ButtonText>DELETE TUNE (CAN'T UNDO!)</ButtonText>
                   </DeleteButton>
@@ -161,15 +155,10 @@ export default function Editor({
                  //   console.log("Removing tune from " + playlist.title)
                  //   playlists.removeTune(tune_id, playlist.id)
                  // }
-                    console.log(typeof selectedTune);
+                    console.log("Saving to existing tune");
                     for(let attr of prettyAttrs){
                       selectedTune.changeAttr(attr[0], currentTune[attr[0] as keyof tune]);
                     }
-///                 database.write(async () => {database.get('tunes').create(tn => {
-///                   (tn as TuneModel).title = currentTune.title;
-///                 }).then(resultingModel => {
-///                   console.log(resultingModel);
-///                 })});
                     navigation.goBack();
                   }}
                 ><ButtonText>Save</ButtonText>
@@ -180,14 +169,24 @@ export default function Editor({
                 <Button
                   onPress={() => {
                     //Save to new tune
-                    const tune_id = songsList.addNewTune(currentTune);
-                    const newPlaylistSet = new Set(tunePlaylists);
-                    const addedPlaylists = [...newPlaylistSet]
-                      .filter(newPlaylist => !originalPlaylistsSet.has(newPlaylist));
-                    for(var playlist of addedPlaylists){
-                      console.log("Adding tune to " + playlist.title)
-                      playlists.addTune(tune_id, playlist.id)
-                    }
+                    //TODO: Implement playlists
+                  //const tune_id = songsList.addNewTune(currentTune);
+                  //const newPlaylistSet = new Set(tunePlaylists);
+                  //const addedPlaylists = [...newPlaylistSet]
+                  //  .filter(newPlaylist => !originalPlaylistsSet.has(newPlaylist));
+                  //for(var playlist of addedPlaylists){
+                  //  console.log("Adding tune to " + playlist.title)
+                  //  playlists.addTune(tune_id, playlist.id)
+                  //}
+                    console.log("Saving to new tune");
+                    database.write(async () => {database.get('tunes').create(tn => {
+                      for(let attr of prettyAttrs){
+                        (tn as TuneModel).changeAttr(attr[0], currentTune[attr[0] as keyof tune]);
+                      }
+                    }).then(resultingModel => {
+                      console.log(resultingModel);
+                      songsList.updateSongs();
+                    })});
                     navigation.goBack();
                     setNewTune(false);
                   }}
@@ -214,7 +213,7 @@ export default function Editor({
       navigation={props.navigation}
       importingId={false}
       importFn={function(stand: standard){
-        handleSetCurrentTune("db_id", stand.id)
+        handleSetCurrentTune("dbId", stand.id)
         props.navigation.goBack();
       }}/>
     </SafeAreaView>
@@ -225,7 +224,7 @@ export default function Editor({
     //Logically, this screen will never appear if there is no standard, so we can guarantee that getStandardById will return a standard.
     <Compare
       currentTune={currentTune}
-      currentStandard={(currentTune.db_id ? OnlineDB.getStandardById(currentTune.db_id) : null) as standard}
+      currentStandard={(currentTune.dbId ? OnlineDB.getStandardById(currentTune.dbId) : null) as standard}
       navigation={props.navigation}
     />
   }

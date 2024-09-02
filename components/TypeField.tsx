@@ -21,25 +21,6 @@ import {
 import { playlist, tune } from '../types.tsx';
 import Playlists from '../Playlists.tsx';
 import OnlineDB from '../OnlineDB.tsx';
-const tuneDefaults = {
-  "title": "New song",
-  "alternative_title": "",
-  "composers": [],
-  "form": [],
-  "notable_recordings": [],
-  "keys": [],
-  "styles": [],
-  "tempi": [],
-  "contrafacts": [], 
-  "has_lyrics": false,
-  "playthroughs": 0,
-  "form_confidence": 0,
-  "melody_confidence": 0,
-  "solo_confidence": 0,
-  "lyrics_confidence": 0,
-  "played_at": [], 
-  "id": "THIS SHOULD NOT BE HERE" // If the user sees this text at any point, there's an error in the program
-}
 
 function AddPlaylistField({
   newPlaylist,
@@ -120,9 +101,6 @@ function TypeField({
   setTunePlaylists: Function,
   navigation: any
 }){
-  if(attr == null){
-    attr = tuneDefaults[attrKey];
-  }
   if (attrKey === "db_id" as keyof tune){
     const [connectTuneExpanded, setConnectTuneExpanded] = useState(false);
     let stand = null;
