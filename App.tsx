@@ -37,7 +37,7 @@ import {
   Colors,
 } from 'react-native/Libraries/NewAppScreen';
 
-import {standard, tune} from './types.tsx';
+import {standard, tune_draft} from './types.tsx';
 import SongsList from './SongsList.tsx';
 import Playlists from './Playlists.tsx';
 import OnlineDB from './OnlineDB.tsx';
@@ -48,21 +48,23 @@ import {database} from './index.js';
 //PrettyAttrs function as both as "prettifiers" and lists of attrs to display in corresponding editors
 const miniEditorPrettyAttrs = new Map<string, string>([
   ["title", "Title"],
+  ["has_lyrics", "Has lyrics?"],
   ["form_confidence", "Form Confidence"],
   ["melody_confidence", "Melody Confidence"],
   ["solo_confidence", "Solo Confidence"],
   ["lyrics_confidence", "Lyrics Confidence"],
-  ["just_played", "'I Just Played This'"],
+  //  ["just_played", "'I Just Played This'"],
 ])
 const prettyAttrs = new Map<string, string>([
   ["db_id", "Database Connection"],
   ["title", "Title"],
   ["alternative_title", "Alternative Title"],
-  ["composers", "Composers"],
+  //  ["composers", "Composers"],
+  ["composer_placeholder", "Composers"],
   ["form", "Form"],
-  ["notable_recordings", "Notable Recordings"],
+  //  ["notable_recordings", "Notable Recordings"],
   ["keys", "Keys"],
-  ["styles", "Styles"],
+  //  ["styles", "Styles"],
   ["tempi", "Tempi"],
   //  ["contrafacts", "Contrafacts"],
   ["playlists", "Playlists"],
@@ -84,7 +86,7 @@ function App(): React.JSX.Element {
 
   useEffect(() => {
     //The below functions may also create "template" json files if either is not present.
-    songsList.readFromSongsJson();
+    songsList.rereadDb();
     playlists.readFromPlaylistsJson();
     OnlineDB.update();
   }, []);
@@ -156,10 +158,10 @@ function MainMenu({
               //TODO: IMPLEMENT WITH TUNEMODEL
 
             // Create tune, fill with details, then move to editor
-            const tn: tune = {};
+            const tn: tune_draft = {};
             for(let attrPair of prettyAttrs){
               if(attrPair[0] !== "id"){
-                tn[attrPair[0]] = stand[attrPair[0] as keyof stand];
+                tn[attrPair[0] as keyof tune_draft] = stand[attrPair[0] as keyof stand];
               }
             }
           //tn.title = stand.title;

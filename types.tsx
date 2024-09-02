@@ -5,22 +5,22 @@ export type tune_draft = {
   "composers"?: string[]
   "composer_placeholder"?: string
   "form"?: string
-  "notableRecordings"?: string[]
+  "notable_recordings"?: string[]
   "keys"?: string[]
   "styles"?: string[]
   "tempi"?: string[]
 //  "contrafacts"?: string[] // In the future, these could link to other tunes
   "playthroughs"?: number
-  "formConfidence"?: number
-  "melodyConfidence"?: number
-  "soloConfidence"?: number
-  "lyricsConfidence"?: number
-  "hasLyrics"?: boolean
+  "form_confidence"?: number
+  "melody_confidence"?: number
+  "solo_confidence"?: number
+  "lyrics_confidence"?: number
+  "has_lyrics"?: boolean
   "id"?: string
-  "dbId"?: number
+  "db_id"?: number
   "bio"?: string
   "year"?: number
-  "playedAt"?: string[]
+  //  "playedAt"?: string[]
 }
 export type composer = {
   "name": string
@@ -76,6 +76,7 @@ export const tuneDefaults = new Map<string, any>([
   ["title", "New song"],
   ["alternative_title", ""],
   ["composers", []],
+  ["composer_placeholder", ""],
   ["form", ""],
   ["notable_recordings", []],
   ["keys", []],
@@ -88,6 +89,7 @@ export const tuneDefaults = new Map<string, any>([
   ["melody_confidence", 0],
   ["solo_confidence", 0],
   ["lyrics_confidence", 0],
-  ["played_at", [],],
-  ["id", "THIS SHOULD NOT BE HERE"] // If the user sees this text at any point, there's an error in the progra],
+  ["played_at", []],
+  ["db_id", 0]
+  //  ["id", "THIS SHOULD NOT BE HERE"] // If the user sees this text at any point, there's an error in the progra],
 ])

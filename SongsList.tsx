@@ -15,7 +15,7 @@ class SongsList{
     this.songsList = songsList;
     this.setSongs = setSongs;
   }
-  readFromSongsJson(){
+  rereadDb(){
   //RNFS.readFile(songsFilePath)
   //  .then((results) => {
   //    this.updateSongs(JSON.parse(results))
@@ -26,9 +26,9 @@ class SongsList{
   //    console.log("Assuming file doesn't exist, creating one:")
   //    RNFS.writeFile(songsFilePath, JSON.stringify(defaultSongsJson))
   //  })
-  database.get("tunes").query().fetch().then(tunes => {
-    this.setSongs(tunes);
-  });
+    database.get("tunes").query().fetch().then(tunes => {
+      this.setSongs(tunes);
+    });
   }
   replaceSelectedTune(oldTune:TuneModel, newTune:TuneModel){
   // TODO: Implement in WatermelonDB
