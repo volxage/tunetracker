@@ -42,7 +42,7 @@ const fuseOptions = { // For finetuning the search algorithm
 		"composers"
 	]
 };
-import {playlist } from '../types.tsx';
+import {playlist, tune_draft } from '../types.tsx';
 import SongsList from '../SongsList.tsx';
 import Slider from '@react-native-community/slider';
 import reactotron from 'reactotron-react-native';
@@ -82,7 +82,7 @@ type HeaderInputStates = {
   setSelectedTune: Function
   setSelectedPlaylist: Function
 }
-function LListHeader({
+function TuneListHeader({
   headerInputStates,
   navigation,
   playlists,
@@ -217,7 +217,7 @@ function LListHeader({
         <ButtonText><Icon name="menu-swap" size={30} /></ButtonText>
       </Button>
       <Button style={{flex:1}} onPress={() => {
-            const tn: tune = {};
+            const tn: tune_draft = {};
             headerInputStates.setSelectedTune(tn);
             setNewTune(true);
             navigation.navigate("Editor");
@@ -289,13 +289,18 @@ export default function TuneListDisplay({
       //TODO: fuse.search needs to be interpreted as an array for FlatList to understand!
       extraData={selectedAttr}
       ListHeaderComponent={
-        <LListHeader 
+        <TuneListHeader 
           headerInputStates={headerInputStates}
           navigation={navigation}
           playlists={playlists}
           setNewTune={setNewTune}
           selectedAttr={selectedAttr}
         />
+      }
+      ListEmptyComponent={
+        <View style={{backgroundColor: "black", flex: 1}}>
+          <SubText>Click the blue database icon to download a tune from tunetracker.jhilla.org, or click the plus icon to make a new one!</SubText>
+        </View>
       }
       renderItem={({item, index, separators}) => (
         <TouchableHighlight
