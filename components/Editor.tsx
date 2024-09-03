@@ -32,9 +32,6 @@ function reducer(state: any, action: any){
   switch(action.type){
     case 'update_attr':
     {
-      console.log("Updating:");
-      console.log(action["attr"]);
-      console.log(action["value"]);
       const tuneCopy = JSON.parse(JSON.stringify(state["currentTune"]));
       tuneCopy[action["attr"]] = action["value"];
       return {currentTune: tuneCopy};
@@ -259,6 +256,7 @@ export default function Editor({
       currentTune={state["currentTune"]}
       currentStandard={(state["currentTune"].dbId ? OnlineDB.getStandardById(state["currentTune"].dbId) : null) as standard}
       navigation={props.navigation}
+      handleSetCurrentTune={handleSetCurrentTune}
     />
   }
 </Stack.Screen>

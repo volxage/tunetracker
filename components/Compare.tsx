@@ -11,7 +11,7 @@ import {
   SMarginView,
 } from '../Style.tsx'
 
-import { editorAttrs } from '../types.tsx';
+import { editorAttrs, tune_draft, tuneDefaults } from '../types.tsx';
 
 import {
   SafeAreaView,
@@ -23,12 +23,13 @@ import {
 import TypeField from './TypeField.tsx';
 import SongsList from '../SongsList.tsx';
 import Playlists from '../Playlists.tsx';
-import { tune, standard, playlist } from '../types.tsx';
+import { standard, playlist } from '../types.tsx';
 import reactotron from 'reactotron-react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons.js';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Importer from './Importer.tsx';
 import {BackHandler} from 'react-native';
+import Tune from '../model/Tune.js';
 
 //Anything that ends with "confidence" is also excluded
 const exclude_set = new Set([
@@ -65,23 +66,23 @@ function CompareField({item, index, currentStandard, currentTune, handleReplaceA
   item: string[],
   index: number,
   currentStandard: standard,
-  currentTune: tune,
+  currentTune: Tune | tune_draft,
   handleReplaceAttr: Function
 }){
   const standardAttrPresent = (item[0] in currentStandard
             && !empty_equivalent.has(currentStandard[item[0] as keyof standard]
               .toString().trim()));
   const tuneAttrPresent = (item[0] in currentTune
-            && !empty_equivalent.has(currentTune[item[0] as keyof tune]
+            && !empty_equivalent.has(currentTune[item[0] as keyof (Tune | tune_draft)]
               .toString().trim()));
   if(!standardAttrPresent && !tuneAttrPresent){
     return(<></>)
   }
-  if(currentStandard[item[0] as keyof standard] === currentTune[item[0] as keyof tune]){
+  if(currentStandard[item[0] as keyof standard] === currentTune[item[0] as keyof (Tune | tune_draft)]){
     return(
       <View>
         <Title>{item[1]}</Title>
-        <SubText>{currentTune[item[0] as keyof tune]}</SubText>
+        <SubText>{currentTune[item[0] as keyof (Tune | tune_draft)]}</SubText>
       </View>
     )
   }
@@ -132,7 +133,7 @@ function CompareField({item, index, currentStandard, currentTune, handleReplaceA
                     onPress={() => {
                       setChoice(1);
                       // Reset both tune and standard
-                      handleReplaceAttr(item[0], currentTune[item[0] as keyof tune], false);
+                      handleReplaceAttr(item[0], currentTune[item[0] as keyof (Tune | tune_draft)], false);
                       handleReplaceAttr(item[0], currentStandard[item[0] as keyof standard], true);
                     }}
                   >
@@ -144,8 +145,8 @@ function CompareField({item, index, currentStandard, currentTune, handleReplaceA
                   }}
                   onPress={() => {
                     setChoice(2);
-                    handleReplaceAttr(item[0], currentTune[item[0] as keyof tune], false);
-                    handleReplaceAttr(item[0], currentTune[item[0] as keyof tune], true);
+                    handleReplaceAttr(item[0], currentTune[item[0] as keyof (Tune | tune_draft)], false);
+                    handleReplaceAttr(item[0], currentTune[item[0] as keyof (Tune | tune_draft)], true);
                   }}
                   >
                     <ButtonText><Icon name="account-arrow-down" size={30} /></ButtonText>
@@ -153,7 +154,7 @@ function CompareField({item, index, currentStandard, currentTune, handleReplaceA
                 </View>
                 <View>
                   <SMarginView>
-                    <SubText>{stringify(currentTune[item[0] as keyof tune])}</SubText>
+                    <SubText>{stringify(currentTune[item[0] as keyof (Tune | tune_draft)])}</SubText>
                   </SMarginView>
                 </View>
               </View>
@@ -163,16 +164,18 @@ function CompareField({item, index, currentStandard, currentTune, handleReplaceA
 export default function Compare({
   currentTune,
   currentStandard,
-  navigation
+  navigation,
+  handleSetCurrentTune
 }:
 {
-  currentTune: tune,
+  currentTune: Tune | tune_draft,
   currentStandard: standard,
-  navigation: any
+  navigation: any,
+  handleSetCurrentTune: Function
 }){
   const [comparedDbDraft, setComparedDbDraft] = useState(currentStandard);
   const [comparedTuneDraft, setComparedTuneDraft] = useState(currentTune);
-  function handleReplaceAttr(attrKey: keyof tune, value: any, onlineSelected: boolean){
+  function handleReplaceAttr(attrKey: keyof (Tune | tune_draft), value: any, onlineSelected: boolean){
     //Inefficient solution, but there are no Map functions such as "filter" in mapped types
     const cpy = JSON.parse(JSON.stringify(onlineSelected ? currentStandard : currentTune));
     cpy[attrKey] = value;
@@ -214,8 +217,12 @@ export default function Compare({
           <Button style={{flex: 1}}
             onPress={() => {
               navigation.goBack();
-            }}
-          >
+              for(let attr in comparedTuneDraft){
+                if(attr in comparedTuneDraft){
+                  handleSetCurrentTune(attr, comparedTuneDraft[attr as keyof (Tune | tune_draft)]);
+                }
+              }
+              }}>
             <ButtonText>Save to phone</ButtonText>
           </Button>
           <DeleteButton style={{flex: 1}}
