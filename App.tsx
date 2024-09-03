@@ -85,8 +85,8 @@ function App(): React.JSX.Element {
   const playlists = new Playlists(rawPlaylists, setRawPlaylists);
 
   useEffect(() => {
-    //The below functions may also create "template" json files if either is not present.
     songsList.rereadDb();
+    //TODO: Implement playlists in WatermelonDB
     playlists.readFromPlaylistsJson();
     OnlineDB.update();
   }, []);
@@ -111,7 +111,6 @@ function MainMenu({
   songsList: SongsList,
   playlists: Playlists
 }): React.JSX.Element {
-  //const isDarkMode = useColorScheme() === 'dark';
   const [selectedTune, setSelectedTune] = useState(songs[0]);
   const [newTune, setNewTune] = useState(false);
   const isDarkMode = true;

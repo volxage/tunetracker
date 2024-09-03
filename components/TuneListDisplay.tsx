@@ -49,20 +49,20 @@ import reactotron from 'reactotron-react-native';
 import Tune from '../model/Tune.js';
 const prettyAttrs = new Map<string, string>([
   ["title", "Title"],
-  ["alternative_title", "Alternative Title"],
+  ["alternativeTitle", "Alternative Title"],
   ["composers", "Composer(s)"],
   ["form", "Form"],
-  ["notable_recordings", "Notable recordings"],
+//  ["notableRecordings", "Notable recordings"],
   ["keys", "Key(s)"],
   ["styles", "Styles"],
   ["tempi", "Tempi"],
-  ["contrafacts", "Contrafacts"],
+//  ["contrafacts", "Contrafacts"],
   ["playthroughs", "Playthrough Count"],
-  ["form_confidence", "Form Confidence"],
-  ["melody_confidence", "Melody Confidence"],
-  ["solo_confidence", "Solo Confidence"],
-  ["lyrics_confidence", "Lyrics Confidence"],
-  ["played_at", "Played At"],
+  ["formConfidence", "Form Confidence"],
+  ["melodyConfidence", "Melody Confidence"],
+  ["soloConfidence", "Solo Confidence"],
+  ["lyricsConfidence", "Lyrics Confidence"],
+  ["playedAt", "Played At"],
 ]);
 
 function prettyPrint(object: unknown): string{
@@ -152,7 +152,7 @@ function LListHeader({
             backgroundColor: "purple"
         }}
         onPress={() => {
-          headerInputStates.setSelectedAttr("melody_confidence");
+          headerInputStates.setSelectedAttr("melodyConfidence");
         }}>
           <ButtonText>
             <Icon name="music" size={30} />
@@ -164,7 +164,7 @@ function LListHeader({
             backgroundColor: "darkblue"
         }}
         onPress={() => {
-          headerInputStates.setSelectedAttr("form_confidence");
+          headerInputStates.setSelectedAttr("formConfidence");
         }}>
           <ButtonText>
               <Icon name="file-music-outline" size={30}/>
@@ -176,7 +176,7 @@ function LListHeader({
             backgroundColor: "darkcyan"
         }}
         onPress={() => {
-          headerInputStates.setSelectedAttr("solo_confidence");
+          headerInputStates.setSelectedAttr("soloConfidence");
         }}>
         <ButtonText><Icon name="alpha-s-circle-outline" size={30} /></ButtonText>
       </Button>
@@ -186,7 +186,7 @@ function LListHeader({
             backgroundColor: "darkgreen"
         }}
         onPress={() => {
-          headerInputStates.setSelectedAttr("lyrics_confidence");
+          headerInputStates.setSelectedAttr("lyricsConfidence");
         }}>
         <ButtonText><Icon name="script-text" size={30} /></ButtonText>
       </Button>
