@@ -63,11 +63,16 @@ async function fetchTunes(counter=0){
       }
     }
   ).catch(reason => {
+    //TODO: Push error message to user! Or update some "server active" state.
     console.error("ERROR on sending http request");
     console.error(reason);
     fetchTunes(counter + 1);
   });
 }
+
+async function sendTuneDraft(){
+}
+
 export default {
   getStandards() {
     return standards;

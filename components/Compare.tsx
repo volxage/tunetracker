@@ -208,9 +208,9 @@ export default function Compare({
         <Text>Online draft:</Text>
         <SubText>{JSON.stringify(comparedDbDraft)}</SubText>
         <View>
-          <Button style={{backgroundColor: "darkgreen"}}
+          <Button style={{backgroundColor: "grey"}}
           >
-            <ButtonText>Upload draft to database</ButtonText>
+            <ButtonText>Upload (coming soon!)</ButtonText>
           </Button>
         </View>
         <View style={{flexDirection: "row"}}>
