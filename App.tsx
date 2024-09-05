@@ -135,7 +135,7 @@ function MainMenu({
             importingId={false}
             importFn={function(stand: standard, mini=false){
               const tn: tune_draft = {};
-              for(let attrPair of prettyAttrs){
+              for(let attrPair of editorAttrs){
                 if(attrPair[0] !== "id"){
                   tn[attrPair[0] as keyof tune_draft] = stand[attrPair[0] as keyof stand];
                 }

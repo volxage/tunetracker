@@ -50,7 +50,7 @@ export const editorAttrs = [
   ["title", "Title"],
   ["alternativeTitle", "Alternative Title"],
   ["composers", "Composers"],
-  ["composerPlaceholder", "Composers (Placeholder)"],
+  ["composerPlaceholder", "Obscure Composers"],
   ["form", "Form"],
   //  ["notable_recordings", "Notable Recordings"],
   ["mainKey", "Main Key"],
