@@ -24,7 +24,7 @@ export default appSchema({
         {name: 'main_tempo', type: "number", isOptional: true},
         {name: 'tempi', type: "string", isOptional: true},
         {name: 'contrafact_id', type: "string", isOptional: true, isIndexed: true},
-        {name: 'playthroughs', type: "number" },
+        {name: 'playthroughs', type: "number"},
         {name: 'form_confidence', type: "number" },
         {name: 'melody_confidence', type: "number" },
         {name: 'solo_confidence', type: "number" },

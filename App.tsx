@@ -37,7 +37,7 @@ import {
   Colors,
 } from 'react-native/Libraries/NewAppScreen';
 
-import {standard, tune_draft} from './types.tsx';
+import {standard, tune_draft, editorAttrs} from './types.tsx';
 import SongsList from './SongsList.tsx';
 import Playlists from './Playlists.tsx';
 import OnlineDB from './OnlineDB.tsx';
@@ -54,26 +54,6 @@ const miniEditorPrettyAttrs = new Map<string, string>([
   ["soloConfidence", "Solo Confidence"],
   ["lyricsConfidence", "Lyrics Confidence"],
   //  ["just_played", "'I Just Played This'"],
-])
-const prettyAttrs = new Map<string, string>([
-  ["dbId", "Database Connection"],
-  ["title", "Title"],
-  ["alternativeTitle", "Alternative Title"],
-  //  ["composers", "Composers"],
-  ["composerPlaceholder", "Composers"],
-  ["form", "Form"],
-  //  ["notable_recordings", "Notable Recordings"],
-  ["keys", "Keys"],
-  //  ["styles", "Styles"],
-  ["tempi", "Tempi"],
-  //  ["contrafacts", "Contrafacts"],
-  ["playlists", "Playlists"],
-  ["playthroughs", "Playthroughs"],
-  ["hasLyrics", "Has lyrics?"],
-  ["formConfidence", "Form Confidence"],
-  ["melodyConfidence", "Melody Confidence"],
-  ["soloConfidence", "Solo Confidence"],
-  ["lyricsConfidence", "Lyrics Confidence"],
 ])
 
 const Stack = createNativeStackNavigator();
@@ -138,7 +118,7 @@ function MainMenu({
       </Stack.Screen>
       <Stack.Screen name="Editor">
         {(props) => <Editor
-          prettyAttrs={Array.from(prettyAttrs.entries())}
+          prettyAttrs={editorAttrs as Array<[string, string]>}
           selectedTune={selectedTune}
           songsList={songsList}
           playlists={playlists}
