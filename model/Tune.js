@@ -4,6 +4,8 @@ import { field, text, children, lazy, writer, json} from '@nozbe/watermelondb/de
 import {tuneDefaults} from '../types';
 
 
+const sanitizeKeys = json => json;
+const sanitizeTempi = json => json;
 class Tune extends Model {
   static table = 'tunes';
   static associations= {
@@ -45,6 +47,8 @@ class Tune extends Model {
   }
 
 
+
+
   @text('title') title
   @text('alternative_title') alternativeTitle
   @text('form') form
@@ -52,9 +56,9 @@ class Tune extends Model {
   @field('year') year
   @field('has_lyricts') hasLyricist
   @field('main_key') mainKey
-  @json('keys') keys
+  @json('keys', sanitizeKeys) keys
   @field('main_tempo') mainTempo
-  @json('tempi') tempi
+  @json('tempi', sanitizeTempi) tempi
   @field('playthroughs') playthroughs
   @field('form_confidence') formConfidence
   @field('melody_confidence') melodyConfidence
