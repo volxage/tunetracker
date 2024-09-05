@@ -18,8 +18,10 @@ export default appSchema({
         //      {notable_recordings, type: "string" },[]
         {name: 'has_lyricts', type: "boolean", isOptional: true},
         //      "lyricists"?: string[]
+        {name: 'main_key', type: "string", isOptional: true},
         {name: 'keys', type: "string", isOptional: true},
         //      "styles"?: string[]
+        {name: 'main_tempo', type: "number", isOptional: true},
         {name: 'tempi', type: "string", isOptional: true},
         {name: 'contrafact_id', type: "string", isOptional: true, isIndexed: true},
         {name: 'playthroughs', type: "number" },

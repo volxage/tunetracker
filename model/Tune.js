@@ -1,6 +1,6 @@
 //Copyright 2024 Jonathan Hilliard
 import { Model, relation} from '@nozbe/watermelondb'
-import { field, text, children, lazy, writer} from '@nozbe/watermelondb/decorators'
+import { field, text, children, lazy, writer, json} from '@nozbe/watermelondb/decorators'
 import {tuneDefaults} from '../types';
 
 
@@ -51,8 +51,10 @@ class Tune extends Model {
   @text('composer_placeholder') composerPlaceholder
   @field('year') year
   @field('has_lyricts') hasLyricist
-  @field('keys') keys // (Look into RxJS and @json to make json serialization that is observable)
-  @field('tempi') tempi
+  @field('main_key') mainKey
+  @json('keys') keys
+  @field('main_tempo') mainTempo
+  @json('tempi') tempi
   @field('playthroughs') playthroughs
   @field('form_confidence') formConfidence
   @field('melody_confidence') melodyConfidence
