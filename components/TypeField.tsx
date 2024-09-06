@@ -18,7 +18,7 @@ import {
   Switch,
   View,
 } from 'react-native';
-import { playlist, tune } from '../types.tsx';
+import { playlist, tune_draft } from '../types.tsx';
 import Playlists from '../Playlists.tsx';
 import OnlineDB from '../OnlineDB.tsx';
 
@@ -81,6 +81,14 @@ function AddPlaylistField({
   }
 }
 
+function dbConnection({
+
+}: {
+
+}){
+
+}
+
 //TODO: Refactor, there should not be this many props
 function TypeField({
   attr,
@@ -93,7 +101,7 @@ function TypeField({
   navigation
 }: {
   attr: unknown,
-  attrKey: keyof tune,
+  attrKey: keyof tune_draft,
   attrName: string,
   handleSetCurrentTune: Function,
   playlists: Playlists,
@@ -101,7 +109,7 @@ function TypeField({
   setTunePlaylists: Function,
   navigation: any
 }){
-  if (attrKey === "dbId" as keyof tune){
+  if (attrKey === "dbId" as keyof tune_draft){
     const [connectTuneExpanded, setConnectTuneExpanded] = useState(false);
     let stand = null;
     if(typeof attr !== "undefined" && attr !== 0){
@@ -152,7 +160,16 @@ function TypeField({
       </View>
     )
   }
-  else if (attrKey === "playlists" as keyof tune){ //Playlists are NOT an attribute of a tune
+  else if (attrKey === "composers" as keyof tune_draft){
+    //Needs:
+    //Local Composers
+    //Online composers
+    //Composers already assigned to the tune
+
+    //Need a FlatList with composers. For each entry, we want an icon for whether the item is present in local and/or online db.
+    //Maybe add a checkmark on the left if the composer is added to the tune? Or change bg-color of item?
+  }
+  else if (attrKey === "playlists" as keyof tune_draft){ //Playlists are NOT an attribute of a tune
     const [newPlaylistOpen, setNewPlaylistOpen] = useState(false)
     //TODO:
     // Delete Button
