@@ -22,6 +22,7 @@ import { playlist, tune_draft } from '../types.tsx';
 import Playlists from '../Playlists.tsx';
 import OnlineDB from '../OnlineDB.tsx';
 import DbConnection from './TypeFields/DbConnection.tsx';
+import ComposerField from './TypeFields/ComposerField.tsx';
 
 function AddPlaylistField({
   newPlaylist,
@@ -105,7 +106,7 @@ function TypeField({
 }){
   if (attrKey === "dbId" as keyof tune_draft){
     return(
-      <DbConnection attr={attr} navigation={navigation}/>
+      <DbConnection attr={attr} navigation={navigation} />
     );
   }
   else if (attrKey === "composers" as keyof tune_draft){
@@ -116,6 +117,9 @@ function TypeField({
 
     //Need a FlatList with composers. For each entry, we want an icon for whether the item is present in local and/or online db.
     //Maybe add a checkmark on the left if the composer is added to the tune? Or change bg-color of item?
+    return(
+      <ComposerField attr={attr} navigation={navigation} />
+    );
   }
   else if (attrKey === "playlists" as keyof tune_draft){ //Playlists are NOT an attribute of a tune
     const [newPlaylistOpen, setNewPlaylistOpen] = useState(false)
