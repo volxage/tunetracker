@@ -46,6 +46,7 @@ import {playlist, tune_draft } from '../types.tsx';
 import Slider from '@react-native-community/slider';
 import reactotron from 'reactotron-react-native';
 import Tune from '../model/Tune.js';
+import Composer from '../model/Composer.js';
 const prettyAttrs = new Map<string, string>([
   ["title", "Title"],
   ["alternativeTitle", "Alternative Title"],
@@ -77,20 +78,16 @@ type HeaderInputStates = {
   confidenceVisible: boolean
   setConfidenceVisible: Function
   setSearch: Function
-  setSelectedAttr: Function
-  setSelectedTune: Function
 }
 function ComposerListHeader({
   headerInputStates,
   navigation,
   playlists,
-  setNewTune,
   selectedAttr
 }: {
   headerInputStates: HeaderInputStates
   navigation: any,
   playlists: Playlists,
-  setNewTune: Function,
   selectedAttr: String
 }){
   const selectedAttrItems = Array.from(prettyAttrs.entries()).map(
@@ -117,25 +114,27 @@ function ComposerListHeader({
           onChangeText={(text) => {headerInputStates.setSearch(text)}}
         />
       </View>
-      <View style={{flex:1}}>
-        <RNPickerSelect
-          onValueChange={(value) => headerInputStates.setSelectedPlaylist(value)}
-          items={selectedPlaylistItems}
-          useNativeAndroidPickerStyle={false}
-          placeholder={{label: "Select a playlist", value: ""}}
-          style={{inputAndroid:
-            {
-            backgroundColor: 'transparent', color: 'white', fontSize: 20, fontWeight: "300",
-            }
-          }}
-        />
-      </View>
+    {
+    //<View style={{flex:1}}>
+    //  <RNPickerSelect
+    //    onValueChange={(value) => headerInputStates.setSelectedPlaylist(value)}
+    //    items={selectedPlaylistItems}
+    //    useNativeAndroidPickerStyle={false}
+    //    placeholder={{label: "Select a playlist", value: ""}}
+    //    style={{inputAndroid:
+    //      {
+    //      backgroundColor: 'transparent', color: 'white', fontSize: 20, fontWeight: "300",
+    //      }
+    //    }}
+    //  />
+    //</View>
+    }
     </View>
     <View style={{flexDirection: 'row', alignItems: 'center', borderBottomWidth:1}}>
       <View style={{flex: 4}}>
         <RNPickerSelect
           value={selectedAttr}
-          onValueChange={(value) => headerInputStates.setSelectedAttr(value)}
+          onValueChange={(value) => {}}
           items={selectedAttrItems as Array<{label:string, value:string}>}
           useNativeAndroidPickerStyle={false}
           placeholder={{label: "Sort by...", value: "title"}}
@@ -144,50 +143,6 @@ function ComposerListHeader({
           }}
         />
       </View>
-      <Button
-        style={{
-          flex:1,
-            backgroundColor: "purple"
-        }}
-        onPress={() => {
-          headerInputStates.setSelectedAttr("melodyConfidence");
-        }}>
-          <ButtonText>
-            <Icon name="music" size={30} />
-          </ButtonText>
-      </Button>
-      <Button
-        style={{
-          flex:1,
-            backgroundColor: "darkblue"
-        }}
-        onPress={() => {
-          headerInputStates.setSelectedAttr("formConfidence");
-        }}>
-          <ButtonText>
-              <Icon name="file-music-outline" size={30}/>
-          </ButtonText>
-      </Button>
-      <Button
-        style={{
-          flex:1,
-            backgroundColor: "darkcyan"
-        }}
-        onPress={() => {
-          headerInputStates.setSelectedAttr("soloConfidence");
-        }}>
-        <ButtonText><Icon name="alpha-s-circle-outline" size={30} /></ButtonText>
-      </Button>
-      <Button
-        style={{
-          flex:1,
-            backgroundColor: "darkgreen"
-        }}
-        onPress={() => {
-          headerInputStates.setSelectedAttr("lyricsConfidence");
-        }}>
-        <ButtonText><Icon name="script-text" size={30} /></ButtonText>
-      </Button>
     </View>
     <View style={{flexDirection: "row"}}>
       <Button
@@ -216,8 +171,6 @@ function ComposerListHeader({
       </Button>
       <Button style={{flex:1}} onPress={() => {
             const tn: tune_draft = {};
-            headerInputStates.setSelectedTune(tn);
-            setNewTune(true);
             navigation.navigate("Editor");
       }}>
         <ButtonText><Icon name="plus" size={30}/></ButtonText>
@@ -232,15 +185,11 @@ function ComposerListHeader({
 export default function ComposerListDisplay({
   composers,
   navigation,
-  setSelectedTune,
   playlists,
-  setNewTune
 }: {
   composers: Array<Composer>,
   navigation: any,
-  setSelectedTune: Function,
   playlists: Playlists,
-  setNewTune: Function
 }){
   useEffect(() => {bench.stop("Full render")}, [])
   const bench = reactotron.benchmark("ComposerListDisplay benchmark");
@@ -253,7 +202,7 @@ export default function ComposerListDisplay({
   let displayComposers = composers;
   const fuse = new Fuse(displayComposers, fuseOptions);
   if(search === ""){
-    composerSort(displayComposers, selectedAttr, listReversed);
+    //composerSort(displayComposers, selectedAttr, listReversed);
   }else{
     displayComposers = fuse.search(search)
       .map(function(value, index){
@@ -270,7 +219,6 @@ export default function ComposerListDisplay({
     setConfidenceVisible: setConfidenceVisible,
     setSearch: setSearch,
     setSelectedAttr: setSelectedAttr,
-    setSelectedTune: setSelectedTune,
   }
   return (
     <FlatList
@@ -282,7 +230,6 @@ export default function ComposerListDisplay({
           headerInputStates={headerInputStates}
           navigation={navigation}
           playlists={playlists}
-          setNewTune={setNewTune}
           selectedAttr={selectedAttr}
         />
       }
@@ -293,74 +240,18 @@ export default function ComposerListDisplay({
       }
       renderItem={({item, index, separators}) => (
         <TouchableHighlight
-          key={item.title}
-          onPress={() => {setSelectedTune(item); navigation.navigate("MiniEditor");}}
-          onLongPress={() => {setSelectedTune(item); navigation.navigate("Editor");}}
+          key={item.name}
           onShowUnderlay={separators.highlight}
           onHideUnderlay={separators.unhighlight}>
-          {
           <View style={{backgroundColor: 'black', padding: 8}}>
-            <Text>{item.title}</Text>
-            <SubText>{selectedAttr != "title"
-              ? prettyPrint(item[selectedAttr as keyof Tune])
-              : prettyPrint(item["composerPlaceholder" as keyof Tune])}</SubText>
-            {
-              //CONFIDENCE
-              confidenceVisible && 
-              <View>
-                <ConfidenceBarView>
-                  <Slider
-                    value={item.melodyConfidence}
-                    lowerLimit={item.melodyConfidence}
-                    upperLimit={item.melodyConfidence}
-                    minimumValue={0}
-                    maximumValue={100}
-                    minimumTrackTintColor='purple'
-                    thumbTintColor='#00000000'
-                  />
-                </ConfidenceBarView>
-                <ConfidenceBarView>
-                  <Slider
-                    value={item.formConfidence}
-                    lowerLimit={item.formConfidence}
-                    upperLimit={item.formConfidence}
-                    minimumValue={0}
-                    maximumValue={100}
-                    minimumTrackTintColor='darkblue'
-                    thumbTintColor='#00000000'
-                  />
-                </ConfidenceBarView>
-                <ConfidenceBarView>
-                  <Slider
-                    value={item.soloConfidence}
-                    lowerLimit={item.soloConfidence}
-                    upperLimit={item.soloConfidence}
-                    minimumValue={0}
-                    maximumValue={100}
-                    minimumTrackTintColor='darkcyan'
-                    thumbTintColor='#00000000'
-                  />
-                </ConfidenceBarView>
-              { item.hasLyrics &&
-              <ConfidenceBarView>
-                <Slider
-                  value={item.lyricsConfidence}
-                  lowerLimit={item.lyricsConfidence}
-                  upperLimit={item.lyricsConfidence}
-                  minimumValue={0}
-                  maximumValue={100}
-                  minimumTrackTintColor='green'
-                  thumbTintColor='#00000000'
-                />
-              </ConfidenceBarView>
-            }
-          </View>
-        }
+            <Text>{item.name}</Text>
           {typeof bench.step("Item render") === "undefined"}
           </View>
-        }
         </TouchableHighlight>
     )}
   />
   );
 }
+          //<SubText>{selectedAttr != "title"
+          //  ? prettyPrint(item[selectedAttr as keyof Tune])
+          //  : prettyPrint(item["composerPlaceholder" as keyof Tune])}</SubText>

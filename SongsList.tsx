@@ -6,14 +6,17 @@ import defaultSongsJson from './songs.json'
 import uuid from 'react-native-uuid'
 import {database} from '.';
 import TuneModel from './model/Tune';
+import Composer from './model/Composer';
 
 //TODO: Move functions to TuneModel
 class SongsList{
   readonly songsList: TuneModel[];
+  composerList: Composer[];
   readonly setSongs: Function;
   constructor(songsList: TuneModel[], setSongs: Function){
     this.songsList = songsList;
     this.setSongs = setSongs;
+    this.composerList = [];
   }
   rereadDb(){
   //RNFS.readFile(songsFilePath)
@@ -28,6 +31,9 @@ class SongsList{
   //  })
     database.get("tunes").query().fetch().then(tunes => {
       this.setSongs(tunes);
+    });
+    database.get("composers").query().fetch().then(composers => {
+      this.composerList = composers as Composer[];
     });
   }
   replaceSelectedTune(oldTune:TuneModel, newTune:TuneModel){

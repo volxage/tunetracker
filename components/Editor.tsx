@@ -27,6 +27,7 @@ import OnlineDB from '../OnlineDB.tsx';
 
 import {database} from '../index.js';
 import TuneModel from '../model/Tune.js';
+import ComposerListDisplay from './ComposerListDisplay.tsx';
 
 function reducer(state: any, action: any){
   switch(action.type){
@@ -257,6 +258,16 @@ export default function Editor({
       currentStandard={(state["currentTune"].dbId ? OnlineDB.getStandardById(state["currentTune"].dbId) : null) as standard}
       navigation={props.navigation}
       handleSetCurrentTune={handleSetCurrentTune}
+    />
+  }
+</Stack.Screen>
+<Stack.Screen name='ComposerSelect'>
+  {props =>
+    //Logically, this screen will never appear if there is no standard, so we can guarantee that getStandardById will return a standard.
+    <ComposerListDisplay
+      composers={songsList.composerList}
+      navigation={navigation}
+      playlists={[]}
     />
   }
 </Stack.Screen>
