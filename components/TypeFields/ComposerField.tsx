@@ -46,6 +46,11 @@ export default function ComposerField({
       {
         composerExpanded &&
         <View>
+          <Button
+            onPress={() => {navigation.navigate("ComposerSelector")}}
+          >
+          <ButtonText>YO MAMA</ButtonText>
+          </Button>
         </View>
       }
     </View>

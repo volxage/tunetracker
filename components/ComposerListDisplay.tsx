@@ -90,26 +90,27 @@ function ComposerListHeader({
   playlists: Playlists,
   selectedAttr: String
 }){
-  const selectedAttrItems = Array.from(prettyAttrs.entries()).map(
-    (entry) => {return {label: entry[1], value: entry[0]}}
-  );
+//const selectedAttrItems = Array.from(prettyAttrs.entries()).map(
+//  (entry) => {return {label: entry[1], value: entry[0]}}
+//);
 
-  const selectedPlaylistItems = Array.from(playlists.getPlaylists().map(
-    (playlist) => {return {label: playlist.title, value: playlist.id}}
-  ));
-  selectedPlaylistItems.unshift(
-    {
-      label: "All Songs",
-      value: " "
-    }
-  )
+//const selectedPlaylistItems = Array.from(playlists.getPlaylists().map(
+//  (playlist) => {return {label: playlist.title, value: playlist.id}}
+//));
+//selectedPlaylistItems.unshift(
+//  {
+//    label: "All Songs",
+//    value: " "
+//  }
+//)
 
   return(
   <View>
     <View style={{flexDirection: 'row', borderBottomWidth:1}}>
       <View style={{flex:1}}>
         <TextInput
-          placeholder={"Search"}
+          style={{backgroundColor: "#222"}}
+          placeholder={"Enter your composer here"}
           placeholderTextColor={"white"}
           onChangeText={(text) => {headerInputStates.setSearch(text)}}
         />
@@ -129,55 +130,6 @@ function ComposerListHeader({
     //  />
     //</View>
     }
-    </View>
-    <View style={{flexDirection: 'row', alignItems: 'center', borderBottomWidth:1}}>
-      <View style={{flex: 4}}>
-        <RNPickerSelect
-          value={selectedAttr}
-          onValueChange={(value) => {}}
-          items={selectedAttrItems as Array<{label:string, value:string}>}
-          useNativeAndroidPickerStyle={false}
-          placeholder={{label: "Sort by...", value: "title"}}
-          style={{inputAndroid:
-            {backgroundColor: 'transparent', color: 'white', fontSize: 20, fontWeight: "300"}
-          }}
-        />
-      </View>
-    </View>
-    <View style={{flexDirection: "row"}}>
-      <Button
-        style={{
-          flex:1,
-            backgroundColor: !headerInputStates.confidenceVisible
-            ? "darkgreen"
-            : "darkred",
-        }}
-        onPress={() => {
-          headerInputStates.setConfidenceVisible(!headerInputStates.confidenceVisible)
-        }}>
-        <ButtonText><Icon name="segment" size={30} /></ButtonText>
-      </Button>
-      <Button
-        style={{
-          flex:1,
-            backgroundColor: !headerInputStates.listReversed
-            ? "darkgreen"
-            : "darkred",
-        }}
-        onPress={() => {
-          headerInputStates.setListReversed(!headerInputStates.listReversed)
-        }}>
-        <ButtonText><Icon name="menu-swap" size={30} /></ButtonText>
-      </Button>
-      <Button style={{flex:1}} onPress={() => {
-            const tn: tune_draft = {};
-            navigation.navigate("Editor");
-      }}>
-        <ButtonText><Icon name="plus" size={30}/></ButtonText>
-      </Button>
-      <Button style={{flex:1}} onPress={() => navigation.navigate("Importer")}>
-        <ButtonText><Icon name="database-arrow-down" size={30}/></ButtonText>
-      </Button>
     </View>
   </View>
 );
@@ -235,7 +187,7 @@ export default function ComposerListDisplay({
       }
       ListEmptyComponent={
         <View style={{backgroundColor: "black", flex: 1}}>
-          <SubText>Click the blue database icon to download a tune from tunetracker.jhilla.org, or click the plus icon to make a new one!</SubText>
+          <SubText>Enter your composer above to search/add a composer.</SubText>
         </View>
       }
       renderItem={({item, index, separators}) => (

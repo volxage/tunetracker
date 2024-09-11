@@ -261,7 +261,7 @@ export default function Editor({
     />
   }
 </Stack.Screen>
-<Stack.Screen name='ComposerSelect'>
+<Stack.Screen name='ComposerSelector'>
   {props =>
     //Logically, this screen will never appear if there is no standard, so we can guarantee that getStandardById will return a standard.
     <ComposerListDisplay
