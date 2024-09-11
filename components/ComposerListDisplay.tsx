@@ -14,7 +14,8 @@ import {
   TextInput,
   Button,
   ButtonText,
-  ConfidenceBarView
+  ConfidenceBarView,
+  BackgroundView
 } from '../Style.tsx'
 import tuneSort from '../tuneSort.tsx'
 import Playlists from '../Playlists.tsx'
@@ -47,24 +48,6 @@ import Slider from '@react-native-community/slider';
 import reactotron from 'reactotron-react-native';
 import Tune from '../model/Tune.js';
 import Composer from '../model/Composer.js';
-const prettyAttrs = new Map<string, string>([
-  ["title", "Title"],
-  ["alternativeTitle", "Alternative Title"],
-  ["composers", "Composer(s)"],
-  ["form", "Form"],
-//  ["notableRecordings", "Notable recordings"],
-  ["keys", "Key(s)"],
-  ["styles", "Styles"],
-  ["tempi", "Tempi"],
-//  ["contrafacts", "Contrafacts"],
-  ["playthroughs", "Playthrough Count"],
-  ["formConfidence", "Form Confidence"],
-  ["melodyConfidence", "Melody Confidence"],
-  ["soloConfidence", "Solo Confidence"],
-  ["lyricsConfidence", "Lyrics Confidence"],
-  ["playedAt", "Played At"],
-]);
-
 function prettyPrint(object: unknown): string{
   if (typeof object == "string") return object as string;
   if (typeof object == "number") return JSON.stringify(object);
@@ -81,58 +64,69 @@ type HeaderInputStates = {
 }
 function ComposerListHeader({
   headerInputStates,
-  navigation,
-  playlists,
-  selectedAttr
+  addComposerOptionFlag
 }: {
-  headerInputStates: HeaderInputStates
-  navigation: any,
-  playlists: Playlists,
-  selectedAttr: String
+  headerInputStates: HeaderInputStates,
+  addComposerOptionFlag: boolean
 }){
-//const selectedAttrItems = Array.from(prettyAttrs.entries()).map(
-//  (entry) => {return {label: entry[1], value: entry[0]}}
-//);
-
-//const selectedPlaylistItems = Array.from(playlists.getPlaylists().map(
-//  (playlist) => {return {label: playlist.title, value: playlist.id}}
-//));
-//selectedPlaylistItems.unshift(
-//  {
-//    label: "All Songs",
-//    value: " "
-//  }
-//)
-
+  const [addComposerExpanded, setAddComposerExpanded] = useState(false);
   return(
-  <View>
-    <View style={{flexDirection: 'row', borderBottomWidth:1}}>
-      <View style={{flex:1}}>
-        <TextInput
-          style={{backgroundColor: "#222"}}
-          placeholder={"Enter your composer here"}
-          placeholderTextColor={"white"}
-          onChangeText={(text) => {headerInputStates.setSearch(text)}}
-        />
+    <View>
+      <View style={{flexDirection: 'row', borderBottomWidth:1, backgroundColor: "#222"}}>
+        <View style={{flex:1}}>
+          <TextInput
+            placeholder={"Enter your composer here"}
+            placeholderTextColor={"white"}
+            onChangeText={(text) => {headerInputStates.setSearch(text)}}
+          />
+          <Button onPress={() => setAddComposerExpanded(!addComposerExpanded)}>
+            {
+              addComposerExpanded ?
+                <ButtonText>(Collapse)</ButtonText>
+                :
+                <ButtonText>Add Brand New Composer</ButtonText>
+            }
+          </Button>
+          {
+            addComposerExpanded &&
+              <BackgroundView>
+                {
+                  addComposerOptionFlag ?
+                    <View>
+                      <SubText>This search doesn't seem to match well with any composer you've entered before, or any composer from our database. You can add a new composer by pressing the button below.</SubText>
+                      <Button>
+                        <ButtonText>Add *Brand New* composer</ButtonText>
+                      </Button>
+                    </View>
+                    :
+                    <View>
+                      <SubText>You have very similar search results. Tap and hold the button below to add a brand new composer ONLY if you're sure that it's a different composer from the composers shown in the results. (For instance, you might reasonably end up adding Bill Evans twice as there have been two Bill Evans's in jazz history.)</SubText>
+                      <Button>
+                        <ButtonText>Add *brand new* composer</ButtonText>
+                      </Button>
+                    </View>
+                }
+              </BackgroundView>
+          }
+        </View>
+        {
+          //<View style={{flex:1}}>
+          //  <RNPickerSelect
+          //    onValueChange={(value) => headerInputStates.setSelectedPlaylist(value)}
+          //    items={selectedPlaylistItems}
+          //    useNativeAndroidPickerStyle={false}
+          //    placeholder={{label: "Select a playlist", value: ""}}
+          //    style={{inputAndroid:
+          //      {
+          //      backgroundColor: 'transparent', color: 'white', fontSize: 20, fontWeight: "300",
+          //      }
+          //    }}
+          //  />
+          //</View>
+        }
       </View>
-    {
-    //<View style={{flex:1}}>
-    //  <RNPickerSelect
-    //    onValueChange={(value) => headerInputStates.setSelectedPlaylist(value)}
-    //    items={selectedPlaylistItems}
-    //    useNativeAndroidPickerStyle={false}
-    //    placeholder={{label: "Select a playlist", value: ""}}
-    //    style={{inputAndroid:
-    //      {
-    //      backgroundColor: 'transparent', color: 'white', fontSize: 20, fontWeight: "300",
-    //      }
-    //    }}
-    //  />
-    //</View>
-    }
     </View>
-  </View>
-);
+  );
 }
 export default function ComposerListDisplay({
   composers,
@@ -146,20 +140,28 @@ export default function ComposerListDisplay({
   useEffect(() => {bench.stop("Full render")}, [])
   const bench = reactotron.benchmark("ComposerListDisplay benchmark");
   const [listReversed, setListReversed] = useState(false);
-  const [selectedAttr, setSelectedAttr] = useState("title");
+  const [selectedAttr, setSelectedAttr] = useState("name");
   const [selectedPlaylist, setSelectedPlaylist] = useState("");
   const [search, setSearch] = useState("");
   const [confidenceVisible, setConfidenceVisible] = useState(false);
+  const [selectedComposers, setSelectedComposers] = useState([]);
+  const [addComposerOptionFlag, setAddComposerOptionFlag] = useState(true);
 
   let displayComposers = composers;
   const fuse = new Fuse(displayComposers, fuseOptions);
   if(search === ""){
     //composerSort(displayComposers, selectedAttr, listReversed);
   }else{
-    displayComposers = fuse.search(search)
-      .map(function(value, index){
-        return value.item;
-      });
+    const searchResults = fuse.search(search);
+    //If there's no composer in the results, or the top result has a low score, add option to add a new composer
+    if((!searchResults || !searchResults[0]) || (searchResults[0].score && searchResults[0].score < 0.6)){
+      setAddComposerOptionFlag(true);
+    }else{
+      setAddComposerOptionFlag(false);
+    }
+    displayComposers = searchResults.map(function(value, index){
+      return value.item;
+    });
   }
   bench.step("Pre-render")
 
@@ -180,15 +182,8 @@ export default function ComposerListDisplay({
       ListHeaderComponent={
         <ComposerListHeader
           headerInputStates={headerInputStates}
-          navigation={navigation}
-          playlists={playlists}
-          selectedAttr={selectedAttr}
+          addComposerOptionFlag={addComposerOptionFlag}
         />
-      }
-      ListEmptyComponent={
-        <View style={{backgroundColor: "black", flex: 1}}>
-          <SubText>Enter your composer above to search/add a composer.</SubText>
-        </View>
       }
       renderItem={({item, index, separators}) => (
         <TouchableHighlight
