@@ -67,6 +67,12 @@ export const editorAttrs = [
   ["soloConfidence", "Solo Confidence"],
   ["lyricsConfidence", "Lyrics Confidence"],
 ];
+export const composerEditorAttrs = [
+  ["name", "Name"],
+  ["birth", "Birthday"],
+  ["death", "Day of Death"],
+  ["bio", "Biography"]
+];
 export const miniEditorAttrs = new Map<string, string>([
   ["title", "Title"],
   ["formConfidence", "Form Confidence"],
@@ -74,6 +80,12 @@ export const miniEditorAttrs = new Map<string, string>([
   ["soloConfidence", "Solo Confidence"],
   ["lyricsConfidence", "Lyrics Confidence"],
   //  ["justPlayed", "'I Just Played This'"],
+])
+export const composerDefaults = new Map<string, any>([
+  ["name", ""],
+  ["birth", ""],
+  ["death", ""],
+  ["bio", ""],
 ])
 export const tuneDefaults = new Map<string, any>([
   ["title", "New song"],

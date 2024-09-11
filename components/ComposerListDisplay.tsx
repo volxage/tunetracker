@@ -61,6 +61,7 @@ type HeaderInputStates = {
   confidenceVisible: boolean
   setConfidenceVisible: Function
   setSearch: Function
+  navigation: any
 }
 function ComposerListHeader({
   headerInputStates,
@@ -84,7 +85,7 @@ function ComposerListHeader({
               addComposerExpanded ?
                 <ButtonText>(Collapse)</ButtonText>
                 :
-                <ButtonText>Add Brand New Composer</ButtonText>
+                <ButtonText>Can't find my composer below</ButtonText>
             }
           </Button>
           {
@@ -94,7 +95,9 @@ function ComposerListHeader({
                   addComposerOptionFlag ?
                     <View>
                       <SubText>This search doesn't seem to match well with any composer you've entered before, or any composer from our database. You can add a new composer by pressing the button below.</SubText>
-                      <Button>
+                      <Button
+                        onPress={() => headerInputStates.navigation.navigate("ComposerEditor")}
+                      >
                         <ButtonText>Add *Brand New* composer</ButtonText>
                       </Button>
                     </View>
@@ -173,6 +176,7 @@ export default function ComposerListDisplay({
     setConfidenceVisible: setConfidenceVisible,
     setSearch: setSearch,
     setSelectedAttr: setSelectedAttr,
+    navigation: navigation
   }
   return (
     <FlatList

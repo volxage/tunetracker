@@ -1,3 +1,4 @@
+
 // Copyright 2024 Jonathan Hilliard
 
 import React, {isValidElement, useEffect, useReducer, useState} from 'react';
@@ -17,62 +18,61 @@ import {
 import TypeField from './TypeField.tsx';
 import SongsList from '../SongsList.tsx';
 import Playlists from '../Playlists.tsx';
-import {tune_draft, standard, playlist, tuneDefaults, editorAttrs, composerEditorAttrs} from '../types.tsx';
+import {tune_draft, standard, playlist, composerDefaults} from '../types.tsx';
 import reactotron from 'reactotron-react-native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Importer from './Importer.tsx';
 import {BackHandler} from 'react-native';
-import Compare from './Compare.tsx';
 import OnlineDB from '../OnlineDB.tsx';
 
 import {database} from '../index.js';
 import TuneModel from '../model/Tune.js';
 import ComposerListDisplay from './ComposerListDisplay.tsx';
-import ComposerEditor from './ComposerEditor.tsx';
+import Composer from '../model/Composer.js';
 
 function reducer(state: any, action: any){
   switch(action.type){
     case 'update_attr':
     {
-      const tuneCopy = JSON.parse(JSON.stringify(state["currentTune"]));
+      const tuneCopy = JSON.parse(JSON.stringify(state["currentComposer"]));
       tuneCopy[action["attr"]] = action["value"];
-      return {currentTune: tuneCopy};
+      return {currentComposer: tuneCopy};
     }
     case 'set_to_selected':
     {
       const tune: tune_draft = {}
-      if(action["selectedTune"] instanceof TuneModel){
-        for(let attr of tuneDefaults){
-          let key = attr[0] as keyof TuneModel;
-          if(key in action["selectedTune"]
-            && typeof action["selectedTune"][key] !== "undefined"
-            && action["selectedTune"][key] !== null
+      if(action["selectedComposer"] instanceof Composer){
+        for(let attr of composerDefaults){
+          let key = attr[0] as keyof Composer;
+          if(key in action["selectedComposer"]
+            && typeof action["selectedComposer"][key] !== "undefined"
+            && action["selectedComposer"][key] !== null
           ){
-            tune[key as keyof tune_draft] = action["selectedTune"][key as keyof TuneModel]
+            tune[key as keyof tune_draft] = action["selectedComposer"][key as keyof Composer]
           }else{
             tune[key as keyof tune_draft] = attr[1]
           }
         }
       }else{
-        for(let attr of tuneDefaults){
-          let key = attr[0] as keyof tune_draft;
-          if(key in action["selectedTune"] && typeof action["selectedTune"][key] !== "undefined"){
-            tune[key as keyof tune_draft] = action["selectedTune"][key as keyof tune_draft]
+        for(let attr of composerDefaults){
+          let key = attr[0] as keyof Composer;
+          if(key in action["selectedComposer"] && typeof action["selectedComposer"][key] !== "undefined"){
+            tune[key as keyof tune_draft] = action["selectedComposer"][key as keyof Composer]
           }else{
             tune[key as keyof tune_draft] = attr[1]
           }
         }
-        //tune.dbId = action["selectedTune"]["id"]
+        //tune.dbId = action["selectedComposer"]["id"]
       }
-      return {currentTune: tune};
+      return {currentComposer: tune};
     }
   }
 }
 
-export default function Editor({
+export default function ComposerEditor({
   prettyAttrs, 
   navigation,
-  selectedTune,
+  selectedComposer,
   songsList,
   playlists,
   newTune,
@@ -80,23 +80,23 @@ export default function Editor({
 }: {
   prettyAttrs: Array<[string, string]>,
   navigation: any, //TODO: Find type of "navigation"
-  selectedTune: TuneModel | tune_draft,
+  selectedComposer: Composer,
   songsList: SongsList,
   playlists: Playlists,
   newTune: boolean,
   setNewTune: Function
 }): React.JSX.Element {
   //Intentional copy to allow cancelling of edits
-  //  const [currentTune, setCurrentTune] = useState()
-  console.log("Rerender Editor");
-  const [state, dispatch] = useReducer(reducer, {currentTune: {}});
+  //  const [currentComposer, setCurrentTune] = useState()
+  console.log("Rerender ComposerEditor");
+  const [state, dispatch] = useReducer(reducer, {currentComposer: {}});
   const [tunePlaylists, setTunePlaylists]: [playlist[], Function] = useState([])
   const [originalPlaylistsSet, setOriginalPlaylistsSet]: [Set<playlist>, Function] = useState(new Set())
   const bench = reactotron.benchmark("Editor benchmark");
   const Stack = createNativeStackNavigator();
 
   useEffect(() => {
-    dispatch({type: "set_to_selected", selectedTune: selectedTune});
+    dispatch({type: "set_to_selected", selectedComposer: selectedComposer});
     BackHandler.addEventListener('hardwareBackPress', navigation.goBack)
     return () => {
       BackHandler.removeEventListener('hardwareBackPress', navigation.goBack)
@@ -105,8 +105,8 @@ export default function Editor({
 
   useEffect(() => {
     //If there's no id, it's impossible that the tune has been assigned playlists already.
-    if (typeof selectedTune.id !== "undefined"){ 
-      const tmpTunesPlaylist = playlists.getTunePlaylists(selectedTune.id);
+    if (typeof selectedComposer.id !== "undefined"){ 
+      const tmpTunesPlaylist = playlists.getTunePlaylists(selectedComposer.id);
       setTunePlaylists(tmpTunesPlaylist);
       setOriginalPlaylistsSet(new Set(tmpTunesPlaylist));
     }
@@ -124,14 +124,14 @@ export default function Editor({
             data={prettyAttrs}
             renderItem={({item, index, separators}) => (
               <View>
-                { (item[0] !== "lyricsConfidence" || state["currentTune"]["hasLyrics"]) &&
+                { (item[0] !== "lyricsConfidence" || state["currentComposer"]["hasLyrics"]) &&
                 <TouchableHighlight
                   key={item[0]}
                   onShowUnderlay={separators.highlight}
                   onHideUnderlay={separators.unhighlight}
                 >
                   <TypeField
-                    attr={state["currentTune"][item[0]]}
+                    attr={state["currentComposer"][item[0]]}
                     attrKey={item[0]}
                     attrName={item[1]}
                     handleSetCurrentTune={handleSetCurrentTune}
@@ -154,7 +154,7 @@ export default function Editor({
                 <DeleteButton
                   onLongPress={() => {
                     database.write(async () => {
-                      (selectedTune as TuneModel).destroyPermanently();
+                      (selectedComposer as Composer).destroyPermanently();
                     });
                     navigation.goBack();
                     songsList.rereadDb();
@@ -174,7 +174,7 @@ export default function Editor({
                   onPress={() => {
                     //Save to existing tune
 
-                 ///const tune_id = songsList.replaceSelectedTune(selectedTune, currentTune);
+                 ///const tune_id = songsList.replaceSelectedTune(selectedComposer, currentComposer);
                  ///const newPlaylistSet = new Set(tunePlaylists);
                  ///const removedPlaylists = [...originalPlaylistsSet]
                  ///  .filter(oldPlaylist => !newPlaylistSet.has(oldPlaylist));
@@ -190,7 +190,7 @@ export default function Editor({
                  //   playlists.removeTune(tune_id, playlist.id)
                  // }
                     console.log("Saving to existing tune");
-                    (selectedTune as TuneModel).replace(state["currentTune"]).then( () => {
+                    (selectedComposer as Composer).replace(state["currentComposer"]).then( () => {
                       songsList.rereadDb();
                       navigation.goBack();
                     });
@@ -204,7 +204,7 @@ export default function Editor({
                   onPress={() => {
                     //Save to new tune
                     //TODO: Implement playlists
-                  //const tune_id = songsList.addNewTune(currentTune);
+                  //const tune_id = songsList.addNewTune(currentComposer);
                   //const newPlaylistSet = new Set(tunePlaylists);
                   //const addedPlaylists = [...newPlaylistSet]
                   //  .filter(newPlaylist => !originalPlaylistsSet.has(newPlaylist));
@@ -214,7 +214,7 @@ export default function Editor({
                   //}
                     console.log("Saving to new tune");
                     database.write(async () => {database.get('tunes').create(tn => {
-                      (tn as TuneModel).replace(state["currentTune"])
+                      (tn as TuneModel).replace(state["currentComposer"])
                     }).then(resultingModel => {
                       console.log(resultingModel);
                       songsList.rereadDb();
@@ -253,35 +253,24 @@ export default function Editor({
 </Stack.Screen>
 <Stack.Screen name="Compare">
   {props =>
+  <View></View>
     //Logically, this screen will never appear if there is no standard, so we can guarantee that getStandardById will return a standard.
-    <Compare
-      currentTune={state["currentTune"]}
-      currentStandard={(state["currentTune"].dbId ? OnlineDB.getStandardById(state["currentTune"].dbId) : null) as standard}
-      navigation={props.navigation}
-      handleSetCurrentTune={handleSetCurrentTune}
-    />
+  //<Compare
+  //  currentComposer={state["currentComposer"]}
+  //  onlineComposer={(state["currentComposer"].dbId ? OnlineDB.getStandardById(state["currentComposer"].dbId) : null) as standard}
+  //  navigation={props.navigation}
+  //  handleSetCurrentTune={handleSetCurrentTune}
+   //>
   }
 </Stack.Screen>
 <Stack.Screen name='ComposerSelector'>
   {props =>
+    //Logically, this screen will never appear if there is no standard, so we can guarantee that getStandardById will return a standard.
     <ComposerListDisplay
       composers={songsList.composerList}
       navigation={navigation}
       playlists={[]}
     />
-  }
-</Stack.Screen>
-<Stack.Screen name='ComposerEditor'>
-  {props =>
-    <ComposerEditor
-          selectedComposer={{}}
-          prettyAttrs={composerEditorAttrs}
-          songsList={songsList}
-          playlists={playlists}
-          newTune={newTune}
-          setNewTune={setNewTune}
-          navigation={props.navigation}
-        />
   }
 </Stack.Screen>
 </Stack.Navigator>

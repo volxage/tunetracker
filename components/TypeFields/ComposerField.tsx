@@ -49,7 +49,7 @@ export default function ComposerField({
           <Button
             onPress={() => {navigation.navigate("ComposerSelector")}}
           >
-          <ButtonText>YO MAMA</ButtonText>
+          <ButtonText>Select Composers</ButtonText>
           </Button>
         </View>
       }
