@@ -89,7 +89,7 @@ function TypeField({
   attr,
   attrKey,
   attrName,
-  handleSetCurrentTune,
+  handleSetCurrentItem,
   playlists,
   tunePlaylists,
   setTunePlaylists,
@@ -98,7 +98,7 @@ function TypeField({
   attr: unknown,
   attrKey: keyof (tune_draft | composer_draft),
   attrName: string,
-  handleSetCurrentTune: Function,
+  handleSetCurrentItem: Function,
   playlists: Playlists,
   tunePlaylists: playlist[],
   setTunePlaylists: Function,
@@ -168,7 +168,7 @@ function TypeField({
       <View style={{backgroundColor: 'black', padding: 8}}>
         <Title>{attrName.toUpperCase()}</Title>
         <TextInput defaultValue={attr} placeholderTextColor={"grey"}
-          onChangeText={(text) => handleSetCurrentTune(attrKey, text)}
+          onChangeText={(text) => handleSetCurrentItem(attrKey, text)}
         />
       </View>
     );
@@ -187,7 +187,7 @@ function TypeField({
           maximumValue={100}
           step={1}
           value={attr as number}
-          onSlidingComplete={(value) => {handleSetCurrentTune(attrKey, value)}}
+          onSlidingComplete={(value) => {handleSetCurrentItem(attrKey, value)}}
           thumbImage={icon}
           style={{marginVertical: 20}}
           minimumTrackTintColor='cadetblue'
@@ -203,7 +203,7 @@ function TypeField({
         <Title>{attrName.toUpperCase()}</Title>
         <View style={{flexDirection: "row"}}>
           <Switch
-            onValueChange={(value) => {setBool(value); handleSetCurrentTune(attrKey, value)}}
+            onValueChange={(value) => {setBool(value); handleSetCurrentItem(attrKey, value)}}
             value={bool}
           />
         </View>
@@ -217,7 +217,7 @@ function TypeField({
       const newArrAttr = (attr as string[]).map((c, i) => {
         return i === index ? value : c;
       });
-      handleSetCurrentTune(attrKey, newArrAttr);
+      handleSetCurrentItem(attrKey, newArrAttr);
       //setarrAttr(newArrAttr); handeSetCurrentTune causes a rerender, indirectly updating arrAttr.
     }
     return(
@@ -227,7 +227,7 @@ function TypeField({
             <Title>{attrName.toUpperCase()}</Title>
           </View>
           <View style={{alignContent: 'flex-end', flex: 1}}>
-            <Button onPress={() => handleSetCurrentTune(attrKey, (attr as string[]).concat(["New item"]))}>
+            <Button onPress={() => handleSetCurrentItem(attrKey, (attr as string[]).concat(["New item"]))}>
               <ButtonText><Icon name="plus" size={30}/></ButtonText>
             </Button>
           </View>
@@ -245,7 +245,7 @@ function TypeField({
               </View>
               <View style={{flex:1, alignContent: 'flex-end'}}>
                 <DeleteButton onPress={
-                    () => handleSetCurrentTune(attrKey, (attr as string[]).filter((a, i) => i !== index))
+                    () => handleSetCurrentItem(attrKey, (attr as string[]).filter((a, i) => i !== index))
                 }>
                   <ButtonText><Icon name="close" size={30}/></ButtonText>
                 </DeleteButton>

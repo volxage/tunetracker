@@ -112,7 +112,7 @@ export default function ComposerEditor({
     }
     bench.stop("Post-render")
   }, [])
-  function handleSetCurrentTune(attr_key: keyof composer_draft, value: any){
+  function handleSetCurrentComposer(attr_key: keyof composer_draft, value: any){
     dispatch({type: 'update_attr', attr: attr_key, value: value});
   }
   bench.step("Prerender")
@@ -134,7 +134,7 @@ export default function ComposerEditor({
                     attr={state["currentComposer"][item[0]]}
                     attrKey={item[0]}
                     attrName={item[1]}
-                    handleSetCurrentTune={handleSetCurrentTune}
+                    handleSetCurrentItem={handleSetCurrentComposer}
                     playlists={playlists}
                     tunePlaylists={tunePlaylists}
                     setTunePlaylists={setTunePlaylists}
@@ -244,7 +244,7 @@ export default function ComposerEditor({
       navigation={props.navigation}
       importingId={false}
       importFn={function(stand: standard, mini: boolean){
-        handleSetCurrentTune("dbId", stand.id)
+        handleSetCurrentComposer("dbId", stand.id)
         props.navigation.goBack();
       }}/>
     </SafeAreaView>
@@ -258,7 +258,7 @@ export default function ComposerEditor({
   //  currentComposer={state["currentComposer"]}
   //  onlineComposer={(state["currentComposer"].dbId ? OnlineDB.getStandardById(state["currentComposer"].dbId) : null) as standard}
   //  navigation={props.navigation}
-  //  handleSetCurrentTune={handleSetCurrentTune}
+  //  handleSetCurrentItem={handleSetCurrentItem}
    //>
   }
 </Stack.Screen>
