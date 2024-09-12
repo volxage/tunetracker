@@ -22,6 +22,9 @@ export type tune_draft = {
   "year"?: number
   //  "playedAt"?: string[]
 }
+export type composer_draft = {
+
+}
 export type composer = {
   "name": string
   "bio": string
@@ -86,6 +89,7 @@ export const composerDefaults = new Map<string, any>([
   ["birth", ""],
   ["death", ""],
   ["bio", ""],
+  ["dbId", 0]
 ])
 export const tuneDefaults = new Map<string, any>([
   ["title", "New song"],

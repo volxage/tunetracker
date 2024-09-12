@@ -40,6 +40,7 @@ export default appSchema({
         {name: 'birth', type: 'number', isOptional: true},
         {name: 'death', type: 'number', isOptional: true},
         {name: 'bio', type: 'string', isOptional: true},
+        {name: 'db_id', type: 'number', isOptional: true},
       ]
     }),
     tableSchema({

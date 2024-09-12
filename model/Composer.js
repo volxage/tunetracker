@@ -1,6 +1,6 @@
 //Copyright 2024 Jonathan Hilliard
 import { Model } from '@nozbe/watermelondb'
-import { text, lazy, date} from '@nozbe/watermelondb/decorators'
+import { text, lazy, date, field} from '@nozbe/watermelondb/decorators'
 
 export default class Composer extends Model {
   static table = 'composers';
@@ -18,4 +18,5 @@ export default class Composer extends Model {
   @date('birth') birth
   @date('death') death
   @text('bio') bio
+  @field('db_id') dbId
 }
