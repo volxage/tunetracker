@@ -34,9 +34,9 @@ function reducer(state: any, action: any){
   switch(action.type){
     case 'update_attr':
     {
-      const tuneCopy = JSON.parse(JSON.stringify(state["currentComposer"]));
-      tuneCopy[action["attr"]] = action["value"];
-      return {currentComposer: tuneCopy};
+      const compCopy = JSON.parse(JSON.stringify(state["currentComposer"]));
+      compCopy[action["attr"]] = action["value"];
+      return {currentComposer: compCopy};
     }
     case 'set_to_selected':
     {
@@ -64,7 +64,7 @@ function reducer(state: any, action: any){
         }
         //tune.dbId = action["selectedComposer"]["id"]
       }
-      return {currentComposer: tune};
+      return {currentComposer: cd};
     }
   }
 }

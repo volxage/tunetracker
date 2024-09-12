@@ -1,6 +1,6 @@
 //Copyright 2024 Jonathan Hilliard
 import { Model } from '@nozbe/watermelondb'
-import { text, lazy, date, field} from '@nozbe/watermelondb/decorators'
+import { text, lazy, date, field, writer} from '@nozbe/watermelondb/decorators'
 import {composerDefaults} from '../types';
 
 export default class Composer extends Model {
