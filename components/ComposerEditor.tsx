@@ -18,7 +18,7 @@ import {
 import TypeField from './TypeField.tsx';
 import SongsList from '../SongsList.tsx';
 import Playlists from '../Playlists.tsx';
-import {tune_draft, standard, playlist, composerDefaults} from '../types.tsx';
+import {composer_draft, standard, playlist, composerDefaults} from '../types.tsx';
 import reactotron from 'reactotron-react-native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Importer from './Importer.tsx';
@@ -40,7 +40,7 @@ function reducer(state: any, action: any){
     }
     case 'set_to_selected':
     {
-      const tune: tune_draft = {}
+      const cd: composer_draft = {}
       if(action["selectedComposer"] instanceof Composer){
         for(let attr of composerDefaults){
           let key = attr[0] as keyof Composer;
@@ -48,18 +48,18 @@ function reducer(state: any, action: any){
             && typeof action["selectedComposer"][key] !== "undefined"
             && action["selectedComposer"][key] !== null
           ){
-            tune[key as keyof tune_draft] = action["selectedComposer"][key as keyof Composer]
+            cd[key as keyof composer_draft] = action["selectedComposer"][key as keyof Composer]
           }else{
-            tune[key as keyof tune_draft] = attr[1]
+            cd[key as keyof composer_draft] = attr[1]
           }
         }
       }else{
         for(let attr of composerDefaults){
           let key = attr[0] as keyof Composer;
           if(key in action["selectedComposer"] && typeof action["selectedComposer"][key] !== "undefined"){
-            tune[key as keyof tune_draft] = action["selectedComposer"][key as keyof Composer]
+            cd[key as keyof composer_draft] = action["selectedComposer"][key as keyof Composer]
           }else{
-            tune[key as keyof tune_draft] = attr[1]
+            cd[key as keyof composer_draft] = attr[1]
           }
         }
         //tune.dbId = action["selectedComposer"]["id"]
@@ -75,7 +75,7 @@ export default function ComposerEditor({
   selectedComposer,
   songsList,
   playlists,
-  newTune,
+  newComposer,
   setNewTune
 }: {
   prettyAttrs: Array<[string, string]>,
@@ -83,7 +83,7 @@ export default function ComposerEditor({
   selectedComposer: Composer,
   songsList: SongsList,
   playlists: Playlists,
-  newTune: boolean,
+  newComposer: boolean,
   setNewTune: Function
 }): React.JSX.Element {
   //Intentional copy to allow cancelling of edits
@@ -112,7 +112,7 @@ export default function ComposerEditor({
     }
     bench.stop("Post-render")
   }, [])
-  function handleSetCurrentTune(attr_key: keyof tune_draft, value: any){
+  function handleSetCurrentTune(attr_key: keyof composer_draft, value: any){
     dispatch({type: 'update_attr', attr: attr_key, value: value});
   }
   bench.step("Prerender")
@@ -150,7 +150,7 @@ export default function ComposerEditor({
                   Press and hold if you're sure
                 </SubText>
               {
-                !newTune && 
+                !newComposer && 
                 <DeleteButton
                   onLongPress={() => {
                     database.write(async () => {
@@ -168,8 +168,7 @@ export default function ComposerEditor({
                     {
                     }
               {
-                // newTune ? save new tune : update existing tune
-                !newTune &&
+                !newComposer &&
                 <Button
                   onPress={() => {
                     //Save to existing tune
@@ -199,7 +198,7 @@ export default function ComposerEditor({
               </Button>
             }
               {
-                newTune &&
+                newComposer &&
                 <Button
                   onPress={() => {
                     //Save to new tune

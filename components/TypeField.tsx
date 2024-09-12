@@ -18,7 +18,7 @@ import {
   Switch,
   View,
 } from 'react-native';
-import { playlist, tune_draft } from '../types.tsx';
+import { composer_draft, playlist, tune_draft } from '../types.tsx';
 import Playlists from '../Playlists.tsx';
 import OnlineDB from '../OnlineDB.tsx';
 import DbConnection from './TypeFields/DbConnection.tsx';
@@ -96,7 +96,7 @@ function TypeField({
   navigation
 }: {
   attr: unknown,
-  attrKey: keyof tune_draft,
+  attrKey: keyof (tune_draft | composer_draft),
   attrName: string,
   handleSetCurrentTune: Function,
   playlists: Playlists,
@@ -104,12 +104,13 @@ function TypeField({
   setTunePlaylists: Function,
   navigation: any
 }){
-  if (attrKey === "dbId" as keyof tune_draft){
+  type keyOfEitherDraft = keyof (tune_draft | composer_draft)
+  if (attrKey === "dbId" as keyOfEitherDraft){
     return(
       <DbConnection attr={attr} navigation={navigation} />
     );
   }
-  else if (attrKey === "composers" as keyof tune_draft){
+  else if (attrKey === "composers" as keyOfEitherDraft){
     //Needs:
     //Local Composers
     //Online composers
@@ -121,7 +122,7 @@ function TypeField({
       <ComposerField attr={attr} navigation={navigation} />
     );
   }
-  else if (attrKey === "playlists" as keyof tune_draft){ //Playlists are NOT an attribute of a tune
+  else if (attrKey === "playlists" as keyOfEitherDraft){ //Playlists are NOT an attribute of a tune
     const [newPlaylistOpen, setNewPlaylistOpen] = useState(false)
     //TODO:
     // Delete Button
