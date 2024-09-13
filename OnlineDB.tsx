@@ -5,6 +5,9 @@ let composers: composer[] = [];
 let status = "WAITING"
 
 async function fetchComposers(counter=0){
+    if(counter > 6){
+      return [];
+    }
     fetch("https://api.jhilla.org/tunetracker/composers", {
       method: 'GET',
       headers: {
@@ -37,6 +40,9 @@ async function fetchComposers(counter=0){
     });
 }
 async function fetchTunes(counter=0){
+    if(counter > 6){
+      return [];
+    }
   fetch("https://api.jhilla.org/tunetracker/tunes", {
     method: 'GET',
     headers: {
