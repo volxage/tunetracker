@@ -17,7 +17,7 @@ import {
 import TypeField from './TypeField.tsx';
 import SongsList from '../SongsList.tsx';
 import Playlists from '../Playlists.tsx';
-import {tune_draft, standard, playlist, tuneDefaults, editorAttrs, composerEditorAttrs} from '../types.tsx';
+import {tune_draft, standard, playlist, tuneDefaults, editorAttrs, composerEditorAttrs, composer} from '../types.tsx';
 import reactotron from 'reactotron-react-native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Importer from './Importer.tsx';
@@ -29,6 +29,7 @@ import {database} from '../index.js';
 import TuneModel from '../model/Tune.js';
 import ComposerListDisplay from './ComposerListDisplay.tsx';
 import ComposerEditor from './ComposerEditor.tsx';
+import Composer from '../model/Composer.js';
 
 function reducer(state: any, action: any){
   switch(action.type){
@@ -265,7 +266,7 @@ export default function Editor({
 <Stack.Screen name='ComposerSelector'>
   {props =>
     <ComposerListDisplay
-      composers={songsList.composerList}
+      composers={(songsList.composerList as Array<Composer | composer>).concat(OnlineDB.getComposers())}
       navigation={navigation}
       playlists={[]}
     />

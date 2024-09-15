@@ -83,6 +83,9 @@ export default {
   getStandards() {
     return standards;
   },
+  getComposers() {
+    return composers;
+  },
   getStandardById(id: number) {
     //TODO: Replace with API call
     return standards.find((stand: standard) => stand.id === id);

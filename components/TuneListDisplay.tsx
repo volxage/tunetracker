@@ -286,7 +286,6 @@ export default function TuneListDisplay({
   return (
     <FlatList
       data={displaySongs}
-      //TODO: fuse.search needs to be interpreted as an array for FlatList to understand!
       extraData={selectedAttr}
       ListHeaderComponent={
         <TuneListHeader 

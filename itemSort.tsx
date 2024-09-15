@@ -1,8 +1,8 @@
 // Copyright 2024 Jonathan Hilliard
 import Composer from "./model/Composer";
 import Tune from "./model/Tune";
-import { standard } from "./types";
-function itemSort(songs: Array<Tune | standard | Composer>, selected: string, reversed: boolean){
+import { composer, standard } from "./types";
+function itemSort(songs: Array<Tune | standard | Composer | composer>, selected: string, reversed: boolean){
   let reverse_null_multiplier = 1;
   let reversed_multiplier = reversed ? -1 : 1;
   if (selected.endsWith("confidence") || selected == "playthroughs"){

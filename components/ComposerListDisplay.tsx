@@ -17,7 +17,7 @@ import {
   ConfidenceBarView,
   BackgroundView
 } from '../Style.tsx'
-import tuneSort from '../tuneSort.tsx'
+import itemSort from '../itemSort.tsx'
 import Playlists from '../Playlists.tsx'
 import RNPickerSelect from 'react-native-picker-select';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
@@ -26,7 +26,7 @@ import Fuse from 'fuse.js';
 
 const fuseOptions = { // For finetuning the search algorithm
 	// isCaseSensitive: false,
-	// includeScore: false,
+	includeScore: true,
 	// shouldSort: true,
 	// includeMatches: false,
 	// findAllMatches: false,
@@ -39,11 +39,11 @@ const fuseOptions = { // For finetuning the search algorithm
 	// ignoreFieldNorm: false,
 	// fieldNormWeight: 1,
 	keys: [
-		"title",
-		"composers"
+		"name",
+//		"composers"
 	]
 };
-import {playlist, tune_draft } from '../types.tsx';
+import {composer, playlist, tune_draft } from '../types.tsx';
 import Slider from '@react-native-community/slider';
 import reactotron from 'reactotron-react-native';
 import Tune from '../model/Tune.js';
@@ -136,7 +136,7 @@ export default function ComposerListDisplay({
   navigation,
   playlists,
 }: {
-  composers: Array<Composer>,
+  composers: Array<Composer | composer>,
   navigation: any,
   playlists: Playlists,
 }){
@@ -149,24 +149,28 @@ export default function ComposerListDisplay({
   const [confidenceVisible, setConfidenceVisible] = useState(false);
   const [selectedComposers, setSelectedComposers] = useState([]);
   const [addComposerOptionFlag, setAddComposerOptionFlag] = useState(true);
+  let suggestAddComposer = false;
 
   let displayComposers = composers;
   const fuse = new Fuse(displayComposers, fuseOptions);
   if(search === ""){
-    //composerSort(displayComposers, selectedAttr, listReversed);
+    itemSort(displayComposers, selectedAttr, listReversed);
   }else{
     const searchResults = fuse.search(search);
     //If there's no composer in the results, or the top result has a low score, add option to add a new composer
-    if((!searchResults || !searchResults[0]) || (searchResults[0].score && searchResults[0].score < 0.6)){
-      setAddComposerOptionFlag(true);
-    }else{
-      setAddComposerOptionFlag(false);
+    suggestAddComposer = false;
+    if(!searchResults || !searchResults[0]){
+      suggestAddComposer = true;
+    }
+    else if(searchResults[0].score && searchResults[0].score > 0.6){
+      suggestAddComposer = true;
     }
     displayComposers = searchResults.map(function(value, index){
       return value.item;
     });
   }
   bench.step("Pre-render")
+  ""
 
   const headerInputStates = 
   {
@@ -181,12 +185,11 @@ export default function ComposerListDisplay({
   return (
     <FlatList
       data={displayComposers}
-      //TODO: fuse.search needs to be interpreted as an array for FlatList to understand!
       extraData={selectedAttr}
       ListHeaderComponent={
         <ComposerListHeader
           headerInputStates={headerInputStates}
-          addComposerOptionFlag={addComposerOptionFlag}
+          addComposerOptionFlag={suggestAddComposer}
         />
       }
       renderItem={({item, index, separators}) => (
@@ -196,6 +199,7 @@ export default function ComposerListDisplay({
           onHideUnderlay={separators.unhighlight}>
           <View style={{backgroundColor: 'black', padding: 8}}>
             <Text>{item.name}</Text>
+            <SubText>{(item.birth ? "B: " + item.birth.split("T")[0] : "B: none") + ", " + (item.death ? "D: " + item.death.split("T")[0]  : "D: none")}</SubText>
           {typeof bench.step("Item render") === "undefined"}
           </View>
         </TouchableHighlight>
