@@ -11,12 +11,14 @@ import Composer from './model/Composer';
 //TODO: Move functions to TuneModel
 class SongsList{
   readonly songsList: TuneModel[];
-  composerList: Composer[];
   readonly setSongs: Function;
-  constructor(songsList: TuneModel[], setSongs: Function){
+  readonly composersList: Composer[];
+  readonly setComposers: Function;
+  constructor(songsList: TuneModel[], setSongs: Function, composers: Composer[], setComposers: Function){
     this.songsList = songsList;
     this.setSongs = setSongs;
-    this.composerList = [];
+    this.composersList = composers;
+    this.setComposers = setComposers;
   }
   rereadDb(){
   //RNFS.readFile(songsFilePath)
@@ -33,7 +35,7 @@ class SongsList{
       this.setSongs(tunes);
     });
     database.get("composers").query().fetch().then(composers => {
-      this.composerList = composers as Composer[];
+      this.setComposers(composers as Composer[]);
     });
   }
   replaceSelectedTune(oldTune:TuneModel, newTune:TuneModel){
@@ -77,6 +79,7 @@ class SongsList{
   }
   updateSongs(){
     database.get('tunes').query().fetch().then(result => this.setSongs(result));
+    database.get('composers').query().fetch().then(result => this.setComposers(result as Composer[]));
   }
 }
 export default SongsList

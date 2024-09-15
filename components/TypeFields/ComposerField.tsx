@@ -31,25 +31,13 @@ export default function ComposerField({
   }
   return(
     <View>
-      <Title></Title>
-      <Button
-        onPress={() => {setComposerExpanded(!composerExpanded)}}
-        style={{backgroundColor: "#222"}}
-      >
-        <ButtonText>
-          <Icon
-            name={composerExpanded ? "earth-minus" : "earth-plus"}
-            size={30}
-          />
-        </ButtonText>
-      </Button>
+      <Title>COMPOSERS</Title>
       {
-        composerExpanded &&
         <View>
           <Button
             onPress={() => {navigation.navigate("ComposerSelector")}}
           >
-          <ButtonText>Select Composers</ButtonText>
+            <ButtonText>Select Composers</ButtonText>
           </Button>
         </View>
       }

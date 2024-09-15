@@ -27,7 +27,6 @@ import OnlineDB from '../OnlineDB.tsx';
 
 import {database} from '../index.js';
 import TuneModel from '../model/Tune.js';
-import ComposerListDisplay from './ComposerListDisplay.tsx';
 import Composer from '../model/Composer.js';
 
 function reducer(state: any, action: any){
@@ -76,15 +75,15 @@ export default function ComposerEditor({
   songsList,
   playlists,
   newComposer,
-  setNewTune
+  setNewComposer
 }: {
   prettyAttrs: Array<[string, string]>,
   navigation: any, //TODO: Find type of "navigation"
-  selectedComposer: Composer,
+  selectedComposer: Composer | composer_draft,
   songsList: SongsList,
   playlists: Playlists,
   newComposer: boolean,
-  setNewTune: Function
+  setNewComposer: Function
 }): React.JSX.Element {
   //Intentional copy to allow cancelling of edits
   //  const [currentComposer, setCurrentTune] = useState()
@@ -212,14 +211,14 @@ export default function ComposerEditor({
                   //  playlists.addTune(tune_id, playlist.id)
                   //}
                     console.log("Saving to new tune");
-                    database.write(async () => {database.get('tunes').create(tn => {
-                      (tn as TuneModel).replace(state["currentComposer"])
+                    database.write(async () => {database.get('composers').create(comp => {
+                      (comp as Composer).replace(state["currentComposer"])
                     }).then(resultingModel => {
                       console.log(resultingModel);
                       songsList.rereadDb();
                     })});
                     navigation.goBack();
-                    setNewTune(false);
+                    setNewComposer(false);
                   }}
                 ><ButtonText>Save</ButtonText>
               </Button>
@@ -228,7 +227,7 @@ export default function ComposerEditor({
           </View>
           <View style={{flex: 1}}>
             <DeleteButton
-              onPress={() => {navigation.goBack(); songsList.rereadDb; setNewTune(false);}}
+              onPress={() => {navigation.goBack(); songsList.rereadDb; setNewComposer(false);}}
             ><ButtonText>Cancel Edit</ButtonText></DeleteButton>
         </View>
       </View>
@@ -260,16 +259,6 @@ export default function ComposerEditor({
   //  navigation={props.navigation}
   //  handleSetCurrentItem={handleSetCurrentItem}
    //>
-  }
-</Stack.Screen>
-<Stack.Screen name='ComposerSelector'>
-  {props =>
-    //Logically, this screen will never appear if there is no standard, so we can guarantee that getStandardById will return a standard.
-    <ComposerListDisplay
-      composers={songsList.composerList}
-      navigation={navigation}
-      playlists={[]}
-    />
   }
 </Stack.Screen>
 </Stack.Navigator>

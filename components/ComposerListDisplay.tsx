@@ -6,6 +6,7 @@ import {
   Switch,
   View,
   TouchableHighlight,
+  SafeAreaView,
 } from 'react-native';
 
 import {
@@ -43,11 +44,15 @@ const fuseOptions = { // For finetuning the search algorithm
 //		"composers"
 	]
 };
-import {composer, playlist, tune_draft } from '../types.tsx';
+import {composer, composer_draft, composerEditorAttrs, playlist, tune_draft } from '../types.tsx';
 import Slider from '@react-native-community/slider';
 import reactotron from 'reactotron-react-native';
 import Tune from '../model/Tune.js';
 import Composer from '../model/Composer.js';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import ComposerEditor from './ComposerEditor.tsx';
+import SongsList from '../SongsList.tsx';
+import {database} from '../index.js';
 function prettyPrint(object: unknown): string{
   if (typeof object == "string") return object as string;
   if (typeof object == "number") return JSON.stringify(object);
@@ -62,6 +67,7 @@ type HeaderInputStates = {
   setConfidenceVisible: Function
   setSearch: Function
   navigation: any
+  setNewComposer: Function
 }
 function ComposerListHeader({
   headerInputStates,
@@ -96,7 +102,7 @@ function ComposerListHeader({
                     <View>
                       <SubText>This search doesn't seem to match well with any composer you've entered before, or any composer from our database. You can add a new composer by pressing the button below.</SubText>
                       <Button
-                        onPress={() => headerInputStates.navigation.navigate("ComposerEditor")}
+                        onPress={() => {headerInputStates.setNewComposer(true); headerInputStates.navigation.navigate("ComposerEditor")}}
                       >
                         <ButtonText>Add *Brand New* composer</ButtonText>
                       </Button>
@@ -131,14 +137,42 @@ function ComposerListHeader({
     </View>
   );
 }
+
+function LocalityIndicators({
+  item
+}: {
+  item: Composer | composer_draft
+}){
+  if(item instanceof Composer){
+    if(item.dbId && item.dbId !== 0){
+      return(
+        <View style={{flexDirection: "row"}}>
+          <SubText><Icon name='database' size={24}></Icon></SubText>
+          <SubText><Icon name='account' size={24}></Icon></SubText>
+        </View>
+      );
+    }else{
+      return(
+        <SubText><Icon name='account' size={24}></Icon></SubText>
+      );
+    }
+  }else{
+    return(
+      <SubText><Icon name='database' size={24}></Icon></SubText>
+    );
+  }
+}
+
 export default function ComposerListDisplay({
   composers,
   navigation,
   playlists,
+  songsList
 }: {
   composers: Array<Composer | composer>,
   navigation: any,
   playlists: Playlists,
+  songsList: SongsList
 }){
   useEffect(() => {bench.stop("Full render")}, [])
   const bench = reactotron.benchmark("ComposerListDisplay benchmark");
@@ -148,11 +182,13 @@ export default function ComposerListDisplay({
   const [search, setSearch] = useState("");
   const [confidenceVisible, setConfidenceVisible] = useState(false);
   const [selectedComposers, setSelectedComposers] = useState([]);
-  const [addComposerOptionFlag, setAddComposerOptionFlag] = useState(true);
+  const [newComposer, setNewComposer] = useState(false);
   let suggestAddComposer = false;
 
   let displayComposers = composers;
+  console.log(displayComposers);
   const fuse = new Fuse(displayComposers, fuseOptions);
+  database.get('composers').query().fetch().then(result => console.log(result));
   if(search === ""){
     itemSort(displayComposers, selectedAttr, listReversed);
   }else{
@@ -170,7 +206,6 @@ export default function ComposerListDisplay({
     });
   }
   bench.step("Pre-render")
-  ""
 
   const headerInputStates = 
   {
@@ -180,44 +215,56 @@ export default function ComposerListDisplay({
     setConfidenceVisible: setConfidenceVisible,
     setSearch: setSearch,
     setSelectedAttr: setSelectedAttr,
-    navigation: navigation
+    navigation: navigation,
+    setNewComposer: setNewComposer
   }
+  const Stack = createNativeStackNavigator();
   return (
-    <FlatList
-      data={displayComposers}
-      extraData={selectedAttr}
-      ListHeaderComponent={
-        <ComposerListHeader
-          headerInputStates={headerInputStates}
-          addComposerOptionFlag={suggestAddComposer}
-        />
-      }
-      renderItem={({item, index, separators}) => (
-        <TouchableHighlight
-          key={item.name}
-          onShowUnderlay={separators.highlight}
-          onHideUnderlay={separators.unhighlight}>
-          <View style={{backgroundColor: 'black', padding: 8}}>
-            <Text>{item.name}</Text>
-            <SubText>{(item.birth ? "B: " + item.birth.split("T")[0] : "B: none") + ", " + (item.death ? "D: " + item.death.split("T")[0]  : "D: none")}</SubText>
-            {
-              (item instanceof Composer) ?
-                (
-                  <View>
-                      <SubText><Icon name='account' size={24}></Icon></SubText>
-                  (item.dbId && item.dbId !== 0) &&
-                      <SubText><Icon name='database' size={24}></Icon></SubText>
+    <Stack.Navigator screenOptions={{headerShown: false}}>
+      <Stack.Screen name={"ComposerListDisplay"} >
+        {props => 
+          <SafeAreaView>
+            <FlatList
+              data={displayComposers}
+              extraData={selectedAttr}
+              ListHeaderComponent={
+                <ComposerListHeader
+                  headerInputStates={headerInputStates}
+                  addComposerOptionFlag={suggestAddComposer}
+                />
+              }
+              renderItem={({item, index, separators}) => (
+                <TouchableHighlight
+                  key={item.name}
+                  onShowUnderlay={separators.highlight}
+                  onHideUnderlay={separators.unhighlight}>
+                  <View style={{backgroundColor: 'black', padding: 8}}>
+                    <Text>{item.name}</Text>
+                    <SubText>{(item.birth ? "B: " + item.birth.split("T")[0] : "B: none") + ", " + (item.death ? "D: " + item.death.split("T")[0]  : "D: none")}</SubText>
+                    <LocalityIndicators item={item}/>
+                    {typeof bench.step("Item render") === "undefined"}
                   </View>
-                )
-              :
-                <SubText><Icon name='database' size={24}></Icon></SubText>
-            
-            }
-          {typeof bench.step("Item render") === "undefined"}
-          </View>
-        </TouchableHighlight>
-    )}
-  />
+                </TouchableHighlight>
+              )}
+            />
+          </SafeAreaView>
+        }
+    </Stack.Screen>
+      <Stack.Screen name='ComposerEditor'>
+        {props =>
+          <ComposerEditor
+            selectedComposer={{}}
+            prettyAttrs={(composerEditorAttrs as [string, string][])}
+            songsList={songsList}
+            playlists={playlists}
+            setNewComposer={setNewComposer}
+            newComposer={newComposer}
+            navigation={props.navigation}
+          />
+        }
+      </Stack.Screen>
+
+  </Stack.Navigator>
   );
 }
           //<SubText>{selectedAttr != "title"

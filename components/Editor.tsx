@@ -266,23 +266,11 @@ export default function Editor({
 <Stack.Screen name='ComposerSelector'>
   {props =>
     <ComposerListDisplay
-      composers={(songsList.composerList as Array<Composer | composer>).concat(OnlineDB.getComposers())}
+      composers={(songsList.composersList as Array<Composer | composer>).concat(OnlineDB.getComposers())}
+      songsList={songsList}
       navigation={navigation}
       playlists={[]}
     />
-  }
-</Stack.Screen>
-<Stack.Screen name='ComposerEditor'>
-  {props =>
-    <ComposerEditor
-          selectedComposer={{}}
-          prettyAttrs={composerEditorAttrs}
-          songsList={songsList}
-          playlists={playlists}
-          newTune={newTune}
-          setNewTune={setNewTune}
-          navigation={props.navigation}
-        />
   }
 </Stack.Screen>
 </Stack.Navigator>

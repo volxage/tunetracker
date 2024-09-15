@@ -60,7 +60,8 @@ const Stack = createNativeStackNavigator();
 
 function App(): React.JSX.Element {
   const [songs, setSongs] = useState([]);
-  const songsList = new SongsList(songs, setSongs);
+  const [composers, setComposers] = useState([]);
+  const songsList = new SongsList(songs, setSongs, composers, setComposers);
   const [rawPlaylists, setRawPlaylists] = useState([])
   const playlists = new Playlists(rawPlaylists, setRawPlaylists);
 
