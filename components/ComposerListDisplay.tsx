@@ -200,6 +200,19 @@ export default function ComposerListDisplay({
           <View style={{backgroundColor: 'black', padding: 8}}>
             <Text>{item.name}</Text>
             <SubText>{(item.birth ? "B: " + item.birth.split("T")[0] : "B: none") + ", " + (item.death ? "D: " + item.death.split("T")[0]  : "D: none")}</SubText>
+            {
+              (item instanceof Composer) ?
+                (
+                  <View>
+                      <SubText><Icon name='account' size={24}></Icon></SubText>
+                  (item.dbId && item.dbId !== 0) &&
+                      <SubText><Icon name='database' size={24}></Icon></SubText>
+                  </View>
+                )
+              :
+                <SubText><Icon name='database' size={24}></Icon></SubText>
+            
+            }
           {typeof bench.step("Item render") === "undefined"}
           </View>
         </TouchableHighlight>
