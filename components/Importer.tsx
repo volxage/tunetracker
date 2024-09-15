@@ -17,7 +17,7 @@ import {
   ButtonText,
   SMarginView
 } from '../Style.tsx'
-import tuneSort from '../tuneSort.tsx'
+import itemSort from '../itemSort.tsx'
 import RNPickerSelect from 'react-native-picker-select';
 import Fuse from 'fuse.js';
 import OnlineDB from '../OnlineDB.tsx';
@@ -128,7 +128,7 @@ export default function Importer({
   let displayStandards = standards;
   const fuse = new Fuse(standards, fuseOptions);
   if(search === ""){
-    tuneSort(displayStandards, selectedAttr, listReversed);
+    itemSort(displayStandards, selectedAttr, listReversed);
   }else{
     displayStandards = fuse.search(search)
       .map(function(value){

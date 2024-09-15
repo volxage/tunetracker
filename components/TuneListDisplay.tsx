@@ -16,7 +16,7 @@ import {
   ButtonText,
   ConfidenceBarView
 } from '../Style.tsx'
-import tuneSort from '../tuneSort.tsx'
+import itemSort from '../itemSort.tsx'
 import Playlists from '../Playlists.tsx'
 import RNPickerSelect from 'react-native-picker-select';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
@@ -263,7 +263,7 @@ export default function TuneListDisplay({
   }
   const fuse = new Fuse(displaySongs, fuseOptions);
   if(search === ""){
-    tuneSort(displaySongs, selectedAttr, listReversed);
+    itemSort(displaySongs, selectedAttr, listReversed);
   }else{
     displaySongs = fuse.search(search)
       .map(function(value, index){
