@@ -269,6 +269,7 @@ export default function Editor({
       composers={(songsList.composersList as Array<Composer | composer>).concat(OnlineDB.getComposers())}
       songsList={songsList}
       navigation={navigation}
+      handleSetCurrentTune={handleSetCurrentTune}
       playlists={[]}
     />
   }

@@ -16,7 +16,8 @@ import {
   Button,
   ButtonText,
   ConfidenceBarView,
-  BackgroundView
+  BackgroundView,
+  DeleteButton
 } from '../Style.tsx'
 import itemSort from '../itemSort.tsx'
 import Playlists from '../Playlists.tsx'
@@ -61,13 +62,11 @@ function prettyPrint(object: unknown): string{
 }
 
 type HeaderInputStates = {
-  listReversed: boolean
-  setListReversed: Function
-  confidenceVisible: boolean
-  setConfidenceVisible: Function
   setSearch: Function
   navigation: any
   setNewComposer: Function
+  handleSetCurrentTune: Function
+  selectedComposers: Array<composer | Composer>
 }
 function ComposerListHeader({
   headerInputStates,
@@ -86,12 +85,23 @@ function ComposerListHeader({
             placeholderTextColor={"white"}
             onChangeText={(text) => {headerInputStates.setSearch(text)}}
           />
+          <View style={{flexDirection: "row"}}>
+            <Button style={{flex: 1}} onPress={() => {
+              headerInputStates.handleSetCurrentTune("composers", headerInputStates.selectedComposers);
+              headerInputStates.navigation.navigate("EditorUnwrapped");
+            }}>
+              <ButtonText>Save selection</ButtonText>
+            </Button>
+            <DeleteButton style={{flex: 1}}>
+              <ButtonText>Cancel changes</ButtonText>
+            </DeleteButton>
+          </View>
           <Button onPress={() => setAddComposerExpanded(!addComposerExpanded)}>
             {
               addComposerExpanded ?
-                <ButtonText>(Collapse)</ButtonText>
-                :
-                <ButtonText>Can't find my composer below</ButtonText>
+              <ButtonText>(Collapse)</ButtonText>
+              :
+              <ButtonText>Can't find my composer below</ButtonText>
             }
           </Button>
           {
@@ -167,12 +177,14 @@ export default function ComposerListDisplay({
   composers,
   navigation,
   playlists,
-  songsList
+  songsList,
+  handleSetCurrentTune
 }: {
   composers: Array<Composer | composer>,
   navigation: any,
   playlists: Playlists,
-  songsList: SongsList
+  songsList: SongsList,
+  handleSetCurrentTune: Function
 }){
   useEffect(() => {bench.stop("Full render")}, [])
   const bench = reactotron.benchmark("ComposerListDisplay benchmark");
@@ -221,14 +233,11 @@ export default function ComposerListDisplay({
 
   const headerInputStates = 
   {
-    listReversed: listReversed,
-    setListReversed: setListReversed,
-    confidenceVisible: confidenceVisible,
-    setConfidenceVisible: setConfidenceVisible,
     setSearch: setSearch,
-    setSelectedAttr: setSelectedAttr,
     navigation: navigation,
-    setNewComposer: setNewComposer
+    setNewComposer: setNewComposer,
+    handleSetCurrentTune: handleSetCurrentTune,
+    selectedComposers: selectedComposers
   }
   const Stack = createNativeStackNavigator();
   return (

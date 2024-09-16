@@ -16,12 +16,14 @@ import {
   View,
 } from 'react-native';
 import OnlineDB from '../../OnlineDB.tsx';
+import Composer from '../../model/Composer.js';
+import {composer} from '../../types.tsx';
 
 export default function ComposerField({
   attr,
   navigation
 }:{
-  attr: unknown,
+  attr: Array<composer | Composer>,
   navigation: any
 }){
   const [composerExpanded, setComposerExpanded] = useState(false);
@@ -32,15 +34,24 @@ export default function ComposerField({
   return(
     <View>
       <Title>COMPOSERS</Title>
-      {
-        <View>
-          <Button
-            onPress={() => {navigation.navigate("ComposerSelector")}}
-          >
-            <ButtonText>Select Composers</ButtonText>
-          </Button>
-        </View>
-      }
+      <FlatList
+        data={attr}
+        renderItem={({item, index, separators}) => (
+          <View style={{padding: 8}}>
+            <Text>{item.name}</Text>
+            <SubText>{(item.birth ? "B: " + item.birth.split("T")[0] : "B: none") + ", " + (item.death ? "D: " + item.death.split("T")[0]  : "D: none")}</SubText>
+          </View>
+      )}
+    />
+    {
+      <View>
+        <Button
+          onPress={() => {navigation.navigate("ComposerSelector")}}
+        >
+          <ButtonText>Select Composers</ButtonText>
+        </Button>
+      </View>
+    }
     </View>
   )
 }
