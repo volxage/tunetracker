@@ -1,7 +1,7 @@
 // Copyright 2024 Jonathan Hilliard
 import Composer from "./model/Composer";
 import Tune from "./model/Tune";
-import { composer, standard } from "./types";
+import { composer, composer_draft, standard } from "./types";
 function itemSort(songs: Array<Tune | standard | Composer | composer>, selected: string, reversed: boolean){
   let reverse_null_multiplier = 1;
   let reversed_multiplier = reversed ? -1 : 1;

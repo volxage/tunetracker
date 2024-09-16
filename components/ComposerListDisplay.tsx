@@ -44,7 +44,7 @@ const fuseOptions = { // For finetuning the search algorithm
 //		"composers"
 	]
 };
-import {composer, composer_draft, composerEditorAttrs, playlist, tune_draft } from '../types.tsx';
+import {composer, composerEditorAttrs, playlist, tune_draft } from '../types.tsx';
 import Slider from '@react-native-community/slider';
 import reactotron from 'reactotron-react-native';
 import Tune from '../model/Tune.js';
@@ -141,7 +141,7 @@ function ComposerListHeader({
 function LocalityIndicators({
   item
 }: {
-  item: Composer | composer_draft
+  item: Composer | composer
 }){
   if(item instanceof Composer){
     if(item.dbId && item.dbId !== 0){
@@ -181,7 +181,7 @@ export default function ComposerListDisplay({
   const [selectedPlaylist, setSelectedPlaylist] = useState("");
   const [search, setSearch] = useState("");
   const [confidenceVisible, setConfidenceVisible] = useState(false);
-  const [selectedComposers, setSelectedComposers] = useState([]);
+  const [selectedComposers, setSelectedComposers]: [Array<Composer | composer>, Function] = useState([]);
   const [newComposer, setNewComposer] = useState(false);
   let suggestAddComposer = false;
 
@@ -191,6 +191,8 @@ export default function ComposerListDisplay({
   database.get('composers').query().fetch().then(result => console.log(result));
   if(search === ""){
     itemSort(displayComposers, selectedAttr, listReversed);
+    displayComposers = displayComposers.filter(comp => !(selectedComposers.includes(comp)));
+    displayComposers.unshift(...selectedComposers);
   }else{
     const searchResults = fuse.search(search);
     //If there's no composer in the results, or the top result has a low score, add option to add a new composer
