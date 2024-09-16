@@ -109,7 +109,7 @@ function ComposerListHeader({
                     </View>
                     :
                     <View>
-                      <SubText>You have very similar search results. Tap and hold the button below to add a brand new composer ONLY if you're sure that it's a different composer from the composers shown in the results. (For instance, you might reasonably end up adding Bill Evans twice as there have been two Bill Evans's in jazz history.)</SubText>
+                      <SubText>You have very similar search results. Tap and hold the button below to add a brand new composer ONLY if you're sure that it's a different composer from the composers shown in the results.</SubText>
                       <Button>
                         <ButtonText>Add *brand new* composer</ButtonText>
                       </Button>
