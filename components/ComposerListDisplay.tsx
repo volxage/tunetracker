@@ -185,6 +185,14 @@ export default function ComposerListDisplay({
   const [newComposer, setNewComposer] = useState(false);
   let suggestAddComposer = false;
 
+  function toggleComposerSelect(item: Composer | composer){
+    if(selectedComposers.includes(item)){
+      setSelectedComposers(selectedComposers.filter(comp => comp != item));
+    }else{
+      setSelectedComposers(selectedComposers.concat(item));
+    }
+  }
+
   let displayComposers = composers;
   console.log(displayComposers);
   const fuse = new Fuse(displayComposers, fuseOptions);
@@ -206,6 +214,8 @@ export default function ComposerListDisplay({
     displayComposers = searchResults.map(function(value, index){
       return value.item;
     });
+    displayComposers = displayComposers.filter(comp => !(selectedComposers.includes(comp)));
+    displayComposers.unshift(...selectedComposers);
   }
   bench.step("Pre-render")
 
@@ -238,9 +248,10 @@ export default function ComposerListDisplay({
               renderItem={({item, index, separators}) => (
                 <TouchableHighlight
                   key={item.name}
+                  onPress={() => {toggleComposerSelect(item)}}
                   onShowUnderlay={separators.highlight}
                   onHideUnderlay={separators.unhighlight}>
-                  <View style={{backgroundColor: 'black', padding: 8}}>
+                  <View style={{backgroundColor: (selectedComposers.includes(item) ? '#404040' : 'black'), padding: 8}}>
                     <Text>{item.name}</Text>
                     <SubText>{(item.birth ? "B: " + item.birth.split("T")[0] : "B: none") + ", " + (item.death ? "D: " + item.death.split("T")[0]  : "D: none")}</SubText>
                     <LocalityIndicators item={item}/>
