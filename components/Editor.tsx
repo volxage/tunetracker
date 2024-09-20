@@ -215,7 +215,9 @@ export default function Editor({
                   //}
                     console.log("Saving to new tune");
                     database.write(async () => {database.get('tunes').create(tn => {
-                      (tn as TuneModel).replace(state["currentTune"])
+                      (tn as TuneModel).replace(state["currentTune"]);
+                      //TODO: Find proper way to add M:N relations
+                      ///(tn as TuneModel).composers.extend(state["currentTune"]["composers"]);
                     }).then(resultingModel => {
                       console.log(resultingModel);
                       songsList.rereadDb();

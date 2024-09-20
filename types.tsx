@@ -3,7 +3,6 @@ export type tune_draft = {
   "title"?: string
   "alternativeTitle"?: string
   "composers"?: string[]
-  "composerPlaceholder"?: string
   "form"?: string
   "notableRecordings"?: string[]
   "keys"?: string[]
@@ -50,7 +49,6 @@ export const editorAttrs = [
   ["title", "Title"],
   ["alternativeTitle", "Alternative Title"],
   ["composers", "Composers"],
-  ["composerPlaceholder", "Obscure Composers"],
   ["form", "Form"],
   //  ["notable_recordings", "Notable Recordings"],
   ["mainKey", "Main Key"],
@@ -91,8 +89,6 @@ export const composerDefaults = new Map<string, any>([
 export const tuneDefaults = new Map<string, any>([
   ["title", "New song"],
   ["alternativeTitle", ""],
-  ["composers", []],
-  ["composerPlaceholder", ""],
   ["form", ""],
   ["notableRecordings", []],
   ["mainKey", ""],

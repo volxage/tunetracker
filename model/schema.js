@@ -12,7 +12,6 @@ export default appSchema({
         {name: 'title', type: 'string'},
         {name: 'alternative_title', type: 'string', isOptional: true},
 //        {composers, type: "string"},
-        {name: 'composer_placeholder', type: "string", isOptional: true},
         {name: 'form', type: "string", isOptional: true},
         {name: 'year', type: "number", isOptional: true},
         //      {notable_recordings, type: "string" },[]

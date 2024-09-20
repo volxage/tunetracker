@@ -9,7 +9,10 @@ export default class Composer extends Model {
 //    tunes: { type: 'belongs_to', key: 'contrafact_id' }
     tune_composers: { type: 'has_many', foreignKey: 'composer_id' }
   }
-
+  @lazy
+  tunes = this.collections
+    .get('tunes')
+    .query(Q.on('tune_composers', 'composer_id', this.id));
   @writer async changeAttr(attr, newValue){
     //TODO: Validate type. Import prettyAttrs?
     await this.update(composer => {
@@ -36,10 +39,6 @@ export default class Composer extends Model {
       }
     }
   }
-  @lazy
-  tunes = this.collections
-    .get('tunes')
-    .query(Q.on('tune_composers', 'composer_id', this.id));
 
   @text('name') name
   @date('birth') birth
