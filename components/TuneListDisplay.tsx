@@ -20,9 +20,9 @@ import itemSort from '../itemSort.tsx'
 import Playlists from '../Playlists.tsx'
 import RNPickerSelect from 'react-native-picker-select';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import { withObservables } from '@nozbe/watermelondb/react'
+
 import Fuse from 'fuse.js';
-
-
 const fuseOptions = { // For finetuning the search algorithm
 	// isCaseSensitive: false,
 	// includeScore: false,
@@ -42,12 +42,16 @@ const fuseOptions = { // For finetuning the search algorithm
 		"composers"
 	]
 };
+
 import {playlist, tune_draft } from '../types.tsx';
 import SongsList from '../SongsList.tsx';
 import Slider from '@react-native-community/slider';
 import reactotron from 'reactotron-react-native';
 import Tune from '../model/Tune.js';
-const prettyAttrs = new Map<string, string>([
+import Composer from '../model/Composer.js';
+import {database} from '../index.js';
+import TuneComposer from '../model/TuneComposer.js';
+const selectionAttrs = new Map<string, string>([
   ["title", "Title"],
   ["alternativeTitle", "Alternative Title"],
   ["composers", "Composer(s)"],
@@ -72,6 +76,117 @@ function prettyPrint(object: unknown): string{
   return "(Empty)";
 }
 
+function ItemRender({
+  tune,
+  setSelectedTune,
+  navigation,
+  selectedAttr,
+  confidenceVisible,
+  bench,
+  separators,
+  composers
+}: {
+  tune: Tune,
+  setSelectedTune: Function,
+  navigation: any,
+  selectedAttr: string,
+  confidenceVisible: boolean,
+  bench: any,
+  separators: any,
+  composers: Composer[]
+}){
+  console.log("Tune id:");
+  console.log(tune.id);
+  return(
+  <TouchableHighlight
+    key={tune.title}
+    onPress={() => {setSelectedTune(tune); navigation.navigate("MiniEditor");}}
+    onLongPress={() => {setSelectedTune(tune); navigation.navigate("Editor");}}
+    onShowUnderlay={separators.highlight}
+    onHideUnderlay={separators.unhighlight}>
+    {
+      <View style={{backgroundColor: 'black', padding: 8}}>
+        <Text>{tune.title}</Text>
+        <SubText>{selectedAttr != "title"
+          ? prettyPrint(tune[selectedAttr as keyof Tune])
+          : composers.map(comp => comp.name).join(", ")}</SubText>
+      {
+        //CONFIDENCE
+        confidenceVisible && 
+        <View>
+          <ConfidenceBarView>
+            <Slider
+              value={tune.melodyConfidence}
+              lowerLimit={tune.melodyConfidence}
+              upperLimit={tune.melodyConfidence}
+              minimumValue={0}
+              maximumValue={100}
+              minimumTrackTintColor='purple'
+              thumbTintColor='#00000000'
+            />
+          </ConfidenceBarView>
+          <ConfidenceBarView>
+            <Slider
+              value={tune.formConfidence}
+              lowerLimit={tune.formConfidence}
+              upperLimit={tune.formConfidence}
+              minimumValue={0}
+              maximumValue={100}
+              minimumTrackTintColor='darkblue'
+              thumbTintColor='#00000000'
+            />
+          </ConfidenceBarView>
+          <ConfidenceBarView>
+            <Slider
+              value={tune.soloConfidence}
+              lowerLimit={tune.soloConfidence}
+              upperLimit={tune.soloConfidence}
+              minimumValue={0}
+              maximumValue={100}
+              minimumTrackTintColor='darkcyan'
+              thumbTintColor='#00000000'
+            />
+          </ConfidenceBarView>
+        { tune.hasLyrics &&
+        <ConfidenceBarView>
+          <Slider
+            value={tune.lyricsConfidence}
+            lowerLimit={tune.lyricsConfidence}
+            upperLimit={tune.lyricsConfidence}
+            minimumValue={0}
+            maximumValue={100}
+            minimumTrackTintColor='green'
+            thumbTintColor='#00000000'
+          />
+        </ConfidenceBarView>
+        }
+      </View>
+    }
+      {typeof bench.step("Item render") === "undefined"}
+    </View>
+  }
+</TouchableHighlight>
+  )
+}
+const tuneEnhance = withObservables(['tune',
+  'setSelectedTune',
+  'navigation',
+  'selectedAttr',
+  'confidenceVisible',
+  'bench',
+  'separators'
+], ({ tune,
+  setSelectedTune,
+  navigation,
+  selectedAttr,
+  confidenceVisible,
+  bench,
+  separators
+}) => ({
+  tune,
+  composers: tune.composers,
+}));
+const EnhancedItemRender = tuneEnhance(ItemRender);
 type HeaderInputStates = {
   listReversed: boolean
   setListReversed: Function
@@ -82,6 +197,7 @@ type HeaderInputStates = {
   setSelectedTune: Function
   setSelectedPlaylist: Function
 }
+
 function TuneListHeader({
   headerInputStates,
   navigation,
@@ -95,7 +211,7 @@ function TuneListHeader({
   setNewTune: Function,
   selectedAttr: String
 }){
-  const selectedAttrItems = Array.from(prettyAttrs.entries()).map(
+  const selectedAttrItems = Array.from(selectionAttrs.entries()).map(
     (entry) => {return {label: entry[1], value: entry[0]}}
   );
 
@@ -302,74 +418,15 @@ export default function TuneListDisplay({
         </View>
       }
       renderItem={({item, index, separators}) => (
-        <TouchableHighlight
-          key={item.title}
-          onPress={() => {setSelectedTune(item); navigation.navigate("MiniEditor");}}
-          onLongPress={() => {setSelectedTune(item); navigation.navigate("Editor");}}
-          onShowUnderlay={separators.highlight}
-          onHideUnderlay={separators.unhighlight}>
-          {
-          <View style={{backgroundColor: 'black', padding: 8}}>
-            <Text>{item.title}</Text>
-            <SubText>{selectedAttr != "title"
-              ? prettyPrint(item[selectedAttr as keyof Tune])
-              : prettyPrint(item.composers)}</SubText>
-            {
-              //CONFIDENCE
-              confidenceVisible && 
-              <View>
-                <ConfidenceBarView>
-                  <Slider
-                    value={item.melodyConfidence}
-                    lowerLimit={item.melodyConfidence}
-                    upperLimit={item.melodyConfidence}
-                    minimumValue={0}
-                    maximumValue={100}
-                    minimumTrackTintColor='purple'
-                    thumbTintColor='#00000000'
-                  />
-                </ConfidenceBarView>
-                <ConfidenceBarView>
-                  <Slider
-                    value={item.formConfidence}
-                    lowerLimit={item.formConfidence}
-                    upperLimit={item.formConfidence}
-                    minimumValue={0}
-                    maximumValue={100}
-                    minimumTrackTintColor='darkblue'
-                    thumbTintColor='#00000000'
-                  />
-                </ConfidenceBarView>
-                <ConfidenceBarView>
-                  <Slider
-                    value={item.soloConfidence}
-                    lowerLimit={item.soloConfidence}
-                    upperLimit={item.soloConfidence}
-                    minimumValue={0}
-                    maximumValue={100}
-                    minimumTrackTintColor='darkcyan'
-                    thumbTintColor='#00000000'
-                  />
-                </ConfidenceBarView>
-              { item.hasLyrics &&
-              <ConfidenceBarView>
-                <Slider
-                  value={item.lyricsConfidence}
-                  lowerLimit={item.lyricsConfidence}
-                  upperLimit={item.lyricsConfidence}
-                  minimumValue={0}
-                  maximumValue={100}
-                  minimumTrackTintColor='green'
-                  thumbTintColor='#00000000'
-                />
-              </ConfidenceBarView>
-            }
-          </View>
-        }
-          {typeof bench.step("Item render") === "undefined"}
-          </View>
-        }
-        </TouchableHighlight>
+        <EnhancedItemRender 
+          tune={item}
+          setSelectedTune={setSelectedTune}
+          navigation={navigation}
+          selectedAttr={selectedAttr}
+          confidenceVisible={confidenceVisible}
+          bench={bench}
+          separators={separators}
+        />
     )}
   />
   );

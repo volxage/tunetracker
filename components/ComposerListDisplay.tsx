@@ -206,9 +206,7 @@ export default function ComposerListDisplay({
   }
 
   let displayComposers = composers;
-  console.log(displayComposers);
   const fuse = new Fuse(displayComposers, fuseOptions);
-  database.get('composers').query().fetch().then(result => console.log(result));
   if(search === ""){
     itemSort(displayComposers, selectedAttr, listReversed);
     displayComposers = displayComposers.filter(comp => !(selectedComposers.includes(comp)));

@@ -34,16 +34,29 @@ class Tune extends Model {
         }
       }
     })
+
+    //This should be removed after TCs are reliably created (without empty ids)
+    this.collections.get('tune_composers')
+      .query(Q.where('tune_id', this.id)).fetch().then(res => {
+        for(tc of res){
+          tc.deleteIfInvalid();
+        }
+      });
+
     this.composers.fetch().then(comps => {
       //Remove any old composer not selected, add any new composer not previously saved
-      for(let oldComposer in comps){
-        if(!newTune.composers.includes(oldComposer)){
+      for(let oldComposer of comps){
+        if(!newTune.composers || !newTune.composers.includes(oldComposer)){
           this.removeComposer(oldComposer);
         }
       }
-      for(let newComposer in newTune["composers"]){
-        if(!comps.includes(newComposer)){
-          this.addComposer(newComposer);
+      if(newTune["composers"]){
+        for(let newComposer of newTune["composers"]){
+          console.log("New composer:");
+          console.log(newComposer);
+          if(!comps.includes(newComposer)){
+            this.addComposer(newComposer);
+          }
         }
       }
     });
@@ -55,16 +68,15 @@ class Tune extends Model {
     });
   }
   @writer async removeComposer(composer){
-    this.composers.extend(
-      Q.on("composer", "composer_id", composer.id)
-    ).fetch().then(results => {
+    this.collections.get("tune_composers")
+      .query(Q.where("tune_id", this.id))
+      .fetch().then(results => {
         console.log("Removing TC relation with:");
         console.log(results);
         for(let result of results){
-          result.destroyPermanently();
+          result.delete();
         }
-      }
-    );
+      });
   }
 
   *attrs(start = 0, end = Infinity, step = 1){
