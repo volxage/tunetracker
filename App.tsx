@@ -143,7 +143,6 @@ function MainMenu({
               }
               tn.dbId = stand['id'];
               console.log(tn.dbId);
-              tn.composerPlaceholder = stand["Composers"].map(comp => comp.name).join(", ");
               setSelectedTune(tn);
               setNewTune(true);
               props.navigation.goBack();

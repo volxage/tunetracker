@@ -92,7 +92,9 @@ function ComposerListHeader({
             }}>
               <ButtonText>Save selection</ButtonText>
             </Button>
-            <DeleteButton style={{flex: 1}}>
+            <DeleteButton style={{flex: 1}} onPress={() => {
+              headerInputStates.navigation.navigate("EditorUnwrapped");
+            }}>
               <ButtonText>Cancel changes</ButtonText>
             </DeleteButton>
           </View>

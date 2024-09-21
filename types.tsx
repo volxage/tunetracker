@@ -1,8 +1,10 @@
+import Composer from "./model/Composer"
+
 //Copyright 2024 Jonathan Hilliard
 export type tune_draft = {
   "title"?: string
   "alternativeTitle"?: string
-  "composers"?: string[]
+  "composers"?: Composer[]
   "form"?: string
   "notableRecordings"?: string[]
   "keys"?: string[]
@@ -22,10 +24,11 @@ export type tune_draft = {
   //  "playedAt"?: string[]
 }
 export type composer = {
-  "name": string
-  "bio": string
-  "birth": string
-  "death": string
+  "name"?: string
+  "bio"?: string
+  "birth"?: string
+  "death"?: string
+  "id"?: string
 }
 export type standard = {
   "title": string

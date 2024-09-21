@@ -36,8 +36,13 @@ function reducer(state: any, action: any){
   switch(action.type){
     case 'update_attr':
     {
-      const tuneCopy = JSON.parse(JSON.stringify(state["currentTune"]));
-      tuneCopy[action["attr"]] = action["value"];
+      //const tuneCopy = JSON.parse(JSON.stringify(state["currentTune"]));
+      let tuneCopy: composer = {}
+      for(let attr in state["currentTune"]){
+        tuneCopy[attr as keyof composer] = state["currentTune"][attr];
+      }
+
+      tuneCopy[action["attr"] as keyof composer] = action["value"];
       return {currentTune: tuneCopy};
     }
     case 'set_to_selected':
@@ -54,6 +59,13 @@ function reducer(state: any, action: any){
           }else{
             tune[key as keyof tune_draft] = attr[1]
           }
+        }
+        //Only run on firs
+        if(!state["currentTune"] ||
+          !state["currentTune"].composers){
+          action["selectedTune"].composers.fetch().then(comps => {
+            tune.composers = (comps as Composer[])
+          });
         }
       }else{
         for(let attr of tuneDefaults){
@@ -117,6 +129,9 @@ export default function Editor({
     bench.stop("Post-render")
   }, [])
   function handleSetCurrentTune(attr_key: keyof tune_draft, value: any){
+    console.log("attr_key: " + attr_key);
+    console.log("value: ");
+    console.log(value);
     dispatch({type: 'update_attr', attr: attr_key, value: value});
   }
   bench.step("Prerender")

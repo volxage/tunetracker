@@ -111,13 +111,6 @@ function TypeField({
     );
   }
   else if (attrKey === "composers" as keyOfEitherDraft){
-    //Needs:
-    //Local Composers
-    //Online composers
-    //Composers already assigned to the tune
-
-    //Need a FlatList with composers. For each entry, we want an icon for whether the item is present in local and/or online db.
-    //Maybe add a checkmark on the left if the composer is added to the tune? Or change bg-color of item?
     return(
       <ComposerField attr={attr} navigation={navigation} />
     );
