@@ -1,5 +1,6 @@
+
 //Copyright 2024 Jonathan Hilliard
-import { Model, relation, Q} from '@nozbe/watermelondb'
+import { Model, Q} from '@nozbe/watermelondb'
 import { field, text, children, lazy, writer, json} from '@nozbe/watermelondb/decorators'
 import {tuneDefaults} from '../types';
 import Composer from './Composer';
@@ -34,14 +35,15 @@ class Tune extends Model {
         }
       }
     })
+
     this.composers.fetch().then(comps => {
       //Remove any old composer not selected, add any new composer not previously saved
-      for(let oldComposer in comps){
+      for(let oldComposer of comps){
         if(!newTune.composers.includes(oldComposer)){
           this.removeComposer(oldComposer);
         }
       }
-      for(let newComposer in newTune["composers"]){
+      for(let newComposer of newTune["composers"]){
         if(!comps.includes(newComposer)){
           this.addComposer(newComposer);
         }
@@ -49,10 +51,12 @@ class Tune extends Model {
     });
   }
   @writer async addComposer(composer){
-    await this.collections.get('tune_composers').create(tc => {
-      tc.tune.set(this);
-      tc.composer.set(composer);
-    });
+  //await this.collections.get('tune_composers').create(tc => {
+  //  tc.tune = this
+  //  tc.composer = composer
+  //});
+    //composer.tunes.set(this);
+    this.composers.set(composer);
   }
   @writer async removeComposer(composer){
     this.composers.extend(

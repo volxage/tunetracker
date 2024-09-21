@@ -30,6 +30,7 @@ import TuneModel from '../model/Tune.js';
 import ComposerListDisplay from './ComposerListDisplay.tsx';
 import ComposerEditor from './ComposerEditor.tsx';
 import Composer from '../model/Composer.js';
+import TuneComposer from '../model/TuneComposer.js';
 
 function reducer(state: any, action: any){
   switch(action.type){
@@ -98,6 +99,8 @@ export default function Editor({
 
   useEffect(() => {
     dispatch({type: "set_to_selected", selectedTune: selectedTune});
+    if(selectedTune instanceof TuneModel){
+    }
     BackHandler.addEventListener('hardwareBackPress', navigation.goBack)
     return () => {
       BackHandler.removeEventListener('hardwareBackPress', navigation.goBack)
@@ -135,7 +138,7 @@ export default function Editor({
                     attr={state["currentTune"][item[0]]}
                     attrKey={item[0]}
                     attrName={item[1]}
-                    handleSetCurrentTune={handleSetCurrentTune}
+                    handleSetCurrentItem={handleSetCurrentTune}
                     playlists={playlists}
                     tunePlaylists={tunePlaylists}
                     setTunePlaylists={setTunePlaylists}
@@ -215,9 +218,9 @@ export default function Editor({
                   //}
                     console.log("Saving to new tune");
                     database.write(async () => {database.get('tunes').create(tn => {
+                      // This should implicitly add and remove composer relations
                       (tn as TuneModel).replace(state["currentTune"]);
-                      //TODO: Find proper way to add M:N relations
-                      ///(tn as TuneModel).composers.extend(state["currentTune"]["composers"]);
+                      
                     }).then(resultingModel => {
                       console.log(resultingModel);
                       songsList.rereadDb();
