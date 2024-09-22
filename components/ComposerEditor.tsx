@@ -88,6 +88,7 @@ export default function ComposerEditor({
   //Intentional copy to allow cancelling of edits
   //  const [currentComposer, setCurrentTune] = useState()
   console.log("Rerender ComposerEditor");
+  console.log(prettyAttrs);
   const [state, dispatch] = useReducer(reducer, {currentComposer: {}});
   const [tunePlaylists, setTunePlaylists]: [playlist[], Function] = useState([])
   const [originalPlaylistsSet, setOriginalPlaylistsSet]: [Set<playlist>, Function] = useState(new Set())
@@ -105,9 +106,9 @@ export default function ComposerEditor({
   useEffect(() => {
     //If there's no id, it's impossible that the tune has been assigned playlists already.
     if (typeof selectedComposer.id !== "undefined"){ 
-      const tmpTunesPlaylist = playlists.getTunePlaylists(selectedComposer.id);
-      setTunePlaylists(tmpTunesPlaylist);
-      setOriginalPlaylistsSet(new Set(tmpTunesPlaylist));
+//    const tmpTunesPlaylist = playlists.getTunePlaylists(selectedComposer.id);
+//    setTunePlaylists(tmpTunesPlaylist);
+//    setOriginalPlaylistsSet(new Set(tmpTunesPlaylist));
     }
     bench.stop("Post-render")
   }, [])
@@ -153,7 +154,7 @@ export default function ComposerEditor({
                 <DeleteButton
                   onLongPress={() => {
                     database.write(async () => {
-                      (selectedComposer as Composer).destroyPermanently();
+                      (selectedComposer as Composer).delete();
                     });
                     navigation.goBack();
                     songsList.rereadDb();

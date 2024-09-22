@@ -28,7 +28,6 @@ import OnlineDB from '../OnlineDB.tsx';
 import {database} from '../index.js';
 import TuneModel from '../model/Tune.js';
 import ComposerListDisplay from './ComposerListDisplay.tsx';
-import ComposerEditor from './ComposerEditor.tsx';
 import Composer from '../model/Composer.js';
 import TuneComposer from '../model/TuneComposer.js';
 

@@ -115,6 +115,14 @@ function TypeField({
       <ComposerField attr={attr} navigation={navigation} />
     );
   }
+  else if (attrKey === "birth" || attrKey == "death"){
+    return(
+      <View>
+        <Title>{attrKey}</Title>
+        <Text>{(attr as Date).toUTCString()}</Text>
+      </View>
+    );
+  }
   else if (attrKey === "playlists" as keyOfEitherDraft){ //Playlists are NOT an attribute of a tune
     const [newPlaylistOpen, setNewPlaylistOpen] = useState(false)
     //TODO:

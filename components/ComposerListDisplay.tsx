@@ -54,11 +54,17 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import ComposerEditor from './ComposerEditor.tsx';
 import SongsList from '../SongsList.tsx';
 import {database} from '../index.js';
+
 function prettyPrint(object: unknown): string{
-  if (typeof object == "string") return object as string;
-  if (typeof object == "number") return JSON.stringify(object);
-  if (Array.isArray(object)) return object.join(", ");
-  return "(Empty)";
+//                    {((item.birth && item.birth !== null && item.birth.split) ? "B: " + item.birth.split("T")[0] : "B: none") + ", " + ((item.death && item.death !== null && item.death.split) ? "D: " + item.death.split("T")[0]  : "D: none")}
+  if(object instanceof Date){
+    // For some reason the month number for January in this system is 0...
+    return `${object.getFullYear()}-${object.getMonth() + 1}-${object.getUTCDate()}`;
+  }else if (!object){
+    return "None";
+  }else{
+    return (object as string).split("T")[0];
+  }
 }
 
 type HeaderInputStates = {
@@ -87,7 +93,19 @@ function ComposerListHeader({
           />
           <View style={{flexDirection: "row"}}>
             <Button style={{flex: 1}} onPress={() => {
-              headerInputStates.handleSetCurrentTune("composers", headerInputStates.selectedComposers);
+              const composers: Array<Composer | composer> = [];
+              for(let comp of headerInputStates.selectedComposers){
+                if(comp instanceof Composer){
+                  composers.push(comp);
+                }else{
+                  database.write(async () => {database.get("composers").create(newLocalComp => {
+                    (newLocalComp as Composer).replace(comp);
+                  }).then(result => {
+                    composers.push(result);
+                  })});
+                }
+              }
+              headerInputStates.handleSetCurrentTune("composers", composers);
               headerInputStates.navigation.navigate("EditorUnwrapped");
             }}>
               <ButtonText>Save selection</ButtonText>
@@ -192,11 +210,10 @@ export default function ComposerListDisplay({
   const bench = reactotron.benchmark("ComposerListDisplay benchmark");
   const [listReversed, setListReversed] = useState(false);
   const [selectedAttr, setSelectedAttr] = useState("name");
-  const [selectedPlaylist, setSelectedPlaylist] = useState("");
   const [search, setSearch] = useState("");
-  const [confidenceVisible, setConfidenceVisible] = useState(false);
   const [selectedComposers, setSelectedComposers]: [Array<Composer | composer>, Function] = useState([]);
   const [newComposer, setNewComposer] = useState(false);
+  const [composerToEdit, setComposerToEdit]: [Composer | undefined, Function] = useState();
   let suggestAddComposer = false;
 
   function toggleComposerSelect(item: Composer | composer){
@@ -258,12 +275,18 @@ export default function ComposerListDisplay({
                 <TouchableHighlight
                   key={item.name}
                   onPress={() => {toggleComposerSelect(item)}}
+                  onLongPress={() => {
+                    if(item instanceof Composer){
+                      setComposerToEdit(item);
+                      navigation.navigate("ComposerEditor")
+                    }
+                  }}
                   onShowUnderlay={separators.highlight}
                   onHideUnderlay={separators.unhighlight}>
                   <View style={{backgroundColor: (selectedComposers.includes(item) ? '#404040' : 'black'), padding: 8}}>
                     <Text>{item.name}</Text>
-                    <SubText>{(item.birth ? "B: " + item.birth.split("T")[0] : "B: none") + ", " + (item.death ? "D: " + item.death.split("T")[0]  : "D: none")}</SubText>
                     <LocalityIndicators item={item}/>
+                    <SubText>{prettyPrint(item.birth)}</SubText>
                     {typeof bench.step("Item render") === "undefined"}
                   </View>
                 </TouchableHighlight>
@@ -275,7 +298,7 @@ export default function ComposerListDisplay({
       <Stack.Screen name='ComposerEditor'>
         {props =>
           <ComposerEditor
-            selectedComposer={{}}
+            selectedComposer={composerToEdit}
             prettyAttrs={(composerEditorAttrs as [string, string][])}
             songsList={songsList}
             playlists={playlists}
@@ -289,6 +312,3 @@ export default function ComposerListDisplay({
   </Stack.Navigator>
   );
 }
-          //<SubText>{selectedAttr != "title"
-          //  ? prettyPrint(item[selectedAttr as keyof Tune])
-          //  : prettyPrint(item["composerPlaceholder" as keyof Tune])}</SubText>
