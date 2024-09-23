@@ -23,6 +23,7 @@ import Playlists from '../Playlists.tsx';
 import OnlineDB from '../OnlineDB.tsx';
 import DbConnection from './TypeFields/DbConnection.tsx';
 import ComposerField from './TypeFields/ComposerField.tsx';
+import DatePicker from 'react-native-date-picker';
 
 function AddPlaylistField({
   newPlaylist,
@@ -115,11 +116,30 @@ function TypeField({
       <ComposerField attr={attr} navigation={navigation} />
     );
   }
-  else if (attrKey === "birth" || attrKey == "death"){
+  else if (attr instanceof Date){
+    const [dateCopy, setDateCopy] = useState(new Date(attr.valueOf()));
+    const [dateOpen, setDateOpen] = useState(false);
     return(
       <View>
-        <Title>{attrKey}</Title>
-        <Text>{(attr as Date).toUTCString()}</Text>
+        <DatePicker
+          modal
+          mode="date"
+          date={dateCopy}
+          open={dateOpen}
+          onConfirm={(date) => {
+            setDateOpen(false)
+            setDateCopy(date);
+            handleSetCurrentItem(attrKey, dateCopy);
+          }}
+          onCancel={() => {
+            setDateOpen(false);
+          }}
+        />
+        <Title>{attrKey as string}</Title>
+        <Text>{dateCopy.toString()}</Text>
+        <Button onPress={() => setDateOpen(true)}>
+        <ButtonText>Set time</ButtonText>
+        </Button>
       </View>
     );
   }

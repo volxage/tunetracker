@@ -18,7 +18,7 @@ import {
 import TypeField from './TypeField.tsx';
 import SongsList from '../SongsList.tsx';
 import Playlists from '../Playlists.tsx';
-import {composer_draft, standard, playlist, composerDefaults} from '../types.tsx';
+import {composer, standard, playlist, composerDefaults} from '../types.tsx';
 import reactotron from 'reactotron-react-native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Importer from './Importer.tsx';
@@ -39,7 +39,7 @@ function reducer(state: any, action: any){
     }
     case 'set_to_selected':
     {
-      const cd: composer_draft = {}
+      const cd: composer = {}
       if(action["selectedComposer"] instanceof Composer){
         for(let attr of composerDefaults){
           let key = attr[0] as keyof Composer;
@@ -47,18 +47,18 @@ function reducer(state: any, action: any){
             && typeof action["selectedComposer"][key] !== "undefined"
             && action["selectedComposer"][key] !== null
           ){
-            cd[key as keyof composer_draft] = action["selectedComposer"][key as keyof Composer]
+            cd[key as keyof composer] = action["selectedComposer"][key as keyof Composer]
           }else{
-            cd[key as keyof composer_draft] = attr[1]
+            cd[key as keyof composer] = attr[1]
           }
         }
       }else{
         for(let attr of composerDefaults){
           let key = attr[0] as keyof Composer;
           if(key in action["selectedComposer"] && typeof action["selectedComposer"][key] !== "undefined"){
-            cd[key as keyof composer_draft] = action["selectedComposer"][key as keyof Composer]
+            cd[key as keyof composer] = action["selectedComposer"][key as keyof Composer]
           }else{
-            cd[key as keyof composer_draft] = attr[1]
+            cd[key as keyof composer] = attr[1]
           }
         }
         //tune.dbId = action["selectedComposer"]["id"]
@@ -79,7 +79,7 @@ export default function ComposerEditor({
 }: {
   prettyAttrs: Array<[string, string]>,
   navigation: any, //TODO: Find type of "navigation"
-  selectedComposer: Composer | composer_draft,
+  selectedComposer: Composer | composer,
   songsList: SongsList,
   playlists: Playlists,
   newComposer: boolean,
@@ -112,7 +112,7 @@ export default function ComposerEditor({
     }
     bench.stop("Post-render")
   }, [])
-  function handleSetCurrentComposer(attr_key: keyof composer_draft, value: any){
+  function handleSetCurrentComposer(attr_key: keyof composer, value: any){
     dispatch({type: 'update_attr', attr: attr_key, value: value});
   }
   bench.step("Prerender")

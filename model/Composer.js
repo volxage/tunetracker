@@ -26,7 +26,6 @@ export default class Composer extends Model {
             console.log(attrPair[0]);
             composer[attrPair[0]] = newComposer[attrPair[0]];
             console.log();
-          
         }
       }
       if("id" in newComposer){
