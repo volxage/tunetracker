@@ -24,6 +24,7 @@ import OnlineDB from '../OnlineDB.tsx';
 import DbConnection from './TypeFields/DbConnection.tsx';
 import ComposerField from './TypeFields/ComposerField.tsx';
 import DatePicker from 'react-native-date-picker';
+import dateDisplay from '../dateDisplay.tsx';
 
 function AddPlaylistField({
   newPlaylist,
@@ -137,10 +138,16 @@ function TypeField({
           }}
         />
         <Title>{(attrKey as string).toUpperCase()}</Title>
-        <Text>{}</Text>
-        <Button onPress={() => setDateOpen(true)}>
-        <ButtonText>Set time</ButtonText>
-        </Button>
+        <View style={{flexDirection: "row"}}>
+          <View style={{flex: 1, alignItems: "left", alignSelf: "center"}}>
+            <View style={{borderColor: "grey", borderWidth: 1, padding: 8}}>
+              <SubText>{dateDisplay(attr)}</SubText>
+            </View>
+          </View>
+          <Button style={{flex:1}} onPress={() => setDateOpen(true)}>
+            <ButtonText>Set date</ButtonText>
+          </Button>
+        </View>
       </View>
     );
   }
