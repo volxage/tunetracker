@@ -188,20 +188,22 @@ export default function ComposerListDisplay({
   navigation,
   playlists,
   songsList,
-  handleSetCurrentTune
+  handleSetCurrentTune,
+  originalTuneComposers
 }: {
   composers: Array<Composer | composer>,
   navigation: any,
   playlists: Playlists,
   songsList: SongsList,
-  handleSetCurrentTune: Function
+  handleSetCurrentTune: Function,
+  originalTuneComposers: Composer[]
 }){
   useEffect(() => {bench.stop("Full render")}, [])
   const bench = reactotron.benchmark("ComposerListDisplay benchmark");
   const [listReversed, setListReversed] = useState(false);
   const [selectedAttr, setSelectedAttr] = useState("name");
   const [search, setSearch] = useState("");
-  const [selectedComposers, setSelectedComposers]: [Array<Composer | composer>, Function] = useState([]);
+  const [selectedComposers, setSelectedComposers]: [Array<Composer | composer>, Function] = useState(originalTuneComposers);
   const [newComposer, setNewComposer] = useState(false);
   const [composerToEdit, setComposerToEdit]: [Composer | undefined, Function] = useState();
   let suggestAddComposer = false;

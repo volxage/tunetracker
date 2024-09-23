@@ -36,12 +36,12 @@ function reducer(state: any, action: any){
     case 'update_attr':
     {
       //const tuneCopy = JSON.parse(JSON.stringify(state["currentTune"]));
-      let tuneCopy: composer = {}
+      let tuneCopy: tune_draft = {}
       for(let attr in state["currentTune"]){
-        tuneCopy[attr as keyof composer] = state["currentTune"][attr];
+        tuneCopy[attr as keyof tune_draft] = state["currentTune"][attr];
       }
 
-      tuneCopy[action["attr"] as keyof composer] = action["value"];
+      tuneCopy[action["attr"] as keyof tune_draft] = action["value"];
       return {currentTune: tuneCopy};
     }
     case 'set_to_selected':
@@ -59,7 +59,7 @@ function reducer(state: any, action: any){
             tune[key as keyof tune_draft] = attr[1]
           }
         }
-        //Only run on firs
+        //Only run on first loading
         if(!state["currentTune"] ||
           !state["currentTune"].composers){
           action["selectedTune"].composers.fetch().then(comps => {
@@ -194,23 +194,6 @@ export default function Editor({
                 !newTune &&
                 <Button
                   onPress={() => {
-                    //Save to existing tune
-
-                 ///const tune_id = songsList.replaceSelectedTune(selectedTune, currentTune);
-                 ///const newPlaylistSet = new Set(tunePlaylists);
-                 ///const removedPlaylists = [...originalPlaylistsSet]
-                 ///  .filter(oldPlaylist => !newPlaylistSet.has(oldPlaylist));
-                 ///const updatedPlaylists = [...newPlaylistSet]
-                 ///  .filter(newPlaylist => !originalPlaylistsSet.has(newPlaylist));
-                 ///for(var playlist of updatedPlaylists){
-                 ///  console.log("Adding tune to " + playlist.title)
-                 ///  playlists.addTune(tune_id, playlist.id)
-                 ///}
-                    //TODO: Implement playlists
-                 // for(var playlist of removedPlaylists){
-                 //   console.log("Removing tune from " + playlist.title)
-                 //   playlists.removeTune(tune_id, playlist.id)
-                 // }
                     console.log("Saving to existing tune");
                     (selectedTune as TuneModel).replace(state["currentTune"]).then( () => {
                       songsList.rereadDb();
@@ -290,6 +273,7 @@ export default function Editor({
   {props =>
     <ComposerListDisplay
       composers={composers}
+      originalTuneComposers={state["currentTune"]["composers"] ? state["currentTune"]["composers"] : []}
       songsList={songsList}
       navigation={navigation}
       handleSetCurrentTune={handleSetCurrentTune}
