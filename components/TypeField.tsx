@@ -129,13 +129,13 @@ function TypeField({
           onConfirm={(date) => {
             setDateOpen(false)
             setDateCopy(date);
-            handleSetCurrentItem(attrKey, dateCopy);
+            handleSetCurrentItem(attrKey, date);
           }}
           onCancel={() => {
             setDateOpen(false);
           }}
         />
-        <Title>{attrKey as string}</Title>
+        <Title>{(attrKey as string).toUpperCase()}</Title>
         <Text>{dateCopy.toString()}</Text>
         <Button onPress={() => setDateOpen(true)}>
         <ButtonText>Set time</ButtonText>

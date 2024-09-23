@@ -159,7 +159,7 @@ export default function ComposerEditor({
                     navigation.goBack();
                     songsList.rereadDb();
                   }}>
-                    <ButtonText>DELETE TUNE (CAN'T UNDO!)</ButtonText>
+                    <ButtonText>DELETE COMPOSER (CAN'T UNDO!)</ButtonText>
                   </DeleteButton>
                 }
                 <View style={{flexDirection: "row", backgroundColor: "black"}}>
