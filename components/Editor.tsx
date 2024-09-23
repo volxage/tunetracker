@@ -262,8 +262,8 @@ export default function Editor({
   {props =>
     //Logically, this screen will never appear if there is no standard, so we can guarantee that getStandardById will return a standard.
     <Compare
-      currentTune={state["currentTune"]}
-      currentStandard={(state["currentTune"].dbId ? OnlineDB.getStandardById(state["currentTune"].dbId) : null) as standard}
+      currentItem={state["currentTune"]}
+      onlineVersion={(state["currentTune"].dbId ? OnlineDB.getStandardById(state["currentTune"].dbId) : null) as standard}
       navigation={props.navigation}
       handleSetCurrentTune={handleSetCurrentTune}
     />

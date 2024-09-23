@@ -11,7 +11,7 @@ import {
   SMarginView,
 } from '../Style.tsx'
 
-import { editorAttrs, tune_draft, tuneDefaults } from '../types.tsx';
+import { composer, editorAttrs, tune_draft, tuneDefaults } from '../types.tsx';
 
 import {
   SafeAreaView,
@@ -30,6 +30,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Importer from './Importer.tsx';
 import {BackHandler} from 'react-native';
 import Tune from '../model/Tune.js';
+import Composer from '../model/Composer.js';
 
 //Anything that ends with "confidence" is also excluded
 const exclude_set = new Set([
@@ -61,28 +62,31 @@ function stringify(value: any): string{
   }
   return "Unable to parse"
 }
-function CompareField({item, index, currentStandard, currentTune, handleReplaceAttr}:
+type local_type = tune_draft | composer;
+type online_type = standard | composer;
+function CompareField({item, index, onlineVersion, currentItem, handleReplaceAttr}:
 {
   item: string[],
   index: number,
-  currentStandard: standard,
-  currentTune: Tune | tune_draft,
+  onlineVersion: online_type
+  currentItem: local_type,
   handleReplaceAttr: Function
 }){
-  const standardAttrPresent = (item[0] in currentStandard
-            && !empty_equivalent.has(currentStandard[item[0] as keyof standard]
+  console.log(onlineVersion);
+  const standardAttrPresent = (item[0] in onlineVersion
+            && !empty_equivalent.has(onlineVersion[item[0] as keyof online_type]
               .toString().trim()));
-  const tuneAttrPresent = (item[0] in currentTune
-            && !empty_equivalent.has(currentTune[item[0] as keyof (Tune | tune_draft)]
+  const tuneAttrPresent = (item[0] in currentItem
+            && !empty_equivalent.has(currentItem[item[0] as keyof local_type]
               .toString().trim()));
   if(!standardAttrPresent && !tuneAttrPresent){
     return(<></>)
   }
-  if(currentStandard[item[0] as keyof standard] === currentTune[item[0] as keyof (Tune | tune_draft)]){
+  if(onlineVersion[item[0] as keyof online_type] === currentItem[item[0] as keyof local_type]){
     return(
       <View>
         <Title>{item[1]}</Title>
-        <SubText>{currentTune[item[0] as keyof (Tune | tune_draft)]}</SubText>
+        <SubText>{currentItem[item[0] as keyof local_type]}</SubText>
       </View>
     )
   }
@@ -92,19 +96,19 @@ function CompareField({item, index, currentStandard, currentTune, handleReplaceA
       <Title>{item[1]}</Title>
       <View>
         {
-          (item[0] in currentStandard
-            && !empty_equivalent.has(currentStandard[item[0] as keyof standard]
+          (item[0] in onlineVersion
+            && !empty_equivalent.has(onlineVersion[item[0] as keyof online_type]
               .toString().trim())) &&
               <View>
                 <SMarginView>
-                  <SubText>{stringify(currentStandard[item[0] as keyof standard])}</SubText>
+                  <SubText>{stringify(onlineVersion[item[0] as keyof online_type])}</SubText>
                 </SMarginView>
               </View>
             }
             <View style={{flexDirection: "row"}}>
               {
-                (item[0] in currentStandard
-                  && !empty_equivalent.has(currentStandard[item[0] as keyof standard]
+                (item[0] in onlineVersion
+                  && !empty_equivalent.has(onlineVersion[item[0] as keyof online_type]
                     .toString().trim())) ?
                     <Button style={{
                         backgroundColor: choice === 0 ? "#338" : "#222",
@@ -112,8 +116,8 @@ function CompareField({item, index, currentStandard, currentTune, handleReplaceA
                       }}
                       onPress={() => {
                         setChoice(0);
-                        handleReplaceAttr(item[0], currentStandard[item[0] as keyof standard], true);
-                        handleReplaceAttr(item[0], currentStandard[item[0] as keyof standard], false);
+                        handleReplaceAttr(item[0], onlineVersion[item[0] as keyof online_type], true);
+                        handleReplaceAttr(item[0], onlineVersion[item[0] as keyof online_type], false);
                       }}
                       >
                       <ButtonText><Icon name="database-arrow-up" size={30} /></ButtonText>
@@ -133,8 +137,8 @@ function CompareField({item, index, currentStandard, currentTune, handleReplaceA
                     onPress={() => {
                       setChoice(1);
                       // Reset both tune and standard
-                      handleReplaceAttr(item[0], currentTune[item[0] as keyof (Tune | tune_draft)], false);
-                      handleReplaceAttr(item[0], currentStandard[item[0] as keyof standard], true);
+                      handleReplaceAttr(item[0], currentItem[item[0] as keyof local_type], false);
+                      handleReplaceAttr(item[0], onlineVersion[item[0] as keyof online_type], true);
                     }}
                   >
                     <ButtonText><Icon name="dots-horizontal" size={30} /></ButtonText>
@@ -145,8 +149,8 @@ function CompareField({item, index, currentStandard, currentTune, handleReplaceA
                   }}
                   onPress={() => {
                     setChoice(2);
-                    handleReplaceAttr(item[0], currentTune[item[0] as keyof (Tune | tune_draft)], false);
-                    handleReplaceAttr(item[0], currentTune[item[0] as keyof (Tune | tune_draft)], true);
+                    handleReplaceAttr(item[0], currentItem[item[0] as keyof local_type], false);
+                    handleReplaceAttr(item[0], currentItem[item[0] as keyof local_type], true);
                   }}
                   >
                     <ButtonText><Icon name="account-arrow-down" size={30} /></ButtonText>
@@ -154,7 +158,7 @@ function CompareField({item, index, currentStandard, currentTune, handleReplaceA
                 </View>
                 <View>
                   <SMarginView>
-                    <SubText>{stringify(currentTune[item[0] as keyof (Tune | tune_draft)])}</SubText>
+                    <SubText>{stringify(currentItem[item[0] as keyof local_type])}</SubText>
                   </SMarginView>
                 </View>
               </View>
@@ -162,22 +166,22 @@ function CompareField({item, index, currentStandard, currentTune, handleReplaceA
           );
 }
 export default function Compare({
-  currentTune,
-  currentStandard,
+  currentItem,
+  onlineVersion,
   navigation,
   handleSetCurrentTune
 }:
 {
-  currentTune: Tune | tune_draft,
-  currentStandard: standard,
+  currentItem: Tune | tune_draft,
+  onlineVersion: standard,
   navigation: any,
   handleSetCurrentTune: Function
 }){
-  const [comparedDbDraft, setComparedDbDraft] = useState(currentStandard);
-  const [comparedTuneDraft, setComparedTuneDraft] = useState(currentTune);
+  const [comparedDbDraft, setComparedDbDraft] = useState(onlineVersion);
+  const [comparedTuneDraft, setComparedTuneDraft] = useState(currentItem);
   function handleReplaceAttr(attrKey: keyof (Tune | tune_draft), value: any, onlineSelected: boolean){
     //Inefficient solution, but there are no Map functions such as "filter" in mapped types
-    const cpy = JSON.parse(JSON.stringify(onlineSelected ? currentStandard : currentTune));
+    const cpy = JSON.parse(JSON.stringify(onlineSelected ? onlineVersion : currentItem));
     cpy[attrKey] = value;
     if(onlineSelected){
       setComparedDbDraft(cpy)
@@ -197,8 +201,8 @@ export default function Compare({
     renderItem={({item, index, separators}) => (
       <CompareField item={item}
         index={index}
-        currentTune={currentTune}
-        currentStandard={currentStandard}
+        currentItem={currentItem}
+        onlineVersion={onlineVersion}
         handleReplaceAttr={handleReplaceAttr}/>
     )}
     ListFooterComponent={(props) => (
