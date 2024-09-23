@@ -20,9 +20,6 @@ import {
   TouchableHighlight,
 } from 'react-native';
 
-import TypeField from './TypeField.tsx';
-import SongsList from '../SongsList.tsx';
-import Playlists from '../Playlists.tsx';
 import { standard, playlist } from '../types.tsx';
 import reactotron from 'reactotron-react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons.js';
@@ -34,9 +31,10 @@ import Composer from '../model/Composer.js';
 
 //Anything that ends with "confidence" is also excluded
 const exclude_set = new Set([
-  "db_id",
+  "dbId",
   "playlists",
-  "playthroughs"
+  "playthroughs",
+  "composers"
 ]);
 
 const empty_equivalent = new Set([
@@ -72,7 +70,6 @@ function CompareField({item, index, onlineVersion, currentItem, handleReplaceAtt
   currentItem: local_type,
   handleReplaceAttr: Function
 }){
-  console.log(onlineVersion);
   const standardAttrPresent = (item[0] in onlineVersion
             && !empty_equivalent.has(onlineVersion[item[0] as keyof online_type]
               .toString().trim()));
@@ -172,7 +169,7 @@ export default function Compare({
   handleSetCurrentTune
 }:
 {
-  currentItem: Tune | tune_draft,
+  currentItem: tune_draft,
   onlineVersion: standard,
   navigation: any,
   handleSetCurrentTune: Function
@@ -180,8 +177,18 @@ export default function Compare({
   const [comparedDbDraft, setComparedDbDraft] = useState(onlineVersion);
   const [comparedTuneDraft, setComparedTuneDraft] = useState(currentItem);
   function handleReplaceAttr(attrKey: keyof (Tune | tune_draft), value: any, onlineSelected: boolean){
+    const cpy: online_type = {}
+    if(onlineSelected){
+      for(let attr in onlineVersion){
+        cpy[attr as keyof online_type] = onlineVersion[attr as keyof online_type];
+      }
+    }else{
+      for(let attr in currentItem){
+        cpy[attr as keyof local_type] = onlineVersion[attr as keyof local_type];
+      }
+    }
     //Inefficient solution, but there are no Map functions such as "filter" in mapped types
-    const cpy = JSON.parse(JSON.stringify(onlineSelected ? onlineVersion : currentItem));
+    //const cpy = JSON.parse(JSON.stringify(onlineSelected ? onlineVersion : currentItem));
     cpy[attrKey] = value;
     if(onlineSelected){
       setComparedDbDraft(cpy)
@@ -189,10 +196,12 @@ export default function Compare({
       setComparedTuneDraft(cpy);
     }
   }
+  const comparedTuneDraftDebugString = JSON.stringify(comparedTuneDraft, ["title", "alternativeTitle", "form", "composers","id", "birth", "death"]).replaceAll(",", "\n");
+  const comparedDbDraftDebugString = JSON.stringify(comparedDbDraft).replaceAll(",", "\n");
   return(
   <BackgroundView>
   <FlatList
-    data={editorAttrs.filter((item) => (!exclude_set.has(item[0]) && !item[0].endsWith("confidence")))}
+    data={editorAttrs.filter((item) => (!exclude_set.has(item[0]) && !item[0].endsWith("Confidence")))}
     ListHeaderComponent={(props) => (
       <SMarginView>
         <SubText>Here, you can assess the differences between the online version of the tune (on top in each category) and your local version (at the bottom of each category) and choose which one you think to be more accurate. If you think neither are accurate, return to the Editor (via Cancel changes) to fix your version and then come back to upload your changes! Categories where both your local tune and the online tune are empty won't show up here.</SubText>
@@ -207,10 +216,12 @@ export default function Compare({
     )}
     ListFooterComponent={(props) => (
       <>
-        <Text>Tune draft:</Text>
-        <SubText>{JSON.stringify(comparedTuneDraft)}</SubText>
-        <Text>Online draft:</Text>
-        <SubText>{JSON.stringify(comparedDbDraft)}</SubText>
+        {
+      //<Text>Tune draft:</Text>
+      //<SubText>{comparedTuneDraftDebugString}</SubText>
+      //<Text>Online draft:</Text>
+      //<SubText>{comparedDbDraftDebugString}</SubText>
+        }
         <View>
           <Button style={{backgroundColor: "grey"}}
           >
