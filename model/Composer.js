@@ -2,6 +2,7 @@
 import { Model } from '@nozbe/watermelondb'
 import { text, lazy, date, field, writer} from '@nozbe/watermelondb/decorators'
 import {composerDefaults} from '../types';
+import dateDisplay from '../dateDisplay';
 
 export default class Composer extends Model {
   static table = 'composers';
@@ -45,6 +46,15 @@ export default class Composer extends Model {
   }
   @writer async delete(){
     this.destroyPermanently();
+  }
+  toString(){
+    return(`B: ${dateDisplay(this["birth"])} D: ${dateDisplay(this["death"])}`);
+  }
+  debugString(){
+    let returnString = this.toString();
+    returnString = returnString.concat(
+      `\ndbId: ${this.dbId}\n`
+    );
   }
 
   @text('name') name
