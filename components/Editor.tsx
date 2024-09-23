@@ -134,6 +134,10 @@ export default function Editor({
     dispatch({type: 'update_attr', attr: attr_key, value: value});
   }
   bench.step("Prerender")
+  let composers=(songsList.composersList as Array<Composer | composer>).concat(OnlineDB.getComposers())
+  const composerIdSet = new Set(songsList.composersList.map(comp => comp.dbId));
+  composers = composers.filter(comp => ((comp instanceof Composer) || !(composerIdSet.has(comp.id))));
+  
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name={"EditorUnwrapped"} >
@@ -285,7 +289,7 @@ export default function Editor({
 <Stack.Screen name='ComposerSelector'>
   {props =>
     <ComposerListDisplay
-      composers={(songsList.composersList as Array<Composer | composer>).concat(OnlineDB.getComposers())}
+      composers={composers}
       songsList={songsList}
       navigation={navigation}
       handleSetCurrentTune={handleSetCurrentTune}

@@ -126,6 +126,7 @@ function TypeField({
           mode="date"
           date={dateCopy}
           open={dateOpen}
+          timeZoneOffsetInMinutes={0}
           onConfirm={(date) => {
             setDateOpen(false)
             setDateCopy(date);
@@ -136,7 +137,7 @@ function TypeField({
           }}
         />
         <Title>{(attrKey as string).toUpperCase()}</Title>
-        <Text>{dateCopy.toString()}</Text>
+        <Text>{}</Text>
         <Button onPress={() => setDateOpen(true)}>
         <ButtonText>Set time</ButtonText>
         </Button>
