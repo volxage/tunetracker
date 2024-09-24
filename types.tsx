@@ -69,6 +69,7 @@ export const editorAttrs = [
   ["lyricsConfidence", "Lyrics Confidence"],
 ];
 export const composerEditorAttrs = [
+  ["dbId", "Database Connection"],
   ["name", "Name"],
   ["birth", "Birthday"],
   ["death", "Day of Death"],

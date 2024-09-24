@@ -265,7 +265,7 @@ export default function Editor({
       currentItem={state["currentTune"]}
       onlineVersion={(state["currentTune"].dbId ? OnlineDB.getStandardById(state["currentTune"].dbId) : null) as standard}
       navigation={props.navigation}
-      handleSetCurrentTune={handleSetCurrentTune}
+      handleSetCurrentItem={handleSetCurrentTune}
     />
   }
 </Stack.Screen>

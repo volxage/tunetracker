@@ -166,13 +166,13 @@ export default function Compare({
   currentItem,
   onlineVersion,
   navigation,
-  handleSetCurrentTune
+  handleSetCurrentItem
 }:
 {
   currentItem: tune_draft,
   onlineVersion: standard,
   navigation: any,
-  handleSetCurrentTune: Function
+  handleSetCurrentItem: Function
 }){
   const [comparedDbDraft, setComparedDbDraft] = useState(onlineVersion);
   const [comparedTuneDraft, setComparedTuneDraft] = useState(currentItem);
@@ -234,7 +234,7 @@ export default function Compare({
               navigation.goBack();
               for(let attr in comparedTuneDraft){
                 if(attr in comparedTuneDraft){
-                  handleSetCurrentTune(attr, comparedTuneDraft[attr as keyof (Tune | tune_draft)]);
+                  handleSetCurrentItem(attr, comparedTuneDraft[attr as keyof (Tune | tune_draft)]);
                 }
               }
               }}>

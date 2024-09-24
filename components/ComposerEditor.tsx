@@ -28,6 +28,7 @@ import OnlineDB from '../OnlineDB.tsx';
 import {database} from '../index.js';
 import TuneModel from '../model/Tune.js';
 import Composer from '../model/Composer.js';
+import Compare from './Compare.tsx';
 
 function reducer(state: any, action: any){
   switch(action.type){
@@ -61,7 +62,6 @@ function reducer(state: any, action: any){
             cd[key as keyof composer] = attr[1]
           }
         }
-        //tune.dbId = action["selectedComposer"]["id"]
       }
       return {currentComposer: cd};
     }
@@ -104,12 +104,6 @@ export default function ComposerEditor({
   }, []);
 
   useEffect(() => {
-    //If there's no id, it's impossible that the tune has been assigned playlists already.
-    if (typeof selectedComposer.id !== "undefined"){ 
-//    const tmpTunesPlaylist = playlists.getTunePlaylists(selectedComposer.id);
-//    setTunePlaylists(tmpTunesPlaylist);
-//    setOriginalPlaylistsSet(new Set(tmpTunesPlaylist));
-    }
     bench.stop("Post-render")
   }, [])
   function handleSetCurrentComposer(attr_key: keyof composer, value: any){
@@ -171,23 +165,6 @@ export default function ComposerEditor({
                 !newComposer &&
                 <Button
                   onPress={() => {
-                    //Save to existing tune
-
-                 ///const tune_id = songsList.replaceSelectedTune(selectedComposer, currentComposer);
-                 ///const newPlaylistSet = new Set(tunePlaylists);
-                 ///const removedPlaylists = [...originalPlaylistsSet]
-                 ///  .filter(oldPlaylist => !newPlaylistSet.has(oldPlaylist));
-                 ///const updatedPlaylists = [...newPlaylistSet]
-                 ///  .filter(newPlaylist => !originalPlaylistsSet.has(newPlaylist));
-                 ///for(var playlist of updatedPlaylists){
-                 ///  console.log("Adding tune to " + playlist.title)
-                 ///  playlists.addTune(tune_id, playlist.id)
-                 ///}
-                    //TODO: Implement playlists
-                 // for(var playlist of removedPlaylists){
-                 //   console.log("Removing tune from " + playlist.title)
-                 //   playlists.removeTune(tune_id, playlist.id)
-                 // }
                     console.log("Saving to existing tune");
                     (selectedComposer as Composer).replace(state["currentComposer"]).then( () => {
                       songsList.rereadDb();
@@ -201,16 +178,6 @@ export default function ComposerEditor({
                 newComposer &&
                 <Button
                   onPress={() => {
-                    //Save to new tune
-                    //TODO: Implement playlists
-                  //const tune_id = songsList.addNewTune(currentComposer);
-                  //const newPlaylistSet = new Set(tunePlaylists);
-                  //const addedPlaylists = [...newPlaylistSet]
-                  //  .filter(newPlaylist => !originalPlaylistsSet.has(newPlaylist));
-                  //for(var playlist of addedPlaylists){
-                  //  console.log("Adding tune to " + playlist.title)
-                  //  playlists.addTune(tune_id, playlist.id)
-                  //}
                     console.log("Saving to new tune");
                     database.write(async () => {database.get('composers').create(comp => {
                       (comp as Composer).replace(state["currentComposer"])
@@ -252,14 +219,12 @@ export default function ComposerEditor({
 </Stack.Screen>
 <Stack.Screen name="Compare">
   {props =>
-  <View></View>
-    //Logically, this screen will never appear if there is no standard, so we can guarantee that getStandardById will return a standard.
-  //<Compare
-  //  currentComposer={state["currentComposer"]}
-  //  onlineComposer={(state["currentComposer"].dbId ? OnlineDB.getStandardById(state["currentComposer"].dbId) : null) as standard}
-  //  navigation={props.navigation}
-  //  handleSetCurrentItem={handleSetCurrentItem}
-   //>
+  <Compare
+    currentItem={state["currentComposer"]}
+    onlineVersion={(state["currentComposer"].dbId ? OnlineDB.getStandardById(state["currentComposer"].dbId) : null) as standard}
+    navigation={props.navigation}
+    handleSetCurrentItem={handleSetCurrentComposer}
+  />
   }
 </Stack.Screen>
 </Stack.Navigator>

@@ -51,7 +51,9 @@ export default function DbConnection({
             (stand === null || typeof stand === "undefined") ?
             <View>
               <SMarginView>
-                <SubText>You haven't connected this tune to the database yet! Connecting a tune allows you to request changes to the online copy of the tune, meaning other users can use your updated tune information, and new users can import more accurate information! It also gives you the ability to import changes from the database uploaded from other users.</SubText>
+                <SubText>
+                  You haven't connected this item to the database yet! Connecting an item allows you to request changes to the online copy of the item, meaning other users can use your updated information, and new users can import more accurate information! It also gives you the ability to import changes from the database uploaded from other users.
+                </SubText>
               </SMarginView>
               <Button
                 onPress={() => {navigation.navigate("ImportID")}}
