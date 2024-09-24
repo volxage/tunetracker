@@ -161,6 +161,7 @@ export default function Editor({
                     tunePlaylists={tunePlaylists}
                     setTunePlaylists={setTunePlaylists}
                     navigation={navigation}
+                    isComposer={false}
                   />
                 </TouchableHighlight>
                 }{typeof bench.step("Item render") === "undefined"}

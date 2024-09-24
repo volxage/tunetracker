@@ -133,6 +133,7 @@ export default function ComposerEditor({
                     tunePlaylists={tunePlaylists}
                     setTunePlaylists={setTunePlaylists}
                     navigation={navigation}
+                    isComposer={true}
                   />
                 </TouchableHighlight>
                 }{typeof bench.step("Item render") === "undefined"}
@@ -221,7 +222,7 @@ export default function ComposerEditor({
   {props =>
   <Compare
     currentItem={state["currentComposer"]}
-    onlineVersion={(state["currentComposer"].dbId ? OnlineDB.getStandardById(state["currentComposer"].dbId) : null) as standard}
+    onlineVersion={(state["currentComposer"].dbId ? OnlineDB.getComposerById(state["currentComposer"].dbId) : null) as composer}
     navigation={props.navigation}
     handleSetCurrentItem={handleSetCurrentComposer}
   />

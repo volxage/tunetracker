@@ -90,6 +90,10 @@ export default {
     //TODO: Replace with API call
     return standards.find((stand: standard) => stand.id === id);
   },
+  getComposerById(id: number) {
+    //TODO: Replace with API call
+    return composers.find((comp: composer) => comp.id === id);
+  },
   update() {
     fetchComposers();
     fetchTunes();

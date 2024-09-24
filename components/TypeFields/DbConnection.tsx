@@ -1,29 +1,25 @@
 import {
-  TextInput,
-  DeleteButton,
   ButtonText,
   Button,
   Title,
-  Text,
   SubText,
   SMarginView
 } from '../../Style.tsx'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import React, {useEffect, useState} from 'react';
 import {
-  FlatList,
-  Switch,
   View,
 } from 'react-native';
-import { playlist, tune_draft } from '../../types.tsx';
 import OnlineDB from '../../OnlineDB.tsx';
 
 export default function DbConnection({
   attr,
-  navigation
+  navigation,
+  isComposer
 }:{
   attr: unknown,
-  navigation: any
+  navigation: any,
+  isComposer: boolean
 }){
   const [connectTuneExpanded, setConnectTuneExpanded] = useState(false);
   let stand = null;
