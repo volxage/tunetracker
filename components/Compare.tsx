@@ -11,7 +11,7 @@ import {
   SMarginView,
 } from '../Style.tsx'
 
-import { composer, editorAttrs, tune_draft, tuneDefaults } from '../types.tsx';
+import { composer, composerEditorAttrs, editorAttrs, tune_draft, tuneDefaults } from '../types.tsx';
 
 import {
   SafeAreaView,
@@ -28,6 +28,7 @@ import Importer from './Importer.tsx';
 import {BackHandler} from 'react-native';
 import Tune from '../model/Tune.js';
 import Composer from '../model/Composer.js';
+import dateDisplay from '../dateDisplay.tsx';
 
 //Anything that ends with "confidence" is also excluded
 const exclude_set = new Set([
@@ -58,6 +59,9 @@ function stringify(value: any): string{
   if(Array.isArray(value)){
     return value.join(", ");
   }
+  if(value instanceof Date){
+    return(dateDisplay(value))
+  }
   return "Unable to parse"
 }
 type local_type = tune_draft | composer;
@@ -79,13 +83,27 @@ function CompareField({item, index, onlineVersion, currentItem, handleReplaceAtt
   if(!standardAttrPresent && !tuneAttrPresent){
     return(<></>)
   }
-  if(onlineVersion[item[0] as keyof online_type] === currentItem[item[0] as keyof local_type]){
+  if( (onlineVersion[item[0] as keyof online_type] === currentItem[item[0] as keyof local_type])){
     return(
       <View>
         <Title>{item[1]}</Title>
         <SubText>{currentItem[item[0] as keyof local_type]}</SubText>
       </View>
     )
+  }
+  let local_item = currentItem[item[0] as keyof local_type]
+  let online_item = onlineVersion[item[0] as keyof online_type]
+  let local_display = stringify(local_item)
+  let online_display = stringify(online_item)
+  if(item[0] === "birth" || item[0] === "death"){
+    if((local_item && online_item) && local_item.toString() === online_item.toString()){
+      return(
+        <View>
+          <Title>{item[1]}</Title>
+          <SubText>{dateDisplay(local_item)}</SubText>
+        </View>
+      );
+    }
   }
   const [choice, setChoice] = useState(1); // 0 - DB   1 - Neither   2 - Local
   return(
@@ -94,19 +112,17 @@ function CompareField({item, index, onlineVersion, currentItem, handleReplaceAtt
       <View>
         {
           (item[0] in onlineVersion
-            && !empty_equivalent.has(onlineVersion[item[0] as keyof online_type]
-              .toString().trim())) &&
+            && !empty_equivalent.has(online_item)) &&
               <View>
                 <SMarginView>
-                  <SubText>{stringify(onlineVersion[item[0] as keyof online_type])}</SubText>
+                  <SubText>{online_display}</SubText>
                 </SMarginView>
               </View>
             }
             <View style={{flexDirection: "row"}}>
               {
                 (item[0] in onlineVersion
-                  && !empty_equivalent.has(onlineVersion[item[0] as keyof online_type]
-                    .toString().trim())) ?
+                  && !empty_equivalent.has(online_item)) ?
                     <Button style={{
                         backgroundColor: choice === 0 ? "#338" : "#222",
                         flex: 1
@@ -134,8 +150,8 @@ function CompareField({item, index, onlineVersion, currentItem, handleReplaceAtt
                     onPress={() => {
                       setChoice(1);
                       // Reset both tune and standard
-                      handleReplaceAttr(item[0], currentItem[item[0] as keyof local_type], false);
-                      handleReplaceAttr(item[0], onlineVersion[item[0] as keyof online_type], true);
+                      handleReplaceAttr(item[0], local_item, false);
+                      handleReplaceAttr(item[0], online_item, true);
                     }}
                   >
                     <ButtonText><Icon name="dots-horizontal" size={30} /></ButtonText>
@@ -146,8 +162,8 @@ function CompareField({item, index, onlineVersion, currentItem, handleReplaceAtt
                   }}
                   onPress={() => {
                     setChoice(2);
-                    handleReplaceAttr(item[0], currentItem[item[0] as keyof local_type], false);
-                    handleReplaceAttr(item[0], currentItem[item[0] as keyof local_type], true);
+                    handleReplaceAttr(item[0], local_item, false);
+                    handleReplaceAttr(item[0], local_item, true);
                   }}
                   >
                     <ButtonText><Icon name="account-arrow-down" size={30} /></ButtonText>
@@ -155,7 +171,7 @@ function CompareField({item, index, onlineVersion, currentItem, handleReplaceAtt
                 </View>
                 <View>
                   <SMarginView>
-                    <SubText>{stringify(currentItem[item[0] as keyof local_type])}</SubText>
+                    <SubText>{local_display}</SubText>
                   </SMarginView>
                 </View>
               </View>
@@ -166,13 +182,15 @@ export default function Compare({
   currentItem,
   onlineVersion,
   navigation,
-  handleSetCurrentItem
+  handleSetCurrentItem,
+  isComposer
 }:
 {
   currentItem: tune_draft,
   onlineVersion: standard,
   navigation: any,
-  handleSetCurrentItem: Function
+  handleSetCurrentItem: Function,
+  isComposer: boolean
 }){
   const [comparedDbDraft, setComparedDbDraft] = useState(onlineVersion);
   const [comparedTuneDraft, setComparedTuneDraft] = useState(currentItem);
@@ -198,10 +216,12 @@ export default function Compare({
   }
   const comparedTuneDraftDebugString = JSON.stringify(comparedTuneDraft, ["title", "alternativeTitle", "form", "composers","id", "birth", "death"]).replaceAll(",", "\n");
   const comparedDbDraftDebugString = JSON.stringify(comparedDbDraft).replaceAll(",", "\n");
+  const attrs = (isComposer ? composerEditorAttrs : editorAttrs).filter((item) => (!exclude_set.has(item[0]) && !item[0].endsWith("Confidence")))
+  console.log(attrs);
   return(
   <BackgroundView>
   <FlatList
-    data={editorAttrs.filter((item) => (!exclude_set.has(item[0]) && !item[0].endsWith("Confidence")))}
+    data={attrs}
     ListHeaderComponent={(props) => (
       <SMarginView>
         <SubText>Here, you can assess the differences between the online version of the tune (on top in each category) and your local version (at the bottom of each category) and choose which one you think to be more accurate. If you think neither are accurate, return to the Editor (via Cancel changes) to fix your version and then come back to upload your changes! Categories where both your local tune and the online tune are empty won't show up here.</SubText>

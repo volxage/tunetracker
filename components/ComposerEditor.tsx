@@ -88,7 +88,7 @@ export default function ComposerEditor({
   //Intentional copy to allow cancelling of edits
   //  const [currentComposer, setCurrentTune] = useState()
   console.log("Rerender ComposerEditor");
-  console.log(prettyAttrs);
+  //console.log(prettyAttrs);
   const [state, dispatch] = useReducer(reducer, {currentComposer: {}});
   const [tunePlaylists, setTunePlaylists]: [playlist[], Function] = useState([])
   const [originalPlaylistsSet, setOriginalPlaylistsSet]: [Set<playlist>, Function] = useState(new Set())
@@ -110,6 +110,11 @@ export default function ComposerEditor({
     dispatch({type: 'update_attr', attr: attr_key, value: value});
   }
   bench.step("Prerender")
+  const onlineVersion = (state["currentComposer"].dbId ? OnlineDB.getComposerById(state["currentComposer"].dbId) : null) as composer
+  if(onlineVersion){
+    onlineVersion.birth = onlineVersion.birth ? new Date(onlineVersion.birth) : undefined;
+    onlineVersion.death = onlineVersion.death ? new Date(onlineVersion.death) : undefined;
+  }
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name={"EditorUnwrapped"} >
@@ -193,6 +198,7 @@ export default function ComposerEditor({
               </Button>
             }
 
+
           </View>
           <View style={{flex: 1}}>
             <DeleteButton
@@ -218,13 +224,14 @@ export default function ComposerEditor({
     </SafeAreaView>
   }
 </Stack.Screen>
-<Stack.Screen name="Compare">
+<Stack.Screen name="ComposerCompare">
   {props =>
   <Compare
     currentItem={state["currentComposer"]}
     onlineVersion={(state["currentComposer"].dbId ? OnlineDB.getComposerById(state["currentComposer"].dbId) : null) as composer}
     navigation={props.navigation}
     handleSetCurrentItem={handleSetCurrentComposer}
+    isComposer={true}
   />
   }
 </Stack.Screen>

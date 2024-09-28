@@ -31,6 +31,7 @@ export default class Composer extends Model {
       }
       if("id" in newComposer){
         composer.dbId = newComposer["id"] 
+        console.log("DBID:");
       }
     })
     console.log(this.dbId);

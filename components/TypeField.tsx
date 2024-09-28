@@ -95,7 +95,8 @@ function TypeField({
   playlists,
   tunePlaylists,
   setTunePlaylists,
-  navigation
+  navigation,
+  isComposer
 }: {
   attr: unknown,
   attrKey: keyof (tune_draft | composer_draft),
@@ -104,12 +105,19 @@ function TypeField({
   playlists: Playlists,
   tunePlaylists: playlist[],
   setTunePlaylists: Function,
-  navigation: any
+  navigation: any,
+  isComposer: boolean
 }){
+  if(isComposer){
+    console.log("Attr:");
+    console.log(attrKey);
+    console.log("Value:");
+    console.log(attr);
+  }
   type keyOfEitherDraft = keyof (tune_draft | composer_draft)
   if (attrKey === "dbId" as keyOfEitherDraft){
     return(
-      <DbConnection attr={attr} navigation={navigation} />
+      <DbConnection attr={attr} navigation={navigation} isComposer={isComposer} />
     );
   }
   else if (attrKey === "composers" as keyOfEitherDraft){

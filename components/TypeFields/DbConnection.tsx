@@ -7,10 +7,12 @@ import {
 } from '../../Style.tsx'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import React, {useEffect, useState} from 'react';
+import {composer, standard, tune_draft} from '../../types.tsx';
 import {
   View,
 } from 'react-native';
 import OnlineDB from '../../OnlineDB.tsx';
+import dateDisplay from '../../dateDisplay.tsx';
 
 export default function DbConnection({
   attr,
@@ -22,9 +24,15 @@ export default function DbConnection({
   isComposer: boolean
 }){
   const [connectTuneExpanded, setConnectTuneExpanded] = useState(false);
-  let stand = null;
+  let item = null;
   if(typeof attr !== "undefined" && attr !== 0){
-    stand = OnlineDB.getStandardById(attr as number);
+    if(isComposer){
+      item = OnlineDB.getComposerById(attr as number);
+      console.log(item);
+      console.log("is compoesr");
+    }else{
+      item = OnlineDB.getStandardById(attr as number);
+    }
   }
   return(
     <View>
@@ -44,7 +52,7 @@ export default function DbConnection({
         connectTuneExpanded &&
         <View>
           {
-            (stand === null || typeof stand === "undefined") ?
+            (item === null || typeof item === "undefined") ?
             <View>
               <SMarginView>
                 <SubText>
@@ -58,18 +66,49 @@ export default function DbConnection({
               </Button>
             </View>
             :
-            <View>
-              <SubText>Connected!</SubText>
-              <SubText>Title: {stand.title}</SubText>
-              <SubText>Bio: {stand.bio}</SubText>
-              <SubText>Year: {stand.year}</SubText>
-              <Button onPress={() => {navigation.navigate("Compare")}}>
-                <ButtonText>Compare and Change</ButtonText>
-              </Button>
-            </View>
+            <Preview item={item} isComposer={isComposer} navigation={navigation} />
           }
         </View>
       }
     </View>
   )
+}
+function Preview({
+  item, isComposer, navigation
+}:
+{
+  item: composer | standard,
+  isComposer: boolean,
+  navigation: any
+}
+){
+  if(isComposer){
+    const comp = item as composer
+    return (
+            <View>
+              <SubText>Connected!</SubText>
+              <SubText>Name: {comp.name}</SubText>
+              <SubText>Bio: {comp.bio}</SubText>
+              <SubText>Birth: {dateDisplay(comp.birth)}</SubText>
+              <SubText>Death: {dateDisplay(comp.death)}</SubText>
+              <Button onPress={() => {navigation.navigate("ComposerCompare")}}>
+                <ButtonText>Compare and Change (Coming soon!)</ButtonText>
+              </Button>
+            </View>
+    );
+  }
+  if(!isComposer){
+    const tn = item as tune_draft
+    return (
+            <View>
+              <SubText>Connected!</SubText>
+              <SubText>Title: {tn.title}</SubText>
+              <SubText>Bio: {tn.bio}</SubText>
+              <SubText>Year: {tn.year}</SubText>
+              <Button onPress={() => {navigation.navigate("Compare")}}>
+                <ButtonText>Compare and Change</ButtonText>
+              </Button>
+            </View>
+    );
+  }
 }
