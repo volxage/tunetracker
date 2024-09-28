@@ -34,9 +34,20 @@ function reducer(state: any, action: any){
   switch(action.type){
     case 'update_attr':
     {
-      const compCopy = JSON.parse(JSON.stringify(state["currentComposer"]));
-      compCopy[action["attr"]] = action["value"];
-      return {currentComposer: compCopy};
+      const cd: composer = {}
+      for(let attr of composerDefaults){
+        let key = attr[0] as keyof Composer;
+        if(key in state["currentComposer"]
+          && typeof state["currentComposer"][key] !== "undefined"
+          && state["currentComposer"][key] !== null
+        ){
+          cd[key as keyof composer] = state["currentComposer"][key as keyof Composer]
+        }else{
+          cd[key as keyof composer] = attr[1]
+        }
+      }
+      cd[action["attr"] as keyof composer] = action["value"];
+      return {currentComposer: cd};
     }
     case 'set_to_selected':
     {
