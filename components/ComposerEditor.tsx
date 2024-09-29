@@ -182,7 +182,6 @@ export default function ComposerEditor({
                 !newComposer &&
                 <Button
                   onPress={() => {
-                    console.log("Saving to existing tune");
                     (selectedComposer as Composer).replace(state["currentComposer"]).then( () => {
                       songsList.rereadDb();
                       navigation.goBack();
@@ -195,7 +194,6 @@ export default function ComposerEditor({
                 newComposer &&
                 <Button
                   onPress={() => {
-                    console.log("Saving to new tune");
                     database.write(async () => {database.get('composers').create(comp => {
                       (comp as Composer).replace(state["currentComposer"])
                     }).then(resultingModel => {

@@ -137,6 +137,7 @@ function MainMenu({
             navigation={props.navigation}
             importingId={false}
             importFn={function(stand: standard, mini=false){
+              //TODO: Consider possibility of updating the Editor props from App.tsx instead of waiting to switch
               const tn: tune_draft = {};
               for(let attrPair of editorAttrs){
                 if(attrPair[0] !== "id"){
@@ -145,21 +146,53 @@ function MainMenu({
               }
               tn.dbId = stand['id'];
               if(stand["Composers"]){
+                const compDbIds = stand["Composers"].map(comp => comp.id)
                 database.get('composers').query(
-                  Q.where("db_id", Q.oneOf(stand["Composers"].map(comp => comp.id)))
+                  Q.where("db_id", Q.oneOf(compDbIds))
                 ).fetch().then(comps => {
                   tn.composers = comps as Composer[];
                   console.log(tn.composers);
-                  if(tn.composers.length != comps.length){
-                    
+                  if(tn.composers.length != stand["Composers"].length){
+                    console.log("Past inequality");
+                    //TODO: Optimize
+                    // Composer(s) are missing from localDB.
+                    // Finds all dbIds where there are no corresponding local entries
+                    const missingComposersIds = compDbIds.filter(id => 
+                      !comps.some(dbComposer => (dbComposer as Composer).dbId === id)
+                    );
+                    console.log("Missing composer ids:");
+                    console.log(missingComposersIds);
+                    // Maps missing IDs to onineDB composers
+                    const missingComposers = missingComposersIds.map(missingCompId => {
+                      stand["Composers"].find(onlineComp => onlineComp.id === missingCompId);
+                    });
+                    console.log("Missing composers:");
+                    console.log(missingComposers);
+                    for(const missingComp of missingComposers){
+                      //TODO: Batch edit?
+                      database.write(async () => {database.get('composers').create(comp => {
+                        (comp as Composer).replace(missingComp)
+                      }).then(resultingModel => {
+                        //TODO: Is this necessary?
+                        songsList.rereadDb();
+                        tn.composers?.push(resultingModel as Composer)
+                      })}).then(() => {
+                        setSelectedTune(tn);
+                        setNewTune(true);
+                        props.navigation.goBack();
+                        mini ? props.navigation.navigate("MiniEditor")
+                          :props.navigation.navigate("Editor")
+                      });
+                    }
+                  }else{
+                    setSelectedTune(tn);
+                    setNewTune(true);
+                    props.navigation.goBack();
+                    mini ? props.navigation.navigate("MiniEditor")
+                      :props.navigation.navigate("Editor")
                   }
                 })
               }
-              setSelectedTune(tn);
-              setNewTune(true);
-              props.navigation.goBack();
-              mini ? props.navigation.navigate("MiniEditor")
-                :props.navigation.navigate("Editor")
             }}/>
           </SafeAreaView>
         }

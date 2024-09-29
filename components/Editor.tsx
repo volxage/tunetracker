@@ -67,6 +67,7 @@ function reducer(state: any, action: any){
           });
         }
       }else{
+        console.log(action["selectedTune"]);
         for(let attr of tuneDefaults){
           let key = attr[0] as keyof tune_draft;
           if(key in action["selectedTune"] && typeof action["selectedTune"][key] !== "undefined"){
