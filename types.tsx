@@ -28,13 +28,13 @@ export type composer = {
   "bio"?: string
   "birth"?: Date
   "death"?: Date
-  "id"?: string
+  "id": string
   "dbId"?: string
 }
 export type standard = {
   "title": string
   "alternative_title": string
-  "Composers": object
+  "Composers": Array<composer>
   "form": string
   "bio": string
   "year": string

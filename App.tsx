@@ -43,6 +43,8 @@ import Playlists from './Playlists.tsx';
 import OnlineDB from './OnlineDB.tsx';
 import Tune from './model/Tune.js';
 import {database} from './index.js';
+import { Q } from "@nozbe/watermelondb"
+import Composer from './model/Composer.js';
 
 
 //PrettyAttrs function as both as "prettifiers" and lists of attrs to display in corresponding editors
@@ -142,7 +144,17 @@ function MainMenu({
                 }
               }
               tn.dbId = stand['id'];
-              console.log(tn.dbId);
+              if(stand["Composers"]){
+                database.get('composers').query(
+                  Q.where("db_id", Q.oneOf(stand["Composers"].map(comp => comp.id)))
+                ).fetch().then(comps => {
+                  tn.composers = comps as Composer[];
+                  console.log(tn.composers);
+                  if(tn.composers.length != comps.length){
+                    
+                  }
+                })
+              }
               setSelectedTune(tn);
               setNewTune(true);
               props.navigation.goBack();
