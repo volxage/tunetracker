@@ -21,20 +21,24 @@ export default class Composer extends Model {
     });
   }
   @writer async replace(newComposer){
-    await this.update(composer => {
-      for(let attrPair of composerDefaults){
-        if(attrPair[0] in newComposer){
+    if(!(newComposer)){
+      console.error("Composer-Replace called on undefined object");
+    }else{
+      await this.update(composer => {
+        for(let attrPair of composerDefaults){
+          if(attrPair[0] in newComposer){
             console.log(attrPair[0]);
             composer[attrPair[0]] = newComposer[attrPair[0]];
             console.log();
+          }
         }
-      }
-      if("id" in newComposer){
-        composer.dbId = newComposer["id"] 
-        console.log("DBID:");
-      }
-    })
-    console.log(this.dbId);
+        if("id" in newComposer){
+          composer.dbId = newComposer["id"] 
+          console.log("DBID:");
+        }
+      })
+      console.log(this.dbId);
+    }
   }
   *attrs(start = 0, end = Infinity, step = 1){
     for(let attrPair of composerDefaults){

@@ -163,9 +163,9 @@ function MainMenu({
                     console.log("Missing composer ids:");
                     console.log(missingComposersIds);
                     // Maps missing IDs to onineDB composers
-                    const missingComposers = missingComposersIds.map(missingCompId => {
-                      stand["Composers"].find(onlineComp => onlineComp.id === missingCompId);
-                    });
+                    const missingComposers = missingComposersIds.map(missingCompId => 
+                      stand["Composers"].find(onlineComp => onlineComp.id === missingCompId)
+                    );
                     console.log("Missing composers:");
                     console.log(missingComposers);
                     for(const missingComp of missingComposers){
