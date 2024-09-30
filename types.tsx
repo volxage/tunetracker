@@ -48,6 +48,12 @@ export type playlist = {
   "tunes": string[]
 }
 
+export enum Status{
+  Waiting,
+  Failed,
+  Complete
+}
+
 export const editorAttrs = [
   ["dbId", "Database Connection"],
   ["title", "Title"],

@@ -1,11 +1,24 @@
 // Copyright 2024 Jonathan Hilliard
-import { composer, standard} from "./types";
+import {createContext} from "react";
+import { composer, standard, Status } from "./types";
 let standards: standard[] = [];
 let composers: composer[] = [];
-let status = "WAITING"
+let status = Status.Waiting
+const statusListeners = new Set<Function>();
 
+function addListener(listener: Function){
+  statusListeners.add(listener);
+  listener(status);
+}
+function setStatus(newStatus: Status){
+  for(const listener of statusListeners){
+    listener(newStatus);
+  }
+  status = newStatus;
+}
 async function fetchComposers(counter=0){
     if(counter > 6){
+      status = Status.Failed
       return [];
     }
     fetch("https://api.jhilla.org/tunetracker/composers", {
@@ -22,25 +35,27 @@ async function fetchComposers(counter=0){
             composers = (json as composer[]);
             //console.log("Standards:");
             //console.log(standards);
+            setStatus(Status.Complete);
           }).catch(reason => {
-            console.error("ERROR:");
-            console.error(reason);
+            //console.error("ERROR:");
+            //console.error(reason);
             fetchComposers(counter + 1);
           });
         }else{
-          console.log("response not ok");
+          console.error("response not ok");
           console.log(response.status);
           fetchComposers(counter + 1);
         }
       }
     ).catch(reason => {
-      console.error("ERROR on sending http request");
-      console.error(reason);
+      //console.error("ERROR on sending http request");
+      //console.error(reason);
       fetchComposers(counter + 1);
     });
 }
 async function fetchTunes(counter=0){
     if(counter > 6){
+      setStatus(Status.Failed);
       return [];
     }
   fetch("https://api.jhilla.org/tunetracker/tunes", {
@@ -55,23 +70,17 @@ async function fetchTunes(counter=0){
         console.log("response ok!");
         response.json().then(json => {
           standards = (json as standard[]);
+          setStatus(Status.Complete);
           //console.log("Standards:");
           //console.log(standards);
         }).catch(reason => {
-          console.error("ERROR:");
-          console.error(reason);
           fetchTunes(counter + 1);
         });
       }else{
-        console.log("response not ok");
-        console.log(response.status);
         fetchTunes(counter + 1);
       }
     }
   ).catch(reason => {
-    //TODO: Push error message to user! Or update some "server active" state.
-    console.error("ERROR on sending http request");
-    console.error(reason);
     fetchTunes(counter + 1);
   });
 }
@@ -79,7 +88,11 @@ async function fetchTunes(counter=0){
 async function sendTuneDraft(){
 }
 
+const DbStatusContext = createContext(status)
 export default {
+  status,
+  DbStatusContext,
+  addListener,
   getStandards() {
     return standards;
   },

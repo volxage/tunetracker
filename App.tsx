@@ -37,7 +37,7 @@ import {
   Colors,
 } from 'react-native/Libraries/NewAppScreen';
 
-import {standard, tune_draft, editorAttrs} from './types.tsx';
+import {standard, tune_draft, editorAttrs, Status} from './types.tsx';
 import SongsList from './SongsList.tsx';
 import Playlists from './Playlists.tsx';
 import OnlineDB from './OnlineDB.tsx';

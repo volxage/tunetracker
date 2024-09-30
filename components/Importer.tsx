@@ -177,7 +177,7 @@ export default function Importer({
         <Text>Loading...</Text>
       </View>
       <SMarginView>
-        <SubText>Your internet or the server may be down. Email jhilla@jhilla.org if you believe the server is down.</SubText>
+        <SubText>Your internet or the server may be down. Email jhilla@jhilla.org if you believe the server is down. If the server is down, then tunetracker.jhilla.org should also be down!</SubText>
       </SMarginView>
       <DeleteButton onPress={() => {navigation.goBack()}}><ButtonText>Cancel import</ButtonText></DeleteButton>
     </SMarginView>

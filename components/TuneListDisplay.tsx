@@ -21,6 +21,7 @@ import Playlists from '../Playlists.tsx'
 import RNPickerSelect from 'react-native-picker-select';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { withObservables } from '@nozbe/watermelondb/react'
+import OnlineDB from '../OnlineDB.tsx';
 
 import Fuse from 'fuse.js';
 const fuseOptions = { // For finetuning the search algorithm
@@ -43,7 +44,7 @@ const fuseOptions = { // For finetuning the search algorithm
 	]
 };
 
-import {playlist, tune_draft } from '../types.tsx';
+import {playlist, Status, tune_draft } from '../types.tsx';
 import SongsList from '../SongsList.tsx';
 import Slider from '@react-native-community/slider';
 import reactotron from 'reactotron-react-native';
@@ -203,13 +204,15 @@ function TuneListHeader({
   navigation,
   playlists,
   setNewTune,
-  selectedAttr
+  selectedAttr,
+  dbStatus
 }: {
   headerInputStates: HeaderInputStates
   navigation: any,
   playlists: Playlists,
   setNewTune: Function,
-  selectedAttr: String
+  selectedAttr: String,
+  dbStatus: Status
 }){
   const selectedAttrItems = Array.from(selectionAttrs.entries()).map(
     (entry) => {return {label: entry[1], value: entry[0]}}
@@ -224,6 +227,11 @@ function TuneListHeader({
       value: " "
     }
   )
+const statusColorMap = new Map([
+  [Status.Waiting, "goldenrod"],
+  [Status.Complete, "lightcyan"],
+  [Status.Failed, "darkred"]
+])
 
   return(
   <View>
@@ -336,11 +344,16 @@ function TuneListHeader({
             const tn: tune_draft = {};
             headerInputStates.setSelectedTune(tn);
             setNewTune(true);
+            
             navigation.navigate("Editor");
       }}>
         <ButtonText><Icon name="plus" size={30}/></ButtonText>
       </Button>
-      <Button style={{flex:1}} onPress={() => navigation.navigate("Importer")}>
+      <Button style={{
+          flex:1,
+          backgroundColor: statusColorMap.get(dbStatus)
+          }}
+        onPress={() => navigation.navigate("Importer")}>
         <ButtonText><Icon name="database-arrow-down" size={30}/></ButtonText>
       </Button>
     </View>
@@ -360,14 +373,21 @@ export default function TuneListDisplay({
   playlists: Playlists,
   setNewTune: Function
 }){
-  useEffect(() => {bench.stop("Full render")})
+  useEffect(() => {
+    bench.stop("Full render");
+  })
   const bench = reactotron.benchmark("TuneListDisplay benchmark");
   const [listReversed, setListReversed] = useState(false);
   const [selectedAttr, setSelectedAttr] = useState("title");
   const [selectedPlaylist, setSelectedPlaylist] = useState("");
   const [search, setSearch] = useState("");
   const [confidenceVisible, setConfidenceVisible] = useState(false);
+  const [dbStatus, setDbStatus] = useState(Status.Waiting);
 
+  useEffect(() => {
+    bench.stop("Full render");
+    OnlineDB.addListener(setDbStatus);
+  })
   let displaySongs = songs;
   if(selectedPlaylist !== " "){
     const playlist = playlists.getPlaylist(selectedPlaylist)
@@ -410,6 +430,7 @@ export default function TuneListDisplay({
           playlists={playlists}
           setNewTune={setNewTune}
           selectedAttr={selectedAttr}
+          dbStatus={dbStatus}
         />
       }
       ListEmptyComponent={
