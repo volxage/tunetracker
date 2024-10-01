@@ -229,7 +229,7 @@ function TuneListHeader({
   )
 const statusColorMap = new Map([
   [Status.Waiting, "goldenrod"],
-  [Status.Complete, "lightcyan"],
+  [Status.Complete, "cadetblue"],
   [Status.Failed, "darkred"]
 ])
 
