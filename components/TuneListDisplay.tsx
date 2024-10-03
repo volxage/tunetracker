@@ -356,6 +356,11 @@ const statusColorMap = new Map([
         onPress={() => navigation.navigate("Importer")}>
         <ButtonText><Icon name="database-arrow-down" size={30}/></ButtonText>
       </Button>
+      <Button style={{
+        flex:1
+      }}>
+        <ButtonText><Icon name="dots-horizontal" size={30}/></ButtonText>
+      </Button>
     </View>
   </View>
 );
