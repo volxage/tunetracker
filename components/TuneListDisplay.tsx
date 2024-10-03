@@ -358,7 +358,8 @@ const statusColorMap = new Map([
       </Button>
       <Button style={{
         flex:1
-      }}>
+      }}
+      onPress={() => navigation.navigate("ExtrasMenu")}>
         <ButtonText><Icon name="dots-horizontal" size={30}/></ButtonText>
       </Button>
     </View>

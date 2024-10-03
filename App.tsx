@@ -45,6 +45,7 @@ import Tune from './model/Tune.js';
 import {database} from './index.js';
 import { Q } from "@nozbe/watermelondb"
 import Composer from './model/Composer.js';
+import ExtrasMenu from './components/ExtrasMenu.tsx';
 
 
 //PrettyAttrs function as both as "prettifiers" and lists of attrs to display in corresponding editors
@@ -210,6 +211,17 @@ function MainMenu({
           </View>
         </SafeAreaView>
       }
+    </Stack.Screen>
+    <Stack.Screen name="ExtrasMenu">
+        {(props) =>
+        <SafeAreaView style={{flex: 1, backgroundColor: "black"}}>
+          <View style={{flex:1}}>
+            <ExtrasMenu
+              navigation={props.navigation}
+            />
+          </View>
+        </SafeAreaView>
+        }
     </Stack.Screen>
   </Stack.Navigator>
 );
