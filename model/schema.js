@@ -49,5 +49,19 @@ export default appSchema({
         {name: 'composer_id', type: 'string', isIndexed: true},
       ]
     }),
+    tableSchema({
+      name: 'playlist',
+      columns: [
+        {name: 'title', type: 'string'},
+        {name: 'description', type: 'string', isOptional: true},
+      ]
+    }),
+    tableSchema({
+      name: 'playlist_tunes',
+      columns: [
+        {name: 'tune_id', type: 'string', isIndexed: true},
+        {name: 'playlist_id', type: 'string', isIndexed: true},
+      ]
+    }),
   ]
 })
