@@ -7,24 +7,24 @@ import Composer from './Composer';
 
 
 class Playlist extends Model {
-  static table = 'tunes';
+  static table = 'playlists';
   static associations= {
-    playlist_tunes: { type: 'has_many', key: 'playlist_id' },
+    tune_playlists: { type: 'has_many', key: 'playlist_id' },
   }
 
   @lazy
   tunes = this.collections
     .get('tunes')
-    .query(Q.on('playlist_tunes', 'playlist_id', this.id));
+    .query(Q.on('tune_playlists', 'playlist_id', this.id));
 
   @writer async addTune(tune){
-    await this.collections.get('playlist_tunes').create(tc => {
+    await this.collections.get('tune_playlists').create(tc => {
       tc.playlist.set(this);
       tc.tune.set(tune);
     });
   }
   @writer async removeTune(tune){
-    this.collections.get("playlist_tunes")
+    this.collections.get("tune_playlists")
       .query(Q.where("playlist_id", this.id))
       .fetch().then(results => {
         console.log("Removing PT relation with:");
@@ -34,17 +34,6 @@ class Playlist extends Model {
         }
       });
   }
-
-  *attrs(start = 0, end = Infinity, step = 1){
-    for(let attrPair of tuneDefaults){
-      if(attrPair[0] in this){
-        yield this[attrPair[0]];
-      }else{
-        yield attrPair[1];
-      }
-    }
-  }
-
 
 
 

@@ -8,7 +8,7 @@ export default class TuneComposer extends Model {
     composers: { type: 'belongs_to', key: 'composer_id' },
   }
   @writer async deleteIfInvalid(){
-    // Deletes TC relation if there is a missing id for a Tune or Composer
+    // Deletes TP relation if there is a missing id for a Tune or Composer
     // After these relations are reliably created, these will only be invalid if
     // a tune or composer is deleted. This should be handled by Tune and Composer anyway.
     const comp_id = this._getRaw("composer_id");

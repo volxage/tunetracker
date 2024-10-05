@@ -30,6 +30,7 @@ import TuneModel from '../model/Tune.js';
 import ComposerListDisplay from './ComposerListDisplay.tsx';
 import Composer from '../model/Composer.js';
 import TuneComposer from '../model/TuneComposer.js';
+import Playlist from '../model/Playlist.js';
 
 function reducer(state: any, action: any){
   switch(action.type){
@@ -62,12 +63,18 @@ function reducer(state: any, action: any){
         //Only run on first loading
         if(!state["currentTune"] ||
           !state["currentTune"].composers){
+          console.log(JSON.stringify(action["selectedTune"].composers._rawDescription));
           action["selectedTune"].composers.fetch().then(comps => {
             tune.composers = (comps as Composer[])
           });
         }
+        if(!state["playlists"] ||
+          !state["currentTune"].playlists){
+          action["selectedTune"].playlists.fetch().then(lists => {
+
+          });
+        }
       }else{
-        console.log(action["selectedTune"]);
         for(let attr of tuneDefaults){
           let key = attr[0] as keyof tune_draft;
           if(key in action["selectedTune"] && typeof action["selectedTune"][key] !== "undefined"){

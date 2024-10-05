@@ -14,6 +14,7 @@ export default class Composer extends Model {
   tunes = this.collections
     .get('tunes')
     .query(Q.on('tune_composers', 'composer_id', this.id));
+
   @writer async changeAttr(attr, newValue){
     //TODO: Validate type. Import prettyAttrs?
     await this.update(composer => {

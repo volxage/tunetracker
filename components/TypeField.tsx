@@ -18,7 +18,7 @@ import {
   Switch,
   View,
 } from 'react-native';
-import { composer_draft, playlist, tune_draft } from '../types.tsx';
+import { composer, playlist, tune_draft } from '../types.tsx';
 import Playlists from '../Playlists.tsx';
 import OnlineDB from '../OnlineDB.tsx';
 import DbConnection from './TypeFields/DbConnection.tsx';
@@ -99,7 +99,7 @@ function TypeField({
   isComposer
 }: {
   attr: unknown,
-  attrKey: keyof (tune_draft | composer_draft),
+  attrKey: keyof (tune_draft | composer),
   attrName: string,
   handleSetCurrentItem: Function,
   playlists: Playlists,
@@ -114,7 +114,7 @@ function TypeField({
     console.log("Value:");
     console.log(attr);
   }
-  type keyOfEitherDraft = keyof (tune_draft | composer_draft)
+  type keyOfEitherDraft = keyof (tune_draft | composer)
   if (attrKey === "dbId" as keyOfEitherDraft){
     return(
       <DbConnection attr={attr} navigation={navigation} isComposer={isComposer} />

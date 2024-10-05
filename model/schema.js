@@ -50,14 +50,14 @@ export default appSchema({
       ]
     }),
     tableSchema({
-      name: 'playlist',
+      name: 'playlists',
       columns: [
         {name: 'title', type: 'string'},
         {name: 'description', type: 'string', isOptional: true},
       ]
     }),
     tableSchema({
-      name: 'playlist_tunes',
+      name: 'tune_playlists',
       columns: [
         {name: 'tune_id', type: 'string', isIndexed: true},
         {name: 'playlist_id', type: 'string', isIndexed: true},

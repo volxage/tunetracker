@@ -1,4 +1,3 @@
-
 import { immutableRelation, writer } from '@nozbe/watermelondb/decorators'
 import { Model } from '@nozbe/watermelondb'
 

@@ -2,7 +2,6 @@
 import { Model, relation, Q} from '@nozbe/watermelondb'
 import { field, text, children, lazy, writer, json} from '@nozbe/watermelondb/decorators'
 import {tuneDefaults} from '../types';
-import Composer from './Composer';
 
 
 const sanitizeKeys = json => json;
@@ -12,12 +11,17 @@ class Tune extends Model {
   static associations= {
     tunes: { type: 'has_many', key: 'contrafact_id' },
     tune_composers: { type: 'has_many', foreignKey: "tune_id" },
+    tune_playlists: { type: 'has_many', foreignKey: "tune_id" }
   }
 
-  @lazy
-  composers = this.collections
+  @lazy playlists = this.collections
+    .get('playlists')
+    .query();
+
+  @lazy composers = this.collections
     .get('composers')
     .query(Q.on('tune_composers', 'tune_id', this.id));
+
 
   @writer async changeAttr(attr, newValue){
     //TODO: Validate type. Import prettyAttrs?

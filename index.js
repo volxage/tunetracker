@@ -16,6 +16,8 @@ import schema from './model/schema'
 import Tune from './model/Tune';
 import Composer from './model/Composer';
 import TuneComposer from './model/TuneComposer';
+import Playlist from './model/Playlist';
+import TunePlaylist from './model/TunePlaylist';
 
 const adapter = new SQLiteAdapter({
   schema,
@@ -32,7 +34,7 @@ const adapter = new SQLiteAdapter({
 
 export const database = new Database({
   adapter,
-  modelClasses: [Tune, Composer, TuneComposer]
+  modelClasses: [Tune, Composer, TuneComposer, Playlist, TunePlaylist]
 })
 
 AppRegistry.registerComponent(appName, () => App);

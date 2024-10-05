@@ -88,6 +88,7 @@ export const miniEditorAttrs = new Map<string, string>([
   ["melodyConfidence", "Melody Confidence"],
   ["soloConfidence", "Solo Confidence"],
   ["lyricsConfidence", "Lyrics Confidence"],
+  ["playlists", "Playlists"]
   //  ["justPlayed", "'I Just Played This'"],
 ])
 export const composerDefaults = new Map<string, any>([
