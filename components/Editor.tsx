@@ -63,7 +63,6 @@ function reducer(state: any, action: any){
         //Only run on first loading
         if(!state["currentTune"] ||
           !state["currentTune"].composers){
-          console.log(JSON.stringify(action["selectedTune"].composers._rawDescription));
           action["selectedTune"].composers.fetch().then(comps => {
             tune.composers = (comps as Composer[])
           });

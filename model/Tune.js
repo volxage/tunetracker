@@ -16,7 +16,7 @@ class Tune extends Model {
 
   @lazy playlists = this.collections
     .get('playlists')
-    .query();
+    .query(Q.on('tune_playlists', 'tune_id', this.id));
 
   @lazy composers = this.collections
     .get('composers')
