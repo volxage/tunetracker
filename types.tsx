@@ -7,8 +7,10 @@ export type tune_draft = {
   "composers"?: Composer[]
   "form"?: string
   "notableRecordings"?: string[]
+  "mainKey"?: string
   "keys"?: string[]
   "styles"?: string[]
+  "mainTempo"?: number
   "tempi"?: string[]
 //  "contrafacts"?: string[] // In the future, these could link to other tunes
   "playthroughs"?: number

@@ -19,23 +19,5 @@ import TuneComposer from './model/TuneComposer';
 import Playlist from './model/Playlist';
 import TunePlaylist from './model/TunePlaylist';
 
-const adapter = new SQLiteAdapter({
-  schema,
-
-  //UNCOMMENT ON DEPLOYMENT
-  //migrations,
-
-  //jsi
-  onSetupError: error => {
-    //TODO: Add error message screen to navigation stacks.
-    console.error("Error on database load");
-  }
-})
-
-export const database = new Database({
-  adapter,
-  modelClasses: [Tune, Composer, TuneComposer, Playlist, TunePlaylist]
-})
-
 AppRegistry.registerComponent(appName, () => App);
 

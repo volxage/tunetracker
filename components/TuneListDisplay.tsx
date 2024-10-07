@@ -50,8 +50,6 @@ import Slider from '@react-native-community/slider';
 import reactotron from 'reactotron-react-native';
 import Tune from '../model/Tune.js';
 import Composer from '../model/Composer.js';
-import {database} from '../index.js';
-import TuneComposer from '../model/TuneComposer.js';
 const selectionAttrs = new Map<string, string>([
   ["title", "Title"],
   ["alternativeTitle", "Alternative Title"],

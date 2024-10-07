@@ -42,7 +42,6 @@ import SongsList from './SongsList.tsx';
 import Playlists from './Playlists.tsx';
 import OnlineDB from './OnlineDB.tsx';
 import Tune from './model/Tune.js';
-import {database} from './index.js';
 import { Q } from "@nozbe/watermelondb"
 import Composer from './model/Composer.js';
 import ExtrasMenu from './components/ExtrasMenu.tsx';
@@ -138,7 +137,7 @@ function MainMenu({
             navigation={props.navigation}
             importingId={false}
             importFn={function(stand: standard, mini=false){
-              //TODO: Consider possibility of updating the Editor props from App.tsx instead of waiting to switch
+              //TODO: Rewrite for Realm
               const tn: tune_draft = {};
               for(let attrPair of editorAttrs){
                 if(attrPair[0] !== "id"){
