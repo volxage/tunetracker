@@ -45,7 +45,7 @@ export default class Tune extends Realm.Object<Tune, 'title'> {
       dbId: tn.dbId,
     }
   }
-  static schema = {
+  static schema: Realm.ObjectSchema = {
     name: 'Tune',
     primaryKey: '_id;',
     properties: {
@@ -63,7 +63,7 @@ export default class Tune extends Realm.Object<Tune, 'title'> {
       melodyConfidence: "double?",
       soloConfidence: "double?",
       lyricsConfidence: "double?",
-      dbId: {type: "int?", indexed: true},
+      dbId: {type: "int", indexed: true, optional: true},
     }
   }
 }

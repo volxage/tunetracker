@@ -16,7 +16,7 @@ export default class Playlist extends Realm.Object<Playlist, 'title'> {
       description: pl.description,
     }
   }
-  static schema = {
+  static schema: Realm.ObjectSchema = {
     name: 'Tune',
     primaryKey: '_id;',
     properties: {

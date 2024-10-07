@@ -48,12 +48,11 @@ const fuseOptions = { // For finetuning the search algorithm
 import {composer, composerEditorAttrs, playlist, tune_draft } from '../types.tsx';
 import Slider from '@react-native-community/slider';
 import reactotron from 'reactotron-react-native';
-import Tune from '../model/Tune.js';
-import Composer from '../model/Composer.js';
+import Tune from '../model/Tune.ts';
+import Composer from '../model/Composer.ts';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import ComposerEditor from './ComposerEditor.tsx';
 import SongsList from '../SongsList.tsx';
-import {database} from '../index.js';
 import dateDisplay from '../dateDisplay.tsx';
 
 

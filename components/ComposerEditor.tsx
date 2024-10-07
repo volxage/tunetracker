@@ -25,9 +25,8 @@ import Importer from './Importer.tsx';
 import {BackHandler} from 'react-native';
 import OnlineDB from '../OnlineDB.tsx';
 
-import {database} from '../index.js';
-import TuneModel from '../model/Tune.js';
-import Composer from '../model/Composer.js';
+import TuneModel from '../model/Tune.ts';
+import Composer from '../model/Composer.ts';
 import Compare from './Compare.tsx';
 
 function reducer(state: any, action: any){

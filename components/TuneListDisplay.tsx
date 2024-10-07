@@ -20,7 +20,6 @@ import itemSort from '../itemSort.tsx'
 import Playlists from '../Playlists.tsx'
 import RNPickerSelect from 'react-native-picker-select';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import { withObservables } from '@nozbe/watermelondb/react'
 import OnlineDB from '../OnlineDB.tsx';
 
 import Fuse from 'fuse.js';
@@ -48,8 +47,9 @@ import {playlist, Status, tune_draft } from '../types.tsx';
 import SongsList from '../SongsList.tsx';
 import Slider from '@react-native-community/slider';
 import reactotron from 'reactotron-react-native';
-import Tune from '../model/Tune.js';
-import Composer from '../model/Composer.js';
+import Tune from '../model/Tune.ts';
+import Composer from '../model/Composer.ts';
+import {useQuery} from '@realm/react';
 const selectionAttrs = new Map<string, string>([
   ["title", "Title"],
   ["alternativeTitle", "Alternative Title"],
@@ -83,7 +83,6 @@ function ItemRender({
   confidenceVisible,
   bench,
   separators,
-  composers
 }: {
   tune: Tune,
   setSelectedTune: Function,
@@ -92,10 +91,8 @@ function ItemRender({
   confidenceVisible: boolean,
   bench: any,
   separators: any,
-  composers: Composer[]
 }){
-  console.log("Tune id:");
-  console.log(tune.id);
+  const composers = useQuery(Composer)
   return(
   <TouchableHighlight
     key={tune.title}
@@ -146,7 +143,7 @@ function ItemRender({
               thumbTintColor='#00000000'
             />
           </ConfidenceBarView>
-        { tune.hasLyrics &&
+        { tune.hasLyricts &&
         <ConfidenceBarView>
           <Slider
             value={tune.lyricsConfidence}
@@ -167,25 +164,6 @@ function ItemRender({
 </TouchableHighlight>
   )
 }
-const tuneEnhance = withObservables(['tune',
-  'setSelectedTune',
-  'navigation',
-  'selectedAttr',
-  'confidenceVisible',
-  'bench',
-  'separators'
-], ({ tune,
-  setSelectedTune,
-  navigation,
-  selectedAttr,
-  confidenceVisible,
-  bench,
-  separators
-}) => ({
-  tune,
-  composers: tune.composers,
-}));
-const EnhancedItemRender = tuneEnhance(ItemRender);
 type HeaderInputStates = {
   listReversed: boolean
   setListReversed: Function
@@ -365,16 +343,12 @@ const statusColorMap = new Map([
 );
 }
 export default function TuneListDisplay({
-  songs,
   navigation,
   setSelectedTune,
-  playlists,
   setNewTune
 }: {
-  songs: Array<Tune>,
   navigation: any,
   setSelectedTune: Function,
-  playlists: Playlists,
   setNewTune: Function
 }){
   useEffect(() => {
@@ -392,7 +366,7 @@ export default function TuneListDisplay({
     bench.stop("Full render");
     OnlineDB.addListener(setDbStatus);
   })
-  let displaySongs = songs;
+  let displaySongs = useQuery('Tune');
   if(selectedPlaylist !== " "){
     const playlist = playlists.getPlaylist(selectedPlaylist)
     if(typeof playlist !== "undefined"){
@@ -443,7 +417,7 @@ export default function TuneListDisplay({
         </View>
       }
       renderItem={({item, index, separators}) => (
-        <EnhancedItemRender 
+        <ItemRender 
           tune={item}
           setSelectedTune={setSelectedTune}
           navigation={navigation}

@@ -25,12 +25,10 @@ import {BackHandler} from 'react-native';
 import Compare from './Compare.tsx';
 import OnlineDB from '../OnlineDB.tsx';
 
-import {database} from '../index.js';
-import TuneModel from '../model/Tune.js';
+import TuneModel from '../model/Tune.ts';
 import ComposerListDisplay from './ComposerListDisplay.tsx';
-import Composer from '../model/Composer.js';
-import TuneComposer from '../model/TuneComposer.js';
-import Playlist from '../model/Playlist.js';
+import Composer from '../model/Composer.ts';
+import Playlist from '../model/Playlist.ts';
 
 function reducer(state: any, action: any){
   switch(action.type){

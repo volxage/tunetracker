@@ -38,13 +38,15 @@ import {
 } from 'react-native/Libraries/NewAppScreen';
 
 import {standard, tune_draft, editorAttrs, Status} from './types.tsx';
-import SongsList from './SongsList.tsx';
 import Playlists from './Playlists.tsx';
 import OnlineDB from './OnlineDB.tsx';
-import Tune from './model/Tune.js';
 import { Q } from "@nozbe/watermelondb"
-import Composer from './model/Composer.js';
 import ExtrasMenu from './components/ExtrasMenu.tsx';
+import {RealmProvider} from '@realm/react';
+import Tune from './model/Tune.ts';
+import compose from '@nozbe/watermelondb/react/compose';
+import Composer from './model/Composer.ts';
+import Playlist from './model/Playlist.ts';
 
 
 //PrettyAttrs function as both as "prettifiers" and lists of attrs to display in corresponding editors
@@ -61,14 +63,10 @@ const miniEditorPrettyAttrs = new Map<string, string>([
 const Stack = createNativeStackNavigator();
 
 function App(): React.JSX.Element {
-  const [songs, setSongs] = useState([]);
-  const [composers, setComposers] = useState([]);
-  const songsList = new SongsList(songs, setSongs, composers, setComposers);
   const [rawPlaylists, setRawPlaylists] = useState([])
   const playlists = new Playlists(rawPlaylists, setRawPlaylists);
 
   useEffect(() => {
-    songsList.rereadDb();
     //TODO: Implement playlists in WatermelonDB
     playlists.readFromPlaylistsJson();
     OnlineDB.update();
@@ -76,25 +74,18 @@ function App(): React.JSX.Element {
 
   return(
     <View style={{flex: 1, backgroundColor: "black"}}>
-      <NavigationContainer>
-          <MainMenu
-            songs={songs}
-            songsList={songsList}
-            playlists={playlists}
-          />
-      </NavigationContainer>
+      <RealmProvider schema={[Tune, Composer, Playlist]}>
+        <NavigationContainer>
+            <MainMenu/>
+        </NavigationContainer>
+      </RealmProvider>
     </View>
   );
 }
 
-function MainMenu({
-  songs, songsList, playlists
-}: {
-  songs: Array<Tune>,
-  songsList: SongsList,
-  playlists: Playlists
-}): React.JSX.Element {
-  const [selectedTune, setSelectedTune] = useState(songs[0]);
+function MainMenu({}: {}): React.JSX.Element {
+  //TODO: Instantiate selectedTune with any tune, remove "as Tune" in editors.
+  const [selectedTune, setSelectedTune]: [Tune | unknown, Function] = useState(undefined);
   const [newTune, setNewTune] = useState(false);
   const isDarkMode = true;
 
@@ -111,9 +102,7 @@ function MainMenu({
       <Stack.Screen name="MiniEditor">
         {(props) => <Editor
           prettyAttrs={arr}
-          selectedTune={selectedTune}
-          songsList={songsList}
-          playlists={playlists}
+          selectedTune={selectedTune as Tune}
           newTune={newTune}
           setNewTune={setNewTune}
           navigation={props.navigation}
@@ -122,9 +111,7 @@ function MainMenu({
       <Stack.Screen name="Editor">
         {(props) => <Editor
           prettyAttrs={editorAttrs as Array<[string, string]>}
-          selectedTune={selectedTune}
-          songsList={songsList}
-          playlists={playlists}
+          selectedTune={selectedTune as Tune}
           newTune={newTune}
           setNewTune={setNewTune}
           navigation={props.navigation}
@@ -201,10 +188,9 @@ function MainMenu({
         {(props) =>
         <SafeAreaView style={backgroundStyle}>
           <View>
-            <TuneListDisplay songs={songs}
+            <TuneListDisplay
               navigation={props.navigation}
               setSelectedTune={setSelectedTune}
-              playlists={playlists}
               setNewTune={setNewTune}
             />
           </View>
