@@ -47,7 +47,6 @@ export default class Tune extends Realm.Object<Tune, 'title'> {
   }
   static schema: Realm.ObjectSchema = {
     name: 'Tune',
-    primaryKey: '_id;',
     properties: {
       _id: 'objectId',
       title: {type: 'string', indexed: true},
@@ -55,15 +54,16 @@ export default class Tune extends Realm.Object<Tune, 'title'> {
       year: "int?",
       hasLyricts: "bool?",
       mainKey: "string?",
-      keys: "string[]?",
+      keys: "string?[]",
       mainTempo: "int?",
-      tempi: "int[]?",
+      tempi: "int?[]",
       playthroughs: "int?",
       formConfidence: "double?",
       melodyConfidence: "double?",
       soloConfidence: "double?",
       lyricsConfidence: "double?",
       dbId: {type: "int", indexed: true, optional: true},
-    }
+    },
+    primaryKey: '_id'
   }
 }

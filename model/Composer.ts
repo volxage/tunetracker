@@ -24,7 +24,6 @@ export default class Composer extends Realm.Object<Composer, 'name'> {
   }
   static schema: Realm.ObjectSchema = {
     name: 'Tune',
-    primaryKey: '_id;',
     properties: {
       _id: 'objectId',
       name: {type: 'string', indexed: true},
@@ -33,6 +32,7 @@ export default class Composer extends Realm.Object<Composer, 'name'> {
       bio: "string?",
       dbId: {type: "int", indexed: true, optional: true},
       tunes: {type: "linkingObjects", objectType: "Tune", property: "composers"}
-    }
+    },
+    primaryKey: '_id;'
   }
 }
