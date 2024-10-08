@@ -93,6 +93,7 @@ function ItemRender({
   separators: any,
 }){
   const composers = useQuery(Composer)
+  console.log(tune);
   return(
   <TouchableHighlight
     key={tune.title}
@@ -178,14 +179,12 @@ type HeaderInputStates = {
 function TuneListHeader({
   headerInputStates,
   navigation,
-  playlists,
   setNewTune,
   selectedAttr,
   dbStatus
 }: {
   headerInputStates: HeaderInputStates
   navigation: any,
-  playlists: Playlists,
   setNewTune: Function,
   selectedAttr: String,
   dbStatus: Status
@@ -403,7 +402,7 @@ export default function TuneListDisplay({
       data={displaySongs}
       extraData={selectedAttr}
       ListHeaderComponent={
-        <TuneListHeader 
+        <TuneListHeader
           headerInputStates={headerInputStates}
           navigation={navigation}
           setNewTune={setNewTune}

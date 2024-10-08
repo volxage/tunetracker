@@ -29,13 +29,11 @@ import dateDisplay from '../dateDisplay.tsx';
 function AddPlaylistField({
   newPlaylist,
   tunePlaylists,
-  playlists,
   setTunePlaylists
 }: {
   newPlaylist:boolean,
   tunePlaylists: playlist[],
   setTunePlaylists: Function,
-  playlists: Playlists
 }){
   const [newPlaylistTitle, setNewPlaylistTitle] = useState("")
   if(newPlaylist){
@@ -51,10 +49,10 @@ function AddPlaylistField({
         <View style={{alignContent: 'flex-end', flex: 1}}>
           <Button onPress={() => {
             if(newPlaylistTitle.trim().length != 0){
-              const tmpPlaylist = playlists.addPlaylist(newPlaylistTitle);
-              if(typeof tmpPlaylist !== "undefined"){
-                setTunePlaylists(tunePlaylists.concat(tmpPlaylist));
-              }
+            //const tmpPlaylist = playlists.addPlaylist(newPlaylistTitle);
+            //if(typeof tmpPlaylist !== "undefined"){
+            //  setTunePlaylists(tunePlaylists.concat(tmpPlaylist));
+            //}
             }
           }}>
             <ButtonText><Icon name="plus" size={30}/></ButtonText>
@@ -63,25 +61,25 @@ function AddPlaylistField({
       </View>
     );
   }else{
-    let availablePlaylists = playlists.getPlaylists()
-      .filter(playlist => !(tunePlaylists.includes(playlist)));
-    return (
-      <RNPickerSelect
-        onValueChange={
-          // When the component rerenders, onValueChange is called with a value of "".
-          (value) => {value !== "" && setTunePlaylists(tunePlaylists.concat(value))}
-        }
-        items={
-          availablePlaylists
-            .map((playlist) => {return {label:playlist.title, value: playlist}})
-        }
-        useNativeAndroidPickerStyle={false}
-        placeholder={{label: "Select a playlist to insert tune into", value: ""}}
-        style={{inputAndroid:
-          {backgroundColor: 'transparent', color: 'white', fontSize: 18, fontWeight: "300"}
-        }}
-      />
-    );
+//  let availablePlaylists = playlists.getPlaylists()
+//    .filter(playlist => !(tunePlaylists.includes(playlist)));
+//  return (
+//    <RNPickerSelect
+//      onValueChange={
+//        // When the component rerenders, onValueChange is called with a value of "".
+//        (value) => {value !== "" && setTunePlaylists(tunePlaylists.concat(value))}
+//      }
+//      items={
+//        availablePlaylists
+//          .map((playlist) => {return {label:playlist.title, value: playlist}})
+//      }
+//      useNativeAndroidPickerStyle={false}
+//      placeholder={{label: "Select a playlist to insert tune into", value: ""}}
+//      style={{inputAndroid:
+//        {backgroundColor: 'transparent', color: 'white', fontSize: 18, fontWeight: "300"}
+//      }}
+//    />
+//  );
   }
 }
 

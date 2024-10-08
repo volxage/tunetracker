@@ -19,7 +19,7 @@ export default class Playlist extends Realm.Object<Playlist, 'title'> {
   static schema: Realm.ObjectSchema = {
     name: 'Playlist',
     properties: {
-      _id: 'objectId',
+      _id: {type: 'objectId', default: new Realm.BSON.ObjectId()},
       name: {type: 'string', indexed: true},
       description: 'string',
       tunes: {type: "linkingObjects", objectType: "Tune", property: "playlists"}

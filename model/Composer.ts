@@ -25,7 +25,7 @@ export default class Composer extends Realm.Object<Composer, 'name'> {
   static schema: Realm.ObjectSchema = {
     name: 'Composer',
     properties: {
-      _id: 'objectId',
+      _id: {type: 'objectId', default: new Realm.BSON.ObjectId()},
       name: {type: 'string', indexed: true},
       birth: "date?",
       death: "date?",

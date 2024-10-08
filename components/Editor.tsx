@@ -25,10 +25,11 @@ import {BackHandler} from 'react-native';
 import Compare from './Compare.tsx';
 import OnlineDB from '../OnlineDB.tsx';
 
-import TuneModel from '../model/Tune.ts';
+import Tune from '../model/Tune.ts';
 import ComposerListDisplay from './ComposerListDisplay.tsx';
 import Composer from '../model/Composer.ts';
 import Playlist from '../model/Playlist.ts';
+import {useRealm} from '@realm/react';
 
 function reducer(state: any, action: any){
   switch(action.type){
@@ -46,14 +47,14 @@ function reducer(state: any, action: any){
     case 'set_to_selected':
     {
       const tune: tune_draft = {}
-      if(action["selectedTune"] instanceof TuneModel){
+      if(action["selectedTune"] instanceof Tune){
         for(let attr of tuneDefaults){
-          let key = attr[0] as keyof TuneModel;
+          let key = attr[0] as keyof Tune;
           if(key in action["selectedTune"]
             && typeof action["selectedTune"][key] !== "undefined"
             && action["selectedTune"][key] !== null
           ){
-            tune[key as keyof tune_draft] = action["selectedTune"][key as keyof TuneModel]
+            tune[key as keyof tune_draft] = action["selectedTune"][key as keyof Tune]
           }else{
             tune[key as keyof tune_draft] = attr[1]
           }
@@ -98,7 +99,7 @@ export default function Editor({
 }: {
   prettyAttrs: Array<[string, string]>,
   navigation: any, //TODO: Find type of "navigation"
-  selectedTune: TuneModel | tune_draft,
+  selectedTune: Tune | tune_draft,
   songsList: SongsList,
   playlists: Playlists,
   newTune: boolean,
@@ -107,6 +108,7 @@ export default function Editor({
   //Intentional copy to allow cancelling of edits
   //  const [currentTune, setCurrentTune] = useState()
   console.log("Rerender Editor");
+  const realm = useRealm();
   const [state, dispatch] = useReducer(reducer, {currentTune: {}});
   const [tunePlaylists, setTunePlaylists]: [playlist[], Function] = useState([])
   const [originalPlaylistsSet, setOriginalPlaylistsSet]: [Set<playlist>, Function] = useState(new Set())
@@ -115,7 +117,7 @@ export default function Editor({
 
   useEffect(() => {
     dispatch({type: "set_to_selected", selectedTune: selectedTune});
-    if(selectedTune instanceof TuneModel){
+    if(selectedTune instanceof Tune){
     }
     BackHandler.addEventListener('hardwareBackPress', navigation.goBack)
     return () => {
@@ -139,9 +141,6 @@ export default function Editor({
     dispatch({type: 'update_attr', attr: attr_key, value: value});
   }
   bench.step("Prerender")
-  let composers=(songsList.composersList as Array<Composer | composer>).concat(OnlineDB.getComposers())
-  const composerIdSet = new Set(songsList.composersList.map(comp => comp.dbId));
-  composers = composers.filter(comp => ((comp instanceof Composer) || !(composerIdSet.has(comp.id))));
   
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
@@ -181,9 +180,9 @@ export default function Editor({
                 !newTune && 
                 <DeleteButton
                   onLongPress={() => {
-                    database.write(async () => {
-                      (selectedTune as TuneModel).destroyPermanently();
-                    });
+                  //database.write(async () => {
+                  //  (selectedTune as Tune).destroyPermanently();
+                  //});
                     navigation.goBack();
                     songsList.rereadDb();
                   }}>
@@ -201,7 +200,7 @@ export default function Editor({
                 <Button
                   onPress={() => {
                     console.log("Saving to existing tune");
-                    (selectedTune as TuneModel).replace(state["currentTune"]).then( () => {
+                    (selectedTune as Tune).replace(state["currentTune"]).then( () => {
                       songsList.rereadDb();
                       navigation.goBack();
                     });
@@ -224,14 +223,19 @@ export default function Editor({
                   //  playlists.addTune(tune_id, playlist.id)
                   //}
                     console.log("Saving to new tune");
-                    database.write(async () => {database.get('tunes').create(tn => {
-                      // This should implicitly add and remove composer relations
-                      (tn as TuneModel).replace(state["currentTune"]);
-                      
-                    }).then(resultingModel => {
-                      console.log(resultingModel);
-                      songsList.rereadDb();
-                    })});
+                    realm.write(() => {
+                      realm.create("Tune",
+                        state["currentTune"]
+                      )
+                    });
+                  //database.write(async () => {database.get('tunes').create(tn => {
+                  //  // This should implicitly add and remove composer relations
+                  //  (tn as Tune).replace(state["currentTune"]);
+                  //  
+                  //}).then(resultingModel => {
+                  //  console.log(resultingModel);
+                  //  songsList.rereadDb();
+                  //})});
                     navigation.goBack();
                     setNewTune(false);
                   }}
@@ -278,7 +282,6 @@ export default function Editor({
 <Stack.Screen name='ComposerSelector'>
   {props =>
     <ComposerListDisplay
-      composers={composers}
       originalTuneComposers={state["currentTune"]["composers"] ? state["currentTune"]["composers"] : []}
       songsList={songsList}
       navigation={navigation}

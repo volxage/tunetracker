@@ -5,7 +5,7 @@ import Composer from '../model/Composer.ts'
 import Playlist from '../model/Playlist.ts'
 
 export default class Tune extends Realm.Object<Tune, 'title'> {
-  //  _id!: number;
+  _id!: Realm.BSON.ObjectId;
   title!: string;
   alternativeTitle?: string;
   composers?: Realm.List<Composer>;
@@ -27,7 +27,7 @@ export default class Tune extends Realm.Object<Tune, 'title'> {
 
   static generate(tn: tune_draft){
     return {
-      //      _id: new Realm.BSON.ObjectId(),
+      _id: new Realm.BSON.ObjectId(),
       title: tn.title,
       alternativeTitle: tn.alternativeTitle,
       form: tn.form,
@@ -48,7 +48,7 @@ export default class Tune extends Realm.Object<Tune, 'title'> {
   static schema: Realm.ObjectSchema = {
     name: 'Tune',
     properties: {
-      _id: 'int',
+      _id: {type: 'objectId', default: new Realm.BSON.ObjectId()},
       title: {type: 'string', indexed: true},
       form: "string?",
       year: "int?",
