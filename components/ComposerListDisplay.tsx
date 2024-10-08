@@ -54,6 +54,9 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import ComposerEditor from './ComposerEditor.tsx';
 import SongsList from '../SongsList.tsx';
 import dateDisplay from '../dateDisplay.tsx';
+import {useQuery, useRealm} from '@realm/react';
+import OnlineDB from '../OnlineDB.tsx';
+import {BSON} from 'realm';
 
 
 type HeaderInputStates = {
@@ -61,7 +64,8 @@ type HeaderInputStates = {
   navigation: any
   setNewComposer: Function
   handleSetCurrentTune: Function
-  selectedComposers: Array<composer | Composer>
+  selectedComposers: Array<Composer>
+  selectedOnlineComposers: Array<composer>
 }
 function ComposerListHeader({
   headerInputStates,
@@ -71,6 +75,7 @@ function ComposerListHeader({
   addComposerOptionFlag: boolean
 }){
   const [addComposerExpanded, setAddComposerExpanded] = useState(false);
+  const realm = useRealm();
   return(
     <View>
       <View style={{flexDirection: 'row', borderBottomWidth:1, backgroundColor: "#222"}}>
@@ -83,15 +88,21 @@ function ComposerListHeader({
           <View style={{flexDirection: "row"}}>
             <Button style={{flex: 1}} onPress={() => {
               const composers: Array<Composer | composer> = [];
-              for(let comp of headerInputStates.selectedComposers){
+              for(let comp of headerInputStates.selectedOnlineComposers){
                 if(comp instanceof Composer){
                   composers.push(comp);
                 }else{
-                  database.write(async () => {database.get("composers").create(newLocalComp => {
-                    (newLocalComp as Composer).replace(comp);
-                  }).then(result => {
-                    composers.push(result);
-                  })});
+                  realm.write(() => {
+                    (realm.create("Composer",
+                      {
+                        _id: new BSON.ObjectId(),
+                        name: comp.name,
+                        bio: comp.bio,
+                        birth: comp.birth,
+                        death: comp.death,
+                        dbId: comp.id
+                      }) as Composer)
+                  });
                 }
               }
               headerInputStates.handleSetCurrentTune("composers", composers);
@@ -183,44 +194,60 @@ function LocalityIndicators({
 }
 
 export default function ComposerListDisplay({
-  composers,
   navigation,
-  playlists,
-  songsList,
   handleSetCurrentTune,
   originalTuneComposers
 }: {
-  composers: Array<Composer | composer>,
   navigation: any,
-  playlists: Playlists,
-  songsList: SongsList,
   handleSetCurrentTune: Function,
   originalTuneComposers: Composer[]
 }){
-  useEffect(() => {bench.stop("Full render")}, [])
+  const [onlineComposers, setOnlineComposers]: [(composer)[], Function]= useState([]);
+  useEffect(() => {
+    bench.stop("Full render");
+    setOnlineComposers(OnlineDB.getComposers());
+  }, [])
   const bench = reactotron.benchmark("ComposerListDisplay benchmark");
   const [listReversed, setListReversed] = useState(false);
   const [selectedAttr, setSelectedAttr] = useState("name");
   const [search, setSearch] = useState("");
-  const [selectedComposers, setSelectedComposers]: [Array<Composer | composer>, Function] = useState(originalTuneComposers);
+  const [selectedComposers, setSelectedComposers]: [Array<Composer>, Function] = useState(originalTuneComposers);
+  const [selectedOnlineComposers, setSelectedOnlineComposers]: [composer[], Function] = useState([])
   const [newComposer, setNewComposer] = useState(false);
   const [composerToEdit, setComposerToEdit]: [Composer | undefined, Function] = useState();
   let suggestAddComposer = false;
 
   function toggleComposerSelect(item: Composer | composer){
-    if(selectedComposers.includes(item)){
-      setSelectedComposers(selectedComposers.filter(comp => comp != item));
+    // Realm is picky about checking what items are in arrays.
+    // So we need to have two separate arrays so Realm can be sure one of the arrays...
+    // only contains Composers.
+    if(item instanceof Composer){
+      if(selectedComposers.includes(item)){
+        setSelectedComposers(selectedComposers.filter(comp => comp != item));
+      }else{
+        setSelectedComposers(selectedComposers.concat(item));
+      }
     }else{
-      setSelectedComposers(selectedComposers.concat(item));
+      if(selectedOnlineComposers.includes(item)){
+        setOnlineComposers(onlineComposers.filter(comp => comp != item));
+      }else{
+        setSelectedOnlineComposers(selectedOnlineComposers.concat(item));
+      }
     }
   }
+  function isSelected(item: Composer | composer){
+    if(item instanceof Composer){
+      return selectedComposers.includes(item);
+    }
+    return selectedOnlineComposers.includes(item);
+  }
 
-  let displayComposers = composers;
+  let displayComposers = [...(useQuery("Composer").map(res => res as Composer)), ...onlineComposers];
   const fuse = new Fuse(displayComposers, fuseOptions);
   if(search === ""){
-    itemSort(displayComposers, selectedAttr, listReversed);
-    displayComposers = displayComposers.filter(comp => !(selectedComposers.includes(comp)));
-    displayComposers.unshift(...selectedComposers);
+    //itemSort(displayComposers, selectedAttr, listReversed);
+    //displayComposers = displayComposers.filter(comp => !(selectedComposers.includes(comp)));
+    //displayComposers.unshift(...selectedComposers);
   }else{
     const searchResults = fuse.search(search);
     //If there's no composer in the results, or the top result has a low score, add option to add a new composer
@@ -234,7 +261,7 @@ export default function ComposerListDisplay({
     displayComposers = searchResults.map(function(value, index){
       return value.item;
     });
-    displayComposers = displayComposers.filter(comp => !(selectedComposers.includes(comp)));
+    //displayComposers = displayComposers.filter(comp => !(selectedComposers.includes(comp)));
     displayComposers.unshift(...selectedComposers);
   }
   bench.step("Pre-render")
@@ -245,7 +272,8 @@ export default function ComposerListDisplay({
     navigation: navigation,
     setNewComposer: setNewComposer,
     handleSetCurrentTune: handleSetCurrentTune,
-    selectedComposers: selectedComposers
+    selectedComposers: selectedComposers,
+    selectedOnlineComposers: selectedOnlineComposers
   }
   const Stack = createNativeStackNavigator();
   return (
@@ -274,7 +302,7 @@ export default function ComposerListDisplay({
                   }}
                   onShowUnderlay={separators.highlight}
                   onHideUnderlay={separators.unhighlight}>
-                  <View style={{backgroundColor: (selectedComposers.includes(item) ? '#404040' : 'black'), padding: 8}}>
+                  <View style={{backgroundColor: (isSelected(item) ? '#404040' : 'black'), padding: 8}}>
                     <Text>{item.name}</Text>
                     <LocalityIndicators item={item}/>
                     <SubText>{dateDisplay(item.birth)}</SubText>

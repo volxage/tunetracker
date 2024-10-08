@@ -93,7 +93,6 @@ function ItemRender({
   separators: any,
 }){
   const composers = useQuery(Composer)
-  console.log(tune);
   return(
   <TouchableHighlight
     key={tune.title}
@@ -106,7 +105,7 @@ function ItemRender({
         <Text>{tune.title}</Text>
         <SubText>{selectedAttr != "title"
           ? prettyPrint(tune[selectedAttr as keyof Tune])
-          : composers.map(comp => comp.name).join(", ")}</SubText>
+          : prettyPrint(tune["composers"])}</SubText>
       {
         //CONFIDENCE
         confidenceVisible && 

@@ -30,7 +30,7 @@ export type composer = {
   "bio"?: string
   "birth"?: Date
   "death"?: Date
-  "id": string
+  "id": number
   "dbId"?: string
 }
 export type standard = {

@@ -270,10 +270,8 @@ export default function Editor({
   {props =>
     <ComposerListDisplay
       originalTuneComposers={state["currentTune"]["composers"] ? state["currentTune"]["composers"] : []}
-      songsList={songsList}
       navigation={navigation}
       handleSetCurrentTune={handleSetCurrentTune}
-      playlists={[]}
     />
   }
 </Stack.Screen>
