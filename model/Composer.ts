@@ -4,7 +4,7 @@ import {composer, tune_draft} from "../types";
 import Tune from '../model/Tune.ts'
 
 export default class Composer extends Realm.Object<Composer, 'name'> {
-  _id!: Realm.BSON.ObjectId;
+  id!: Realm.BSON.ObjectId;
   name!: string;
   birth?: Date;
   death?: Date;
@@ -14,7 +14,7 @@ export default class Composer extends Realm.Object<Composer, 'name'> {
 
   static generate(tn: composer){
     return {
-      _id: new Realm.BSON.ObjectId(),
+      id: new Realm.BSON.ObjectId(),
       name: tn.name,
       birth: tn.birth,
       death: tn.death,
@@ -25,7 +25,7 @@ export default class Composer extends Realm.Object<Composer, 'name'> {
   static schema: Realm.ObjectSchema = {
     name: 'Composer',
     properties: {
-      _id: {type: 'objectId', default: new Realm.BSON.ObjectId()},
+      id: {type: 'objectId', default: new Realm.BSON.ObjectId()},
       name: {type: 'string', indexed: true},
       birth: "date?",
       death: "date?",
@@ -33,6 +33,6 @@ export default class Composer extends Realm.Object<Composer, 'name'> {
       dbId: {type: "int", indexed: true, optional: true},
       tunes: {type: "linkingObjects", objectType: "Tune", property: "composers"}
     },
-    primaryKey: '_id'
+    primaryKey: 'id'
   }
 }

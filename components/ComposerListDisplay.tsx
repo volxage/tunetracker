@@ -95,7 +95,7 @@ function ComposerListHeader({
                   realm.write(() => {
                     (realm.create("Composer",
                       {
-                        _id: new BSON.ObjectId(),
+                        id: new BSON.ObjectId(),
                         name: comp.name,
                         bio: comp.bio,
                         birth: comp.birth,
@@ -208,7 +208,6 @@ export default function ComposerListDisplay({
     setOnlineComposers(OnlineDB.getComposers());
   }, [])
   const bench = reactotron.benchmark("ComposerListDisplay benchmark");
-  const [listReversed, setListReversed] = useState(false);
   const [selectedAttr, setSelectedAttr] = useState("name");
   const [search, setSearch] = useState("");
   const [selectedComposers, setSelectedComposers]: [Array<Composer>, Function] = useState(originalTuneComposers);
@@ -229,7 +228,7 @@ export default function ComposerListDisplay({
       }
     }else{
       if(selectedOnlineComposers.includes(item)){
-        setOnlineComposers(onlineComposers.filter(comp => comp != item));
+        setSelectedOnlineComposers(selectedOnlineComposers.filter(comp => comp !== item));
       }else{
         setSelectedOnlineComposers(selectedOnlineComposers.concat(item));
       }
@@ -242,12 +241,15 @@ export default function ComposerListDisplay({
     return selectedOnlineComposers.includes(item);
   }
 
-  let displayComposers = [...(useQuery("Composer").map(res => res as Composer)), ...onlineComposers];
+
+  const localComposers = (useQuery("Composer").map(res => res as Composer))
+  const localDbIds = localComposers.filter(lComp => lComp.dbId).map(lComp => lComp.dbId);
+  let displayComposers = [...localComposers,
+    ...(onlineComposers.filter(oComp => !localDbIds.includes(oComp.id)))].filter(comp => !isSelected(comp))
   const fuse = new Fuse(displayComposers, fuseOptions);
   if(search === ""){
     //itemSort(displayComposers, selectedAttr, listReversed);
-    //displayComposers = displayComposers.filter(comp => !(selectedComposers.includes(comp)));
-    //displayComposers.unshift(...selectedComposers);
+    displayComposers = [...selectedComposers, ...selectedOnlineComposers, ...displayComposers]
   }else{
     const searchResults = fuse.search(search);
     //If there's no composer in the results, or the top result has a low score, add option to add a new composer
@@ -261,8 +263,9 @@ export default function ComposerListDisplay({
     displayComposers = searchResults.map(function(value, index){
       return value.item;
     });
-    //displayComposers = displayComposers.filter(comp => !(selectedComposers.includes(comp)));
+    displayComposers = displayComposers.filter(comp => !isSelected(comp));
     displayComposers.unshift(...selectedComposers);
+    displayComposers.unshift(...selectedOnlineComposers);
   }
   bench.step("Pre-render")
 
@@ -292,7 +295,7 @@ export default function ComposerListDisplay({
               }
               renderItem={({item, index, separators}) => (
                 <TouchableHighlight
-                  key={item.name}
+                  key={item.id as any}
                   onPress={() => {toggleComposerSelect(item)}}
                   onLongPress={() => {
                     if(item instanceof Composer){
