@@ -74,7 +74,7 @@ function App(): React.JSX.Element {
 
   return(
     <View style={{flex: 1, backgroundColor: "black"}}>
-      <RealmProvider schema={[Tune, Composer, Playlist]}>
+      <RealmProvider schema={[Tune, Composer, Playlist]} deleteRealmIfMigrationNeeded={true} >
         <NavigationContainer>
             <MainMenu/>
         </NavigationContainer>

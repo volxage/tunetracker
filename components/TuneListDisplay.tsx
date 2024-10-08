@@ -194,15 +194,15 @@ function TuneListHeader({
     (entry) => {return {label: entry[1], value: entry[0]}}
   );
 
-  const selectedPlaylistItems = Array.from(playlists.getPlaylists().map(
-    (playlist) => {return {label: playlist.title, value: playlist.id}}
-  ));
-  selectedPlaylistItems.unshift(
-    {
-      label: "All Songs",
-      value: " "
-    }
-  )
+//const selectedPlaylistItems = Array.from(playlists.getPlaylists().map(
+//  (playlist) => {return {label: playlist.title, value: playlist.id}}
+//));
+//selectedPlaylistItems.unshift(
+//  {
+//    label: "All Songs",
+//    value: " "
+//  }
+//)
 const statusColorMap = new Map([
   [Status.Waiting, "goldenrod"],
   [Status.Complete, "cadetblue"],
@@ -222,7 +222,7 @@ const statusColorMap = new Map([
       <View style={{flex:1}}>
         <RNPickerSelect
           onValueChange={(value) => headerInputStates.setSelectedPlaylist(value)}
-          items={selectedPlaylistItems}
+          items={[]}
           useNativeAndroidPickerStyle={false}
           placeholder={{label: "Select a playlist", value: ""}}
           style={{inputAndroid:
@@ -368,16 +368,17 @@ export default function TuneListDisplay({
   })
   let displaySongs = useQuery('Tune');
   if(selectedPlaylist !== " "){
-    const playlist = playlists.getPlaylist(selectedPlaylist)
-    if(typeof playlist !== "undefined"){
-      displaySongs = songs.filter(
-        tune => typeof tune.id !== "undefined" && playlist.tunes.includes(tune.id)
-      )
-    }
+    //const playlist = playlists.getPlaylist(selectedPlaylist)
+  //if(typeof playlist !== "undefined"){
+  //  displaySongs = songs.filter(
+  //    tune => typeof tune.id !== "undefined" && playlist.tunes.includes(tune.id)
+  //  )
+  //}
   }
   const fuse = new Fuse(displaySongs, fuseOptions);
   if(search === ""){
-    itemSort(displaySongs, selectedAttr, listReversed);
+
+    //itemSort(displaySongs, selectedAttr, listReversed);
   }else{
     displaySongs = fuse.search(search)
       .map(function(value, index){
@@ -405,7 +406,6 @@ export default function TuneListDisplay({
         <TuneListHeader 
           headerInputStates={headerInputStates}
           navigation={navigation}
-          playlists={playlists}
           setNewTune={setNewTune}
           selectedAttr={selectedAttr}
           dbStatus={dbStatus}

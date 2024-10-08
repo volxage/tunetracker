@@ -17,12 +17,12 @@ export default class Playlist extends Realm.Object<Playlist, 'title'> {
     }
   }
   static schema: Realm.ObjectSchema = {
-    name: 'Tune',
+    name: 'Playlist',
     properties: {
       _id: 'objectId',
       name: {type: 'string', indexed: true},
       description: 'string',
-      tunes: {type: "linkingObjects", objectType: "Tune", property: "composers"}
+      tunes: {type: "linkingObjects", objectType: "Tune", property: "playlists"}
     },
     primaryKey: '_id'
   }
