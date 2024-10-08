@@ -59,19 +59,6 @@ function reducer(state: any, action: any){
             tune[key as keyof tune_draft] = attr[1]
           }
         }
-        //Only run on first loading
-        if(!state["currentTune"] ||
-          !state["currentTune"].composers){
-          action["selectedTune"].composers.fetch().then(comps => {
-            tune.composers = (comps as Composer[])
-          });
-        }
-        if(!state["playlists"] ||
-          !state["currentTune"].playlists){
-          action["selectedTune"].playlists.fetch().then(lists => {
-
-          });
-        }
       }else{
         for(let attr of tuneDefaults){
           let key = attr[0] as keyof tune_draft;
@@ -92,16 +79,12 @@ export default function Editor({
   prettyAttrs, 
   navigation,
   selectedTune,
-  songsList,
-  playlists,
   newTune,
   setNewTune
 }: {
   prettyAttrs: Array<[string, string]>,
   navigation: any, //TODO: Find type of "navigation"
   selectedTune: Tune | tune_draft,
-  songsList: SongsList,
-  playlists: Playlists,
   newTune: boolean,
   setNewTune: Function
 }): React.JSX.Element {
@@ -127,12 +110,12 @@ export default function Editor({
 
   useEffect(() => {
     //If there's no id, it's impossible that the tune has been assigned playlists already.
-    if (typeof selectedTune.id !== "undefined"){ 
-      const tmpTunesPlaylist = playlists.getTunePlaylists(selectedTune.id);
-      setTunePlaylists(tmpTunesPlaylist);
-      setOriginalPlaylistsSet(new Set(tmpTunesPlaylist));
-    }
-    bench.stop("Post-render")
+//  if (typeof selectedTune.id !== "undefined"){ 
+//    const tmpTunesPlaylist = playlists.getTunePlaylists(selectedTune.id);
+//    setTunePlaylists(tmpTunesPlaylist);
+//    setOriginalPlaylistsSet(new Set(tmpTunesPlaylist));
+//  }
+//  bench.stop("Post-render")
   }, [])
   function handleSetCurrentTune(attr_key: keyof tune_draft, value: any){
     console.log("attr_key: " + attr_key);
@@ -161,7 +144,6 @@ export default function Editor({
                     attrKey={item[0]}
                     attrName={item[1]}
                     handleSetCurrentItem={handleSetCurrentTune}
-                    playlists={playlists}
                     tunePlaylists={tunePlaylists}
                     setTunePlaylists={setTunePlaylists}
                     navigation={navigation}
@@ -184,7 +166,6 @@ export default function Editor({
                   //  (selectedTune as Tune).destroyPermanently();
                   //});
                     navigation.goBack();
-                    songsList.rereadDb();
                   }}>
                     <ButtonText>DELETE TUNE (CAN'T UNDO!)</ButtonText>
                   </DeleteButton>
@@ -200,10 +181,16 @@ export default function Editor({
                 <Button
                   onPress={() => {
                     console.log("Saving to existing tune");
-                    (selectedTune as Tune).replace(state["currentTune"]).then( () => {
-                      songsList.rereadDb();
-                      navigation.goBack();
+                    realm.write(() => {
+                      for(let attr in (state["currentTune"])){
+                        console.log(attr);
+                        selectedTune[attr as keyof (tune_draft | Tune)] = (state["currentTune"][attr as keyof tune_draft] as any)
+                      }
                     });
+                  //(selectedTune as Tune).replace(state["currentTune"]).then( () => {
+                  //  songsList.rereadDb();
+                    navigation.goBack();
+                  //});
                   }}
                 ><ButtonText>Save</ButtonText>
               </Button>
@@ -246,7 +233,7 @@ export default function Editor({
           </View>
           <View style={{flex: 1}}>
             <DeleteButton
-              onPress={() => {navigation.goBack(); songsList.rereadDb; setNewTune(false);}}
+              onPress={() => {navigation.goBack(); setNewTune(false);}}
             ><ButtonText>Cancel Edit</ButtonText></DeleteButton>
         </View>
       </View>
