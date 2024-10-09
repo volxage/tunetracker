@@ -42,11 +42,12 @@ import Playlists from './Playlists.tsx';
 import OnlineDB from './OnlineDB.tsx';
 import { Q } from "@nozbe/watermelondb"
 import ExtrasMenu from './components/ExtrasMenu.tsx';
-import {RealmProvider} from '@realm/react';
+import {RealmProvider, useQuery, useRealm} from '@realm/react';
 import Tune from './model/Tune.ts';
 import compose from '@nozbe/watermelondb/react/compose';
 import Composer from './model/Composer.ts';
 import Playlist from './model/Playlist.ts';
+import {BSON} from 'realm';
 
 
 //PrettyAttrs function as both as "prettifiers" and lists of attrs to display in corresponding editors
@@ -88,12 +89,14 @@ function MainMenu({}: {}): React.JSX.Element {
   const [selectedTune, setSelectedTune]: [Tune | unknown, Function] = useState(undefined);
   const [newTune, setNewTune] = useState(false);
   const isDarkMode = true;
+  const realm = useRealm();
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
   let entriesArr = Array.from(miniEditorPrettyAttrs.entries());
   let arr = ((entriesArr as Array<Array<unknown>>) as Array<[string, string]>);
+  const allLocalComposers = useQuery(Composer);
   return(
     <Stack.Navigator
       screenOptions={{headerShown: false}}
@@ -124,7 +127,6 @@ function MainMenu({}: {}): React.JSX.Element {
             navigation={props.navigation}
             importingId={false}
             importFn={function(stand: standard, mini=false){
-              //TODO: Rewrite for Realm
               const tn: tune_draft = {};
               for(let attrPair of editorAttrs){
                 if(attrPair[0] !== "id"){
@@ -134,51 +136,53 @@ function MainMenu({}: {}): React.JSX.Element {
               tn.dbId = stand['id'];
               if(stand["Composers"]){
                 const compDbIds = stand["Composers"].map(comp => comp.id)
-                database.get('composers').query(
-                  Q.where("db_id", Q.oneOf(compDbIds))
-                ).fetch().then(comps => {
-                  tn.composers = comps as Composer[];
+                const localComps = allLocalComposers.filter(comp => comp.dbId && compDbIds.includes(comp.dbId));
+                tn.composers = localComps;
+                if(tn.composers.length !== stand["Composers"].length){
                   console.log(tn.composers);
-                  if(tn.composers.length != stand["Composers"].length){
-                    console.log("Past inequality");
-                    //TODO: Optimize
-                    // Composer(s) are missing from localDB.
-                    // Finds all dbIds where there are no corresponding local entries
-                    const missingComposersIds = compDbIds.filter(id => 
-                      !comps.some(dbComposer => (dbComposer as Composer).dbId === id)
-                    );
-                    console.log("Missing composer ids:");
-                    console.log(missingComposersIds);
-                    // Maps missing IDs to onineDB composers
-                    const missingComposers = missingComposersIds.map(missingCompId => 
-                      stand["Composers"].find(onlineComp => onlineComp.id === missingCompId)
-                    );
-                    console.log("Missing composers:");
-                    console.log(missingComposers);
+                  console.log("Past inequality");
+                  //TODO: Optimize
+                  // Composer(s) are missing from localDB.
+                  // Finds all dbIds where there are no corresponding local entries
+                  const missingComposersIds = compDbIds.filter(id => 
+                    !localComps.some(dbComposer => (dbComposer as Composer).dbId === id)
+                  );
+                  console.log("Missing composer ids:");
+                  console.log(missingComposersIds);
+                  // Maps missing IDs to onineDB composers
+                  const missingComposers = missingComposersIds.map(missingCompId => 
+                    stand["Composers"].find(onlineComp => onlineComp.id === missingCompId)
+                  );
+                  console.log("Missing composers:");
+                  console.log(missingComposers);
+                  realm.write(() => {
                     for(const missingComp of missingComposers){
-                      //TODO: Batch edit?
-                      database.write(async () => {database.get('composers').create(comp => {
-                        (comp as Composer).replace(missingComp)
-                      }).then(resultingModel => {
-                        //TODO: Is this necessary?
-                        songsList.rereadDb();
-                        tn.composers?.push(resultingModel as Composer)
-                      })}).then(() => {
+                      if(!missingComp){
+                        //TODO: Handle error from composer not being found in OnlineDB
+                      }else{
+                        const createdComp = realm.create(Composer, {
+                          id: new BSON.ObjectId(),
+                          name: missingComp.name ? missingComp.name : "New Song",
+                          birth: missingComp?.birth,
+                          death: missingComp?.death,
+                          dbId: missingComp.id,
+                        })
+                        tn.composers?.push(createdComp)
                         setSelectedTune(tn);
                         setNewTune(true);
                         props.navigation.goBack();
                         mini ? props.navigation.navigate("MiniEditor")
                           :props.navigation.navigate("Editor")
-                      });
+                      }
                     }
-                  }else{
-                    setSelectedTune(tn);
-                    setNewTune(true);
-                    props.navigation.goBack();
-                    mini ? props.navigation.navigate("MiniEditor")
-                      :props.navigation.navigate("Editor")
-                  }
-                })
+                  });
+                }else{
+                  setSelectedTune(tn);
+                  setNewTune(true);
+                  props.navigation.goBack();
+                  mini ? props.navigation.navigate("MiniEditor")
+                    :props.navigation.navigate("Editor")
+                }
               }
             }}/>
           </SafeAreaView>
