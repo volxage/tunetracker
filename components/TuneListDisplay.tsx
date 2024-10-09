@@ -50,6 +50,7 @@ import reactotron from 'reactotron-react-native';
 import Tune from '../model/Tune.ts';
 import Composer from '../model/Composer.ts';
 import {useQuery} from '@realm/react';
+import {OrderedCollection} from 'realm';
 const selectionAttrs = new Map<string, string>([
   ["title", "Title"],
   ["alternativeTitle", "Alternative Title"],
@@ -71,7 +72,8 @@ const selectionAttrs = new Map<string, string>([
 function prettyPrint(object: unknown): string{
   if (typeof object == "string") return object as string;
   if (typeof object == "number") return JSON.stringify(object);
-  if (Array.isArray(object)) return object.join(", ");
+  if (object instanceof Composer) return object.name;
+  if (Array.isArray(object) || object instanceof OrderedCollection) return object.map(obj => {return prettyPrint(obj)}).join(", ");
   return "(Empty)";
 }
 
