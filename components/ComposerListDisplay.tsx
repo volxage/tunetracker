@@ -89,23 +89,19 @@ function ComposerListHeader({
             <Button style={{flex: 1}} onPress={() => {
               const composers: Array<Composer | composer> = [];
               for(let comp of headerInputStates.selectedOnlineComposers){
-                if(comp instanceof Composer){
-                  composers.push(comp);
-                }else{
-                  realm.write(() => {
-                    (realm.create("Composer",
-                      {
-                        id: new BSON.ObjectId(),
-                        name: comp.name,
-                        bio: comp.bio,
-                        birth: comp.birth,
-                        death: comp.death,
-                        dbId: comp.id
-                      }) as Composer)
-                  });
-                }
+                realm.write(() => {
+                  composers.push(realm.create("Composer",
+                    {
+                      id: new BSON.ObjectId(),
+                      name: comp.name,
+                      bio: comp.bio,
+                      birth: comp.birth,
+                      death: comp.death,
+                      dbId: comp.id
+                    }) as Composer)
+                });
               }
-              headerInputStates.handleSetCurrentTune("composers", composers);
+              headerInputStates.handleSetCurrentTune("composers", [...composers, ...headerInputStates.selectedComposers]);
               headerInputStates.navigation.navigate("EditorUnwrapped");
             }}>
               <ButtonText>Save selection</ButtonText>
@@ -202,6 +198,7 @@ export default function ComposerListDisplay({
   handleSetCurrentTune: Function,
   originalTuneComposers: Composer[]
 }){
+  console.log("Rerender start");
   const [onlineComposers, setOnlineComposers]: [(composer)[], Function]= useState([]);
   useEffect(() => {
     bench.stop("Full render");
@@ -221,9 +218,12 @@ export default function ComposerListDisplay({
     // So we need to have two separate arrays so Realm can be sure one of the arrays...
     // only contains Composers.
     if(item instanceof Composer){
+      console.log(item.id);
       if(selectedComposers.includes(item)){
-        setSelectedComposers(selectedComposers.filter(comp => comp != item));
+        setSelectedComposers(selectedComposers.filter(comp => comp !== item));
       }else{
+        console.log(`Concat ${item.name}`);
+        console.log(selectedComposers);
         setSelectedComposers(selectedComposers.concat(item));
       }
     }else{
@@ -236,7 +236,11 @@ export default function ComposerListDisplay({
   }
   function isSelected(item: Composer | composer){
     if(item instanceof Composer){
-      return selectedComposers.includes(item);
+      if(selectedComposers.includes(item)){
+      }
+      //TODO: Make less janky? Why do we need to iterate once over the array to determine if it's present?
+      //TODO: USE a set instead!
+      return (selectedComposers.includes(item) || selectedComposers.some(sC => sC.id.equals(item.id)));
     }
     return selectedOnlineComposers.includes(item);
   }
@@ -245,9 +249,10 @@ export default function ComposerListDisplay({
   const localComposers = (useQuery("Composer").map(res => res as Composer))
   const localDbIds = localComposers.filter(lComp => lComp.dbId).map(lComp => lComp.dbId);
   let displayComposers = [...localComposers,
-    ...(onlineComposers.filter(oComp => !localDbIds.includes(oComp.id)))].filter(comp => !isSelected(comp))
+    ...(onlineComposers.filter(oComp => !localDbIds.includes(oComp.id)))].filter(comp => !isSelected(comp));
   const fuse = new Fuse(displayComposers, fuseOptions);
   if(search === ""){
+    console.log("dC update");
     //itemSort(displayComposers, selectedAttr, listReversed);
     displayComposers = [...selectedComposers, ...selectedOnlineComposers, ...displayComposers]
   }else{
@@ -322,7 +327,6 @@ export default function ComposerListDisplay({
           <ComposerEditor
             selectedComposer={composerToEdit}
             prettyAttrs={(composerEditorAttrs as [string, string][])}
-            songsList={songsList}
             playlists={playlists}
             setNewComposer={setNewComposer}
             newComposer={newComposer}
