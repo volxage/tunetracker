@@ -7,7 +7,7 @@ export default class Playlist extends Realm.Object<Playlist, 'title'> {
   id!: Realm.BSON.ObjectId;
   title!: string;
   description?: string;
-  tunes?: Realm.List<Tune>;
+  tunes!: Realm.List<Tune>;
 
   static generate(pl: playlist){
     return {
@@ -21,7 +21,7 @@ export default class Playlist extends Realm.Object<Playlist, 'title'> {
     properties: {
       id: {type: 'objectId', default: new Realm.BSON.ObjectId()},
       name: {type: 'string', indexed: true},
-      description: 'string',
+      description: 'string?',
       tunes: {type: "linkingObjects", objectType: "Tune", property: "playlists"}
     },
     primaryKey: 'id'
