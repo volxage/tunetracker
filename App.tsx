@@ -38,7 +38,6 @@ import {
 } from 'react-native/Libraries/NewAppScreen';
 
 import {standard, tune_draft, editorAttrs, Status} from './types.tsx';
-import Playlists from './Playlists.tsx';
 import OnlineDB from './OnlineDB.tsx';
 import { Q } from "@nozbe/watermelondb"
 import ExtrasMenu from './components/ExtrasMenu.tsx';
@@ -65,11 +64,9 @@ const Stack = createNativeStackNavigator();
 
 function App(): React.JSX.Element {
   const [rawPlaylists, setRawPlaylists] = useState([])
-  const playlists = new Playlists(rawPlaylists, setRawPlaylists);
 
   useEffect(() => {
     //TODO: Implement playlists in WatermelonDB
-    playlists.readFromPlaylistsJson();
     OnlineDB.update();
   }, []);
 

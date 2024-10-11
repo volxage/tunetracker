@@ -93,7 +93,6 @@ export default function Editor({
   console.log("Rerender Editor");
   const realm = useRealm();
   const [state, dispatch] = useReducer(reducer, {currentTune: {}});
-  const [tunePlaylists, setTunePlaylists]: [playlist[], Function] = useState([])
   const [originalPlaylistsSet, setOriginalPlaylistsSet]: [Set<playlist>, Function] = useState(new Set())
   const bench = reactotron.benchmark("Editor benchmark");
   const Stack = createNativeStackNavigator();
@@ -144,8 +143,6 @@ export default function Editor({
                     attrKey={item[0]}
                     attrName={item[1]}
                     handleSetCurrentItem={handleSetCurrentTune}
-                    tunePlaylists={tunePlaylists}
-                    setTunePlaylists={setTunePlaylists}
                     navigation={navigation}
                     isComposer={false}
                   />

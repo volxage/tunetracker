@@ -25,6 +25,8 @@ import DbConnection from './TypeFields/DbConnection.tsx';
 import ComposerField from './TypeFields/ComposerField.tsx';
 import DatePicker from 'react-native-date-picker';
 import dateDisplay from '../dateDisplay.tsx';
+import Composer from '../model/Composer.ts';
+import Playlist from '../model/Playlist.ts';
 
 function AddPlaylistField({
   newPlaylist,
@@ -32,7 +34,7 @@ function AddPlaylistField({
   setTunePlaylists
 }: {
   newPlaylist:boolean,
-  tunePlaylists: playlist[],
+  tunePlaylists: (playlist | Playlist)[],
   setTunePlaylists: Function,
 }){
   const [newPlaylistTitle, setNewPlaylistTitle] = useState("")
@@ -91,8 +93,6 @@ function TypeField({
   attrName,
   handleSetCurrentItem,
   playlists,
-  tunePlaylists,
-  setTunePlaylists,
   navigation,
   isComposer
 }: {
@@ -101,8 +101,6 @@ function TypeField({
   attrName: string,
   handleSetCurrentItem: Function,
   playlists: Playlists,
-  tunePlaylists: playlist[],
-  setTunePlaylists: Function,
   navigation: any,
   isComposer: boolean
 }){
@@ -120,7 +118,7 @@ function TypeField({
   }
   else if (attrKey === "composers" as keyOfEitherDraft){
     return(
-      <ComposerField attr={attr} navigation={navigation} />
+      <ComposerField attr={attr as (Composer | composer)[]} navigation={navigation} />
     );
   }
   else if (attr instanceof Date){
@@ -167,7 +165,7 @@ function TypeField({
           <Title>PLAYLISTS</Title>
         </View>
         <FlatList
-          data={tunePlaylists}
+          data={attr as (playlist | Playlist)[]}
           renderItem={({item}) => (
             <View style={{flexDirection: 'row'}}>
               <View style={{flex:4}}>
@@ -190,7 +188,7 @@ function TypeField({
           <Text>New playlist</Text>
         </View>
         <AddPlaylistField
-          tunePlaylists={tunePlaylists}
+          tunePlaylists={attr as (Playlist | playlist)[]}
           playlists={playlists}
           newPlaylist={newPlaylistOpen}
           setTunePlaylists={setTunePlaylists}
