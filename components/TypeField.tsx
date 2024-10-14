@@ -26,14 +26,19 @@ import DatePicker from 'react-native-date-picker';
 import dateDisplay from '../dateDisplay.tsx';
 import Composer from '../model/Composer.ts';
 import Playlist from '../model/Playlist.ts';
+import {useRealm} from '@realm/react';
+import {BSON} from 'realm';
 
 function AddPlaylistField({
   newPlaylist,
-  tunePlaylists
+  tunePlaylists,
+  handleSetCurrentItem
 }: {
   newPlaylist:boolean,
-  tunePlaylists: (playlist | Playlist)[]
+  tunePlaylists: (playlist | Playlist)[],
+  handleSetCurrentItem: Function
 }){
+  const realm = useRealm();
   const [newPlaylistTitle, setNewPlaylistTitle] = useState("")
   if(newPlaylist){
     return(
@@ -47,11 +52,16 @@ function AddPlaylistField({
         </View>
         <View style={{alignContent: 'flex-end', flex: 1}}>
           <Button onPress={() => {
-            if(newPlaylistTitle.trim().length != 0){
-            //const tmpPlaylist = playlists.addPlaylist(newPlaylistTitle);
-            //if(typeof tmpPlaylist !== "undefined"){
-            //  setTunePlaylists(tunePlaylists.concat(tmpPlaylist));
-            //}
+            if(newPlaylistTitle.trim().length !== 0){
+              realm.write(() => {
+                const result = realm.create(Playlist, {title: newPlaylistTitle, id: new BSON.ObjectId()});
+                if(tunePlaylists){
+                  handleSetCurrentItem("playlists",tunePlaylists.concat(result));
+                }else{
+                  handleSetCurrentItem("playlists",[result]);
+                }
+              })
+              setNewPlaylistTitle("")
             }
           }}>
             <ButtonText><Icon name="plus" size={30}/></ButtonText>
@@ -154,6 +164,8 @@ function TypeField({
     const [newPlaylistOpen, setNewPlaylistOpen] = useState(false)
     //TODO:
     // Delete Button
+    console.log("Rendered tune playlists:");
+    console.log(attr);
     return(
       <View style={{padding: 8}}>
         <View style={{paddingBottom:20}}>
@@ -185,6 +197,7 @@ function TypeField({
         <AddPlaylistField
           tunePlaylists={attr as (Playlist | playlist)[]}
           newPlaylist={newPlaylistOpen}
+          handleSetCurrentItem={handleSetCurrentItem}
         />
       </View>
     );
