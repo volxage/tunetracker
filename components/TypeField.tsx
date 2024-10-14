@@ -19,7 +19,6 @@ import {
   View,
 } from 'react-native';
 import { composer, playlist, tune_draft } from '../types.tsx';
-import Playlists from '../Playlists.tsx';
 import OnlineDB from '../OnlineDB.tsx';
 import DbConnection from './TypeFields/DbConnection.tsx';
 import ComposerField from './TypeFields/ComposerField.tsx';
@@ -30,12 +29,10 @@ import Playlist from '../model/Playlist.ts';
 
 function AddPlaylistField({
   newPlaylist,
-  tunePlaylists,
-  setTunePlaylists
+  tunePlaylists
 }: {
   newPlaylist:boolean,
-  tunePlaylists: (playlist | Playlist)[],
-  setTunePlaylists: Function,
+  tunePlaylists: (playlist | Playlist)[]
 }){
   const [newPlaylistTitle, setNewPlaylistTitle] = useState("")
   if(newPlaylist){
@@ -92,7 +89,6 @@ function TypeField({
   attrKey,
   attrName,
   handleSetCurrentItem,
-  playlists,
   navigation,
   isComposer
 }: {
@@ -100,7 +96,6 @@ function TypeField({
   attrKey: keyof (tune_draft | composer),
   attrName: string,
   handleSetCurrentItem: Function,
-  playlists: Playlists,
   navigation: any,
   isComposer: boolean
 }){
@@ -172,9 +167,9 @@ function TypeField({
                 <SubText>{item.title}</SubText>
               </View>
               <View style={{flex:1}}>
-                <DeleteButton onPress={
-                  () => {setTunePlaylists(tunePlaylists
-                                         .filter(playlist => playlist !== item))}
+                <DeleteButton onPress={ () => {}
+                    //() => {setTunePlaylists(tunePlaylists
+                  //                    .filter(playlist => playlist !== item))}
                 }>
                   <ButtonText><Icon name="close" size={30}/></ButtonText>
                 </DeleteButton>
@@ -189,9 +184,7 @@ function TypeField({
         </View>
         <AddPlaylistField
           tunePlaylists={attr as (Playlist | playlist)[]}
-          playlists={playlists}
           newPlaylist={newPlaylistOpen}
-          setTunePlaylists={setTunePlaylists}
         />
       </View>
     );
