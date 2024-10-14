@@ -43,6 +43,10 @@ const fuseOptions = { // For finetuning the search algorithm
 	]
 };
 
+enum playlist_enum {
+  AllTunes = "AllTunes"
+}
+
 import {playlist, Status, tune_draft } from '../types.tsx';
 import SongsList from '../SongsList.tsx';
 import Slider from '@react-native-community/slider';
@@ -50,7 +54,8 @@ import reactotron from 'reactotron-react-native';
 import Tune from '../model/Tune.ts';
 import Composer from '../model/Composer.ts';
 import {useQuery} from '@realm/react';
-import {OrderedCollection} from 'realm';
+import {List, OrderedCollection} from 'realm';
+import Playlist from '../model/Playlist.ts';
 const selectionAttrs = new Map<string, string>([
   ["title", "Title"],
   ["alternativeTitle", "Alternative Title"],
@@ -182,32 +187,29 @@ function TuneListHeader({
   navigation,
   setNewTune,
   selectedAttr,
+  selectedPlaylist,
   dbStatus
 }: {
   headerInputStates: HeaderInputStates
   navigation: any,
   setNewTune: Function,
   selectedAttr: String,
+  selectedPlaylist: Playlist | playlist_enum,
   dbStatus: Status
 }){
   const selectedAttrItems = Array.from(selectionAttrs.entries()).map(
     (entry) => {return {label: entry[1], value: entry[0]}}
   );
 
-//const selectedPlaylistItems = Array.from(playlists.getPlaylists().map(
-//  (playlist) => {return {label: playlist.title, value: playlist.id}}
-//));
-//selectedPlaylistItems.unshift(
-//  {
-//    label: "All Songs",
-//    value: " "
-//  }
-//)
-const statusColorMap = new Map([
-  [Status.Waiting, "goldenrod"],
-  [Status.Complete, "cadetblue"],
-  [Status.Failed, "darkred"]
-])
+  const allPlaylists = useQuery(Playlist)
+  const selectedPlaylistItems: {label: string, value: Playlist | playlist_enum}[] = (allPlaylists.map(
+    (playlist) => {return {label: playlist.title, value: playlist}}
+  ));
+  const statusColorMap = new Map([
+    [Status.Waiting, "goldenrod"],
+    [Status.Complete, "cadetblue"],
+    [Status.Failed, "darkred"]
+  ])
 
   return(
   <View>
@@ -221,10 +223,11 @@ const statusColorMap = new Map([
       </View>
       <View style={{flex:1}}>
         <RNPickerSelect
+          value={selectedPlaylist}
           onValueChange={(value) => headerInputStates.setSelectedPlaylist(value)}
           items={[]}
           useNativeAndroidPickerStyle={false}
-          placeholder={{label: "Select a playlist", value: ""}}
+          placeholder={{label: "No playlist", value: playlist_enum.AllTunes}}
           style={{inputAndroid:
             {
             backgroundColor: 'transparent', color: 'white', fontSize: 20, fontWeight: "300",
@@ -357,7 +360,7 @@ export default function TuneListDisplay({
   const bench = reactotron.benchmark("TuneListDisplay benchmark");
   const [listReversed, setListReversed] = useState(false);
   const [selectedAttr, setSelectedAttr] = useState("title");
-  const [selectedPlaylist, setSelectedPlaylist] = useState("");
+  const [selectedPlaylist, setSelectedPlaylist]: [Playlist | playlist_enum.AllTunes, Function] = useState(playlist_enum.AllTunes);
   const [search, setSearch] = useState("");
   const [confidenceVisible, setConfidenceVisible] = useState(false);
   const [dbStatus, setDbStatus] = useState(Status.Waiting);
@@ -366,23 +369,18 @@ export default function TuneListDisplay({
     bench.stop("Full render");
     OnlineDB.addListener(setDbStatus);
   })
-  let displaySongs = useQuery('Tune');
-  if(selectedPlaylist !== " "){
-    //const playlist = playlists.getPlaylist(selectedPlaylist)
-  //if(typeof playlist !== "undefined"){
-  //  displaySongs = songs.filter(
-  //    tune => typeof tune.id !== "undefined" && playlist.tunes.includes(tune.id)
-  //  )
-  //}
+  let displaySongs: (Tune[] | List<Tune>) = useQuery('Tune').map(res => res as Tune);
+  if(selectedPlaylist !== playlist_enum.AllTunes){
+    const pl = selectedPlaylist as Playlist
+    displaySongs = pl.tunes;
   }
   const fuse = new Fuse(displaySongs, fuseOptions);
   if(search === ""){
-
     //itemSort(displaySongs, selectedAttr, listReversed);
   }else{
     displaySongs = fuse.search(search)
       .map(function(value, index){
-        return value.item;
+        return value.item as Tune;
       });
   }
   bench.step("Pre-render")
@@ -408,6 +406,7 @@ export default function TuneListDisplay({
           navigation={navigation}
           setNewTune={setNewTune}
           selectedAttr={selectedAttr}
+          selectedPlaylist={selectedPlaylist}
           dbStatus={dbStatus}
         />
       }

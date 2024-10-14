@@ -26,7 +26,7 @@ import DatePicker from 'react-native-date-picker';
 import dateDisplay from '../dateDisplay.tsx';
 import Composer from '../model/Composer.ts';
 import Playlist from '../model/Playlist.ts';
-import {useRealm} from '@realm/react';
+import {useQuery, useRealm} from '@realm/react';
 import {BSON} from 'realm';
 
 function AddPlaylistField({
@@ -70,25 +70,25 @@ function AddPlaylistField({
       </View>
     );
   }else{
-//  let availablePlaylists = playlists.getPlaylists()
-//    .filter(playlist => !(tunePlaylists.includes(playlist)));
-//  return (
-//    <RNPickerSelect
-//      onValueChange={
-//        // When the component rerenders, onValueChange is called with a value of "".
-//        (value) => {value !== "" && setTunePlaylists(tunePlaylists.concat(value))}
-//      }
-//      items={
-//        availablePlaylists
-//          .map((playlist) => {return {label:playlist.title, value: playlist}})
-//      }
-//      useNativeAndroidPickerStyle={false}
-//      placeholder={{label: "Select a playlist to insert tune into", value: ""}}
-//      style={{inputAndroid:
-//        {backgroundColor: 'transparent', color: 'white', fontSize: 18, fontWeight: "300"}
-//      }}
-//    />
-//  );
+    let availablePlaylists = useQuery(Playlist)
+      .filter(playlist => !(tunePlaylists.includes(playlist)));
+    return (
+      <RNPickerSelect
+        onValueChange={
+          // When the component rerenders, onValueChange is called with a value of "".
+          (value) => {value !== "" && handleSetCurrentItem("playlists", tunePlaylists.concat(value))}
+        }
+        items={
+          availablePlaylists
+            .map((playlist) => {return {label:playlist.title, value: playlist}})
+        }
+        useNativeAndroidPickerStyle={false}
+        placeholder={{label: "Select a playlist to insert tune into", value: ""}}
+        style={{inputAndroid:
+          {backgroundColor: 'transparent', color: 'white', fontSize: 18, fontWeight: "300"}
+        }}
+      />
+    );
   }
 }
 
