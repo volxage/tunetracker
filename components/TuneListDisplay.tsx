@@ -17,7 +17,6 @@ import {
   ConfidenceBarView
 } from '../Style.tsx'
 import itemSort from '../itemSort.tsx'
-import Playlists from '../Playlists.tsx'
 import RNPickerSelect from 'react-native-picker-select';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import OnlineDB from '../OnlineDB.tsx';
@@ -54,7 +53,7 @@ import reactotron from 'reactotron-react-native';
 import Tune from '../model/Tune.ts';
 import Composer from '../model/Composer.ts';
 import {useQuery} from '@realm/react';
-import {List, OrderedCollection} from 'realm';
+import {BSON, List, OrderedCollection} from 'realm';
 import Playlist from '../model/Playlist.ts';
 const selectionAttrs = new Map<string, string>([
   ["title", "Title"],
@@ -202,8 +201,8 @@ function TuneListHeader({
   );
 
   const allPlaylists = useQuery(Playlist)
-  const selectedPlaylistItems: {label: string, value: Playlist | playlist_enum}[] = (allPlaylists.map(
-    (playlist) => {return {label: playlist.title, value: playlist}}
+  const selectedPlaylistItems: {label: string, value: BSON.ObjectId | playlist_enum}[] = (allPlaylists.map(
+    (playlist) => {return {label: playlist.title, value: playlist.id}}
   ));
   const statusColorMap = new Map([
     [Status.Waiting, "goldenrod"],
@@ -225,7 +224,7 @@ function TuneListHeader({
         <RNPickerSelect
           value={selectedPlaylist}
           onValueChange={(value) => headerInputStates.setSelectedPlaylist(value)}
-          items={[]}
+          items={selectedPlaylistItems}
           useNativeAndroidPickerStyle={false}
           placeholder={{label: "No playlist", value: playlist_enum.AllTunes}}
           style={{inputAndroid:
@@ -360,10 +359,11 @@ export default function TuneListDisplay({
   const bench = reactotron.benchmark("TuneListDisplay benchmark");
   const [listReversed, setListReversed] = useState(false);
   const [selectedAttr, setSelectedAttr] = useState("title");
-  const [selectedPlaylist, setSelectedPlaylist]: [Playlist | playlist_enum.AllTunes, Function] = useState(playlist_enum.AllTunes);
+  const [selectedPlaylist, setSelectedPlaylist]: [BSON.ObjectId | playlist_enum.AllTunes, Function] = useState(playlist_enum.AllTunes);
   const [search, setSearch] = useState("");
   const [confidenceVisible, setConfidenceVisible] = useState(false);
   const [dbStatus, setDbStatus] = useState(Status.Waiting);
+  const allPlaylists = useQuery(Playlist)
 
   useEffect(() => {
     bench.stop("Full render");
@@ -371,8 +371,8 @@ export default function TuneListDisplay({
   })
   let displaySongs: (Tune[] | List<Tune>) = useQuery('Tune').map(res => res as Tune);
   if(selectedPlaylist !== playlist_enum.AllTunes){
-    const pl = selectedPlaylist as Playlist
-    displaySongs = pl.tunes;
+    //TODO: Select all tunes with given playlist ID
+    displaySongs = allPlaylists.filtered("id == $0", selectedPlaylist)[0].tunes
   }
   const fuse = new Fuse(displaySongs, fuseOptions);
   if(search === ""){
