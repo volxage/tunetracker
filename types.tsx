@@ -104,6 +104,7 @@ export const tuneDefaults = new Map<string, any>([
   ["title", "New song"],
   ["alternativeTitle", ""],
   ["composers", []],
+  ["playlists", []],
   ["form", ""],
   ["notableRecordings", []],
   ["mainKey", ""],
