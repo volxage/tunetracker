@@ -20,7 +20,7 @@ export default class Playlist extends Realm.Object<Playlist, 'title'> {
     name: 'Playlist',
     properties: {
       id: {type: 'objectId', default: new Realm.BSON.ObjectId()},
-      name: {type: 'string', indexed: true},
+      title: {type: 'string', indexed: true},
       description: 'string?',
       tunes: {type: "linkingObjects", objectType: "Tune", property: "playlists"}
     },
