@@ -27,7 +27,7 @@ import dateDisplay from '../dateDisplay.tsx';
 import Composer from '../model/Composer.ts';
 import Playlist from '../model/Playlist.ts';
 import {useQuery, useRealm} from '@realm/react';
-import {BSON} from 'realm';
+import {BSON, Results} from 'realm';
 
 function AddPlaylistField({
   newPlaylist,
@@ -40,6 +40,8 @@ function AddPlaylistField({
 }){
   const realm = useRealm();
   const [newPlaylistTitle, setNewPlaylistTitle] = useState("")
+  let availablePlaylists = useQuery(Playlist)
+    .filter(playlist => !(tunePlaylists.some(pl => (pl.id as BSON.ObjectId).equals(playlist.id))));
   if(newPlaylist){
     return(
       <View style={{padding: 8, flexDirection: "row"}}>
@@ -70,8 +72,6 @@ function AddPlaylistField({
       </View>
     );
   }else{
-    let availablePlaylists = useQuery(Playlist)
-      .filter(playlist => !(tunePlaylists.includes(playlist)));
     return (
       <RNPickerSelect
         onValueChange={
@@ -109,6 +109,12 @@ function TypeField({
   navigation: any,
   isComposer: boolean
 }){
+  const allPlaylists = useQuery(Playlist);
+  const [icon, setIcon] = useState();
+  useEffect(() => {
+    Icon.getImageSource('circle', 26, 'white')
+      .then(setIcon);
+  }, []);
   if(isComposer){
     console.log("Attr:");
     console.log(attrKey);
@@ -162,6 +168,7 @@ function TypeField({
   }
   else if (attrKey === "playlists" as keyOfEitherDraft){ //Playlists are NOT an attribute of a tune
     const [newPlaylistOpen, setNewPlaylistOpen] = useState(false)
+    const ids = (attr as (Playlist | playlist)[]).map(pl => pl.id);
     //TODO:
     // Delete Button
     console.log("Rendered tune playlists:");
@@ -179,10 +186,13 @@ function TypeField({
                 <SubText>{item.title}</SubText>
               </View>
               <View style={{flex:1}}>
-                <DeleteButton onPress={ () => {}
-                    //() => {setTunePlaylists(tunePlaylists
-                  //                    .filter(playlist => playlist !== item))}
-                }>
+                <DeleteButton onPress={
+                    () => {
+                      ids.splice(ids.findIndex(id => id.equals(item.id)))
+                      handleSetCurrentItem("playlists",
+                        allPlaylists.filtered("id IN $0", ids)
+                      );
+                    }}>
                   <ButtonText><Icon name="close" size={30}/></ButtonText>
                 </DeleteButton>
               </View>
@@ -212,12 +222,6 @@ function TypeField({
       </View>
     );
   }else if (typeof attr == "number"){
-    const [icon, setIcon] = useState();
-
-    useEffect(() => {
-      Icon.getImageSource('circle', 26, 'white')
-        .then(setIcon);
-    }, []);
     return(
       <View style={{backgroundColor: 'black', padding: 8}}>
         <Title>{attrName.toUpperCase()}</Title>

@@ -1,3 +1,4 @@
+import {BSON} from "realm"
 import Composer from "./model/Composer"
 
 //Copyright 2024 Jonathan Hilliard
@@ -46,7 +47,7 @@ export type standard = {
 export type playlist = {
   "title": string
   "description"?: string
-  "id": string
+  "id": BSON.ObjectId
   "tunes": string[]
 }
 
