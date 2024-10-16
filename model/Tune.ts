@@ -11,7 +11,7 @@ export default class Tune extends Realm.Object<Tune, 'title'> {
   composers?: Realm.List<Composer>;
   form?: string;
   year?: number;
-  hasLyricts?: boolean;
+  hasLyrics?: boolean;
   mainKey?: string;
   // Note that "keys" is reserved in Realm.Object
   keyCenters?: string[]; 
