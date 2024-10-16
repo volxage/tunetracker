@@ -194,6 +194,7 @@ function MainMenu({}: {}): React.JSX.Element {
               navigation={props.navigation}
               setSelectedTune={setSelectedTune}
               setNewTune={setNewTune}
+              allowNewTune={true}
             />
           </View>
         </SafeAreaView>

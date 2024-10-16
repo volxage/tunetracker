@@ -117,8 +117,7 @@ export default function Editor({
   }, [])
   function handleSetCurrentTune(attr_key: keyof tune_draft, value: any){
     console.log("attr_key: " + attr_key);
-    console.log("value: ");
-    console.log(value);
+    console.log(`value: ${value}`);
     dispatch({type: 'update_attr', attr: attr_key, value: value});
   }
   bench.step("Prerender")
@@ -179,7 +178,6 @@ export default function Editor({
                     console.log("Saving to existing tune");
                     realm.write(() => {
                       for(let attr in (state["currentTune"])){
-                        console.log(attr);
                         selectedTune[attr as keyof (tune_draft | Tune)] = (state["currentTune"][attr as keyof tune_draft] as any)
                       }
                     });

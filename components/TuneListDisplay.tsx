@@ -14,7 +14,8 @@ import {
   TextInput,
   Button,
   ButtonText,
-  ConfidenceBarView
+  ConfidenceBarView,
+  DeleteButton
 } from '../Style.tsx'
 import itemSort from '../itemSort.tsx'
 import RNPickerSelect from 'react-native-picker-select';
@@ -178,6 +179,7 @@ type HeaderInputStates = {
   setSelectedAttr: Function
   setSelectedTune: Function
   setSelectedPlaylist: Function
+  allowNewTune?: boolean
 }
 
 function TuneListHeader({
@@ -219,6 +221,7 @@ function TuneListHeader({
           onChangeText={(text) => {headerInputStates.setSearch(text)}}
         />
       </View>
+    {
       <View style={{flex:1}}>
         <RNPickerSelect
           value={selectedPlaylist}
@@ -233,6 +236,7 @@ function TuneListHeader({
           }}
         />
       </View>
+    }
     </View>
     <View style={{flexDirection: 'row', alignItems: 'center', borderBottomWidth:1}}>
       <View style={{flex: 4}}>
@@ -292,7 +296,7 @@ function TuneListHeader({
         <ButtonText><Icon name="script-text" size={30} /></ButtonText>
       </Button>
     </View>
-    <View style={{flexDirection: "row"}}>
+    <View style={{flexDirection: "row", flex: 3}}>
       <Button
         style={{
           flex:1,
@@ -317,28 +321,36 @@ function TuneListHeader({
         }}>
         <ButtonText><Icon name="menu-swap" size={30} /></ButtonText>
       </Button>
-      <Button style={{flex:1}} onPress={() => {
+      {
+        headerInputStates.allowNewTune ?
+        <View style={{flexDirection: "row", flex: 3}}>
+          <Button style={{flex:1}} onPress={() => {
             const tn: tune_draft = {};
             headerInputStates.setSelectedTune(tn);
             setNewTune(true);
-            
+
             navigation.navigate("Editor");
-      }}>
-        <ButtonText><Icon name="plus" size={30}/></ButtonText>
-      </Button>
-      <Button style={{
-          flex:1,
-          backgroundColor: statusColorMap.get(dbStatus)
+          }}>
+            <ButtonText><Icon name="plus" size={30}/></ButtonText>
+          </Button>
+          <Button style={{
+            flex:1,
+              backgroundColor: statusColorMap.get(dbStatus)
           }}
-        onPress={() => navigation.navigate("Importer")}>
-        <ButtonText><Icon name="database-arrow-down" size={30}/></ButtonText>
-      </Button>
-      <Button style={{
-        flex:1
-      }}
-      onPress={() => navigation.navigate("ExtrasMenu")}>
+          onPress={() => navigation.navigate("Importer")}>
+          <ButtonText><Icon name="database-arrow-down" size={30}/></ButtonText>
+        </Button>
+        <Button style={{
+          flex:1
+        }}
+        onPress={() => navigation.navigate("ExtrasMenu")}>
         <ButtonText><Icon name="dots-horizontal" size={30}/></ButtonText>
       </Button>
+    </View>:
+    <DeleteButton style={{flex: 3}}>
+      <ButtonText>Go back</ButtonText>
+    </DeleteButton>
+    }
     </View>
   </View>
 );
@@ -346,11 +358,13 @@ function TuneListHeader({
 export default function TuneListDisplay({
   navigation,
   setSelectedTune,
-  setNewTune
+  setNewTune,
+  allowNewTune
 }: {
   navigation: any,
   setSelectedTune: Function,
-  setNewTune: Function
+  setNewTune: Function,
+  allowNewTune: boolean
 }){
   useEffect(() => {
     bench.stop("Full render");
@@ -393,7 +407,8 @@ export default function TuneListDisplay({
     setSearch: setSearch,
     setSelectedAttr: setSelectedAttr,
     setSelectedTune: setSelectedTune,
-    setSelectedPlaylist: setSelectedPlaylist
+    setSelectedPlaylist: setSelectedPlaylist,
+    allowNewTune: allowNewTune
   }
   return (
     <FlatList
