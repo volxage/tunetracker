@@ -81,6 +81,50 @@ function prettyPrint(object: unknown): string{
   return "(Empty)";
 }
 
+function ConfidenceBar({
+  tune,
+  confidenceType,
+  color
+}: {
+  tune: Tune
+  confidenceType: string
+  color: string
+}){
+  let confidence = tune[confidenceType as keyof Tune] as number;
+  // TODO: Replace below with dynamically sized View object instead of slider to save on rendering speed
+  return(
+    <ConfidenceBarView>
+      <Slider
+        value={confidence}
+        lowerLimit={confidence}
+        upperLimit={confidence}
+        minimumValue={0}
+        maximumValue={100}
+        minimumTrackTintColor={color}
+        thumbTintColor='#00000000'
+      />
+    </ConfidenceBarView>
+  );
+}
+
+function ConfidenceBars({
+  tune
+}: {
+  tune: Tune
+}){
+  return(
+    <View>
+      <ConfidenceBar tune={tune} confidenceType='formConfidence' color='purple'/>
+      <ConfidenceBar tune={tune} confidenceType='melodyConfidence' color='blue'/>
+      <ConfidenceBar tune={tune} confidenceType='soloConfidence' color='darkcyan'/>
+      {
+        tune.hasLyrics &&
+        <ConfidenceBar tune={tune} confidenceType='lyricsConfidence' color='darkgreen'/>
+      }
+    </View>
+  );
+}
+
 function ItemRender({
   tune,
   setSelectedTune,
@@ -116,53 +160,8 @@ function ItemRender({
         //CONFIDENCE
         confidenceVisible && 
         <View>
-          <ConfidenceBarView>
-            <Slider
-              value={tune.melodyConfidence}
-              lowerLimit={tune.melodyConfidence}
-              upperLimit={tune.melodyConfidence}
-              minimumValue={0}
-              maximumValue={100}
-              minimumTrackTintColor='purple'
-              thumbTintColor='#00000000'
-            />
-          </ConfidenceBarView>
-          <ConfidenceBarView>
-            <Slider
-              value={tune.formConfidence}
-              lowerLimit={tune.formConfidence}
-              upperLimit={tune.formConfidence}
-              minimumValue={0}
-              maximumValue={100}
-              minimumTrackTintColor='darkblue'
-              thumbTintColor='#00000000'
-            />
-          </ConfidenceBarView>
-          <ConfidenceBarView>
-            <Slider
-              value={tune.soloConfidence}
-              lowerLimit={tune.soloConfidence}
-              upperLimit={tune.soloConfidence}
-              minimumValue={0}
-              maximumValue={100}
-              minimumTrackTintColor='darkcyan'
-              thumbTintColor='#00000000'
-            />
-          </ConfidenceBarView>
-        { tune.hasLyricts &&
-        <ConfidenceBarView>
-          <Slider
-            value={tune.lyricsConfidence}
-            lowerLimit={tune.lyricsConfidence}
-            upperLimit={tune.lyricsConfidence}
-            minimumValue={0}
-            maximumValue={100}
-            minimumTrackTintColor='green'
-            thumbTintColor='#00000000'
-          />
-        </ConfidenceBarView>
-        }
-      </View>
+          <ConfidenceBars tune={tune} />
+        </View>
     }
       {typeof bench.step("Item render") === "undefined"}
     </View>
