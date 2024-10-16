@@ -53,7 +53,7 @@ export default class Tune extends Realm.Object<Tune, 'title'> {
       alternativeTitle: "string?",
       form: "string?",
       year: "int?",
-      hasLyricts: "bool?",
+      hasLyrics: "bool?",
       mainKey: "string?",
       keys: "string?[]",
       mainTempo: "int?",
