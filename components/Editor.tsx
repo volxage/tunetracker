@@ -259,16 +259,19 @@ export default function Editor({
       onlineVersion={(state["currentTune"].dbId ? OnlineDB.getStandardById(state["currentTune"].dbId) : null) as standard}
       navigation={props.navigation}
       handleSetCurrentItem={handleSetCurrentTune}
+      isComposer={false}
     />
   }
 </Stack.Screen>
 <Stack.Screen name='ComposerSelector'>
   {props =>
+  <SafeAreaView style={{flex: 1}}>
     <ComposerListDisplay
       originalTuneComposers={state["currentTune"]["composers"] ? state["currentTune"]["composers"] : []}
       navigation={navigation}
       handleSetCurrentTune={handleSetCurrentTune}
     />
+  </SafeAreaView>
   }
 </Stack.Screen>
 </Stack.Navigator>
