@@ -111,6 +111,7 @@ function TypeField({
 }){
   const allPlaylists = useQuery(Playlist);
   const [icon, setIcon] = useState();
+  const [bool, setBool] = useState(attr)
   useEffect(() => {
     Icon.getImageSource('circle', 26, 'white')
       .then(setIcon);
@@ -240,7 +241,6 @@ function TypeField({
     );
   }
   else if (typeof attr === "boolean") {
-    const [bool, setBool] = useState(attr)
     return(
       <View style={{backgroundColor: 'black', padding: 8}}>
         <Title>{attrName.toUpperCase()}</Title>
