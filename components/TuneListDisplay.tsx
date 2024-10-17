@@ -151,7 +151,6 @@ function ItemRender({
 }){
   const composers = useQuery(Composer)
   const isSelected = selected.some(id => tune.id.equals(id))
-  console.log(isSelected);
   return(
   <TouchableHighlight
     key={tune.title}
@@ -348,7 +347,8 @@ function TuneListHeader({
           <Button style={{flex:1}} onPress={() => {
             const tn: tune_draft = {};
             headerInputStates.setSelectedTune(tn);
-            setNewTune(true);
+            //TODO: Figure out why this needs to be false in order for TLD to have newTune be true!
+            setNewTune(false);
 
             navigation.navigate("Editor");
           }}>
@@ -368,7 +368,7 @@ function TuneListHeader({
         <ButtonText><Icon name="dots-horizontal" size={30}/></ButtonText>
       </Button>
     </View>:
-    <DeleteButton style={{flex: 3}}>
+    <DeleteButton onPress={() => {navigation.goBack()}} style={{flex: 3}}>
       <ButtonText>Go back</ButtonText>
     </DeleteButton>
     }

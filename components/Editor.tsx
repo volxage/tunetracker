@@ -157,9 +157,9 @@ export default function Editor({
                 !newTune && 
                 <DeleteButton
                   onLongPress={() => {
-                  //database.write(async () => {
-                  //  (selectedTune as Tune).destroyPermanently();
-                  //});
+                    realm.write(() => {
+                      realm.delete(selectedTune as Tune);
+                    })
                     navigation.goBack();
                   }}>
                     <ButtonText>DELETE TUNE (CAN'T UNDO!)</ButtonText>
