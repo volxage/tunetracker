@@ -3,6 +3,7 @@ import {Title, Text, SubText, TextInput} from "../Style";
 import {useQuery} from "@realm/react";
 import Playlist from "../model/Playlist";
 import {useState} from "react";
+import TuneListDisplay from "./TuneListDisplay";
 
 export default function PlaylistEditor(
   {
@@ -28,14 +29,7 @@ export default function PlaylistEditor(
         onChangeText={text => {setNewDescription(text)}}
       />
       <Title>TUNES</Title>
-      <FlatList 
-        data={playlist.tunes}
-        renderItem={({item}) => 
-        <View>
-          <Text>{item.title}</Text>
-        </View>
-      }
-    />
+      <TuneListDisplay navigation={navigation} setSelectedTune={() => {}} setNewTune={() => {}} allowNewTune={false} selectMode={true}/>
   </View>
   );
 }
