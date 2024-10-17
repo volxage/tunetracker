@@ -54,7 +54,7 @@ import reactotron from 'reactotron-react-native';
 import Tune from '../model/Tune.ts';
 import Composer from '../model/Composer.ts';
 import {useQuery} from '@realm/react';
-import {BSON, List, OrderedCollection} from 'realm';
+import {BSON, List, OrderedCollection, Results} from 'realm';
 import Playlist from '../model/Playlist.ts';
 const selectionAttrs = new Map<string, string>([
   ["title", "Title"],
@@ -359,12 +359,14 @@ export default function TuneListDisplay({
   navigation,
   setSelectedTune,
   setNewTune,
-  allowNewTune
+  allowNewTune,
+  selectMode
 }: {
   navigation: any,
   setSelectedTune: Function,
   setNewTune: Function,
-  allowNewTune: boolean
+  allowNewTune: boolean,
+  selectMode: boolean
 }){
   useEffect(() => {
     bench.stop("Full render");
@@ -376,16 +378,20 @@ export default function TuneListDisplay({
   const [search, setSearch] = useState("");
   const [confidenceVisible, setConfidenceVisible] = useState(false);
   const [dbStatus, setDbStatus] = useState(Status.Waiting);
+  const [selectedTunes, setSelectedTunes] = useState([]);
   const allPlaylists = useQuery(Playlist)
 
   useEffect(() => {
     bench.stop("Full render");
     OnlineDB.addListener(setDbStatus);
   })
-  let displaySongs: (Tune[] | List<Tune>) = useQuery('Tune').map(res => res as Tune);
+  const allSongs = useQuery(Tune);
+  let displaySongs = allSongs
   if(selectedPlaylist !== playlist_enum.AllTunes){
-    //TODO: Select all tunes with given playlist ID
     displaySongs = allPlaylists.filtered("id == $0", selectedPlaylist)[0].tunes
+  }
+  if(selectMode){
+    const selected = allSongs.filtered("id IN $0", selectedTunes);
   }
   const fuse = new Fuse(displaySongs, fuseOptions);
   if(search === ""){
