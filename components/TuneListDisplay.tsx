@@ -134,7 +134,9 @@ function ItemRender({
   confidenceVisible,
   bench,
   separators,
-  selectMode
+  selectMode,
+  selectTune,
+  selected
 }: {
   tune: Tune,
   setSelectedTune: Function,
@@ -143,14 +145,23 @@ function ItemRender({
   confidenceVisible: boolean,
   bench: any,
   separators: any,
-  selectMode: boolean
+  selectMode: boolean,
+  selectTune: Function,
+  selected: BSON.ObjectId[]
 }){
   const composers = useQuery(Composer)
+  const isSelected = selected.some(id => tune.id.equals(id))
+  console.log(isSelected);
   return(
   <TouchableHighlight
     key={tune.title}
     onPress={() => {
       setSelectedTune(tune);
+      if(selectMode){
+        selectTune(tune)
+      }else{
+        setSelectedTune(tune);
+      }
       if(!selectMode){
         navigation.navigate("MiniEditor");
       }
@@ -162,7 +173,7 @@ function ItemRender({
     onShowUnderlay={separators.highlight}
     onHideUnderlay={separators.unhighlight}>
     {
-      <View style={{backgroundColor: 'black', padding: 8}}>
+      <View style={{backgroundColor: isSelected ? "#404040" : "black", padding: 8}}>
         <Text>{tune.title}</Text>
         <SubText>{selectedAttr != "title"
           ? prettyPrint(tune[selectedAttr as keyof Tune])
@@ -390,18 +401,16 @@ export default function TuneListDisplay({
   const [dbStatus, setDbStatus] = useState(Status.Waiting);
   const [selectedTunes, setSelectedTunes]: [Tune[], Function] = useState([]);
   const allPlaylists = useQuery(Playlist)
+  let selectedIds: BSON.ObjectId[] = []
 
   useEffect(() => {
     bench.stop("Full render");
     OnlineDB.addListener(setDbStatus);
   })
   const allSongs = useQuery(Tune);
-  let displaySongs = allSongs
+  let displaySongs = allSongs;
   if(selectedPlaylist !== playlist_enum.AllTunes){
     displaySongs = allPlaylists.filtered("id == $0", selectedPlaylist)[0].tunes
-  }
-  if(selectMode){
-    const selected = allSongs.filtered("id IN $0", selectedTunes);
   }
   const fuse = new Fuse(displaySongs, fuseOptions);
   if(search === ""){
@@ -411,6 +420,12 @@ export default function TuneListDisplay({
       .map(function(value, index){
         return value.item as Tune;
       });
+  }
+  if(selectMode){
+    const selected = allSongs.filtered("id IN $0", selectedTunes.map(s => s.id));
+    const deselected = allSongs.filtered("!(id IN $0)", selectedTunes.map(s => s.id))
+    displaySongs = [...selected, ...deselected]
+    selectedIds = selected.map(tn => tn.id);
   }
   bench.step("Pre-render")
 
@@ -448,18 +463,19 @@ export default function TuneListDisplay({
       renderItem={({item, index, separators}) => (
         <ItemRender 
           tune={item}
-          setSelectedTune={selectMode ? ((res: Tune) => {
-              if(!selectedTunes.some(val => val.id.equals(res.id))){
-console.log("Added tune");
-                setSelectedTunes(selectedTunes.concat(res))
-              }
-          }) : setSelectedTune}
+          setSelectedTune={setSelectedTune}
           navigation={navigation}
           selectedAttr={selectedAttr}
           confidenceVisible={confidenceVisible}
           bench={bench}
           separators={separators}
           selectMode={selectMode}
+          selected={selectedIds}
+          selectTune={(res: Tune) => {
+              if(!selectedTunes.some(val => val.id.equals(res.id))){
+                setSelectedTunes(selectedTunes.concat(res))
+              }
+          }}
         />
     )}
   />

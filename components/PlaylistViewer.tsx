@@ -4,6 +4,10 @@ import {useQuery} from "@realm/react";
 import Playlist from "../model/Playlist";
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
 import PlaylistEditor from "./PlaylistEditor";
+import {useState} from "react";
+import {editorAttrs} from "../types";
+import Tune from "../model/Tune";
+import Editor from "./Editor";
 
 export default function PlaylistViewer(
   {
@@ -15,6 +19,7 @@ export default function PlaylistViewer(
   const allPlaylists = useQuery(Playlist);
   const Stack = createNativeStackNavigator();
   let selectedPlaylist = allPlaylists.length > 0 ? allPlaylists[0] : undefined
+  const [tuneToEdit, setTuneToEdit] = useState();
   return(
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name={"PlaylistViewerUnwrapped"} >
@@ -48,9 +53,18 @@ export default function PlaylistViewer(
       </Stack.Screen>
       <Stack.Screen name={"PlaylistEditor"}>
         {props => <SafeAreaView style={{backgroundColor: "black"}}>
-          <PlaylistEditor navigation={props.navigation} playlist={selectedPlaylist as Playlist}/>
-        </SafeAreaView>}
-      </Stack.Screen>
-    </Stack.Navigator>
-  );
+          <PlaylistEditor navigation={props.navigation} playlist={selectedPlaylist as Playlist} setTuneToEdit={setTuneToEdit}/>
+      </SafeAreaView>}
+    </Stack.Screen>
+ <Stack.Screen name="Editor">
+        {(props) => <Editor
+          prettyAttrs={editorAttrs as Array<[string, string]>}
+          selectedTune={tuneToEdit as unknown as Tune}
+          newTune={false}
+          setNewTune={() => {}}
+          navigation={props.navigation}
+        />}
+    </Stack.Screen>
+  </Stack.Navigator>
+);
 }

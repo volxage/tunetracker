@@ -8,14 +8,16 @@ import TuneListDisplay from "./TuneListDisplay";
 export default function PlaylistEditor(
   {
     playlist,
-    navigation
+    navigation,
+    setTuneToEdit
   }:
   {
     playlist: Playlist,
-    navigation: any
+    navigation: any,
+    setTuneToEdit: Function
   }){
-  const [newTitle, setNewTitle] = useState(playlist.title)
-  const [newDescription, setNewDescription] = useState(playlist.description)
+  const [newTitle, setNewTitle] = useState(playlist.title);
+  const [newDescription, setNewDescription] = useState(playlist.description);
   return(
     <View style={{backgroundColor: "black"}}>
       <Title>TITLE</Title>
@@ -29,7 +31,7 @@ export default function PlaylistEditor(
         onChangeText={text => {setNewDescription(text)}}
       />
       <Title>TUNES</Title>
-      <TuneListDisplay navigation={navigation} setSelectedTune={() => {}} setNewTune={() => {}} allowNewTune={false} selectMode={true}/>
+      <TuneListDisplay navigation={navigation} setSelectedTune={setTuneToEdit} setNewTune={() => {}} allowNewTune={false} selectMode={true}/>
   </View>
   );
 }
