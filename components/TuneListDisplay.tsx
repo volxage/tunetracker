@@ -134,6 +134,7 @@ function ItemRender({
   confidenceVisible,
   bench,
   separators,
+  selectMode
 }: {
   tune: Tune,
   setSelectedTune: Function,
@@ -142,13 +143,24 @@ function ItemRender({
   confidenceVisible: boolean,
   bench: any,
   separators: any,
+  selectMode: boolean
 }){
   const composers = useQuery(Composer)
   return(
   <TouchableHighlight
     key={tune.title}
-    onPress={() => {setSelectedTune(tune); navigation.navigate("MiniEditor");}}
-    onLongPress={() => {setSelectedTune(tune); navigation.navigate("Editor");}}
+    onPress={() => {
+      setSelectedTune(tune);
+      if(!selectMode){
+        navigation.navigate("MiniEditor");
+      }
+    }}
+    onLongPress={() => {
+      setSelectedTune(tune);
+      if(!selectMode){
+        navigation.navigate("Editor");
+      }
+    }}
     onShowUnderlay={separators.highlight}
     onHideUnderlay={separators.unhighlight}>
     {
@@ -378,7 +390,7 @@ export default function TuneListDisplay({
   const [search, setSearch] = useState("");
   const [confidenceVisible, setConfidenceVisible] = useState(false);
   const [dbStatus, setDbStatus] = useState(Status.Waiting);
-  const [selectedTunes, setSelectedTunes] = useState([]);
+  const [selectedTunes, setSelectedTunes]: [Tune[], Function] = useState([]);
   const allPlaylists = useQuery(Playlist)
 
   useEffect(() => {
@@ -438,12 +450,18 @@ export default function TuneListDisplay({
       renderItem={({item, index, separators}) => (
         <ItemRender 
           tune={item}
-          setSelectedTune={setSelectedTune}
+          setSelectedTune={selectMode ? ((res: Tune) => {
+              if(!selectedTunes.some(val => val.id.equals(res.id))){
+console.log("Added tune");
+                setSelectedTunes(selectedTunes.concat(res))
+              }
+          }) : setSelectedTune}
           navigation={navigation}
           selectedAttr={selectedAttr}
           confidenceVisible={confidenceVisible}
           bench={bench}
           separators={separators}
+          selectMode={selectMode}
         />
     )}
   />
