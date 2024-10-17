@@ -422,8 +422,8 @@ export default function TuneListDisplay({
       });
   }
   if(selectMode){
-    const selected = allSongs.filtered("id IN $0", selectedTunes.map(s => s.id));
-    const deselected = allSongs.filtered("!(id IN $0)", selectedTunes.map(s => s.id))
+    const selected = displaySongs.filtered("id IN $0", selectedTunes.map(s => s.id));
+    const deselected = displaySongs.filtered("!(id IN $0)", selectedTunes.map(s => s.id))
     displaySongs = [...selected, ...deselected]
     selectedIds = selected.map(tn => tn.id);
   }
