@@ -474,6 +474,8 @@ export default function TuneListDisplay({
           selectTune={(res: Tune) => {
               if(!selectedTunes.some(val => val.id.equals(res.id))){
                 setSelectedTunes(selectedTunes.concat(res))
+              }else{
+                setSelectedTunes(selectedTunes.filter(t => !t.id.equals(res.id)))
               }
           }}
         />
