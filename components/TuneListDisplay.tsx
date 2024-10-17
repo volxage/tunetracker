@@ -157,9 +157,7 @@ function ItemRender({
     }}
     onLongPress={() => {
       setSelectedTune(tune);
-      if(!selectMode){
-        navigation.navigate("Editor");
-      }
+      navigation.navigate("Editor");
     }}
     onShowUnderlay={separators.highlight}
     onHideUnderlay={separators.unhighlight}>
