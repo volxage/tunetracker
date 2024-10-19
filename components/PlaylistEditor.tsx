@@ -5,7 +5,7 @@ import Playlist from "../model/Playlist";
 import {useState} from "react";
 import TuneListDisplay from "./TuneListDisplay";
 import Tune from "../model/Tune";
-import {List} from "realm";
+import {List, Results} from "realm";
 
 export default function PlaylistEditor(
   {
@@ -20,7 +20,7 @@ export default function PlaylistEditor(
   }){
   const [newTitle, setNewTitle] = useState(playlist.title);
   const [newDescription, setNewDescription] = useState(playlist.description);
-  const [plSelectedTunes, setPlSelectedTunes]: [Tune[], Function] = useState([]);
+  const [plSelectedTunes, setPlSelectedTunes]: [(List<Tune>), Function] = useState(playlist.tunes);
   const realm = useRealm();
   const allTunes = useQuery(Tune)
   return(
@@ -55,7 +55,7 @@ export default function PlaylistEditor(
             Save
           </ButtonText>
         </Button>
-        <DeleteButton style={{flex:1}}>
+        <DeleteButton style={{flex:1}} onPress={() => {navigation.goBack()}}>
           <ButtonText>
             Cancel
           </ButtonText>
