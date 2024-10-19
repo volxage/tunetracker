@@ -342,7 +342,7 @@ function TuneListHeader({
         <ButtonText><Icon name="menu-swap" size={30} /></ButtonText>
       </Button>
       {
-        headerInputStates.allowNewTune ?
+        headerInputStates.allowNewTune &&
         <View style={{flexDirection: "row", flex: 3}}>
           <Button style={{flex:1}} onPress={() => {
             const tn: tune_draft = {};
@@ -367,10 +367,7 @@ function TuneListHeader({
         onPress={() => navigation.navigate("ExtrasMenu")}>
         <ButtonText><Icon name="dots-horizontal" size={30}/></ButtonText>
       </Button>
-    </View>:
-    <DeleteButton onPress={() => {navigation.goBack()}} style={{flex: 3}}>
-      <ButtonText>Go back</ButtonText>
-    </DeleteButton>
+    </View>
     }
     </View>
   </View>
@@ -381,13 +378,17 @@ export default function TuneListDisplay({
   setSelectedTune,
   setNewTune,
   allowNewTune,
-  selectMode
+  selectMode,
+  selectedTunes,
+  setSelectedTunes
 }: {
   navigation: any,
   setSelectedTune: Function,
   setNewTune: Function,
   allowNewTune: boolean,
-  selectMode: boolean
+  selectMode: boolean,
+  selectedTunes: Tune[],
+  setSelectedTunes: Function
 }){
   useEffect(() => {
     bench.stop("Full render");
@@ -399,7 +400,6 @@ export default function TuneListDisplay({
   const [search, setSearch] = useState("");
   const [confidenceVisible, setConfidenceVisible] = useState(false);
   const [dbStatus, setDbStatus] = useState(Status.Waiting);
-  const [selectedTunes, setSelectedTunes]: [Tune[], Function] = useState([]);
   const allPlaylists = useQuery(Playlist)
   let selectedIds: BSON.ObjectId[] = []
 

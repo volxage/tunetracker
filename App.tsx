@@ -85,6 +85,7 @@ function App(): React.JSX.Element {
 function MainMenu({}: {}): React.JSX.Element {
   //TODO: Instantiate selectedTune with any tune, remove "as Tune" in editors.
   const [selectedTune, setSelectedTune]: [Tune | unknown, Function] = useState(undefined);
+  const [selectedTunes, setSelectedTunes]: [Tune[], Function] = useState([]);
   const [newTune, setNewTune] = useState(false);
   const isDarkMode = true;
   const realm = useRealm();
@@ -196,6 +197,8 @@ function MainMenu({}: {}): React.JSX.Element {
               setNewTune={setNewTune}
               allowNewTune={true}
               selectMode={false}
+              selectedTunes={selectedTunes}
+              setSelectedTunes={setSelectedTunes}
             />
           </View>
         </SafeAreaView>

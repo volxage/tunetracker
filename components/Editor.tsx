@@ -92,7 +92,6 @@ export default function Editor({
   console.log("Rerender Editor");
   const realm = useRealm();
   const [state, dispatch] = useReducer(reducer, {currentTune: {}});
-  const [originalPlaylistsSet, setOriginalPlaylistsSet]: [Set<playlist>, Function] = useState(new Set())
   const bench = reactotron.benchmark("Editor benchmark");
   const Stack = createNativeStackNavigator();
 
@@ -106,15 +105,6 @@ export default function Editor({
     }
   }, []);
 
-  useEffect(() => {
-    //If there's no id, it's impossible that the tune has been assigned playlists already.
-//  if (typeof selectedTune.id !== "undefined"){ 
-//    const tmpTunesPlaylist = playlists.getTunePlaylists(selectedTune.id);
-//    setTunePlaylists(tmpTunesPlaylist);
-//    setOriginalPlaylistsSet(new Set(tmpTunesPlaylist));
-//  }
-//  bench.stop("Post-render")
-  }, [])
   function handleSetCurrentTune(attr_key: keyof tune_draft, value: any){
     console.log("attr_key: " + attr_key);
     console.log(`value: ${value}`);
