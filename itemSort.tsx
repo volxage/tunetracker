@@ -86,7 +86,7 @@ function itemSort(songs: Array<Tune | standard | Composer | composer> | Results<
     if(selected === "composers"){
       return songs.map(s => s as Tune).sort(itemCompare)
     }else{
-      return songs.sorted(selected);
+      return songs.sorted(selected, reversed);
     }
   }else{
     return songs.sort(itemCompare);
