@@ -1,16 +1,18 @@
 // Copyright 2024 Jonathan Hilliard
+import {Results} from "realm";
 import Composer from "./model/Composer";
 import Tune from "./model/Tune";
 import { composer, standard } from "./types";
-function itemSort(songs: Array<Tune | standard | Composer | composer>, selected: string, reversed: boolean){
+import Realm from "realm";
+function itemSort(songs: Array<Tune | standard | Composer | composer> | Results<Tune>, selected: string, reversed: boolean){
   let reverse_null_multiplier = 1;
   let reversed_multiplier = reversed ? -1 : 1;
   if (selected.endsWith("confidence") || selected == "playthroughs"){
     reverse_null_multiplier = -1 * reversed_multiplier;
   }
-  songs.sort(function(a_song, b_song){
-    let a = a_song[selected as keyof typeof a_song] as unknown;
-    let b = b_song[selected as keyof typeof b_song] as unknown;
+  function itemCompare(a_item, b_item){
+    let a = a_item[selected as keyof typeof a_item] as unknown;
+    let b = b_item[selected as keyof typeof b_item] as unknown;
     if(selected === "Rank" || selected === "Year" || selected === "birth" || selected === "death"){
       if (Number(a) < Number(b)){
         return -1 * reversed_multiplier;
@@ -24,7 +26,7 @@ function itemSort(songs: Array<Tune | standard | Composer | composer>, selected:
 
     if (a == null) return 1 * reverse_null_multiplier;
     if (b == null) return -1 * reverse_null_multiplier;
-    
+
     if (typeof a == "string"){
       if (a.toLowerCase() < (b as String).toLowerCase()){
         return -1 * reversed_multiplier;
@@ -65,7 +67,30 @@ function itemSort(songs: Array<Tune | standard | Composer | composer>, selected:
       }
       }
     }
+    else if ((a instanceof Results && b instanceof Results) || (a instanceof Realm.List && b instanceof Realm.List)){
+      if (a.length == 0) return 1;
+      if (b.length == 0) return -1;
+      const firstStr = a[0] instanceof Tune ? a[0].title : (a[0] as Composer).name;
+      const secondStr = b[0] instanceof Tune ? b[0].title : (b[0] as Composer).name;
+      if (firstStr.toLowerCase() < secondStr.toLowerCase()){
+        return -1 * reversed_multiplier;
+      }else if (firstStr.toLowerCase() > secondStr.toLowerCase()){
+        return 1 * reversed_multiplier;
+      }
+    }
+    console.log(a.constructor.name);
+    console.log("Type not found.");
     return 0;
-  });
+  }
+  if(songs instanceof Results){
+    if(selected === "composers"){
+      return songs.map(s => s as Tune).sort(itemCompare)
+    }else{
+      return songs.sorted(selected);
+    }
+  }else{
+    return songs.sort(itemCompare);
+  }
 }
+
 export default itemSort

@@ -39,9 +39,11 @@ function AddPlaylistField({
   handleSetCurrentItem: Function
 }){
   const realm = useRealm();
-  const [newPlaylistTitle, setNewPlaylistTitle] = useState("")
+  const [newPlaylistTitle, setNewPlaylistTitle] = useState("");
+  const tunePlaylistIds = tunePlaylists.map(pl => pl.id);
+
   let availablePlaylists = useQuery(Playlist)
-    .filter(playlist => !(tunePlaylists.some(pl => (pl.id as BSON.ObjectId).equals(playlist.id))));
+    .filtered("!(id in $0)", tunePlaylistIds);
   if(newPlaylist){
     return(
       <View style={{padding: 8, flexDirection: "row"}}>
@@ -172,8 +174,6 @@ function TypeField({
     const ids = (attr as (Playlist | playlist)[]).map(pl => pl.id);
     //TODO:
     // Delete Button
-    console.log("Rendered tune playlists:");
-    console.log(attr);
     return(
       <View style={{padding: 8}}>
         <View style={{paddingBottom:20}}>

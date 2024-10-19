@@ -414,7 +414,7 @@ export default function TuneListDisplay({
   }
   const fuse = new Fuse(displaySongs, fuseOptions);
   if(search === ""){
-    //itemSort(displaySongs, selectedAttr, listReversed);
+    displaySongs = itemSort(displaySongs, selectedAttr, listReversed);
   }else{
     displaySongs = fuse.search(search)
       .map(function(value, index){
