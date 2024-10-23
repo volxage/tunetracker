@@ -29,6 +29,7 @@ import ComposerListDisplay from './ComposerListDisplay.tsx';
 import Composer from '../model/Composer.ts';
 import Playlist from '../model/Playlist.ts';
 import {useRealm} from '@realm/react';
+import {BSON} from 'realm';
 
 function reducer(state: any, action: any){
   switch(action.type){
@@ -171,8 +172,6 @@ export default function Editor({
                         selectedTune[attr as keyof (tune_draft | Tune)] = (state["currentTune"][attr as keyof tune_draft] as any)
                       }
                     });
-                  //(selectedTune as Tune).replace(state["currentTune"]).then( () => {
-                  //  songsList.rereadDb();
                     navigation.goBack();
                   //});
                   }}
@@ -183,30 +182,14 @@ export default function Editor({
                 newTune &&
                 <Button
                   onPress={() => {
-                    //Save to new tune
-                    //TODO: Implement playlists
-                  //const tune_id = songsList.addNewTune(currentTune);
-                  //const newPlaylistSet = new Set(tunePlaylists);
-                  //const addedPlaylists = [...newPlaylistSet]
-                  //  .filter(newPlaylist => !originalPlaylistsSet.has(newPlaylist));
-                  //for(var playlist of addedPlaylists){
-                  //  console.log("Adding tune to " + playlist.title)
-                  //  playlists.addTune(tune_id, playlist.id)
-                  //}
                     console.log("Saving to new tune");
+                    const ctCopy = state["currentTune"]
+                    ctCopy.id = new BSON.ObjectId()
                     realm.write(() => {
                       realm.create("Tune",
                         state["currentTune"]
                       )
                     });
-                  //database.write(async () => {database.get('tunes').create(tn => {
-                  //  // This should implicitly add and remove composer relations
-                  //  (tn as Tune).replace(state["currentTune"]);
-                  //  
-                  //}).then(resultingModel => {
-                  //  console.log(resultingModel);
-                  //  songsList.rereadDb();
-                  //})});
                     navigation.goBack();
                     setNewTune(false);
                   }}

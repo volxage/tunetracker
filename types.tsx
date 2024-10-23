@@ -20,7 +20,7 @@ export type tune_draft = {
   "soloConfidence"?: number
   "lyricsConfidence"?: number
   "hasLyrics"?: boolean
-  "id"?: string
+  "id"?: BSON.ObjectId
   "dbId"?: number
   "bio"?: string
   "year"?: number
@@ -69,7 +69,7 @@ export const editorAttrs = [
   ["keys", "Keys"],
   ["styles", "Styles"],
   ["tempi", "Tempi"],
-  //  ["contrafacts", "Contrafacts"],
+  //["contrafacts", "Contrafacts"],
   ["playlists", "Playlists"],
   ["playthroughs", "Playthroughs"],
   ["hasLyrics", "Has lyrics?"],

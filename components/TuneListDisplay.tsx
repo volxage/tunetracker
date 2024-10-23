@@ -53,7 +53,7 @@ import Slider from '@react-native-community/slider';
 import reactotron from 'reactotron-react-native';
 import Tune from '../model/Tune.ts';
 import Composer from '../model/Composer.ts';
-import {useQuery} from '@realm/react';
+import {useQuery, useRealm} from '@realm/react';
 import {BSON, List, OrderedCollection, Results} from 'realm';
 import Playlist from '../model/Playlist.ts';
 const selectionAttrs = new Map<string, string>([
@@ -413,6 +413,12 @@ export default function TuneListDisplay({
     displaySongs = allPlaylists.filtered("id == $0", selectedPlaylist)[0].tunes
   }
   const fuse = new Fuse(displaySongs, fuseOptions);
+  if(selectMode){
+    const selected = displaySongs.filtered("id IN $0", selectedTunes.map(s => s.id));
+    const deselected = displaySongs.filtered("!(id IN $0)", selectedTunes.map(s => s.id))
+    displaySongs = [...selected, ...deselected]
+    selectedIds = selected.map(tn => tn.id);
+  }
   if(search === ""){
     displaySongs = itemSort(displaySongs, selectedAttr, listReversed);
   }else{
@@ -420,12 +426,6 @@ export default function TuneListDisplay({
       .map(function(value, index){
         return value.item as Tune;
       });
-  }
-  if(selectMode){
-    const selected = displaySongs.filtered("id IN $0", selectedTunes.map(s => s.id));
-    const deselected = displaySongs.filtered("!(id IN $0)", selectedTunes.map(s => s.id))
-    displaySongs = [...selected, ...deselected]
-    selectedIds = selected.map(tn => tn.id);
   }
   bench.step("Pre-render")
 

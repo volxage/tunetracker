@@ -29,10 +29,6 @@ export default function ComposerField({
   navigation: any
 }){
   const [composerExpanded, setComposerExpanded] = useState(false);
-  let stand = null;
-  if(typeof attr !== "undefined" && attr !== 0){
-    stand = OnlineDB.getStandardById(attr as number);
-  }
   return(
     <View>
       <Title>COMPOSERS</Title>

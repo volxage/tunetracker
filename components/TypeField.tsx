@@ -28,6 +28,7 @@ import Composer from '../model/Composer.ts';
 import Playlist from '../model/Playlist.ts';
 import {useQuery, useRealm} from '@realm/react';
 import {BSON, Results} from 'realm';
+import { Picker } from '@react-native-picker/picker';
 
 function AddPlaylistField({
   newPlaylist,
@@ -42,8 +43,9 @@ function AddPlaylistField({
   const [newPlaylistTitle, setNewPlaylistTitle] = useState("");
   const tunePlaylistIds = tunePlaylists.map(pl => pl.id);
 
-  let availablePlaylists = useQuery(Playlist)
+  const availablePlaylists = useQuery(Playlist)
     .filtered("!(id in $0)", tunePlaylistIds);
+  //let availablePlaylists = []
   if(newPlaylist){
     return(
       <View style={{padding: 8, flexDirection: "row"}}>
@@ -74,22 +76,35 @@ function AddPlaylistField({
       </View>
     );
   }else{
+    //<RNPickerSelect
+    //  items={
+    //    availablePlaylists
+    //      .map((playlist) => {return {label:playlist.title, value: playlist}})
+    //  }
+    //  useNativeAndroidPickerStyle={false}
+    //  placeholder={{label: "Select a playlist to insert tune into", value: ""}}
+    //  style={{inputAndroid:
+    //    {backgroundColor: 'transparent', color: 'white', fontSize: 18, fontWeight: "300"}
+    //  }}
+    ///>
     return (
-      <RNPickerSelect
-        onValueChange={
-          // When the component rerenders, onValueChange is called with a value of "".
-          (value) => {value !== "" && handleSetCurrentItem("playlists", tunePlaylists.concat(value))}
-        }
-        items={
-          availablePlaylists
-            .map((playlist) => {return {label:playlist.title, value: playlist}})
-        }
-        useNativeAndroidPickerStyle={false}
-        placeholder={{label: "Select a playlist to insert tune into", value: ""}}
-        style={{inputAndroid:
-          {backgroundColor: 'transparent', color: 'white', fontSize: 18, fontWeight: "300"}
-        }}
-      />
+      <View style={{borderColor: "white", borderWidth: 1, margin: 28}}>
+        <Picker
+          onValueChange={
+            // When the component rerenders, onValueChange is called with a value of "".
+            (value) => {value !== "" && handleSetCurrentItem("playlists", tunePlaylists.concat(value))}
+          }
+        >
+          {
+            availablePlaylists.map(
+              (playlist) => 
+              <Picker.Item label={playlist.title} value={playlist} key={playlist.id}
+                style={{color: "white", backgroundColor:"black"}}
+              />
+              )
+          }
+        </Picker>
+      </View>
     );
   }
 }
