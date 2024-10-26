@@ -6,6 +6,13 @@ import {useState} from "react";
 import TuneListDisplay from "./TuneListDisplay";
 import Tune from "../model/Tune";
 import {List, Results} from "realm";
+import RNFS from "react-native-fs";
+import Share from "react-native-share";
+import buff from "buffer";
+const tmpPlaylistPath = RNFS.TemporaryDirectoryPath + "/tmp_playlist.json";
+
+
+
 
 export default function PlaylistEditor(
   {
@@ -60,6 +67,38 @@ export default function PlaylistEditor(
             Cancel
           </ButtonText>
         </DeleteButton>
+      </View>
+      <View style={{flexDirection: "row"}}>
+        <Button style={{flex: 1}} onPress={() => {
+       ///const json = plSelectedTunes.map(tune => {
+       ///  return {
+       ///    "dbId": tune.dbId,
+       ///    "title": tune.title,
+       ///    "alternativeTitle": tune.alternativeTitle,
+       ///    "composers": tune.composers?.map(comp => {return {"name": comp.name, "dbId": comp.dbId}}),
+       ///    "form": tune.form,
+       ///    "year": tune.year,
+       ///    "hasLyrics": tune.hasLyrics,
+       ///    "mainKey": tune.mainKey,
+       ///    "keys": tune.keyCenters, 
+       ///    "mainTempo": tune.mainTempo,
+       ///    "tempi": tune.tempi,
+       ///  }
+       ///});
+       ///const base64 = new buff.Buffer(JSON.stringify(json)).toString("base64");
+       ///Share.open({url: `data:application/json;base64,${base64}`}).catch(err => {
+       ///});
+        //RNFS.writeFile(tmpPlaylistPath, JSON.stringify(json), "base64")
+        //  .then(() => {
+        //    RNFS.readFile(tmpPlaylistPath, "base64").then(result => {
+        //      
+        //  });
+        //  });
+        }}>
+          <ButtonText>
+            Share (Coming soon!)
+          </ButtonText>
+        </Button>
       </View>
       <Title>TITLE</Title>
       <TextInput
