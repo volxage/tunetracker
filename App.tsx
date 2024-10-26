@@ -48,6 +48,7 @@ import Composer from './model/Composer.ts';
 import Playlist from './model/Playlist.ts';
 import {BSON} from 'realm';
 import PlaylistViewer from './components/PlaylistViewer.tsx';
+import PlaylistImporter from './components/PlaylistImporter.tsx';
 
 
 //PrettyAttrs function as both as "prettifiers" and lists of attrs to display in corresponding editors
@@ -220,6 +221,17 @@ function MainMenu({}: {}): React.JSX.Element {
         <SafeAreaView style={{flex: 1, backgroundColor: "black"}}>
           <View style={{flex:1}}>
             <PlaylistViewer
+              navigation={props.navigation}
+            />
+          </View>
+        </SafeAreaView>
+        }
+    </Stack.Screen>
+    <Stack.Screen name="PlaylistImporter">
+        {(props) =>
+        <SafeAreaView style={{flex: 1, backgroundColor: "black"}}>
+          <View style={{flex:1}}>
+            <PlaylistImporter
               navigation={props.navigation}
             />
           </View>

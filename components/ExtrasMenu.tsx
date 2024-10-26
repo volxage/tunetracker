@@ -19,6 +19,9 @@ export default function ExtrasMenu({
         <Button onPress={() => {navigation.navigate("PlaylistViewer")}}>
           <ButtonText>Playlist Viewer</ButtonText>
         </Button>
+        <Button onPress={() => {navigation.navigate("PlaylistImporter")}}>
+          <ButtonText>Import Playlist</ButtonText>
+        </Button>
         <DeleteButton onPress={() => {navigation.goBack()}}>
           <ButtonText>Back</ButtonText>
         </DeleteButton>
