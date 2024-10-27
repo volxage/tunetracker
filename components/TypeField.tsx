@@ -25,7 +25,7 @@ import dateDisplay from '../dateDisplay.tsx';
 import Composer from '../model/Composer.ts';
 import Playlist from '../model/Playlist.ts';
 import {useQuery, useRealm} from '@realm/react';
-import {BSON, Results} from 'realm';
+import {BSON, List, Results} from 'realm';
 import { Picker } from '@react-native-picker/picker';
 
 function AddPlaylistField({
@@ -131,12 +131,6 @@ function TypeField({
     Icon.getImageSource('circle', 26, 'white')
       .then(setIcon);
   }, []);
-  if(isComposer){
-    console.log("Attr:");
-    console.log(attrKey);
-    console.log("Value:");
-    console.log(attr);
-  }
   type keyOfEitherDraft = keyof (tune_draft | composer)
   if (attrKey === "dbId" as keyOfEitherDraft){
     return(
@@ -266,7 +260,7 @@ function TypeField({
       </View>
     );
   }
-  else if (Array.isArray(attr)){
+  else if (Array.isArray(attr) || attr instanceof List){
 //    const [arrAttr, setarrAttr] = useState(attr);
 
     function handleReplace(value: string, index: number){

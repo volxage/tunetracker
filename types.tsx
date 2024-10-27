@@ -24,6 +24,7 @@ export type tune_draft = {
   "dbId"?: number
   "bio"?: string
   "year"?: number
+  playedAt?: Date
   //  "playedAt"?: string[]
 }
 export type composer = {
@@ -77,6 +78,7 @@ export const editorAttrs = [
   ["melodyConfidence", "Melody Confidence"],
   ["soloConfidence", "Solo Confidence"],
   ["lyricsConfidence", "Lyrics Confidence"],
+  ["playedAt", "Last played"]
 ];
 export const composerEditorAttrs = [
   ["dbId", "Database Connection"],
@@ -91,8 +93,8 @@ export const miniEditorAttrs = new Map<string, string>([
   ["melodyConfidence", "Melody Confidence"],
   ["soloConfidence", "Solo Confidence"],
   ["lyricsConfidence", "Lyrics Confidence"],
-  ["playlists", "Playlists"]
-  //  ["justPlayed", "'I Just Played This'"],
+  ["playlists", "Playlists"],
+  ["justPlayed", "'I Just Played This'"]
 ])
 export const composerDefaults = new Map<string, any>([
   ["name", ""],
@@ -120,7 +122,6 @@ export const tuneDefaults = new Map<string, any>([
   ["melodyConfidence", 0],
   ["soloConfidence", 0],
   ["lyricsConfidence", 0],
-  //  ["played_at", []],
   ["dbId", 0]
   //  ["id", "THIS SHOULD NOT BE HERE"] // If the user sees this text at any point, there's an error in the progra],
 ])

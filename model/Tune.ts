@@ -17,6 +17,8 @@ export default class Tune extends Realm.Object<Tune, 'title'> {
   keyCenters?: string[]; 
   mainTempo?: number;
   tempi?: number[];
+  mainStyle?: string;
+  styles?: string[];
   playthroughs?: number;
   formConfidence?: number;
   melodyConfidence?: number;
@@ -24,27 +26,28 @@ export default class Tune extends Realm.Object<Tune, 'title'> {
   lyricsConfidence?: number;
   dbId?: number;
   playlists?: Realm.List<Playlist>;
+  playedAt?: Date;
 
-  static generate(tn: tune_draft){
-    return {
-      id: new Realm.BSON.ObjectId(),
-      title: tn.title,
-      alternativeTitle: tn.alternativeTitle,
-      form: tn.form,
-      year: tn.year,
-      hasLyricts: tn.hasLyrics,
-      mainKey: tn.mainKey,
-      keyCenters: tn.keyCenters,
-      mainTempo: tn.mainTempo,
-      tempi: tn.tempi,
-      playthroughs: tn.playthroughs,
-      formConfidence: tn.formConfidence,
-      melodyConfidence: tn.melodyConfidence,
-      soloConfidence: tn.soloConfidence,
-      lyricsConfidence: tn.lyricsConfidence,
-      dbId: tn.dbId,
-    }
-  }
+//static generate(tn: tune_draft){
+//  return {
+//    id: new Realm.BSON.ObjectId(),
+//    title: tn.title,
+//    alternativeTitle: tn.alternativeTitle,
+//    form: tn.form,
+//    year: tn.year,
+//    hasLyricts: tn.hasLyrics,
+//    mainKey: tn.mainKey,
+//    keyCenters: tn.keyCenters,
+//    mainTempo: tn.mainTempo,
+//    tempi: tn.tempi,
+//    playthroughs: tn.playthroughs,
+//    formConfidence: tn.formConfidence,
+//    melodyConfidence: tn.melodyConfidence,
+//    soloConfidence: tn.soloConfidence,
+//    lyricsConfidence: tn.lyricsConfidence,
+//    dbId: tn.dbId,
+//  }
+//}
   static schema: Realm.ObjectSchema = {
     name: 'Tune',
     properties: {
@@ -58,11 +61,14 @@ export default class Tune extends Realm.Object<Tune, 'title'> {
       keyCenters: "string?[]",
       mainTempo: "int?",
       tempi: "int?[]",
+      mainStyle: "string?",
+      styles: "string?[]",
       playthroughs: "int?",
       formConfidence: "double?",
       melodyConfidence: "double?",
       soloConfidence: "double?",
       lyricsConfidence: "double?",
+      playedAt: "date?",
       dbId: {type: "int", indexed: true, optional: true},
 
       composers: 'Composer[]',
