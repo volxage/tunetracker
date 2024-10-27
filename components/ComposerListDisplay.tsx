@@ -20,7 +20,6 @@ import {
   DeleteButton
 } from '../Style.tsx'
 import itemSort from '../itemSort.tsx'
-import RNPickerSelect from 'react-native-picker-select';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import Fuse from 'fuse.js';
 

@@ -12,14 +12,12 @@ import {
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import React, {useEffect, useState} from 'react';
 import Slider from '@react-native-community/slider';
-import RNPickerSelect from 'react-native-picker-select';
 import {
   FlatList,
   Switch,
   View,
 } from 'react-native';
 import { composer, playlist, tune_draft } from '../types.tsx';
-import OnlineDB from '../OnlineDB.tsx';
 import DbConnection from './TypeFields/DbConnection.tsx';
 import ComposerField from './TypeFields/ComposerField.tsx';
 import DatePicker from 'react-native-date-picker';

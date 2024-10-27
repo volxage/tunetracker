@@ -18,7 +18,7 @@ import {
   SMarginView
 } from '../Style.tsx'
 import itemSort from '../itemSort.tsx'
-import RNPickerSelect from 'react-native-picker-select';
+import {Picker} from '@react-native-picker/picker';
 import Fuse from 'fuse.js';
 import OnlineDB from '../OnlineDB.tsx';
 
@@ -85,15 +85,21 @@ function ImporterHeader({
       />
     <View style={{flexDirection: 'row', alignItems: 'center'}}>
       <View style={{flex: 2}}>
-        <RNPickerSelect
+        <Picker
           onValueChange={(value) => updateSelectedAttr(value)}
-          items={selectedAttrItems as Array<any>} // THIS IS SO STUPID
-          useNativeAndroidPickerStyle={false}
-          style={{inputAndroid: {backgroundColor: 'transparent', color: 'white', fontSize: 18, fontWeight: "300"}}}
-        />
+        >
+          {
+            (selectedAttrItems).map(
+              (attrPair) => 
+              <Picker.Item label={attrPair.label} value={attrPair.value} key={attrPair.value}
+              style={{color: "white", backgroundColor: "#222222", fontSize: 20, fontWeight: 200}}
+              />
+              )
+          }
+        </Picker>
       </View>
       <View style={{alignItems: "flex-end"}}>
-      <SubText>{"Reverse sort:"}</SubText>
+        <SubText>{"Reverse sort:"}</SubText>
       </View>
       <View style={{flex: 1, alignItems: "center"}}>
         <Switch value={listReversed} onValueChange={() => setListReversed(!listReversed)}/>

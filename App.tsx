@@ -39,11 +39,9 @@ import {
 
 import {standard, tune_draft, editorAttrs, Status} from './types.tsx';
 import OnlineDB from './OnlineDB.tsx';
-import { Q } from "@nozbe/watermelondb"
 import ExtrasMenu from './components/ExtrasMenu.tsx';
 import {RealmProvider, useQuery, useRealm} from '@realm/react';
 import Tune from './model/Tune.ts';
-import compose from '@nozbe/watermelondb/react/compose';
 import Composer from './model/Composer.ts';
 import Playlist from './model/Playlist.ts';
 import {BSON} from 'realm';
@@ -68,7 +66,6 @@ function App(): React.JSX.Element {
   const [rawPlaylists, setRawPlaylists] = useState([])
 
   useEffect(() => {
-    //TODO: Implement playlists in WatermelonDB
     OnlineDB.update();
   }, []);
 
