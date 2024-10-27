@@ -1,4 +1,5 @@
 // Copyright 2024 Jonathan Hilliard
+import {Picker} from '@react-native-picker/picker';
 import styled from 'styled-components/native'
 
 const Button = styled.Pressable`
@@ -43,8 +44,8 @@ const ButtonText = styled.Text`
 `
 const TextInput = styled.TextInput`
   font-size: 20px;
-  font-weight: 200;
   color: white;
+  padding: 16px;
 `;
 const SMarginView = styled.View`
   background-color: black;
@@ -56,5 +57,6 @@ const ConfidenceBarView = styled.View`
 `;
 const BackgroundView = styled.View`
   background-color: black;
-`
+`;
+
 export {Text, Title, SubText, TextInput, DeleteButton, Button, ButtonText, SMarginView, ConfidenceBarView, BackgroundView};

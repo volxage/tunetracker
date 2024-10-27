@@ -251,12 +251,12 @@ function TuneListHeader({
           {
             allPlaylists.map(playlist => 
             <Picker.Item label={playlist.title} value={playlist.id} key={playlist.id.toString()}
-              style={{color: "white", backgroundColor: "black"}}
+              style={{color: "white", backgroundColor: "#222222", fontSize: 20, fontWeight: 200}}
             />
             )
           }
           <Picker.Item label="No playlist" value={playlist_enum.AllTunes}
-            style={{color: "white", backgroundColor: "black"}}
+            style={{color: "white", backgroundColor: "#222222", fontSize: 20, fontWeight: 200}}
           />
         </Picker>
       </View>
@@ -271,7 +271,7 @@ function TuneListHeader({
         {
           selectedAttrItems.map(val => 
           <Picker.Item label={val.label} value={val.value} key={val.value}
-            style={{color: "white", backgroundColor: "black"}}
+            style={{color: "white", backgroundColor: "#222222", fontSize: 20, fontWeight: 200}}
           />
           )
         }
