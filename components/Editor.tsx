@@ -15,8 +15,7 @@ import {
 } from 'react-native';
 
 import TypeField from './TypeField.tsx';
-import SongsList from '../SongsList.tsx';
-import {tune_draft, standard, playlist, tuneDefaults, editorAttrs, composerEditorAttrs, composer} from '../types.tsx';
+import {tune_draft, standard, tuneDefaults} from '../types.tsx';
 import reactotron from 'reactotron-react-native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Importer from './Importer.tsx';
@@ -26,8 +25,6 @@ import OnlineDB from '../OnlineDB.tsx';
 
 import Tune from '../model/Tune.ts';
 import ComposerListDisplay from './ComposerListDisplay.tsx';
-import Composer from '../model/Composer.ts';
-import Playlist from '../model/Playlist.ts';
 import {useRealm} from '@realm/react';
 import {BSON} from 'realm';
 
@@ -35,13 +32,14 @@ function reducer(state: any, action: any){
   switch(action.type){
     case 'update_attr':
     {
-      //const tuneCopy = JSON.parse(JSON.stringify(state["currentTune"]));
+      console.log("Updating attr " + action["attr"]);
       let tuneCopy: tune_draft = {}
       for(let attr in state["currentTune"]){
         tuneCopy[attr as keyof tune_draft] = state["currentTune"][attr];
       }
 
       tuneCopy[action["attr"] as keyof tune_draft] = action["value"];
+      // Mark attr as changed for it to be saved
       return {currentTune: tuneCopy};
     }
     case 'set_to_selected':
@@ -89,12 +87,12 @@ export default function Editor({
   setNewTune: Function
 }): React.JSX.Element {
   //Intentional copy to allow cancelling of edits
-  //  const [currentTune, setCurrentTune] = useState()
   console.log("Rerender Editor");
   const realm = useRealm();
   const [state, dispatch] = useReducer(reducer, {currentTune: {}});
   const bench = reactotron.benchmark("Editor benchmark");
   const Stack = createNativeStackNavigator();
+  const [changedAttrsList, setChangedAttrsList]: [string[], Function] = useState([]);
 
   useEffect(() => {
     dispatch({type: "set_to_selected", selectedTune: selectedTune});
@@ -107,8 +105,9 @@ export default function Editor({
   }, []);
 
   function handleSetCurrentTune(attr_key: keyof tune_draft, value: any){
-    console.log("attr_key: " + attr_key);
-    console.log(`value: ${value}`);
+    if(!changedAttrsList.includes(attr_key)){
+      setChangedAttrsList(changedAttrsList.concat(attr_key));
+    }
     dispatch({type: 'update_attr', attr: attr_key, value: value});
   }
   bench.step("Prerender")
@@ -166,9 +165,8 @@ export default function Editor({
                 !newTune &&
                 <Button
                   onPress={() => {
-                    console.log("Saving to existing tune");
                     realm.write(() => {
-                      for(let attr in (state["currentTune"])){
+                      for(let attr of changedAttrsList){
                         selectedTune[attr as keyof (tune_draft | Tune)] = (state["currentTune"][attr as keyof tune_draft] as any)
                       }
                     });
@@ -182,7 +180,6 @@ export default function Editor({
                 newTune &&
                 <Button
                   onPress={() => {
-                    console.log("Saving to new tune");
                     const ctCopy = state["currentTune"]
                     ctCopy.id = new BSON.ObjectId()
                     realm.write(() => {
