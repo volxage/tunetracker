@@ -1,4 +1,6 @@
 //Copyright 2024 Jonathan Hilliard
+import RNFS from 'react-native-fs'
+const songsFilePath = RNFS.DocumentDirectoryPath + "/songs.json"
 import TuneModel from './model/Tune';
 import Composer from './model/Composer';
 
@@ -17,6 +19,10 @@ class SongsList{
   rereadDb(){
   }
   updateSongs(){
+  }
+  addNewTune(tune:TuneModel){
+  }
+  deleteTune(tune:TuneModel){
   }
 }
 export default SongsList
