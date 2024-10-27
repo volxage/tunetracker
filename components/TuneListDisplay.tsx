@@ -234,7 +234,7 @@ function TuneListHeader({
   ]);
 
   return(
-  <View>
+    <View style={{backgroundColor: "#222"}}>
     <View style={{flexDirection: 'row', borderBottomWidth:1}}>
       <View style={{flex:1}}>
         <TextInput
@@ -252,12 +252,12 @@ function TuneListHeader({
           {
             allPlaylists.map(playlist => 
             <Picker.Item label={playlist.title} value={playlist.id} key={playlist.id.toString()}
-              style={{color: "white", backgroundColor: "#222222", fontSize: 20, fontWeight: 200}}
+              style={{color: "white", backgroundColor: "#222", fontSize: 20, fontWeight: 200}}
             />
             )
           }
           <Picker.Item label="No playlist" value={playlist_enum.AllTunes}
-            style={{color: "white", backgroundColor: "#222222", fontSize: 20, fontWeight: 200}}
+            style={{color: "white", backgroundColor: "#222", fontSize: 20, fontWeight: 200}}
           />
         </Picker>
       </View>

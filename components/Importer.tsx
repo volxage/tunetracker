@@ -92,14 +92,14 @@ function ImporterHeader({
             (selectedAttrItems).map(
               (attrPair) => 
               <Picker.Item label={attrPair.label} value={attrPair.value} key={attrPair.value}
-                style={{color: "white", backgroundColor:"black"}}
+                style={{color: "white", backgroundColor: "#222", fontSize: 20, fontWeight: 200}}
               />
               )
           }
         </Picker>
       </View>
       <View style={{alignItems: "flex-end"}}>
-        <SubText>{"Reverse sort:"}</SubText>
+        <SubText style={{fontWeight: "medium"}}>{"Reverse sort:"}</SubText>
       </View>
       <View style={{flex: 1, alignItems: "center"}}>
         <Switch value={listReversed} onValueChange={() => setListReversed(!listReversed)}/>

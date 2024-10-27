@@ -4,7 +4,7 @@ import React, {isValidElement, useEffect, useState} from 'react';
 import {SafeAreaView, View} from 'react-native';
 import {Button, ButtonText, DeleteButton, Title} from '../Style';
 
-
+// <Button onPress={() => {navigation.navigate("PlaylistImporter")}}>
 export default function ExtrasMenu({
   navigation,
 }: {
@@ -19,8 +19,8 @@ export default function ExtrasMenu({
         <Button onPress={() => {navigation.navigate("PlaylistViewer")}}>
           <ButtonText>Playlist Viewer</ButtonText>
         </Button>
-        <Button onPress={() => {navigation.navigate("PlaylistImporter")}}>
-          <ButtonText>Import Playlist</ButtonText>
+        <Button style={{backgroundColor: "#111"}}>
+          <ButtonText style={{color: "#777"}}>Import Playlist (Coming soon!)</ButtonText>
         </Button>
         <DeleteButton onPress={() => {navigation.goBack()}}>
           <ButtonText>Back</ButtonText>
