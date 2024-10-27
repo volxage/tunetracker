@@ -18,7 +18,7 @@ import {
   DeleteButton
 } from '../Style.tsx'
 import itemSort from '../itemSort.tsx'
-import RNPickerSelect from 'react-native-picker-select';
+import { Picker } from '@react-native-picker/picker';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import OnlineDB from '../OnlineDB.tsx';
 
@@ -62,7 +62,7 @@ const selectionAttrs = new Map<string, string>([
   ["composers", "Composer(s)"],
   ["form", "Form"],
 //  ["notableRecordings", "Notable recordings"],
-  ["keys", "Key(s)"],
+  ["keyCenters", "Key(s)"],
   ["styles", "Styles"],
   ["tempi", "Tempi"],
 //  ["contrafacts", "Contrafacts"],
@@ -225,11 +225,12 @@ function TuneListHeader({
   const selectedPlaylistItems: {label: string, value: BSON.ObjectId | playlist_enum}[] = (allPlaylists.map(
     (playlist) => {return {label: playlist.title, value: playlist.id}}
   ));
+  selectedPlaylistItems.push({label: "No playlist", value: playlist_enum.AllTunes});
   const statusColorMap = new Map([
     [Status.Waiting, "goldenrod"],
     [Status.Complete, "cadetblue"],
     [Status.Failed, "darkred"]
-  ])
+  ]);
 
   return(
   <View>
@@ -243,33 +244,38 @@ function TuneListHeader({
       </View>
     {
       <View style={{flex:1}}>
-        <RNPickerSelect
-          value={selectedPlaylist}
+        <Picker
+          selectedValue={selectedPlaylist}
           onValueChange={(value) => headerInputStates.setSelectedPlaylist(value)}
-          items={selectedPlaylistItems}
-          useNativeAndroidPickerStyle={false}
-          placeholder={{label: "No playlist", value: playlist_enum.AllTunes}}
-          style={{inputAndroid:
-            {
-            backgroundColor: 'transparent', color: 'white', fontSize: 20, fontWeight: "300",
-            }
-          }}
-        />
+        >
+          {
+            allPlaylists.map(playlist => 
+            <Picker.Item label={playlist.title} value={playlist.id} key={playlist.id.toString()}
+              style={{color: "white", backgroundColor: "black"}}
+            />
+            )
+          }
+          <Picker.Item label="No playlist" value={playlist_enum.AllTunes}
+            style={{color: "white", backgroundColor: "black"}}
+          />
+        </Picker>
       </View>
     }
     </View>
     <View style={{flexDirection: 'row', alignItems: 'center', borderBottomWidth:1}}>
       <View style={{flex: 4}}>
-        <RNPickerSelect
-          value={selectedAttr}
+        <Picker
+          selectedValue={selectedAttr}
           onValueChange={(value) => headerInputStates.setSelectedAttr(value)}
-          items={selectedAttrItems as Array<{label:string, value:string}>}
-          useNativeAndroidPickerStyle={false}
-          placeholder={{label: "Sort by...", value: "title"}}
-          style={{inputAndroid:
-            {backgroundColor: 'transparent', color: 'white', fontSize: 20, fontWeight: "300"}
-          }}
-        />
+        >
+        {
+          selectedAttrItems.map(val => 
+          <Picker.Item label={val.label} value={val.value} key={val.value}
+            style={{color: "white", backgroundColor: "black"}}
+          />
+          )
+        }
+        </Picker>
       </View>
       <Button
         style={{
@@ -348,7 +354,7 @@ function TuneListHeader({
             const tn: tune_draft = {};
             headerInputStates.setSelectedTune(tn);
             //TODO: Figure out why this needs to be false in order for TLD to have newTune be true!
-            setNewTune(false);
+            setNewTune(true);
 
             navigation.navigate("Editor");
           }}>

@@ -9,7 +9,7 @@ export type tune_draft = {
   "form"?: string
   "notableRecordings"?: string[]
   "mainKey"?: string
-  "keys"?: string[]
+  "keyCenters"?: string[]
   "styles"?: string[]
   "mainTempo"?: number
   "tempi"?: string[]
@@ -66,7 +66,7 @@ export const editorAttrs = [
   //  ["notable_recordings", "Notable Recordings"],
   ["mainKey", "Main Key"],
   ["mainTempo", "Main Tempo"],
-  ["keys", "Keys"],
+  ["keyCenters", "Keys"],
   ["styles", "Styles"],
   ["tempi", "Tempi"],
   //["contrafacts", "Contrafacts"],
@@ -110,7 +110,7 @@ export const tuneDefaults = new Map<string, any>([
   ["notableRecordings", []],
   ["mainKey", ""],
   ["mainTempo", 0],
-  ["keys", []],
+  ["keyCenters", []],
   ["styles", []],
   ["tempi", []],
   //  ["contrafacts", [],],

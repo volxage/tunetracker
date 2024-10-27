@@ -12,7 +12,6 @@ import {
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import React, {useEffect, useState} from 'react';
 import Slider from '@react-native-community/slider';
-import RNPickerSelect from 'react-native-picker-select';
 import {
   FlatList,
   Switch,
