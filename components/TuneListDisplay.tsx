@@ -96,14 +96,8 @@ function ConfidenceBar({
   // TODO: Replace below with dynamically sized View object instead of slider to save on rendering speed
   return(
     <ConfidenceBarView>
-      <Slider
-        value={confidence}
-        lowerLimit={confidence}
-        upperLimit={confidence}
-        minimumValue={0}
-        maximumValue={100}
-        minimumTrackTintColor={color}
-        thumbTintColor='#00000000'
+      <View 
+        style={{width: `${confidence}%`, backgroundColor: color, height:10, margin:4}}
       />
     </ConfidenceBarView>
   );
@@ -115,7 +109,7 @@ function ConfidenceBars({
   tune: Tune
 }){
   return(
-    <View>
+    <View style={{flexDirection: "column", padding: 4}}>
       <ConfidenceBar tune={tune} confidenceType='formConfidence' color='purple'/>
       <ConfidenceBar tune={tune} confidenceType='melodyConfidence' color='blue'/>
       <ConfidenceBar tune={tune} confidenceType='soloConfidence' color='darkcyan'/>
