@@ -97,7 +97,7 @@ function renderStandard(item: standard | composer, importFn: Function, separator
   }else{
     const stand = item as standard;
     text = stand.title;
-    if(selectedAttr !== "title" as keyof standard){
+    if(selectedAttr !== "Title" as keyof standard){
       subtext = prettyPrint(stand[selectedAttr as keyof standard])
     }else{
       if(stand["Composers"]){
@@ -184,7 +184,7 @@ export default function Importer({
     }
   }, []);
   const [listReversed, setListReversed] = useState(false);
-  const [selectedAttr, updateSelectedAttr] = useState("Title");
+  const [selectedAttr, updateSelectedAttr] = useState(importingComposers ? "name" : "Title");
   const [search, setSearch] = useState("");
   const standards = importingComposers ? OnlineDB.getComposers() : OnlineDB.getStandards();
 

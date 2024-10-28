@@ -245,9 +245,9 @@ function TuneListHeader({
         >
           {
             allPlaylists.map(playlist => 
-            <Picker.Item label={playlist.title} value={playlist.id} key={playlist.id.toString()}
-              style={{color: "white", backgroundColor: "#222", fontSize: 20, fontWeight: 200}}
-            />
+              <Picker.Item label={playlist.title} value={playlist.id} key={playlist.id.toString()}
+                style={{color: "white", backgroundColor: "#222", fontSize: 20, fontWeight: 200}}
+              />
             )
           }
           <Picker.Item label="No playlist" value={playlist_enum.AllTunes}
