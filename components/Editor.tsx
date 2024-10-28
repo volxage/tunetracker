@@ -223,6 +223,7 @@ export default function Editor({
   {props => 
   <SafeAreaView style={{flex: 1}}>
     <Importer
+      importingComposers={false}
       navigation={props.navigation}
       importingId={false}
       importFn={function(stand: standard, mini: boolean){

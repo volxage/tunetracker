@@ -28,14 +28,14 @@ export type tune_draft = {
   //  "playedAt"?: string[]
 }
 export type composer = {
-  "name"?: string
+  "name": string
   "bio"?: string
   "birth"?: Date
   "death"?: Date
   "dbId"?: string
 }
 export type standard = {
-  "title"?: string
+  "title": string
   "alternative_title"?: string
   "Composers"?: Array<composer>
   "form"?: string

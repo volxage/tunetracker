@@ -60,9 +60,15 @@ export default function DbConnection({
                 </SubText>
               </SMarginView>
               <Button
-                onPress={() => {navigation.navigate("ImportID")}}
+                onPress={() => {
+                  if(isComposer){
+                    navigation.navigate("ComposerImportId")
+                  }else {
+                    navigation.navigate("ImportID")}
+                  }
+                }
               >
-                <ButtonText>Connect to a tune</ButtonText>
+                <ButtonText>Connect to database</ButtonText>
               </Button>
             </View>
             :
@@ -92,7 +98,7 @@ function Preview({
               <SubText>Birth: {dateDisplay(comp.birth)}</SubText>
               <SubText>Death: {dateDisplay(comp.death)}</SubText>
               <Button onPress={() => {navigation.navigate("ComposerCompare")}}>
-                <ButtonText>Compare and Change (Coming soon!)</ButtonText>
+                <ButtonText>Compare and Change</ButtonText>
               </Button>
             </View>
     );

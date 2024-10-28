@@ -121,6 +121,7 @@ function MainMenu({}: {}): React.JSX.Element {
         {(props) =>
         <SafeAreaView style={{flex: 1, backgroundColor: "black"}}>
           <Importer
+            importingComposers={false}
             navigation={props.navigation}
             importingId={false}
             importFn={function(stand: standard, mini=false){

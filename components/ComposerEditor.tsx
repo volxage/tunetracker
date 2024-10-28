@@ -225,10 +225,11 @@ export default function ComposerEditor({
 />
 </SafeAreaView>}
 </Stack.Screen>
-<Stack.Screen name={"ImportID"}>
+<Stack.Screen name={"ComposerImportId"}>
   {props => 
   <SafeAreaView style={{flex: 1}}>
     <Importer
+      importingComposers={true}
       navigation={props.navigation}
       importingId={false}
       importFn={function(stand: standard, mini: boolean){
