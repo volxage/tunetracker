@@ -68,12 +68,24 @@ function CompareField({item, index, onlineVersion, currentItem, handleReplaceAtt
   currentItem: local_type,
   handleReplaceAttr: Function
 }){
-  const standardAttrPresent = (item[0] in onlineVersion
-            && !empty_equivalent.has(onlineVersion[item[0] as keyof online_type]
-              .toString().trim()));
-  const tuneAttrPresent = (item[0] in currentItem
-            && !empty_equivalent.has(currentItem[item[0] as keyof local_type]
-              .toString().trim()));
+  let standardAttrPresent = false;
+  if(item[0] in onlineVersion){
+    const tmpAttr = onlineVersion[item[0] as keyof online_type]
+    if(tmpAttr){
+      if(!empty_equivalent.has(tmpAttr)){
+        standardAttrPresent = true;
+      }
+    }
+  }
+  let tuneAttrPresent = false;
+  if(item[0] in currentItem){
+    const tmpAttr = onlineVersion[item[0] as keyof online_type]
+    if(tmpAttr){
+      if(!empty_equivalent.has(tmpAttr)){
+        standardAttrPresent = true;
+      }
+    }
+  }
   if(!standardAttrPresent && !tuneAttrPresent){
     return(<></>)
   }
