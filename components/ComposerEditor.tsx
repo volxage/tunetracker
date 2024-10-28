@@ -163,11 +163,10 @@ export default function ComposerEditor({
                 !newComposer && 
                 <DeleteButton
                   onLongPress={() => {
-                    database.write(async () => {
-                      (selectedComposer as Composer).delete();
-                    });
+                  //database.write(async () => {
+                  //  (selectedComposer as Composer).delete();
+                  //});
                     navigation.goBack();
-                    songsList.rereadDb();
                   }}>
                     <ButtonText>DELETE COMPOSER (CAN'T UNDO!)</ButtonText>
                   </DeleteButton>
@@ -181,10 +180,9 @@ export default function ComposerEditor({
                 !newComposer &&
                 <Button
                   onPress={() => {
-                    (selectedComposer as Composer).replace(state["currentComposer"]).then( () => {
-                      songsList.rereadDb();
-                      navigation.goBack();
-                    });
+                  //(selectedComposer as Composer).replace(state["currentComposer"]).then( () => {
+                  //  navigation.goBack();
+                  //});
                   }}
                 ><ButtonText>Save</ButtonText>
               </Button>
@@ -193,12 +191,11 @@ export default function ComposerEditor({
                 newComposer &&
                 <Button
                   onPress={() => {
-                    database.write(async () => {database.get('composers').create(comp => {
-                      (comp as Composer).replace(state["currentComposer"])
-                    }).then(resultingModel => {
-                      console.log(resultingModel);
-                      songsList.rereadDb();
-                    })});
+                  //database.write(async () => {database.get('composers').create(comp => {
+                  //  (comp as Composer).replace(state["currentComposer"])
+                  //}).then(resultingModel => {
+                  //  console.log(resultingModel);
+                  //})});
                     navigation.goBack();
                     setNewComposer(false);
                   }}
@@ -210,7 +207,7 @@ export default function ComposerEditor({
           </View>
           <View style={{flex: 1}}>
             <DeleteButton
-              onPress={() => {navigation.goBack(); songsList.rereadDb; setNewComposer(false);}}
+              onPress={() => {navigation.goBack(); setNewComposer(false);}}
             ><ButtonText>Cancel Edit</ButtonText></DeleteButton>
         </View>
       </View>

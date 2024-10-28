@@ -14,10 +14,8 @@ import {
 import { composer, composerEditorAttrs, editorAttrs, tune_draft, tuneDefaults } from '../types.tsx';
 
 import {
-  SafeAreaView,
   FlatList,
   View,
-  TouchableHighlight,
 } from 'react-native';
 
 import { standard, playlist } from '../types.tsx';
@@ -211,7 +209,6 @@ export default function Compare({
   const comparedTuneChangesDebugString = JSON.stringify(comparedTuneChanges, ["title", "alternativeTitle", "form", "composers","id", "birth", "death"]).replaceAll(",", "\n");
   const comparedDbChangesDebugString = JSON.stringify(comparedDbChanges).replaceAll(",", "\n");
   const attrs = (isComposer ? composerEditorAttrs : editorAttrs).filter((item) => (!exclude_set.has(item[0]) && !item[0].endsWith("Confidence")))
-  console.log(attrs);
   return(
   <BackgroundView>
   <FlatList
@@ -240,6 +237,16 @@ export default function Compare({
         }
         <View>
           <Button style={{backgroundColor: "grey"}}
+            onPress={() => {
+              const copyToSend = {
+                title: comparedDbChanges.title,
+                alternative_title: comparedDbChanges.alternative_title,
+                form: comparedDbChanges.form,
+                bio: comparedDbChanges.bio,
+                Composers: comparedDbChanges.Composers?.map(comp => comp.dbId)
+              }
+              console.log(copyToSend);
+            }}
           >
             <ButtonText>Upload (coming soon!)</ButtonText>
           </Button>

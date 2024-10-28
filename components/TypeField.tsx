@@ -27,6 +27,7 @@ import Playlist from '../model/Playlist.ts';
 import {useQuery, useRealm} from '@realm/react';
 import {BSON, List, Results} from 'realm';
 import { Picker } from '@react-native-picker/picker';
+import DateField from './TypeFields/DateField.tsx';
 
 function AddPlaylistField({
   newPlaylist,
@@ -144,37 +145,12 @@ function TypeField({
     );
   }
   else if (attr instanceof Date){
-    const [dateCopy, setDateCopy] = useState(new Date(attr.valueOf()));
-    const [dateOpen, setDateOpen] = useState(false);
     return(
-      <View>
-        <DatePicker
-          modal
-          mode="date"
-          date={dateCopy}
-          open={dateOpen}
-          timeZoneOffsetInMinutes={0}
-          onConfirm={(date) => {
-            setDateOpen(false)
-            setDateCopy(date);
-            handleSetCurrentItem(attrKey, date);
-          }}
-          onCancel={() => {
-            setDateOpen(false);
-          }}
-        />
-        <Title>{(attrKey as string).toUpperCase()}</Title>
-        <View style={{flexDirection: "row"}}>
-          <View style={{flex: 1, alignItems: "left", alignSelf: "center"}}>
-            <View style={{borderColor: "grey", borderWidth: 1, padding: 8}}>
-              <SubText>{dateDisplay(attr)}</SubText>
-            </View>
-          </View>
-          <Button style={{flex:1}} onPress={() => setDateOpen(true)}>
-            <ButtonText>Set date</ButtonText>
-          </Button>
-        </View>
-      </View>
+      <DateField
+        attr={attr}
+        attrKey={attrKey}
+        handleSetCurrentItem={handleSetCurrentItem}
+        navigation={navigation}/>
     );
   }
   else if (attrKey === "playlists" as keyOfEitherDraft && attr){ //Playlists are NOT an attribute of a tune
