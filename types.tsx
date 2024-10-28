@@ -97,8 +97,8 @@ export const miniEditorAttrs = new Map<string, string>([
 ])
 export const composerDefaults = new Map<string, any>([
   ["name", ""],
-  ["birth", ""],
-  ["death", ""],
+  ["birth", new Date(0,0,1)],
+  ["death", new Date(0,0,1)],
   ["bio", ""],
   ["dbId", 0]
 ])

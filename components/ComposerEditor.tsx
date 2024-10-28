@@ -28,6 +28,7 @@ import OnlineDB from '../OnlineDB.tsx';
 import TuneModel from '../model/Tune.ts';
 import Composer from '../model/Composer.ts';
 import Compare from './Compare.tsx';
+import {useRealm} from '@realm/react';
 
 function reducer(state: any, action: any){
   switch(action.type){
@@ -104,6 +105,7 @@ export default function ComposerEditor({
   const [originalPlaylistsSet, setOriginalPlaylistsSet]: [Set<playlist>, Function] = useState(new Set())
   const bench = reactotron.benchmark("Editor benchmark");
   const Stack = createNativeStackNavigator();
+  const realm = useRealm();
 
   useEffect(() => {
     dispatch({type: "set_to_selected", selectedComposer: selectedComposer});
@@ -114,12 +116,12 @@ export default function ComposerEditor({
   }, []);
 
   useEffect(() => {
-    bench.stop("Post-render")
+    bench.stop("Post-render");
   }, [])
   function handleSetCurrentComposer(attr_key: keyof composer, value: any){
     dispatch({type: 'update_attr', attr: attr_key, value: value});
   }
-  bench.step("Prerender")
+  bench.step("Prerender");
   const onlineVersion = (state["currentComposer"].dbId ? OnlineDB.getComposerById(state["currentComposer"].dbId) : null) as composer
   if(onlineVersion){
     onlineVersion.birth = onlineVersion.birth ? new Date(onlineVersion.birth) : undefined;
@@ -163,9 +165,9 @@ export default function ComposerEditor({
                 !newComposer && 
                 <DeleteButton
                   onLongPress={() => {
-                  //database.write(async () => {
-                  //  (selectedComposer as Composer).delete();
-                  //});
+                    realm.write(() => 
+                      realm.delete(selectedComposer)
+                    )
                     navigation.goBack();
                   }}>
                     <ButtonText>DELETE COMPOSER (CAN'T UNDO!)</ButtonText>
@@ -180,9 +182,13 @@ export default function ComposerEditor({
                 !newComposer &&
                 <Button
                   onPress={() => {
-                  //(selectedComposer as Composer).replace(state["currentComposer"]).then( () => {
-                  //  navigation.goBack();
-                  //});
+                    realm.write(() => {
+                      for(let attr in state["currentComposer"]){
+                        //TODO: Supress compiler warnings here
+                        selectedComposer[attr] = state["currentComposer"][attr];
+                      }
+                    });
+                    navigation.goBack()
                   }}
                 ><ButtonText>Save</ButtonText>
               </Button>
@@ -196,6 +202,9 @@ export default function ComposerEditor({
                   //}).then(resultingModel => {
                   //  console.log(resultingModel);
                   //})});
+                    realm.write(() => {
+                      realm.create("Composer", state["currentComposer"]);
+                    });
                     navigation.goBack();
                     setNewComposer(false);
                   }}

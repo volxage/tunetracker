@@ -64,6 +64,7 @@ type HeaderInputStates = {
   handleSetCurrentTune: Function
   selectedComposers: Array<Composer>
   selectedOnlineComposers: Array<composer>
+  setComposerToEdit: Function
 }
 function ComposerListHeader({
   headerInputStates,
@@ -126,7 +127,11 @@ function ComposerListHeader({
                     <View>
                       <SubText>This search doesn't seem to match well with any composer you've entered before, or any composer from our database. You can add a new composer by pressing the button below.</SubText>
                       <Button
-                        onPress={() => {headerInputStates.setNewComposer(true); headerInputStates.navigation.navigate("ComposerEditor")}}
+                        onPress={() => {
+                          headerInputStates.setNewComposer(true);
+                          headerInputStates.setComposerToEdit({});
+                          headerInputStates.navigation.navigate("ComposerEditor")
+                        }}
                       >
                         <ButtonText>Add *Brand New* composer</ButtonText>
                       </Button>
@@ -134,7 +139,13 @@ function ComposerListHeader({
                     :
                     <View>
                       <SubText>You have very similar search results. Tap and hold the button below to add a brand new composer ONLY if you're sure that it's a different composer from the composers shown in the results.</SubText>
-                      <Button>
+                      <Button
+                        onLongPress={() => {
+                          headerInputStates.setNewComposer(true);
+                          headerInputStates.setComposerToEdit({});
+                          headerInputStates.navigation.navigate("ComposerEditor")
+                        }}
+                      >
                         <ButtonText>Add *brand new* composer</ButtonText>
                       </Button>
                     </View>
@@ -279,7 +290,8 @@ export default function ComposerListDisplay({
     setNewComposer: setNewComposer,
     handleSetCurrentTune: handleSetCurrentTune,
     selectedComposers: selectedComposers,
-    selectedOnlineComposers: selectedOnlineComposers
+    selectedOnlineComposers: selectedOnlineComposers,
+    setComposerToEdit: setComposerToEdit
   }
   const Stack = createNativeStackNavigator();
   return (
