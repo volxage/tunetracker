@@ -32,17 +32,16 @@ export type composer = {
   "bio"?: string
   "birth"?: Date
   "death"?: Date
-  "id": number
   "dbId"?: string
 }
 export type standard = {
-  "title": string
-  "alternative_title": string
-  "Composers": Array<composer>
-  "form": string
-  "bio": string
-  "year": string
-  "id": number
+  "title"?: string
+  "alternative_title"?: string
+  "Composers"?: Array<composer>
+  "form"?: string
+  "bio"?: string
+  "year"?: string
+  "id"?: number
   //  "Composers": composer[]
 }
 export type playlist = {

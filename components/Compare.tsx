@@ -23,11 +23,7 @@ import {
 import { standard, playlist } from '../types.tsx';
 import reactotron from 'reactotron-react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons.js';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import Importer from './Importer.tsx';
-import {BackHandler} from 'react-native';
 import Tune from '../model/Tune.js';
-import Composer from '../model/Composer.js';
 import dateDisplay from '../dateDisplay.tsx';
 
 //Anything that ends with "confidence" is also excluded
@@ -192,8 +188,8 @@ export default function Compare({
   handleSetCurrentItem: Function,
   isComposer: boolean
 }){
-  const [comparedDbDraft, setComparedDbDraft] = useState(onlineVersion);
-  const [comparedTuneDraft, setComparedTuneDraft] = useState(currentItem);
+  const [comparedDbChanges, setComparedDbChanges] = useState(onlineVersion);
+  const [comparedTuneChanges, setComparedTuneChanges] = useState(currentItem);
   function handleReplaceAttr(attrKey: keyof (Tune | tune_draft), value: any, onlineSelected: boolean){
     const cpy: online_type = {}
     if(onlineSelected){
@@ -202,20 +198,18 @@ export default function Compare({
       }
     }else{
       for(let attr in currentItem){
-        cpy[attr as keyof local_type] = onlineVersion[attr as keyof local_type];
+        cpy[attr as keyof local_type] = currentItem[attr as keyof local_type];
       }
     }
-    //Inefficient solution, but there are no Map functions such as "filter" in mapped types
-    //const cpy = JSON.parse(JSON.stringify(onlineSelected ? onlineVersion : currentItem));
     cpy[attrKey] = value;
     if(onlineSelected){
-      setComparedDbDraft(cpy)
+      setComparedDbChanges(cpy)
     }else{
-      setComparedTuneDraft(cpy);
+      setComparedTuneChanges(cpy);
     }
   }
-  const comparedTuneDraftDebugString = JSON.stringify(comparedTuneDraft, ["title", "alternativeTitle", "form", "composers","id", "birth", "death"]).replaceAll(",", "\n");
-  const comparedDbDraftDebugString = JSON.stringify(comparedDbDraft).replaceAll(",", "\n");
+  const comparedTuneChangesDebugString = JSON.stringify(comparedTuneChanges, ["title", "alternativeTitle", "form", "composers","id", "birth", "death"]).replaceAll(",", "\n");
+  const comparedDbChangesDebugString = JSON.stringify(comparedDbChanges).replaceAll(",", "\n");
   const attrs = (isComposer ? composerEditorAttrs : editorAttrs).filter((item) => (!exclude_set.has(item[0]) && !item[0].endsWith("Confidence")))
   console.log(attrs);
   return(
@@ -237,10 +231,12 @@ export default function Compare({
     ListFooterComponent={(props) => (
       <>
         {
-      //<Text>Tune draft:</Text>
-      //<SubText>{comparedTuneDraftDebugString}</SubText>
-      //<Text>Online draft:</Text>
-      //<SubText>{comparedDbDraftDebugString}</SubText>
+          <View>
+            <Text>Tune changes:</Text>
+            <SubText>{comparedTuneChangesDebugString}</SubText>
+            <Text>Online changes:</Text>
+            <SubText>{comparedDbChangesDebugString}</SubText>
+          </View>
         }
         <View>
           <Button style={{backgroundColor: "grey"}}
@@ -252,9 +248,9 @@ export default function Compare({
           <Button style={{flex: 1}}
             onPress={() => {
               navigation.goBack();
-              for(let attr in comparedTuneDraft){
-                if(attr in comparedTuneDraft){
-                  handleSetCurrentItem(attr, comparedTuneDraft[attr as keyof (Tune | tune_draft)]);
+              for(let attr in comparedTuneChanges){
+                if(attr in comparedTuneChanges){
+                  handleSetCurrentItem(attr, comparedTuneChanges[attr as keyof (Tune | tune_draft)]);
                 }
               }
               }}>

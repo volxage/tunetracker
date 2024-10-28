@@ -195,11 +195,24 @@ export default function Editor({
             }
 
           </View>
-          <View style={{flex: 1}}>
-            <DeleteButton
-              onPress={() => {navigation.goBack(); setNewTune(false);}}
-            ><ButtonText>Cancel Edit</ButtonText></DeleteButton>
-        </View>
+          {
+            newTune ?
+            <View style={{flex: 1}}>
+              <DeleteButton
+                onPress={() => {navigation.goBack(); setNewTune(false);}}
+              >
+                <ButtonText>Cancel creation</ButtonText>
+              </DeleteButton>
+            </View>
+            :
+            <View style={{flex: 1}}>
+              <DeleteButton
+                onPress={() => {navigation.goBack(); setNewTune(false);}}
+              >
+                <ButtonText>Cancel Edit</ButtonText>
+              </DeleteButton>
+            </View>
+          }
       </View>
     </View>
   }

@@ -127,6 +127,7 @@ function TypeField({
   const allPlaylists = useQuery(Playlist);
   const [icon, setIcon] = useState();
   const [bool, setBool] = useState(attr)
+  const [newPlaylistOpen, setNewPlaylistOpen] = useState(false)
   useEffect(() => {
     Icon.getImageSource('circle', 26, 'white')
       .then(setIcon);
@@ -176,8 +177,9 @@ function TypeField({
       </View>
     );
   }
-  else if (attrKey === "playlists" as keyOfEitherDraft){ //Playlists are NOT an attribute of a tune
-    const [newPlaylistOpen, setNewPlaylistOpen] = useState(false)
+  else if (attrKey === "playlists" as keyOfEitherDraft && attr){ //Playlists are NOT an attribute of a tune
+    console.log(attrKey);
+    console.log(attr);
     const ids = (attr as (Playlist | playlist)[]).map(pl => pl.id);
     //TODO:
     // Delete Button
@@ -262,7 +264,8 @@ function TypeField({
   }
   else if (Array.isArray(attr) || attr instanceof List){
 //    const [arrAttr, setarrAttr] = useState(attr);
-
+    console.log(attrKey);
+    console.log(attr);
     function handleReplace(value: string, index: number){
       const newArrAttr = (attr as string[]).map((c, i) => {
         return i === index ? value : c;
