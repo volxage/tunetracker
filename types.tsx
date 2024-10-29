@@ -117,8 +117,8 @@ export const tuneDefaults = new Map<string, any>([
   //  ["contrafacts", [],],
   ["hasLyrics", false],
   ["playthroughs", 0],
-  ["formConfidence", 0],
   ["melodyConfidence", 0],
+  ["formConfidence", 0],
   ["soloConfidence", 0],
   ["lyricsConfidence", 0],
   ["dbId", 0]

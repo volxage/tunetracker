@@ -23,6 +23,7 @@ import reactotron from 'reactotron-react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons.js';
 import Tune from '../model/Tune.js';
 import dateDisplay from '../dateDisplay.tsx';
+import OnlineDB from '../OnlineDB.tsx';
 
 //Anything that ends with "confidence" is also excluded
 const exclude_set = new Set([
@@ -253,11 +254,12 @@ export default function Compare({
               const copyToSend = {
                 title: comparedDbChanges.title,
                 alternative_title: comparedDbChanges.alternative_title,
+                id: comparedDbChanges.id,
                 form: comparedDbChanges.form,
                 bio: comparedDbChanges.bio,
-                Composers: comparedDbChanges.Composers?.map(comp => comp.dbId)
+                Composers: comparedDbChanges.Composers.map(comp => comp.dbId)
               }
-              console.log(copyToSend);
+              OnlineDB.sendUpdateDraft(copyToSend);
             }}
           >
             <ButtonText>Upload (coming soon!)</ButtonText>

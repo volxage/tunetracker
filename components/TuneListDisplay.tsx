@@ -67,11 +67,11 @@ const selectionAttrs = new Map<string, string>([
   ["mainStyle", "Main Style"],
   ["mainTempo", "Main Tempo"],
 //  ["contrafacts", "Contrafacts"],
-  ["playthroughs", "Playthrough Count"],
-  ["formConfidence", "Form Confidence"],
   ["melodyConfidence", "Melody Confidence"],
+  ["formConfidence", "Form Confidence"],
   ["soloConfidence", "Solo Confidence"],
   ["lyricsConfidence", "Lyrics Confidence"],
+  ["playthroughs", "Playthrough Count"],
   ["playedAt", "Played At"],
 ]);
 
@@ -110,8 +110,8 @@ function ConfidenceBars({
 }){
   return(
     <View style={{flexDirection: "column", padding: 4}}>
-      <ConfidenceBar tune={tune} confidenceType='formConfidence' color='purple'/>
-      <ConfidenceBar tune={tune} confidenceType='melodyConfidence' color='blue'/>
+      <ConfidenceBar tune={tune} confidenceType='melodyConfidence' color='purple'/>
+      <ConfidenceBar tune={tune} confidenceType='formConfidence' color='blue'/>
       <ConfidenceBar tune={tune} confidenceType='soloConfidence' color='darkcyan'/>
       {
         tune.hasLyrics &&
