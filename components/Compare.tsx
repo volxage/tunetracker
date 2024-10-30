@@ -257,7 +257,12 @@ export default function Compare({
                 id: comparedDbChanges.id,
                 form: comparedDbChanges.form,
                 bio: comparedDbChanges.bio,
-                Composers: comparedDbChanges.Composers.map(comp => comp.dbId)
+                composers: comparedDbChanges.Composers.map(comp => {
+                  if("dbId" in comp){
+                    return comp["dbId"]
+                  }
+                  return comp.id;
+                })
               }
               OnlineDB.sendUpdateDraft(copyToSend);
             }}
