@@ -10,6 +10,7 @@ import {
   Text,
   SMarginView,
 } from '../Style.tsx'
+const debugMode = false;
 
 import { composer, composerEditorAttrs, editorAttrs, tune_draft, tuneDefaults } from '../types.tsx';
 
@@ -24,6 +25,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons.js';
 import Tune from '../model/Tune.js';
 import dateDisplay from '../dateDisplay.tsx';
 import OnlineDB from '../OnlineDB.tsx';
+import {AxiosResponse} from 'axios';
 
 //Anything that ends with "confidence" is also excluded
 const exclude_set = new Set([
@@ -201,6 +203,8 @@ export default function Compare({
 }){
   const [comparedDbChanges, setComparedDbChanges] = useState(onlineVersion);
   const [comparedTuneChanges, setComparedTuneChanges] = useState(currentItem);
+  const [uploadResult, setUploadResult] = useState({} as any);
+  const resultAsAny = uploadResult as any;
   function handleReplaceAttr(attrKey: keyof (Tune | tune_draft), value: any, onlineSelected: boolean){
     const cpy: online_type = {}
     if(onlineSelected){
@@ -241,6 +245,7 @@ export default function Compare({
     ListFooterComponent={(props) => (
       <>
         {
+          debugMode &&
           <View>
             <Text>Tune changes:</Text>
             <SubText>{comparedTuneChangesDebugString}</SubText>
@@ -249,26 +254,39 @@ export default function Compare({
           </View>
         }
         <View>
-          <Button style={{backgroundColor: "grey"}}
+          <Button style={{backgroundColor: ("data" in uploadResult) ? "grey" : "cadetblue"}}
             onPress={() => {
-              const copyToSend = {
-                title: comparedDbChanges.title,
-                alternative_title: comparedDbChanges.alternative_title,
-                id: comparedDbChanges.id,
-                form: comparedDbChanges.form,
-                bio: comparedDbChanges.bio,
-                composers: comparedDbChanges.Composers.map(comp => {
-                  if("dbId" in comp){
-                    return comp["dbId"]
-                  }
-                  return comp.id;
-                })
+              //TODO: Get the compiler to chill out
+              if(!("data" in uploadResult)){
+                const copyToSend = {
+                  title: comparedDbChanges.title,
+                  alternative_title: comparedDbChanges.alternative_title,
+                  id: comparedDbChanges.id,
+                  form: comparedDbChanges.form,
+                  bio: comparedDbChanges.bio,
+                  composers: (comparedDbChanges.Composers ? comparedDbChanges.Composers : comparedDbChanges.composers).map(comp => {
+                    if("dbId" in comp){
+                      return comp["dbId"]
+                    }
+                    return comp.id;
+                  })
+                }
+                OnlineDB.sendUpdateDraft(copyToSend).then(res => {
+                  setUploadResult(((res as AxiosResponse).data))
+                });
               }
-              OnlineDB.sendUpdateDraft(copyToSend);
             }}
           >
-            <ButtonText>Upload (coming soon!)</ButtonText>
+            <ButtonText>Upload</ButtonText>
           </Button>
+      {
+        "data" in uploadResult &&
+        <View style={{borderWidth: 1, borderColor: "grey"}}>
+          <SubText>Uploaded tune "{uploadResult["data"]["title"]}"</SubText>
+          <SubText>Attached to composers:</SubText>
+          <SubText style={{fontWeight: 500}}>{uploadResult["composers"].map(comp => comp.name).join(", ")}</SubText>
+        </View>
+      }
         </View>
         <View style={{flexDirection: "row"}}>
           <Button style={{flex: 1}}
