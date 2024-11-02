@@ -2,7 +2,7 @@
 //Add "standard" functionality and translation!
 import { composer, composerDefaults } from "../types"
 import Composer from "../model/Composer";
-export default function standardDraftReducer(state: any, action: any){
+export default function standardComposerDraftReducer(state: any, action: any){
   switch(action.type){
     case 'update_attr':
     {
