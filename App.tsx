@@ -37,7 +37,7 @@ import {
   Colors,
 } from 'react-native/Libraries/NewAppScreen';
 
-import {standard, tune_draft, editorAttrs, Status} from './types.tsx';
+import {standard, tune_draft, editorAttrs, Status, miniEditorAttrs} from './types.tsx';
 import OnlineDB from './OnlineDB.tsx';
 import ExtrasMenu from './components/ExtrasMenu.tsx';
 import {RealmProvider, useQuery, useRealm} from '@realm/react';
@@ -48,17 +48,6 @@ import {BSON} from 'realm';
 import PlaylistViewer from './components/PlaylistViewer.tsx';
 import PlaylistImporter from './components/PlaylistImporter.tsx';
 
-
-//PrettyAttrs function as both as "prettifiers" and lists of attrs to display in corresponding editors
-const miniEditorPrettyAttrs = new Map<string, string>([
-  ["title", "Title"],
-  ["hasLyrics", "Has lyrics?"],
-  ["formConfidence", "Form Confidence"],
-  ["melodyConfidence", "Melody Confidence"],
-  ["soloConfidence", "Solo Confidence"],
-  ["lyricsConfidence", "Lyrics Confidence"],
-  //  ["just_played", "'I Just Played This'"],
-])
 
 const Stack = createNativeStackNavigator();
 
@@ -91,7 +80,7 @@ function MainMenu({}: {}): React.JSX.Element {
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
-  let entriesArr = Array.from(miniEditorPrettyAttrs.entries());
+  let entriesArr = Array.from(miniEditorAttrs.entries());
   let arr = ((entriesArr as Array<Array<unknown>>) as Array<[string, string]>);
   const allLocalComposers = useQuery(Composer);
   return(

@@ -26,7 +26,7 @@ import OnlineDB from '../OnlineDB.tsx';
 import Composer from '../model/Composer.ts';
 import Compare from './Compare.tsx';
 import {useRealm} from '@realm/react';
-import composerDraftReducer from '../model/DraftReducers/ComposerDraftReducer.ts';
+import composerDraftReducer from '../DraftReducers/ComposerDraftReducer.ts';
 
 
 export default function ComposerEditor({

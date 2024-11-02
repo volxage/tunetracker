@@ -98,8 +98,8 @@ export const composerEditorAttrs = [
 ];
 export const miniEditorAttrs = new Map<string, string>([
   ["title", "Title"],
-  ["formConfidence", "Form Confidence"],
   ["melodyConfidence", "Melody Confidence"],
+  ["formConfidence", "Form Confidence"],
   ["soloConfidence", "Solo Confidence"],
   ["lyricsConfidence", "Lyrics Confidence"],
   ["playlists", "Playlists"],

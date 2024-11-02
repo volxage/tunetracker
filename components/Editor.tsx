@@ -28,7 +28,7 @@ import ComposerListDisplay from './ComposerListDisplay.tsx';
 import {useRealm} from '@realm/react';
 import {BSON} from 'realm';
 import TuneDraftContext from '../contexts/TuneDraftContext.ts';
-import tuneDraftReducer from '../model/DraftReducers/TuneDraftReducer.ts';
+import tuneDraftReducer from '../DraftReducers/TuneDraftReducer.ts';
 
 
 export default function Editor({

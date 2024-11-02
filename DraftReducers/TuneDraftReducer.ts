@@ -1,5 +1,5 @@
-import {tune_draft, standard, tuneDefaults} from '../../types.tsx';
-import Tune from '../Tune.ts';
+import {tune_draft, standard, tuneDefaults} from '../types.tsx';
+import Tune from '../model/Tune.ts';
 
 export default function tuneDraftReducer(state: any, action: any){
   switch(action.type){

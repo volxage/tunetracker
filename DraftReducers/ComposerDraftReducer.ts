@@ -1,5 +1,5 @@
-import { composer, composerDefaults } from "../../types"
-import Composer from "../Composer";
+import { composer, composerDefaults } from "../types"
+import Composer from "../model/Composer";
 export default function composerDraftReducer(state: any, action: any){
   switch(action.type){
     case 'update_attr':
