@@ -28,51 +28,8 @@ import ComposerListDisplay from './ComposerListDisplay.tsx';
 import {useRealm} from '@realm/react';
 import {BSON} from 'realm';
 import TuneDraftContext from '../contexts/TuneDraftContext.ts';
+import tuneDraftReducer from '../model/DraftReducers/TuneDraftReducer.ts';
 
-function reducer(state: any, action: any){
-  switch(action.type){
-    case 'update_attr':
-    {
-      console.log("Updating attr " + action["attr"]);
-      let tuneCopy: tune_draft = {}
-      for(let attr in state["currentTune"]){
-        tuneCopy[attr as keyof tune_draft] = state["currentTune"][attr];
-      }
-
-      tuneCopy[action["attr"] as keyof tune_draft] = action["value"];
-      // Mark attr as changed for it to be saved
-      return {currentTune: tuneCopy};
-    }
-    case 'set_to_selected':
-    {
-      const tune: tune_draft = {}
-      if(action["selectedTune"] instanceof Tune){
-        for(let attr of tuneDefaults){
-          let key = attr[0] as keyof Tune;
-          if(key in action["selectedTune"]
-            && typeof action["selectedTune"][key] !== "undefined"
-            && action["selectedTune"][key] !== null
-          ){
-            tune[key as keyof tune_draft] = action["selectedTune"][key as keyof Tune]
-          }else{
-            tune[key as keyof tune_draft] = attr[1]
-          }
-        }
-      }else{
-        for(let attr of tuneDefaults){
-          let key = attr[0] as keyof tune_draft;
-          if(key in action["selectedTune"] && typeof action["selectedTune"][key] !== "undefined"){
-            tune[key as keyof tune_draft] = action["selectedTune"][key as keyof tune_draft]
-          }else{
-            tune[key as keyof tune_draft] = attr[1]
-          }
-        }
-        //tune.dbId = action["selectedTune"]["id"]
-      }
-      return {currentTune: tune};
-    }
-  }
-}
 
 export default function Editor({
   prettyAttrs, 
@@ -90,7 +47,7 @@ export default function Editor({
   //Intentional copy to allow cancelling of edits
   //console.log("Rerender Editor");
   const realm = useRealm();
-  const [state, dispatch] = useReducer(reducer, {currentTune: {}});
+  const [state, dispatch] = useReducer(tuneDraftReducer, {currentTune: {}});
   const bench = reactotron.benchmark("Editor benchmark");
   const Stack = createNativeStackNavigator();
   const [changedAttrsList, setChangedAttrsList]: [string[], Function] = useState([]);

@@ -28,7 +28,7 @@ export type tune_draft = {
   //  "playedAt"?: string[]
 }
 export type composer = {
-  "name": string
+  "name"?: string
   "bio"?: string
   "birth"?: Date
   "death"?: Date

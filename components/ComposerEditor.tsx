@@ -1,7 +1,6 @@
-
 // Copyright 2024 Jonathan Hilliard
 
-import React, {isValidElement, useEffect, useReducer, useState} from 'react';
+import React, {useEffect, useReducer, useState} from 'react';
 import {
   Button,
   DeleteButton,
@@ -17,67 +16,18 @@ import {
 
 import TypeField from './TypeField.tsx';
 import SongsList from '../SongsList.tsx';
-import Playlists from '../Playlists.tsx';
-import {composer, standard, playlist, composerDefaults} from '../types.tsx';
+import {composer, standard} from '../types.tsx';
 import reactotron from 'reactotron-react-native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Importer from './Importer.tsx';
 import {BackHandler} from 'react-native';
 import OnlineDB from '../OnlineDB.tsx';
 
-import TuneModel from '../model/Tune.ts';
 import Composer from '../model/Composer.ts';
 import Compare from './Compare.tsx';
 import {useRealm} from '@realm/react';
+import composerDraftReducer from '../model/DraftReducers/ComposerDraftReducer.ts';
 
-function reducer(state: any, action: any){
-  switch(action.type){
-    case 'update_attr':
-    {
-      const cd: composer = {}
-      for(let attr of composerDefaults){
-        let key = attr[0] as keyof Composer;
-        if(key in state["currentComposer"]
-          && typeof state["currentComposer"][key] !== "undefined"
-          && state["currentComposer"][key] !== null
-        ){
-          cd[key as keyof composer] = state["currentComposer"][key as keyof Composer]
-        }else{
-          cd[key as keyof composer] = attr[1]
-        }
-      }
-      cd[action["attr"] as keyof composer] = action["value"];
-      return {currentComposer: cd};
-    }
-    case 'set_to_selected':
-    {
-      const cd: composer = {}
-      if(action["selectedComposer"] instanceof Composer){
-        for(let attr of composerDefaults){
-          let key = attr[0] as keyof Composer;
-          if(key in action["selectedComposer"]
-            && typeof action["selectedComposer"][key] !== "undefined"
-            && action["selectedComposer"][key] !== null
-          ){
-            cd[key as keyof composer] = action["selectedComposer"][key as keyof Composer]
-          }else{
-            cd[key as keyof composer] = attr[1]
-          }
-        }
-      }else{
-        for(let attr of composerDefaults){
-          let key = attr[0] as keyof Composer;
-          if(key in action["selectedComposer"] && typeof action["selectedComposer"][key] !== "undefined"){
-            cd[key as keyof composer] = action["selectedComposer"][key as keyof Composer]
-          }else{
-            cd[key as keyof composer] = attr[1]
-          }
-        }
-      }
-      return {currentComposer: cd};
-    }
-  }
-}
 
 export default function ComposerEditor({
   prettyAttrs, 
@@ -92,7 +42,7 @@ export default function ComposerEditor({
   navigation: any, //TODO: Find type of "navigation"
   selectedComposer: Composer | composer,
   songsList: SongsList,
-  playlists: Playlists,
+  playlists: any,
   newComposer: boolean,
   setNewComposer: Function
 }): React.JSX.Element {
@@ -100,9 +50,7 @@ export default function ComposerEditor({
   //  const [currentComposer, setCurrentTune] = useState()
   console.log("Rerender ComposerEditor");
   //console.log(prettyAttrs);
-  const [state, dispatch] = useReducer(reducer, {currentComposer: {}});
-  const [tunePlaylists, setTunePlaylists]: [playlist[], Function] = useState([])
-  const [originalPlaylistsSet, setOriginalPlaylistsSet]: [Set<playlist>, Function] = useState(new Set())
+  const [state, dispatch] = useReducer(composerDraftReducer, {currentComposer: {}});
   const bench = reactotron.benchmark("Editor benchmark");
   const Stack = createNativeStackNavigator();
   const realm = useRealm();
@@ -146,9 +94,6 @@ export default function ComposerEditor({
                     attrKey={item[0]}
                     attrName={item[1]}
                     handleSetCurrentItem={handleSetCurrentComposer}
-                    playlists={playlists}
-                    tunePlaylists={tunePlaylists}
-                    setTunePlaylists={setTunePlaylists}
                     navigation={navigation}
                     isComposer={true}
                   />
