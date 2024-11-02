@@ -1,21 +1,20 @@
 import {tune_draft, standard, tuneDefaults} from '../types.tsx';
 import Tune from '../model/Tune.ts';
 
-function translateAttrFromStandardTune(attrKey: keyof standard, attr: any){
+function translateAttrFromTune(attrKey: keyof tune_draft, attr: any){
   switch(attrKey){
-      case 'alternative_title':
+      case 'alternativeTitle':
       {
       }
-      case 'Composers':
+      case 'composers':
       {
       }
   }
 }
-export default function tuneDraftReducer(state: any, action: any){
+export default function standardTuneDraftReducer(state: any, action: any){
   switch(action.type){
-    case 'obtain_attr_from_standard':
+    case 'obtain_attr_from_tune':
     {
-      console.log("Updating attr " + action["attr"]);
       let tuneCopy: tune_draft = {}
       for(let attr in state["currentTune"]){
         tuneCopy[attr as keyof tune_draft] = state["currentTune"][attr];
