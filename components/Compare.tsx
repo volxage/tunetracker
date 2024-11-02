@@ -10,6 +10,7 @@ import {
   Text,
   SMarginView,
 } from '../Style.tsx'
+import { Realm, useRealm } from '@realm/react'
 const debugMode = false;
 
 import { composer, composerEditorAttrs, editorAttrs, tune_draft, tuneDefaults } from '../types.tsx';
@@ -26,13 +27,14 @@ import Tune from '../model/Tune.js';
 import dateDisplay from '../dateDisplay.tsx';
 import OnlineDB from '../OnlineDB.tsx';
 import {AxiosResponse} from 'axios';
+import Composer from '../model/Composer.ts';
 
 //Anything that ends with "confidence" is also excluded
 const exclude_set = new Set([
   "dbId",
   "playlists",
   "playthroughs",
-  "composers"
+  //"composers"
 ]);
 
 const empty_equivalent = new Set([
@@ -42,6 +44,11 @@ const empty_equivalent = new Set([
   "unknown"
 ]);
 function stringify(value: any): string{
+  if(value instanceof Realm.List){
+    console.log("Below is a Realm.List.");
+    console.log(value);
+    return JSON.stringify(value.toJSON());
+  }
   switch(typeof value){
     case "string":
       return value
@@ -75,16 +82,17 @@ function CompareField({item, index, onlineVersion, currentItem, handleReplaceAtt
   if(item[0] in onlineVersion){
     const tmpAttr = onlineVersion[item[0] as keyof online_type]
     if(tmpAttr){
-      if(!empty_equivalent.has(tmpAttr)){
+      if(!empty_equivalent.has(stringify(tmpAttr))){
         standardAttrPresent = true;
       }
     }
   }
   let tuneAttrPresent = false;
   if(item[0] in currentItem){
-    const tmpAttr = onlineVersion[item[0] as keyof online_type]
+    const tmpAttr = currentItem[item[0] as keyof online_type]
+    console.log(tmpAttr);
     if(tmpAttr){
-      if(!empty_equivalent.has(tmpAttr)){
+      if(!empty_equivalent.has(stringify(tmpAttr))){
         standardAttrPresent = true;
       }
     }
@@ -121,7 +129,7 @@ function CompareField({item, index, onlineVersion, currentItem, handleReplaceAtt
       <View>
         {
           (item[0] in onlineVersion
-            && !empty_equivalent.has(online_item)) &&
+            && !empty_equivalent.has(online_display)) &&
               <View>
                 <SMarginView>
                   <SubText>{online_display}</SubText>
@@ -131,7 +139,7 @@ function CompareField({item, index, onlineVersion, currentItem, handleReplaceAtt
             <View style={{flexDirection: "row"}}>
               {
                 (item[0] in onlineVersion
-                  && !empty_equivalent.has(online_item)) ?
+                  && !empty_equivalent.has(online_display)) ?
                     <Button style={{
                         backgroundColor: choice === 0 ? "#338" : "#222",
                         flex: 1

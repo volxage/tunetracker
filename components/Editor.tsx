@@ -27,6 +27,7 @@ import Tune from '../model/Tune.ts';
 import ComposerListDisplay from './ComposerListDisplay.tsx';
 import {useRealm} from '@realm/react';
 import {BSON} from 'realm';
+import TuneDraftContext from '../contexts/TuneDraftContext.ts';
 
 function reducer(state: any, action: any){
   switch(action.type){
@@ -87,7 +88,7 @@ export default function Editor({
   setNewTune: Function
 }): React.JSX.Element {
   //Intentional copy to allow cancelling of edits
-  console.log("Rerender Editor");
+  //console.log("Rerender Editor");
   const realm = useRealm();
   const [state, dispatch] = useReducer(reducer, {currentTune: {}});
   const bench = reactotron.benchmark("Editor benchmark");
@@ -222,14 +223,16 @@ export default function Editor({
 <Stack.Screen name={"ImportID"}>
   {props => 
   <SafeAreaView style={{flex: 1}}>
-    <Importer
-      importingComposers={false}
-      navigation={props.navigation}
-      importingId={false}
-      importFn={function(stand: standard, mini: boolean){
-        handleSetCurrentTune("dbId", stand.id)
-        props.navigation.goBack();
-      }}/>
+    <TuneDraftContext.Provider value={state["currentTune"]}>
+      <Importer
+        importingComposers={false}
+        navigation={props.navigation}
+        importingId={true}
+        importFn={function(stand: standard, mini: boolean){
+          handleSetCurrentTune("dbId", stand.id)
+          props.navigation.goBack();
+        }}/>
+      </TuneDraftContext.Provider>
     </SafeAreaView>
   }
 </Stack.Screen>

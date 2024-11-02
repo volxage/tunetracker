@@ -1,6 +1,6 @@
 //Copyright 2024 Jonathan Hilliard
 
-import React, {isValidElement, useEffect, useState} from 'react';
+import React, {isValidElement, useContext, useEffect, useState} from 'react';
 import {
   FlatList,
   Switch,
@@ -11,15 +11,17 @@ import {
 
 import {
   Text,
+  Button,
   SubText,
   TextInput,
   DeleteButton,
   ButtonText,
-  SMarginView
+  SMarginView,
+  BackgroundView
 } from '../Style.tsx'
 import itemSort from '../itemSort.tsx'
 import {Picker} from '@react-native-picker/picker';
-import Fuse from 'fuse.js';
+import Fuse, {FuseResult} from 'fuse.js';
 import OnlineDB from '../OnlineDB.tsx';
 
 const standardTuneAttrs = new Map<string, string>([
@@ -35,8 +37,11 @@ const standardComposersAttrs = new Map<string, string>([
   ["death", "Death"],
 ]);
 
-import { composer, standard } from '../types.tsx';
+import { composer, standard, tune_draft } from '../types.tsx';
 import dateDisplay from '../dateDisplay.tsx';
+import {create} from 'react-test-renderer';
+import TuneDraftContext from '../contexts/TuneDraftContext.ts';
+import {AxiosResponse} from 'axios';
 
 const tuneFuseOptions = { // For finetuning the search algorithm
 	// isCaseSensitive: false,
@@ -117,7 +122,8 @@ function ImporterHeader({
   navigation,
   setSearch,
   importingId,
-  importingComposers
+  importingComposers,
+  suggestTuneSubmission
 }: {
   listReversed: boolean | undefined,
   setListReversed: Function,
@@ -125,11 +131,15 @@ function ImporterHeader({
   navigation: any,
   setSearch: Function,
   importingId: boolean,
-  importingComposers: boolean
+  importingComposers: boolean,
+  suggestTuneSubmission: boolean
 }){
   const standardAttrs = importingComposers ? standardComposersAttrs : standardTuneAttrs;
   const selectedAttrItems = Array.from(standardAttrs.entries())
     .map((x) => {return {label: x[1], value: x[0]}});
+  const [createOnlineTuneExpanded, setCreateOnlineTuneExpanded] = useState(false);
+  const currentTune = useContext(TuneDraftContext);
+  const [submissionResult, setSubmissionResult] = useState({} as any);
   return(
     <View style={{backgroundColor: "#222"}}>
       <TextInput
@@ -159,10 +169,77 @@ function ImporterHeader({
         <Switch value={listReversed} onValueChange={() => setListReversed(!listReversed)}/>
       </View>
     </View>
-    <DeleteButton onPress={() => navigation.goBack()}>
-      <ButtonText>Cancel import</ButtonText>
-    </DeleteButton>
+    {
+      importingId &&
+      <View>
+        <Button onPress={() => setCreateOnlineTuneExpanded(!createOnlineTuneExpanded)}>
+          {
+            createOnlineTuneExpanded ?
+            <ButtonText>(Collapse)</ButtonText>
+            :
+            <ButtonText>Can't find my tune below</ButtonText>
+          }
+        </Button>
+      {
+        createOnlineTuneExpanded &&
+        <View>
+          {
+            suggestTuneSubmission ?
+            <View>
+              <SubText>This search doesn't seem to match well with any item from our database. You can submit your draft below.</SubText>
+              <Button
+                onPress={() => {
+                  //TODO: Move tune conversion to OnlineDB here and in Compare.tsx
+                  if(!("data" in submissionResult)){
+                    const copyToSend = {
+                      title: currentTune.title,
+                      alternative_title: currentTune.alternativeTitle,
+                      id: currentTune.id,
+                      form: currentTune.form,
+                      bio: currentTune.bio,
+                      composers: (currentTune.Composers ? currentTune.Composers : currentTune.composers).map(comp => {
+                        if("dbId" in comp){
+                          return comp["dbId"]
+                        }
+                        return comp.id;
+                      })
+                    }
+                    OnlineDB.createTuneDraft(copyToSend).then(res => {
+                      setSubmissionResult(((res as AxiosResponse).data))
+                    });
+                  }
+                }}
+              >
+                <ButtonText>Add *brand new* item</ButtonText>
+              </Button>
+              {
+                (submissionResult && "data" in submissionResult) &&
+                <View style={{borderColor: "white"}}>
+                  <SubText>{}</SubText>
+                </View>
+              }
+            </View>
+            :
+            <View>
+              <SubText>You have very similar search results, or you haven't searched yet. We suggest searching for the Tune and connecting to it before submitting your copy; you can still suggest your changes after you connect to our version. Otherwise, tap and hold if you're sure you want to send your copy to our server for review.</SubText>
+              <Button
+                onLongPress={() => {
+                  OnlineDB.createTuneDraft(currentTune);
+                  navigation.goBack();
+                }}
+              >
+                <ButtonText>Submit your Tune to TuneTracker</ButtonText>
+              </Button>
+            </View>
+          }
+        </View>
+      }
     </View>
+  }
+  <DeleteButton onPress={() => navigation.goBack()}>
+    <ButtonText>Cancel import</ButtonText>
+  </DeleteButton>
+</View>
   );
 }
 
@@ -189,14 +266,24 @@ export default function Importer({
   const standards = importingComposers ? OnlineDB.getComposers() : OnlineDB.getStandards();
 
   let displayStandards = standards;
+  let suggestTuneSubmission = false;
   const fuse = new Fuse(standards, importingComposers ? composerFuseOptions : tuneFuseOptions);
+  let searchResults: FuseResult<standard | composer>[] = []
   if(search === ""){
     itemSort(displayStandards, selectedAttr, listReversed);
   }else{
-    displayStandards = fuse.search(search)
+    searchResults = fuse.search(search);
+    displayStandards = searchResults
       .map(function(value){
         return value.item;
       });
+  }
+  suggestTuneSubmission = false;
+  if(!searchResults || !searchResults[0]){
+    suggestTuneSubmission = true;
+  }
+  else if(searchResults[0].score && searchResults[0].score > 0.6){
+    suggestTuneSubmission = true;
   }
   return (
     standards.length ?
@@ -210,6 +297,7 @@ export default function Importer({
           navigation={navigation}
           importingId={importingId}
           importingComposers={importingComposers}
+          suggestTuneSubmission={suggestTuneSubmission}
           setSearch={setSearch}/>
       }
       renderItem={({item, index, separators}) => {
@@ -218,7 +306,6 @@ export default function Importer({
           <TouchableHighlight
             key={item.name}
             onPress={() => {
-              //TODO: Abstract into function
               importFn(item, true);
             }}
             onLongPress={() => {

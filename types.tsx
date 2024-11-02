@@ -44,6 +44,16 @@ export type standard = {
   "id"?: number
   //  "Composers": composer[]
 }
+export type standard_draft = {
+  "title": string
+  "alternative_title"?: string
+  "composers": Array<number>
+  "form"?: string
+  "bio"?: string
+  "year"?: string
+  "id"?: number
+  //  "Composers": composer[]
+}
 export type playlist = {
   "title": string
   "description"?: string

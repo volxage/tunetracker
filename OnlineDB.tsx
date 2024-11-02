@@ -1,6 +1,6 @@
 // Copyright 2024 Jonathan Hilliard
 import {createContext} from "react";
-import { composer, standard, Status, tune_draft } from "./types";
+import { composer, standard, standard_draft, Status, tune_draft } from "./types";
 import http from "./http-to-server.ts"
 let standards: standard[] = [];
 let composers: composer[] = [];
