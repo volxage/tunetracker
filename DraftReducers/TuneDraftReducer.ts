@@ -1,29 +1,40 @@
 import {tune_draft, standard, tuneDefaults} from '../types.tsx';
 import Tune from '../model/Tune.ts';
+import {useQuery, useRealm} from '@realm/react';
+import Composer from '../model/Composer.ts';
 
-function translateAttrFromStandardTune(attrKey: keyof standard, attr: any){
+function findAllLocalComposers(compIds: Array<number>){
+  return useQuery(Composer)
+    .filtered("!(id in $0)", compIds);
+}
+function translateAttrFromStandardTune(attrKey: keyof standard, attr: any): [keyof tune_draft, any]{
   switch(attrKey){
-      case 'alternative_title':
-      {
+    case 'alternative_title': {
+        return ["alternativeTitle", attr];
       }
-      case 'Composers':
-      {
+    case 'Composers': {
+        //NOTE! THIS ASSUMES THE STANDARD'S COMPOSERS ARE LOCALLY STORED ALREADY!
+        //TODO: Handle "edge" case referenced above
+        return ["composers", findAllLocalComposers(attr)]
       }
+    default: {
+      //THIS ASSUMES ANY KEY NOT REFERENCED ABOVE IS A SHARED KEY!
+      return [attrKey as keyof tune_draft, attr];
+    }
   }
 }
 export default function tuneDraftReducer(state: any, action: any){
   switch(action.type){
     case 'obtain_attr_from_standard':
     {
-      console.log("Updating attr " + action["attr"]);
-      let tuneCopy: tune_draft = {}
+      let copy: tune_draft = {}
       for(let attr in state["currentTune"]){
-        tuneCopy[attr as keyof tune_draft] = state["currentTune"][attr];
+        copy[attr as keyof tune_draft] = state["currentTune"][attr];
       }
-
-      tuneCopy[action["attr"] as keyof tune_draft] = action["value"];
+      const translation = translateAttrFromStandardTune(action["attr"], action["value"]);
+      copy[translation[0]] = translation[1];
       // Mark attr as changed for it to be saved
-      return {currentTune: tuneCopy};
+      return {currentTune: copy};
     }
     case 'update_attr':
     {
@@ -34,7 +45,6 @@ export default function tuneDraftReducer(state: any, action: any){
       }
 
       tuneCopy[action["attr"] as keyof tune_draft] = action["value"];
-      // Mark attr as changed for it to be saved
       return {currentTune: tuneCopy};
     }
     case 'set_to_selected':

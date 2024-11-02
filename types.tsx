@@ -45,9 +45,9 @@ export type standard = {
   //  "Composers": composer[]
 }
 export type standard_draft = {
-  "title": string
+  "title"?: string
   "alternative_title"?: string
-  "composers": Array<number>
+  "composers"?: Array<number>
   "form"?: string
   "bio"?: string
   "year"?: string
