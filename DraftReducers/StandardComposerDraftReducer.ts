@@ -9,17 +9,17 @@ export default function standardComposerDraftReducer(state: any, action: any){
       const cd: composer = {}
       for(let attr of composerDefaults){
         let key = attr[0] as keyof Composer;
-        if(key in state["currentStandardComposer"]
-          && typeof state["currentStandardComposer"][key] !== "undefined"
-          && state["currentStandardComposer"][key] !== null
+        if(key in state["currentDraft"]
+          && typeof state["currentDraft"][key] !== "undefined"
+          && state["currentDraft"][key] !== null
         ){
-          cd[key as keyof composer] = state["currentStandardComposer"][key as keyof Composer]
+          cd[key as keyof composer] = state["currentDraft"][key as keyof Composer]
         }else{
           cd[key as keyof composer] = attr[1]
         }
       }
       cd[action["attr"] as keyof composer] = action["value"];
-      return {currentStandardComposer: cd};
+      return {currentDraft: cd};
     }
     case 'set_to_selected':
     {
@@ -46,7 +46,7 @@ export default function standardComposerDraftReducer(state: any, action: any){
           }
         }
       }
-      return {currentStandardComposer: cd};
+      return {currentDraft: cd};
     }
   }
 }

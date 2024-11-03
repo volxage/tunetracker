@@ -4,6 +4,8 @@ import {List} from 'realm';
 import Composer from '../model/Composer.ts';
 
 function translateAttrFromTune(attrKey: keyof tune_draft, attr: any): [keyof standard_draft, any]{
+  console.log("Translate attr from tune to standard");
+  console.log(`attrKey: ${attrKey}, attr: ${attr}`);
   switch(attrKey){
     case 'alternativeTitle': {
       return ["alternative_title", attr];
@@ -21,28 +23,28 @@ function translateAttrFromTune(attrKey: keyof tune_draft, attr: any): [keyof sta
 }
 export default function standardTuneDraftReducer(state: any, action: any){
   switch(action.type){
-    case 'update_from_tune_attr':
+    case 'update_from_other':
     {
       let copy: standard_draft = {}
-      for(let attr in state["currentStandard"]){
-        copy[attr as keyof standard_draft] = state["currentStandard"][attr];
+      for(let attr in state["currentDraft"]){
+        copy[attr as keyof standard_draft] = state["currentDraft"][attr];
       }
       const translation = translateAttrFromTune(action["attr"], action["value"]);
       copy[translation[0]] = translation[1];
       // Mark attr as changed for it to be saved
-      return {currentStandard: copy};
+      return {currentDraft: copy};
     }
     case 'update_attr':
     {
       console.log("Updating attr " + action["attr"]);
       let copy: standard_draft = {}
-      for(let attr in state["currentStandard"]){
-        copy[attr as keyof standard_draft] = state["currentStandard"][attr];
+      for(let attr in state["currentDraft"]){
+        copy[attr as keyof standard_draft] = state["currentDraft"][attr];
       }
 
       copy[action["attr"] as keyof standard_draft] = action["value"];
       // Mark attr as changed for it to be saved
-      return {currentStandard: copy};
+      return {currentDraft: copy};
     }
     case 'set_to_selected':
     {
@@ -70,7 +72,7 @@ export default function standardTuneDraftReducer(state: any, action: any){
         }
         //tune.dbId = action["selectedTune"]["id"]
       }
-      return {currentStandard: tune};
+      return {currentDraft: tune};
     }
   }
 }

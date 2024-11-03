@@ -11,7 +11,7 @@ import {
   SMarginView,
 } from '../Style.tsx'
 import { Realm, useRealm } from '@realm/react'
-const debugMode = false;
+const debugMode = true;
 
 import { composer, composerEditorAttrs, editorAttrs, tune_draft, tuneDefaults } from '../types.tsx';
 
@@ -154,8 +154,21 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
                       }}
                       onPress={() => {
                         setChoice(0);
+
+                        //Original signature: (attrKey, value, onlineSelected)
                         //handleReplaceAttr(item[0], onlineVersion[item[0] as keyof online_type], true);
                         //handleReplaceAttr(item[0], onlineVersion[item[0] as keyof online_type], false);
+                        dbDispatch({
+                          type: 'update_attr',
+                          attr: item[0],
+                          value: onlineVersion[item[0] as keyof online_type]
+                        });
+                        localDispatch({
+                          type: 'update_from_other',
+                          attr: item[0],
+                          value: onlineVersion[item[0] as keyof online_type]
+                        });
+                          // (From Editor.tsx) dispatch({type: 'update_attr', attr: attr_key, value: value});
                       }}
                       >
                       <ButtonText><Icon name="database-arrow-up" size={30} /></ButtonText>
@@ -177,6 +190,16 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
                       // Reset both tune and standard
                       //handleReplaceAttr(item[0], local_item, false);
                       //handleReplaceAttr(item[0], online_item, true);
+                      dbDispatch({
+                        type: 'update_attr',
+                        attr: item[0],
+                        value: local_item
+                      });
+                      localDispatch({
+                        type: 'update_attr',
+                        attr: item[0],
+                        value: online_item
+                      });
                     }}
                   >
                     <ButtonText><Icon name="dots-horizontal" size={30} /></ButtonText>
@@ -189,6 +212,16 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
                     setChoice(2);
                     //handleReplaceAttr(item[0], local_item, false);
                     //handleReplaceAttr(item[0], local_item, true);
+                    dbDispatch({
+                      type: 'update_from_other',
+                      attr: item[0],
+                      value: local_item
+                    });
+                    localDispatch({
+                      type: 'update_attr',
+                      attr: item[0],
+                      value: online_item
+                    });
                   }}
                   >
                     <ButtonText><Icon name="account-arrow-down" size={30} /></ButtonText>
@@ -218,16 +251,16 @@ export default function Compare({
   isComposer: boolean
 }){
   const [dbState, dbDispatch] = useReducer(
-    (isComposer ? standardComposerDraftReducer : standardTuneDraftReducer),
-    (isComposer ? {currentStandardComposer: {}} : {currentStandard: {}})
+    (isComposer ? standardComposerDraftReducer : standardTuneDraftReducer), {currentDraft: {}}
   );
   const [localState, localDispatch] = useReducer(
-    (isComposer ? composerDraftReducer : tuneDraftReducer),
-    (isComposer ? {currentComposer: {}} : {currentTune: {}})
+    (isComposer ? composerDraftReducer : tuneDraftReducer), {currentDraft: {}}
   );
-  const comparedDbChanges = dbState[isComposer ? "currentStandardComposer" : "currentStandard"]
+  //const comparedDbChanges = dbState[isComposer ? "currentStandardComposer" : "currentStandard"]
+  const comparedDbChanges = dbState;
   //  const [comparedDbChanges, setComparedDbChanges] = useState(onlineVersion);
-  const comparedTuneChanges = localState[isComposer ? "currentComposer" : "currentTune"]
+  //const comparedTuneChanges = localState[isComposer ? "currentComposer" : "currentTune"]
+  const comparedTuneChanges = localState;
   //  const [comparedTuneChanges, setComparedTuneChanges] = useState(currentItem);
   const [uploadResult, setUploadResult] = useState({} as any);
   const resultAsAny = uploadResult as any;

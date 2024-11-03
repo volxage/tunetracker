@@ -47,7 +47,7 @@ export default function Editor({
   //Intentional copy to allow cancelling of edits
   //console.log("Rerender Editor");
   const realm = useRealm();
-  const [state, dispatch] = useReducer(tuneDraftReducer, {currentTune: {}});
+  const [state, dispatch] = useReducer(tuneDraftReducer, {currentDraft: {}});
   const bench = reactotron.benchmark("Editor benchmark");
   const Stack = createNativeStackNavigator();
   const [changedAttrsList, setChangedAttrsList]: [string[], Function] = useState([]);
@@ -78,14 +78,14 @@ export default function Editor({
             data={prettyAttrs}
             renderItem={({item, index, separators}) => (
               <View>
-                { (item[0] !== "lyricsConfidence" || state["currentTune"]["hasLyrics"]) &&
+                { (item[0] !== "lyricsConfidence" || state["currentDraft"]["hasLyrics"]) &&
                 <TouchableHighlight
                   key={item[0]}
                   onShowUnderlay={separators.highlight}
                   onHideUnderlay={separators.unhighlight}
                 >
                   <TypeField
-                    attr={state["currentTune"][item[0]]}
+                    attr={state["currentDraft"][item[0]]}
                     attrKey={item[0]}
                     attrName={item[1]}
                     handleSetCurrentItem={handleSetCurrentTune}
@@ -125,7 +125,7 @@ export default function Editor({
                   onPress={() => {
                     realm.write(() => {
                       for(let attr of changedAttrsList){
-                        selectedTune[attr as keyof (tune_draft | Tune)] = (state["currentTune"][attr as keyof tune_draft] as any)
+                        selectedTune[attr as keyof (tune_draft | Tune)] = (state["currentDraft"][attr as keyof tune_draft] as any)
                       }
                     });
                     navigation.goBack();
@@ -138,11 +138,11 @@ export default function Editor({
                 newTune &&
                 <Button
                   onPress={() => {
-                    const ctCopy = state["currentTune"]
+                    const ctCopy = state["currentDraft"]
                     ctCopy.id = new BSON.ObjectId()
                     realm.write(() => {
                       realm.create("Tune",
-                        state["currentTune"]
+                        state["currentDraft"]
                       )
                     });
                     navigation.goBack();
@@ -180,7 +180,7 @@ export default function Editor({
 <Stack.Screen name={"ImportID"}>
   {props => 
   <SafeAreaView style={{flex: 1}}>
-    <TuneDraftContext.Provider value={state["currentTune"]}>
+    <TuneDraftContext.Provider value={state["currentDraft"]}>
       <Importer
         importingComposers={false}
         navigation={props.navigation}
@@ -197,8 +197,8 @@ export default function Editor({
   {props =>
     //Logically, this screen will never appear if there is no standard, so we can guarantee that getStandardById will return a standard.
     <Compare
-      currentItem={state["currentTune"]}
-      onlineVersion={(state["currentTune"].dbId ? OnlineDB.getStandardById(state["currentTune"].dbId) : null) as standard}
+      currentItem={state["currentDraft"]}
+      onlineVersion={(state["currentDraft"].dbId ? OnlineDB.getStandardById(state["currentDraft"].dbId) : null) as standard}
       navigation={props.navigation}
       handleSetCurrentItem={handleSetCurrentTune}
       isComposer={false}
@@ -209,7 +209,7 @@ export default function Editor({
   {props =>
   <SafeAreaView style={{flex: 1}}>
     <ComposerListDisplay
-      originalTuneComposers={state["currentTune"]["composers"] ? state["currentTune"]["composers"] : []}
+      originalTuneComposers={state["currentDraft"]["composers"] ? state["currentDraft"]["composers"] : []}
       navigation={navigation}
       handleSetCurrentTune={handleSetCurrentTune}
     />

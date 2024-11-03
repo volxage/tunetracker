@@ -8,6 +8,8 @@ function findAllLocalComposers(compIds: Array<number>){
     .filtered("!(id in $0)", compIds);
 }
 function translateAttrFromStandardTune(attrKey: keyof standard, attr: any): [keyof tune_draft, any]{
+  console.log("Translate attr from standard to tune");
+  console.log(`attrKey: ${attrKey}, attr: ${attr}`);
   switch(attrKey){
     case 'alternative_title': {
         return ["alternativeTitle", attr];
@@ -25,27 +27,27 @@ function translateAttrFromStandardTune(attrKey: keyof standard, attr: any): [key
 }
 export default function tuneDraftReducer(state: any, action: any){
   switch(action.type){
-    case 'obtain_attr_from_standard':
+    case 'update_from_other':
     {
       let copy: tune_draft = {}
-      for(let attr in state["currentTune"]){
-        copy[attr as keyof tune_draft] = state["currentTune"][attr];
+      for(let attr in state["currentDraft"]){
+        copy[attr as keyof tune_draft] = state["currentDraft"][attr];
       }
       const translation = translateAttrFromStandardTune(action["attr"], action["value"]);
       copy[translation[0]] = translation[1];
       // Mark attr as changed for it to be saved
-      return {currentTune: copy};
+      return {currentDraft: copy};
     }
     case 'update_attr':
     {
       console.log("Updating attr " + action["attr"]);
       let tuneCopy: tune_draft = {}
-      for(let attr in state["currentTune"]){
-        tuneCopy[attr as keyof tune_draft] = state["currentTune"][attr];
+      for(let attr in state["currentDraft"]){
+        tuneCopy[attr as keyof tune_draft] = state["currentDraft"][attr];
       }
 
       tuneCopy[action["attr"] as keyof tune_draft] = action["value"];
-      return {currentTune: tuneCopy};
+      return {currentDraft: tuneCopy};
     }
     case 'set_to_selected':
     {
@@ -73,7 +75,7 @@ export default function tuneDraftReducer(state: any, action: any){
         }
         //tune.dbId = action["selectedTune"]["id"]
       }
-      return {currentTune: tune};
+      return {currentDraft: tune};
     }
   }
 }
