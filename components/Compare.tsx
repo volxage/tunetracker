@@ -1,5 +1,5 @@
 //Copyright 2024 Jonathan Hiliard
-import React, {isValidElement, useEffect, useReducer, useState} from 'react';
+import React, {useEffect, useReducer, useState} from 'react';
 import {
   Button,
   DeleteButton,
@@ -98,7 +98,6 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
   let tuneAttrPresent = false;
   if(item[0] in currentItem){
     const tmpAttr = currentItem[item[0] as keyof online_type]
-    console.log(tmpAttr);
     if(tmpAttr){
       if(!empty_equivalent.has(stringify(tmpAttr))){
         standardAttrPresent = true;
@@ -164,6 +163,7 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
                           value: onlineVersion[item[0] as keyof online_type]
                         });
                         localDispatch({
+                          //type: 'update_from_other',
                           type: 'update_from_other',
                           attr: item[0],
                           value: onlineVersion[item[0] as keyof online_type]
@@ -213,6 +213,7 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
                     //handleReplaceAttr(item[0], local_item, false);
                     //handleReplaceAttr(item[0], local_item, true);
                     dbDispatch({
+                      //type: 'update_from_other',
                       type: 'update_from_other',
                       attr: item[0],
                       value: local_item
@@ -220,7 +221,7 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
                     localDispatch({
                       type: 'update_attr',
                       attr: item[0],
-                      value: online_item
+                      value: local_item
                     });
                   }}
                   >
@@ -256,16 +257,17 @@ export default function Compare({
   const [localState, localDispatch] = useReducer(
     (isComposer ? composerDraftReducer : tuneDraftReducer), {currentDraft: {}}
   );
+
   //const comparedDbChanges = dbState[isComposer ? "currentStandardComposer" : "currentStandard"]
-  const comparedDbChanges = dbState;
+  const comparedDbChanges = dbState["currentDraft"];
   //  const [comparedDbChanges, setComparedDbChanges] = useState(onlineVersion);
   //const comparedTuneChanges = localState[isComposer ? "currentComposer" : "currentTune"]
-  const comparedTuneChanges = localState;
+  const comparedTuneChanges = localState["currentDraft"];
   //  const [comparedTuneChanges, setComparedTuneChanges] = useState(currentItem);
   const [uploadResult, setUploadResult] = useState({} as any);
   const resultAsAny = uploadResult as any;
 
-  const comparedTuneChangesDebugString = JSON.stringify(comparedTuneChanges, ["title", "alternativeTitle", "form", "composers","id", "birth", "death"]).replaceAll(",", "\n");
+  const comparedTuneChangesDebugString = JSON.stringify(comparedTuneChanges).replaceAll(",", "\n");
   const comparedDbChangesDebugString = JSON.stringify(comparedDbChanges).replaceAll(",", "\n");
   const attrs = (isComposer ? composerEditorAttrs : editorAttrs).filter((item) => (!exclude_set.has(item[0]) && !item[0].endsWith("Confidence")))
   return(

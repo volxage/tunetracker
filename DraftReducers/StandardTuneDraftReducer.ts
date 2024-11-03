@@ -4,8 +4,6 @@ import {List} from 'realm';
 import Composer from '../model/Composer.ts';
 
 function translateAttrFromTune(attrKey: keyof tune_draft, attr: any): [keyof standard_draft, any]{
-  console.log("Translate attr from tune to standard");
-  console.log(`attrKey: ${attrKey}, attr: ${attr}`);
   switch(attrKey){
     case 'alternativeTitle': {
       return ["alternative_title", attr];
@@ -36,7 +34,6 @@ export default function standardTuneDraftReducer(state: any, action: any){
     }
     case 'update_attr':
     {
-      console.log("Updating attr " + action["attr"]);
       let copy: standard_draft = {}
       for(let attr in state["currentDraft"]){
         copy[attr as keyof standard_draft] = state["currentDraft"][attr];

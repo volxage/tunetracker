@@ -8,8 +8,6 @@ function findAllLocalComposers(compIds: Array<number>){
     .filtered("!(id in $0)", compIds);
 }
 function translateAttrFromStandardTune(attrKey: keyof standard, attr: any): [keyof tune_draft, any]{
-  console.log("Translate attr from standard to tune");
-  console.log(`attrKey: ${attrKey}, attr: ${attr}`);
   switch(attrKey){
     case 'alternative_title': {
         return ["alternativeTitle", attr];
@@ -35,12 +33,12 @@ export default function tuneDraftReducer(state: any, action: any){
       }
       const translation = translateAttrFromStandardTune(action["attr"], action["value"]);
       copy[translation[0]] = translation[1];
+
       // Mark attr as changed for it to be saved
       return {currentDraft: copy};
     }
     case 'update_attr':
     {
-      console.log("Updating attr " + action["attr"]);
       let tuneCopy: tune_draft = {}
       for(let attr in state["currentDraft"]){
         tuneCopy[attr as keyof tune_draft] = state["currentDraft"][attr];
