@@ -46,14 +46,14 @@ export default function standardTuneDraftReducer(state: any, action: any){
     case 'set_to_selected':
     {
       const tune: tune_draft = {}
-      if(action["selectedTune"] instanceof Tune){
+      if(action["selectedItem"] instanceof Tune){
         for(let attr of tuneDefaults){
           let key = attr[0] as keyof Tune;
-          if(key in action["selectedTune"]
-            && typeof action["selectedTune"][key] !== "undefined"
-            && action["selectedTune"][key] !== null
+          if(key in action["selectedItem"]
+            && typeof action["selectedItem"][key] !== "undefined"
+            && action["selectedItem"][key] !== null
           ){
-            tune[key as keyof tune_draft] = action["selectedTune"][key as keyof Tune]
+            tune[key as keyof tune_draft] = action["selectedItem"][key as keyof Tune]
           }else{
             tune[key as keyof tune_draft] = attr[1]
           }
@@ -61,13 +61,13 @@ export default function standardTuneDraftReducer(state: any, action: any){
       }else{
         for(let attr of tuneDefaults){
           let key = attr[0] as keyof tune_draft;
-          if(key in action["selectedTune"] && typeof action["selectedTune"][key] !== "undefined"){
-            tune[key as keyof tune_draft] = action["selectedTune"][key as keyof tune_draft]
+          if(key in action["selectedItem"] && typeof action["selectedItem"][key] !== "undefined"){
+            tune[key as keyof tune_draft] = action["selectedItem"][key as keyof tune_draft]
           }else{
             tune[key as keyof tune_draft] = attr[1]
           }
         }
-        //tune.dbId = action["selectedTune"]["id"]
+        //tune.dbId = action["selectedItem"]["id"]
       }
       return {currentDraft: tune};
     }

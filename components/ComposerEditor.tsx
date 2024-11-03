@@ -17,7 +17,6 @@ import {
 import TypeField from './TypeField.tsx';
 import SongsList from '../SongsList.tsx';
 import {composer, standard} from '../types.tsx';
-import reactotron from 'reactotron-react-native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Importer from './Importer.tsx';
 import {BackHandler} from 'react-native';
@@ -47,16 +46,15 @@ export default function ComposerEditor({
   setNewComposer: Function
 }): React.JSX.Element {
   //Intentional copy to allow cancelling of edits
-  //  const [currentComposer, setCurrentTune] = useState()
+  //  const [currentDraft, setCurrentTune] = useState()
   console.log("Rerender ComposerEditor");
   //console.log(prettyAttrs);
-  const [state, dispatch] = useReducer(composerDraftReducer, {currentComposer: {}});
-  const bench = reactotron.benchmark("Editor benchmark");
+  const [state, dispatch] = useReducer(composerDraftReducer, {currentDraft: {}});
   const Stack = createNativeStackNavigator();
   const realm = useRealm();
 
   useEffect(() => {
-    dispatch({type: "set_to_selected", selectedComposer: selectedComposer});
+    dispatch({type: "set_to_selected", selectedItem: selectedComposer});
     BackHandler.addEventListener('hardwareBackPress', navigation.goBack)
     return () => {
       BackHandler.removeEventListener('hardwareBackPress', navigation.goBack)
@@ -64,13 +62,11 @@ export default function ComposerEditor({
   }, []);
 
   useEffect(() => {
-    bench.stop("Post-render");
   }, [])
   function handleSetCurrentComposer(attr_key: keyof composer, value: any){
     dispatch({type: 'update_attr', attr: attr_key, value: value});
   }
-  bench.step("Prerender");
-  const onlineVersion = (state["currentComposer"].dbId ? OnlineDB.getComposerById(state["currentComposer"].dbId) : null) as composer
+  const onlineVersion = (state["currentDraft"].dbId ? OnlineDB.getComposerById(state["currentDraft"].dbId) : null) as composer
   if(onlineVersion){
     onlineVersion.birth = onlineVersion.birth ? new Date(onlineVersion.birth) : undefined;
     onlineVersion.death = onlineVersion.death ? new Date(onlineVersion.death) : undefined;
@@ -83,14 +79,14 @@ export default function ComposerEditor({
             data={prettyAttrs}
             renderItem={({item, index, separators}) => (
               <View>
-                { (item[0] !== "lyricsConfidence" || state["currentComposer"]["hasLyrics"]) &&
+                { (item[0] !== "lyricsConfidence" || state["currentDraft"]["hasLyrics"]) &&
                 <TouchableHighlight
                   key={item[0]}
                   onShowUnderlay={separators.highlight}
                   onHideUnderlay={separators.unhighlight}
                 >
                   <TypeField
-                    attr={state["currentComposer"][item[0]]}
+                    attr={state["currentDraft"][item[0]]}
                     attrKey={item[0]}
                     attrName={item[1]}
                     handleSetCurrentItem={handleSetCurrentComposer}
@@ -98,7 +94,7 @@ export default function ComposerEditor({
                     isComposer={true}
                   />
                 </TouchableHighlight>
-                }{typeof bench.step("Item render") === "undefined"}
+                }
               </View>
             )}
             ListFooterComponent={
@@ -128,9 +124,9 @@ export default function ComposerEditor({
                 <Button
                   onPress={() => {
                     realm.write(() => {
-                      for(let attr in state["currentComposer"]){
+                      for(let attr in state["currentDraft"]){
                         //TODO: Supress compiler warnings here
-                        selectedComposer[attr] = state["currentComposer"][attr];
+                        selectedComposer[attr] = state["currentDraft"][attr];
                       }
                     });
                     navigation.goBack()
@@ -143,12 +139,12 @@ export default function ComposerEditor({
                 <Button
                   onPress={() => {
                   //database.write(async () => {database.get('composers').create(comp => {
-                  //  (comp as Composer).replace(state["currentComposer"])
+                  //  (comp as Composer).replace(state["currentDraft"])
                   //}).then(resultingModel => {
                   //  console.log(resultingModel);
                   //})});
                     realm.write(() => {
-                      realm.create("Composer", state["currentComposer"]);
+                      realm.create("Composer", state["currentDraft"]);
                     });
                     navigation.goBack();
                     setNewComposer(false);
@@ -187,8 +183,8 @@ export default function ComposerEditor({
 <Stack.Screen name="ComposerCompare">
   {props =>
   <Compare
-    currentItem={state["currentComposer"]}
-    onlineVersion={(state["currentComposer"].dbId ? OnlineDB.getComposerById(state["currentComposer"].dbId) : null) as composer}
+    currentItem={state["currentDraft"]}
+    onlineVersion={(state["currentDraft"].dbId ? OnlineDB.getComposerById(state["currentDraft"].dbId) : null) as composer}
     navigation={props.navigation}
     handleSetCurrentItem={handleSetCurrentComposer}
     isComposer={true}

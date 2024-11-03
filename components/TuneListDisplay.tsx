@@ -47,10 +47,7 @@ enum playlist_enum {
   AllTunes = "AllTunes"
 }
 
-import {playlist, Status, tune_draft } from '../types.tsx';
-import SongsList from '../SongsList.tsx';
-import Slider from '@react-native-community/slider';
-import reactotron from 'reactotron-react-native';
+import { Status, tune_draft } from '../types.tsx';
 import Tune from '../model/Tune.ts';
 import Composer from '../model/Composer.ts';
 import {useQuery, useRealm} from '@realm/react';
@@ -127,7 +124,6 @@ function ItemRender({
   navigation,
   selectedAttr,
   confidenceVisible,
-  bench,
   separators,
   selectMode,
   selectTune,
@@ -138,7 +134,6 @@ function ItemRender({
   navigation: any,
   selectedAttr: string,
   confidenceVisible: boolean,
-  bench: any,
   separators: any,
   selectMode: boolean,
   selectTune: Function,
@@ -179,7 +174,6 @@ function ItemRender({
           <ConfidenceBars tune={tune} />
         </View>
     }
-      {typeof bench.step("Item render") === "undefined"}
     </View>
   }
 </TouchableHighlight>
@@ -392,9 +386,7 @@ export default function TuneListDisplay({
   setSelectedTunes: Function
 }){
   useEffect(() => {
-    bench.stop("Full render");
   })
-  const bench = reactotron.benchmark("TuneListDisplay benchmark");
   const [listReversed, setListReversed] = useState(false);
   const [selectedAttr, setSelectedAttr] = useState("title");
   const [selectedPlaylist, setSelectedPlaylist]: [BSON.ObjectId | playlist_enum.AllTunes, Function] = useState(playlist_enum.AllTunes);
@@ -405,7 +397,6 @@ export default function TuneListDisplay({
   let selectedIds: BSON.ObjectId[] = []
 
   useEffect(() => {
-    bench.stop("Full render");
     OnlineDB.addListener(setDbStatus);
   })
   const allSongs = useQuery(Tune);
@@ -428,7 +419,6 @@ export default function TuneListDisplay({
         return value.item as Tune;
       });
   }
-  bench.step("Pre-render")
 
   const headerInputStates = 
   {
@@ -468,7 +458,6 @@ export default function TuneListDisplay({
           navigation={navigation}
           selectedAttr={selectedAttr}
           confidenceVisible={confidenceVisible}
-          bench={bench}
           separators={separators}
           selectMode={selectMode}
           selected={selectedIds}

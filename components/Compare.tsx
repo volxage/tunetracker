@@ -20,8 +20,7 @@ import {
   View,
 } from 'react-native';
 
-import { standard, playlist } from '../types.tsx';
-import reactotron from 'reactotron-react-native';
+import { standard } from '../types.tsx';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons.js';
 import Tune from '../model/Tune.js';
 import dateDisplay from '../dateDisplay.tsx';
@@ -32,6 +31,7 @@ import standardTuneDraftReducer from '../DraftReducers/StandardTuneDraftReducer.
 import tuneDraftReducer from '../DraftReducers/TuneDraftReducer.ts';
 import composerDraftReducer from '../DraftReducers/ComposerDraftReducer.ts';
 import standardComposerDraftReducer from '../DraftReducers/StandardComposerDraftReducer.ts';
+import {OrderedCollection} from 'realm';
 
 //Anything that ends with "confidence" is also excluded
 const exclude_set = new Set([
@@ -48,6 +48,8 @@ const empty_equivalent = new Set([
   "unknown"
 ]);
 function stringify(value: any): string{
+  if (value instanceof Composer) return value.name;
+  if (Array.isArray(value) || value instanceof OrderedCollection) return value.map(obj => {return stringify(obj)}).join(", ");
   if(value instanceof Realm.List){
     try{
       return JSON.stringify(value.toJSON());
@@ -153,7 +155,6 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
                       }}
                       onPress={() => {
                         setChoice(0);
-
                         //Original signature: (attrKey, value, onlineSelected)
                         //handleReplaceAttr(item[0], onlineVersion[item[0] as keyof online_type], true);
                         //handleReplaceAttr(item[0], onlineVersion[item[0] as keyof online_type], false);
@@ -258,6 +259,16 @@ export default function Compare({
     (isComposer ? composerDraftReducer : tuneDraftReducer), {currentDraft: {}}
   );
 
+  useEffect(() => {
+    dbDispatch({
+      type: 'set_to_selected',
+      selectedItem: onlineVersion
+    });
+    dbDispatch({
+      type: 'set_to_selected',
+      selectedItem: currentItem
+    });
+  }, []);
   //const comparedDbChanges = dbState[isComposer ? "currentStandardComposer" : "currentStandard"]
   const comparedDbChanges = dbState["currentDraft"];
   //  const [comparedDbChanges, setComparedDbChanges] = useState(onlineVersion);
@@ -267,8 +278,8 @@ export default function Compare({
   const [uploadResult, setUploadResult] = useState({} as any);
   const resultAsAny = uploadResult as any;
 
-  const comparedTuneChangesDebugString = JSON.stringify(comparedTuneChanges).replaceAll(",", "\n");
-  const comparedDbChangesDebugString = JSON.stringify(comparedDbChanges).replaceAll(",", "\n");
+  const comparedTuneChangesDebugString = JSON.stringify(comparedTuneChanges, ["Composers"]).replaceAll(",", "\n");
+  const comparedDbChangesDebugString = JSON.stringify(comparedDbChanges, ["Composers"]).replaceAll(",", "\n");
   const attrs = (isComposer ? composerEditorAttrs : editorAttrs).filter((item) => (!exclude_set.has(item[0]) && !item[0].endsWith("Confidence")))
   return(
   <BackgroundView>

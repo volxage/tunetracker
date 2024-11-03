@@ -44,13 +44,9 @@ const fuseOptions = { // For finetuning the search algorithm
 	]
 };
 import {composer, composerEditorAttrs, playlist, tune_draft } from '../types.tsx';
-import Slider from '@react-native-community/slider';
-import reactotron from 'reactotron-react-native';
-import Tune from '../model/Tune.ts';
 import Composer from '../model/Composer.ts';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import ComposerEditor from './ComposerEditor.tsx';
-import SongsList from '../SongsList.tsx';
 import dateDisplay from '../dateDisplay.tsx';
 import {useQuery, useRealm} from '@realm/react';
 import OnlineDB from '../OnlineDB.tsx';
@@ -210,10 +206,8 @@ export default function ComposerListDisplay({
   console.log("Rerender start");
   const [onlineComposers, setOnlineComposers]: [(composer)[], Function]= useState([]);
   useEffect(() => {
-    bench.stop("Full render");
     setOnlineComposers(OnlineDB.getComposers());
   }, [])
-  const bench = reactotron.benchmark("ComposerListDisplay benchmark");
   const [selectedAttr, setSelectedAttr] = useState("name");
   const [search, setSearch] = useState("");
   const [selectedComposers, setSelectedComposers]: [Array<Composer>, Function] = useState(originalTuneComposers);
@@ -281,7 +275,6 @@ export default function ComposerListDisplay({
     displayComposers.unshift(...selectedComposers);
     displayComposers.unshift(...selectedOnlineComposers);
   }
-  bench.step("Pre-render")
 
   const headerInputStates = 
   {
@@ -324,7 +317,6 @@ export default function ComposerListDisplay({
                     <Text>{item.name}</Text>
                     <LocalityIndicators item={item}/>
                     <SubText>{dateDisplay(item.birth)}</SubText>
-                    {typeof bench.step("Item render") === "undefined"}
                   </View>
                 </TouchableHighlight>
               )}

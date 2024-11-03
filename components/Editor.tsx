@@ -16,7 +16,6 @@ import {
 
 import TypeField from './TypeField.tsx';
 import {tune_draft, standard, tuneDefaults} from '../types.tsx';
-import reactotron from 'reactotron-react-native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Importer from './Importer.tsx';
 import {BackHandler} from 'react-native';
@@ -48,12 +47,11 @@ export default function Editor({
   //console.log("Rerender Editor");
   const realm = useRealm();
   const [state, dispatch] = useReducer(tuneDraftReducer, {currentDraft: {}});
-  const bench = reactotron.benchmark("Editor benchmark");
   const Stack = createNativeStackNavigator();
   const [changedAttrsList, setChangedAttrsList]: [string[], Function] = useState([]);
 
   useEffect(() => {
-    dispatch({type: "set_to_selected", selectedTune: selectedTune});
+    dispatch({type: "set_to_selected", selectedItem: selectedTune});
     if(selectedTune instanceof Tune){
     }
     BackHandler.addEventListener('hardwareBackPress', navigation.goBack)
@@ -68,7 +66,6 @@ export default function Editor({
     }
     dispatch({type: 'update_attr', attr: attr_key, value: value});
   }
-  bench.step("Prerender")
   
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
@@ -93,7 +90,7 @@ export default function Editor({
                     isComposer={false}
                   />
                 </TouchableHighlight>
-                }{typeof bench.step("Item render") === "undefined"}
+                }
               </View>
             )}
             ListFooterComponent={

@@ -24,14 +24,14 @@ export default function composerDraftReducer(state: any, action: any){
     case 'set_to_selected':
     {
       const cd: composer = {}
-      if(action["selectedComposer"] instanceof Composer){
+      if(action["selectedItem"] instanceof Composer){
         for(let attr of composerDefaults){
           let key = attr[0] as keyof Composer;
-          if(key in action["selectedComposer"]
-            && typeof action["selectedComposer"][key] !== "undefined"
-            && action["selectedComposer"][key] !== null
+          if(key in action["selectedItem"]
+            && typeof action["selectedItem"][key] !== "undefined"
+            && action["selectedItem"][key] !== null
           ){
-            cd[key as keyof composer] = action["selectedComposer"][key as keyof Composer]
+            cd[key as keyof composer] = action["selectedItem"][key as keyof Composer]
           }else{
             cd[key as keyof composer] = attr[1]
           }
@@ -39,8 +39,8 @@ export default function composerDraftReducer(state: any, action: any){
       }else{
         for(let attr of composerDefaults){
           let key = attr[0] as keyof Composer;
-          if(key in action["selectedComposer"] && typeof action["selectedComposer"][key] !== "undefined"){
-            cd[key as keyof composer] = action["selectedComposer"][key as keyof Composer]
+          if(key in action["selectedItem"] && typeof action["selectedItem"][key] !== "undefined"){
+            cd[key as keyof composer] = action["selectedItem"][key as keyof Composer]
           }else{
             cd[key as keyof composer] = attr[1]
           }
