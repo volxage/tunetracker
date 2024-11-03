@@ -1,3 +1,5 @@
+//TODO:
+//Add translation
 import { composer, composerDefaults } from "../types"
 import Composer from "../model/Composer";
 export default function composerDraftReducer(state: any, action: any){

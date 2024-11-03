@@ -1,5 +1,5 @@
 //Copyright 2024 Jonathan Hiliard
-import React, {isValidElement, useEffect, useState} from 'react';
+import React, {isValidElement, useEffect, useReducer, useState} from 'react';
 import {
   Button,
   DeleteButton,
@@ -28,6 +28,10 @@ import dateDisplay from '../dateDisplay.tsx';
 import OnlineDB from '../OnlineDB.tsx';
 import {AxiosResponse} from 'axios';
 import Composer from '../model/Composer.ts';
+import standardTuneDraftReducer from '../DraftReducers/StandardTuneDraftReducer.ts';
+import tuneDraftReducer from '../DraftReducers/TuneDraftReducer.ts';
+import composerDraftReducer from '../DraftReducers/ComposerDraftReducer.ts';
+import standardComposerDraftReducer from '../DraftReducers/StandardComposerDraftReducer.ts';
 
 //Anything that ends with "confidence" is also excluded
 const exclude_set = new Set([
@@ -45,9 +49,11 @@ const empty_equivalent = new Set([
 ]);
 function stringify(value: any): string{
   if(value instanceof Realm.List){
-    console.log("Below is a Realm.List.");
-    console.log(value);
-    return JSON.stringify(value.toJSON());
+    try{
+      return JSON.stringify(value.toJSON());
+    }catch{
+      return "geez cyclical object or smth like that";
+    }
   }
   switch(typeof value){
     case "string":
@@ -70,13 +76,15 @@ function stringify(value: any): string{
 }
 type local_type = tune_draft | composer;
 type online_type = standard | composer;
-function CompareField({item, index, onlineVersion, currentItem, handleReplaceAttr}:
+function CompareField({item, index, onlineVersion, currentItem, localDispatch, dbDispatch}:
 {
   item: string[],
   index: number,
   onlineVersion: online_type
   currentItem: local_type,
-  handleReplaceAttr: Function
+  localDispatch: React.Dispatch<any>; 
+  dbDispatch: React.Dispatch<any>;
+  
 }){
   let standardAttrPresent = false;
   if(item[0] in onlineVersion){
@@ -140,14 +148,14 @@ function CompareField({item, index, onlineVersion, currentItem, handleReplaceAtt
               {
                 (item[0] in onlineVersion
                   && !empty_equivalent.has(online_display)) ?
-                    <Button style={{
+                  <Button style={{
                         backgroundColor: choice === 0 ? "#338" : "#222",
                         flex: 1
                       }}
                       onPress={() => {
                         setChoice(0);
-                        handleReplaceAttr(item[0], onlineVersion[item[0] as keyof online_type], true);
-                        handleReplaceAttr(item[0], onlineVersion[item[0] as keyof online_type], false);
+                        //handleReplaceAttr(item[0], onlineVersion[item[0] as keyof online_type], true);
+                        //handleReplaceAttr(item[0], onlineVersion[item[0] as keyof online_type], false);
                       }}
                       >
                       <ButtonText><Icon name="database-arrow-up" size={30} /></ButtonText>
@@ -167,8 +175,8 @@ function CompareField({item, index, onlineVersion, currentItem, handleReplaceAtt
                     onPress={() => {
                       setChoice(1);
                       // Reset both tune and standard
-                      handleReplaceAttr(item[0], local_item, false);
-                      handleReplaceAttr(item[0], online_item, true);
+                      //handleReplaceAttr(item[0], local_item, false);
+                      //handleReplaceAttr(item[0], online_item, true);
                     }}
                   >
                     <ButtonText><Icon name="dots-horizontal" size={30} /></ButtonText>
@@ -179,8 +187,8 @@ function CompareField({item, index, onlineVersion, currentItem, handleReplaceAtt
                   }}
                   onPress={() => {
                     setChoice(2);
-                    handleReplaceAttr(item[0], local_item, false);
-                    handleReplaceAttr(item[0], local_item, true);
+                    //handleReplaceAttr(item[0], local_item, false);
+                    //handleReplaceAttr(item[0], local_item, true);
                   }}
                   >
                     <ButtonText><Icon name="account-arrow-down" size={30} /></ButtonText>
@@ -209,28 +217,21 @@ export default function Compare({
   handleSetCurrentItem: Function,
   isComposer: boolean
 }){
-  const [comparedDbChanges, setComparedDbChanges] = useState(onlineVersion);
-  const [comparedTuneChanges, setComparedTuneChanges] = useState(currentItem);
+  const [dbState, dbDispatch] = useReducer(
+    (isComposer ? standardComposerDraftReducer : standardTuneDraftReducer),
+    (isComposer ? {currentStandardComposer: {}} : {currentStandard: {}})
+  );
+  const [localState, localDispatch] = useReducer(
+    (isComposer ? composerDraftReducer : tuneDraftReducer),
+    (isComposer ? {currentComposer: {}} : {currentTune: {}})
+  );
+  const comparedDbChanges = dbState[isComposer ? "currentStandardComposer" : "currentStandard"]
+  //  const [comparedDbChanges, setComparedDbChanges] = useState(onlineVersion);
+  const comparedTuneChanges = localState[isComposer ? "currentComposer" : "currentTune"]
+  //  const [comparedTuneChanges, setComparedTuneChanges] = useState(currentItem);
   const [uploadResult, setUploadResult] = useState({} as any);
   const resultAsAny = uploadResult as any;
-  function handleReplaceAttr(attrKey: keyof (Tune | tune_draft), value: any, onlineSelected: boolean){
-    const cpy: online_type = {}
-    if(onlineSelected){
-      for(let attr in onlineVersion){
-        cpy[attr as keyof online_type] = onlineVersion[attr as keyof online_type];
-      }
-    }else{
-      for(let attr in currentItem){
-        cpy[attr as keyof local_type] = currentItem[attr as keyof local_type];
-      }
-    }
-    cpy[attrKey] = value;
-    if(onlineSelected){
-      setComparedDbChanges(cpy)
-    }else{
-      setComparedTuneChanges(cpy);
-    }
-  }
+
   const comparedTuneChangesDebugString = JSON.stringify(comparedTuneChanges, ["title", "alternativeTitle", "form", "composers","id", "birth", "death"]).replaceAll(",", "\n");
   const comparedDbChangesDebugString = JSON.stringify(comparedDbChanges).replaceAll(",", "\n");
   const attrs = (isComposer ? composerEditorAttrs : editorAttrs).filter((item) => (!exclude_set.has(item[0]) && !item[0].endsWith("Confidence")))
@@ -248,7 +249,9 @@ export default function Compare({
         index={index}
         currentItem={currentItem}
         onlineVersion={onlineVersion}
-        handleReplaceAttr={handleReplaceAttr}/>
+        localDispatch={localDispatch}
+        dbDispatch={dbDispatch}
+      />
     )}
     ListFooterComponent={(props) => (
       <>
