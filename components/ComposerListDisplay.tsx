@@ -15,11 +15,8 @@ import {
   TextInput,
   Button,
   ButtonText,
-  ConfidenceBarView,
-  BackgroundView,
   DeleteButton
 } from '../Style.tsx'
-import itemSort from '../itemSort.tsx'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import Fuse from 'fuse.js';
 
@@ -43,11 +40,11 @@ const fuseOptions = { // For finetuning the search algorithm
 //		"composers"
 	]
 };
-import {composer, composerEditorAttrs, playlist, tune_draft } from '../types.tsx';
+import {composer, composerEditorAttrs} from '../types.tsx';
 import Composer from '../model/Composer.ts';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import ComposerEditor from './ComposerEditor.tsx';
-import dateDisplay from '../dateDisplay.tsx';
+import dateDisplay from '../textconverters/dateDisplay.tsx';
 import {useQuery, useRealm} from '@realm/react';
 import OnlineDB from '../OnlineDB.tsx';
 import {BSON} from 'realm';

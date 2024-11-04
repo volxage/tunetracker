@@ -12,7 +12,7 @@ import {
   View,
 } from 'react-native';
 import OnlineDB from '../../OnlineDB.tsx';
-import dateDisplay from '../../dateDisplay.tsx';
+import dateDisplay from '../../textconverters/dateDisplay.tsx';
 
 export default function DbConnection({
   attr,

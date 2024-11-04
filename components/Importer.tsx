@@ -37,9 +37,8 @@ const standardComposersAttrs = new Map<string, string>([
   ["death", "Death"],
 ]);
 
-import { composer, standard, tune_draft } from '../types.tsx';
-import dateDisplay from '../dateDisplay.tsx';
-import {create} from 'react-test-renderer';
+import { composer, standard } from '../types.tsx';
+import dateDisplay from '../textconverters/dateDisplay.tsx';
 import TuneDraftContext from '../contexts/TuneDraftContext.ts';
 import {AxiosResponse} from 'axios';
 

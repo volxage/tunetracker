@@ -34,6 +34,13 @@ export type composer = {
   "death"?: Date
   "dbId"?: string
 }
+export type standard_composer = {
+  "name"?: string
+  "bio"?: string
+  "birth"?: Date
+  "death"?: Date
+  "id"?: number
+}
 export type standard = {
   "title": string
   "alternative_title"?: string
@@ -47,7 +54,7 @@ export type standard = {
 export type standard_draft = {
   "title"?: string
   "alternative_title"?: string
-  "composers"?: Array<number>
+  "Composers"?: Array<number>
   "form"?: string
   "bio"?: string
   "year"?: string
@@ -133,4 +140,13 @@ export const tuneDefaults = new Map<string, any>([
   ["lyricsConfidence", 0],
   ["dbId", 0]
   //  ["id", "THIS SHOULD NOT BE HERE"] // If the user sees this text at any point, there's an error in the progra],
-])
+]);
+export const standardDefaults = new Map<string, any>([
+  ["title", "New song"],
+  ["alternative_title", ""],
+  ["Composers", []],
+  ["form", ""],
+  ["bio", ""],
+  ["year", 0],
+  ["id", 0],
+]);

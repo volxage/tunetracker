@@ -23,11 +23,11 @@ import {
 import { standard } from '../types.tsx';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons.js';
 import Tune from '../model/Tune.js';
-import dateDisplay from '../dateDisplay.tsx';
+import dateDisplay from '../textconverters/dateDisplay.tsx';
 import OnlineDB from '../OnlineDB.tsx';
 import {AxiosResponse} from 'axios';
 import Composer from '../model/Composer.ts';
-import standardTuneDraftReducer from '../DraftReducers/StandardTuneDraftReducer.ts';
+import standardTuneDraftReducer, {comparedAttrEqual} from '../DraftReducers/StandardTuneDraftReducer.ts';
 import tuneDraftReducer from '../DraftReducers/TuneDraftReducer.ts';
 import composerDraftReducer from '../DraftReducers/ComposerDraftReducer.ts';
 import standardComposerDraftReducer from '../DraftReducers/StandardComposerDraftReducer.ts';
@@ -47,6 +47,26 @@ const empty_equivalent = new Set([
   "{}",
   "unknown"
 ]);
+function AttrBasicRender({attr, attr_key, pretty_attr_key}:{attr: any, attr_key: keyof local_type, pretty_attr_key: string}){
+  switch(attr_key){
+    case "composers": {
+      return(
+        <View>
+          <Title>Composers</Title>
+          <SubText>{(attr as Composer[]).map(cmp => cmp.name).join(", ")}</SubText>
+        </View>
+      );
+    }
+    default: {
+      return(
+        <View>
+          <Title>{pretty_attr_key}</Title>
+          <SubText>{attr}</SubText>
+        </View>
+      )
+    }
+  }
+}
 function stringify(value: any): string{
   if (value instanceof Composer) return value.name;
   if (Array.isArray(value) || value instanceof OrderedCollection) return value.map(obj => {return stringify(obj)}).join(", ");
@@ -76,8 +96,8 @@ function stringify(value: any): string{
   }
   return "Unable to parse"
 }
-type local_type = tune_draft | composer;
-type online_type = standard | composer;
+type local_type = tune_draft & composer;
+type online_type = standard & composer;
 function CompareField({item, index, onlineVersion, currentItem, localDispatch, dbDispatch}:
 {
   item: string[],
@@ -109,13 +129,10 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
   if(!standardAttrPresent && !tuneAttrPresent){
     return(<></>)
   }
-  if( (onlineVersion[item[0] as keyof online_type] === currentItem[item[0] as keyof local_type])){
+  if(comparedAttrEqual(item[0] as keyof tune_draft, currentItem[item[0] as keyof local_type], onlineVersion)){
     return(
-      <View>
-        <Title>{item[1]}</Title>
-        <SubText>{currentItem[item[0] as keyof local_type]}</SubText>
-      </View>
-    )
+      <AttrBasicRender attr={currentItem[item[0] as keyof local_type]} attr_key={item[0]} pretty_attr_key={item[1]}/>
+    );
   }
   let local_item = currentItem[item[0] as keyof local_type]
   let online_item = onlineVersion[item[0] as keyof online_type]
@@ -155,9 +172,6 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
                       }}
                       onPress={() => {
                         setChoice(0);
-                        //Original signature: (attrKey, value, onlineSelected)
-                        //handleReplaceAttr(item[0], onlineVersion[item[0] as keyof online_type], true);
-                        //handleReplaceAttr(item[0], onlineVersion[item[0] as keyof online_type], false);
                         dbDispatch({
                           type: 'update_attr',
                           attr: item[0],
@@ -188,9 +202,6 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
                     }}
                     onPress={() => {
                       setChoice(1);
-                      // Reset both tune and standard
-                      //handleReplaceAttr(item[0], local_item, false);
-                      //handleReplaceAttr(item[0], online_item, true);
                       dbDispatch({
                         type: 'update_attr',
                         attr: item[0],
@@ -211,10 +222,7 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
                   }}
                   onPress={() => {
                     setChoice(2);
-                    //handleReplaceAttr(item[0], local_item, false);
-                    //handleReplaceAttr(item[0], local_item, true);
                     dbDispatch({
-                      //type: 'update_from_other',
                       type: 'update_from_other',
                       attr: item[0],
                       value: local_item
@@ -264,7 +272,7 @@ export default function Compare({
       type: 'set_to_selected',
       selectedItem: onlineVersion
     });
-    dbDispatch({
+    localDispatch({
       type: 'set_to_selected',
       selectedItem: currentItem
     });

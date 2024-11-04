@@ -18,7 +18,7 @@ import {
 import OnlineDB from '../../OnlineDB.tsx';
 import Composer from '../../model/Composer.js';
 import {composer} from '../../types.tsx';
-import dateDisplay from '../../dateDisplay.tsx';
+import dateDisplay from '../../textconverters/dateDisplay.tsx';
 
 
 export default function ComposerField({

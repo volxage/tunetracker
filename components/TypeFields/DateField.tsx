@@ -2,7 +2,7 @@ import {useState} from "react";
 import {View} from "react-native";
 import DatePicker from "react-native-date-picker";
 import {Button, ButtonText, SubText, Title} from "../../Style";
-import dateDisplay from "../../dateDisplay";
+import dateDisplay from "../../textconverters/dateDisplay";
 
 export default function DateField({
   attr,
