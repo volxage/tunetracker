@@ -10,7 +10,7 @@ import {
   Text,
   SMarginView,
 } from '../Style.tsx'
-import { Realm, useRealm } from '@realm/react'
+import { Realm, useQuery, useRealm } from '@realm/react'
 const debugMode = true;
 
 import { composer, composerEditorAttrs, editorAttrs, tune_draft, tuneDefaults } from '../types.tsx';
@@ -84,6 +84,7 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
   dbDispatch: React.Dispatch<any>;
   
 }){
+  const compQuery = useQuery(Composer);
   let standardAttrPresent = false;
   const translatedKey = translateKeyFromLocal(item[0] as local_key);
   if(translatedKey in onlineVersion){
@@ -131,82 +132,86 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
             <View style={{flexDirection: "row"}}>
               {
                 (standardAttrPresent) ?
-                  <Button style={{
-                        backgroundColor: choice === 0 ? "#338" : "#222",
-                        flex: 1
-                      }}
-                      onPress={() => {
-                        setChoice(0);
-                        localDispatch({
-                          type: 'update_attr',
-                          //attr: item[0],
-                          attr: item[0],
-                          value: onlineVersion[translatedKey]
-                        });
-                        dbDispatch({
-                        //"Update from other" translates the attr from the online standard
-                          type: 'update_from_other',
-                          attr: item[0],
-                          value: onlineVersion[item[0] as keyof online_type]
-                        });
-                          // (From Editor.tsx) dispatch({type: 'update_attr', attr: attr_key, value: value});
-                      }}
-                      >
-                      <ButtonText><Icon name="database-arrow-up" size={30} /></ButtonText>
-                    </Button>
-                    :
-                    <Button style={{
-                      flex:1,
-                        backgroundColor: "#111"
-                    }}>
-                      <ButtonText><Icon name="database-off" size={30} color="darkred" /></ButtonText>
-                    </Button>
-                  }
-                  <Button style={{
-                    backgroundColor: choice === 1 ? "#338" : "#222",
-                      flex: 1
-                    }}
-                    onPress={() => {
-                      setChoice(1);
-                      dbDispatch({
-                        type: 'update_attr',
-                        //attr: item[0],
-                        attr: translatedKey,
-                        value: online_item
-                      });
-                      localDispatch({
-                        type: 'update_attr',
-                        attr: item[0],
-                        value: local_item
-                      });
-                    }}
-                  >
-                    <ButtonText><Icon name="dots-horizontal" size={30} /></ButtonText>
-                  </Button>
-                  <Button style={{
-                    backgroundColor: choice === 2 ? "#338" : "#222",
+                <Button
+                  style={{
+                    backgroundColor: choice === 0 ? "#338" : "#222",
                       flex: 1
                   }}
                   onPress={() => {
-                    setChoice(2);
+                    setChoice(0);
                     dbDispatch({
-                        //"Update from other" translates the attr to the online standard
-                      type: 'update_from_other',
+                      type: 'update_attr',
+                      //attr: item[0],
                       attr: item[0],
-                      value: local_item
+                      value: onlineVersion[translatedKey]
                     });
                     localDispatch({
-                      type: 'update_attr',
-                      attr: item[0],
-                      value: local_item
+                      //"Update from other" translates the attr from the online standard
+                      type: 'update_from_other',
+                      attr: translatedKey,
+                      value: onlineVersion[translatedKey],
+                      composerQuery: compQuery 
                     });
+                    // (From Editor.tsx) dispatch({type: 'update_attr', attr: attr_key, value: value});
                   }}
-                  >
-                    <ButtonText><Icon name="account-arrow-down" size={30} /></ButtonText>
-                  </Button>
-                </View>
-                <View>
-                  <SMarginView>
+                >
+                  <ButtonText><Icon name="database-arrow-up" size={30} /></ButtonText>
+                </Button>
+                :
+                <Button style={{
+                  flex:1,
+                    backgroundColor: "#111"
+                }}>
+                  <ButtonText><Icon name="database-off" size={30} color="darkred" /></ButtonText>
+                </Button>
+              }
+              <Button
+                style={{
+                  backgroundColor: choice === 1 ? "#338" : "#222",
+                    flex: 1
+                }}
+                onPress={() => {
+                  setChoice(1);
+                  dbDispatch({
+                    type: 'update_attr',
+                    //attr: item[0],
+                    attr: translatedKey,
+                    value: online_item
+                  });
+                  localDispatch({
+                    type: 'update_attr',
+                    attr: item[0],
+                    value: local_item
+                  });
+                }}
+              >
+                <ButtonText><Icon name="dots-horizontal" size={30} /></ButtonText>
+              </Button>
+              <Button
+                style={{
+                  backgroundColor: choice === 2 ? "#338" : "#222",
+                    flex: 1
+                }}
+                onPress={() => {
+                setChoice(2);
+                dbDispatch({
+                  //"Update from other" translates the attr to the online standard
+                  type: 'update_from_other',
+                  attr: item[0],
+                  value: local_item
+                });
+                localDispatch({
+                  type: 'update_attr',
+                  attr: item[0],
+                  value: local_item
+                });
+              }}
+            >
+              <ButtonText><Icon name="account-arrow-down" size={30} /></ButtonText>
+            </Button>
+          </View>
+          <View>
+            <SMarginView>
                     <SubText>{local_display}</SubText>
                   </SMarginView>
                 </View>

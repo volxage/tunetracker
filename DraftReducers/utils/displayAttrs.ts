@@ -3,7 +3,7 @@ import {tune_draft, composer, standard_composer, standard, tuneDefaults, standar
 type local_key = keyof (composer & tune_draft)
 type online_key = keyof (standard_composer & standard)
 export default function displayLocalAttr(attrKey: local_key, attr: any){
-  if(attr === "undefined"){
+  if(typeof attr === "undefined"){
     return "";
   }
   switch(attrKey){
@@ -22,7 +22,7 @@ export default function displayLocalAttr(attrKey: local_key, attr: any){
 }
 
 export function displayOnlineAttrs(attrKey: online_key, attr: any){
-  if(attr === "undefined"){
+  if(typeof attr === "undefined"){
     return "";
   }
   switch(attrKey){

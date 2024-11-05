@@ -2,21 +2,23 @@ import {tune_draft, standard, tuneDefaults} from '../types.tsx';
 import Tune from '../model/Tune.ts';
 import {useQuery, useRealm} from '@realm/react';
 import Composer from '../model/Composer.ts';
+import {Results} from 'realm';
 
-function findAllLocalComposers(compIds: Array<number>){
-  return useQuery(Composer)
-    .filtered("!(id in $0)", compIds);
-}
-function translateAttrFromStandardTune(attrKey: keyof standard, attr: any): [keyof tune_draft, any]{
+function translateAttrFromStandardTune(attrKey: keyof standard, attr: any, composerQuery: Results<Composer> | undefined): [keyof tune_draft, any]{
   switch(attrKey){
     case 'alternative_title': {
-        return ["alternativeTitle", attr];
-      }
+      return ["alternativeTitle", attr];
+    }
     case 'Composers': {
-        //NOTE! THIS ASSUMES THE STANDARD'S COMPOSERS ARE LOCALLY STORED ALREADY!
-        //TODO: Handle "edge" case referenced above
-        return ["composers", findAllLocalComposers(attr)]
+      //NOTE! THIS ASSUMES THE STANDARD'S COMPOSERS ARE LOCALLY STORED ALREADY!
+      //TODO: Handle "edge" case referenced above
+      if(!composerQuery){
+        console.error("Composer query not passed, cannot translate from standard");
+        return ["composers", composerQuery];
       }
+      const filtered = composerQuery.filtered("dbId IN $0", attr.map(c => c.id));
+      return ["composers", filtered]
+    }
     default: {
       //THIS ASSUMES ANY KEY NOT REFERENCED ABOVE IS A SHARED KEY!
       return [attrKey as keyof tune_draft, attr];
@@ -31,7 +33,7 @@ export default function tuneDraftReducer(state: any, action: any){
       for(let attr in state["currentDraft"]){
         copy[attr as keyof tune_draft] = state["currentDraft"][attr];
       }
-      const translation = translateAttrFromStandardTune(action["attr"], action["value"]);
+      const translation = translateAttrFromStandardTune(action["attr"], action["value"], action["composerQuery"]);
       copy[translation[0]] = translation[1];
 
       // Mark attr as changed for it to be saved

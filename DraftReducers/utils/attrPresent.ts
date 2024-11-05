@@ -24,8 +24,6 @@ export function localAttrPresent(attrKey: local_key, attr: any): boolean{
     }
     default: {
       if(attrKey === "mainKey"){
-        console.log(JSON.stringify(attr));
-        console.log(`empty_equivalent has? ${empty_equivalent.has(JSON.stringify(attr))}`);
       }
       return !(empty_equivalent.has(JSON.stringify(attr).trim()));
     }
