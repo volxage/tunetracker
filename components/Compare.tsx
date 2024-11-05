@@ -32,6 +32,9 @@ import tuneDraftReducer from '../DraftReducers/TuneDraftReducer.ts';
 import composerDraftReducer from '../DraftReducers/ComposerDraftReducer.ts';
 import standardComposerDraftReducer from '../DraftReducers/StandardComposerDraftReducer.ts';
 import {OrderedCollection} from 'realm';
+import {localAttrPresent, onlineAttrPresent} from '../DraftReducers/utils/attrPresent.ts';
+import displayLocalAttr, {displayOnlineAttrs} from '../DraftReducers/utils/displayAttrs.ts';
+import {translateAttrFromLocal, translateKeyFromLocal} from '../DraftReducers/utils/translate.ts';
 
 //Anything that ends with "confidence" is also excluded
 const exclude_set = new Set([
@@ -97,7 +100,9 @@ function stringify(value: any): string{
   return "Unable to parse"
 }
 type local_type = tune_draft & composer;
+type local_key = keyof local_type
 type online_type = standard & composer;
+type online_key = keyof online_type;
 function CompareField({item, index, onlineVersion, currentItem, localDispatch, dbDispatch}:
 {
   item: string[],
@@ -109,22 +114,13 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
   
 }){
   let standardAttrPresent = false;
-  if(item[0] in onlineVersion){
-    const tmpAttr = onlineVersion[item[0] as keyof online_type]
-    if(tmpAttr){
-      if(!empty_equivalent.has(stringify(tmpAttr))){
-        standardAttrPresent = true;
-      }
-    }
+  const translatedKey = translateKeyFromLocal(item[0] as local_key);
+  if(translatedKey in onlineVersion){
+    standardAttrPresent = onlineAttrPresent(translatedKey, onlineVersion[translatedKey]);
   }
   let tuneAttrPresent = false;
   if(item[0] in currentItem){
-    const tmpAttr = currentItem[item[0] as keyof online_type]
-    if(tmpAttr){
-      if(!empty_equivalent.has(stringify(tmpAttr))){
-        standardAttrPresent = true;
-      }
-    }
+    tuneAttrPresent = localAttrPresent(item[0] as local_key, currentItem[item[0] as local_key]);
   }
   if(!standardAttrPresent && !tuneAttrPresent){
     return(<></>)
@@ -135,9 +131,9 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
     );
   }
   let local_item = currentItem[item[0] as keyof local_type]
-  let online_item = onlineVersion[item[0] as keyof online_type]
-  let local_display = stringify(local_item)
-  let online_display = stringify(online_item)
+  let online_item = onlineVersion[translatedKey]
+  let local_display = displayLocalAttr(item[0] as keyof local_type, currentItem[item[0] as keyof local_type])
+  let online_display = displayOnlineAttrs(translatedKey, onlineVersion[translatedKey])
   if(item[0] === "birth" || item[0] === "death"){
     if((local_item && online_item) && local_item.toString() === online_item.toString()){
       return(
@@ -154,8 +150,7 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
       <Title>{item[1]}</Title>
       <View>
         {
-          (item[0] in onlineVersion
-            && !empty_equivalent.has(online_display)) &&
+          (standardAttrPresent) &&
               <View>
                 <SMarginView>
                   <SubText>{online_display}</SubText>
@@ -164,8 +159,7 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
             }
             <View style={{flexDirection: "row"}}>
               {
-                (item[0] in onlineVersion
-                  && !empty_equivalent.has(online_display)) ?
+                (standardAttrPresent) ?
                   <Button style={{
                         backgroundColor: choice === 0 ? "#338" : "#222",
                         flex: 1

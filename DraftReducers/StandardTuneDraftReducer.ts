@@ -2,23 +2,8 @@ import {tune_draft, standard_draft, tuneDefaults, standardDefaults, standard_com
 import Tune from '../model/Tune.ts';
 import {List} from 'realm';
 import Composer from '../model/Composer.ts';
+import {translateAttrFromTune} from './utils/translate.ts';
 
-function translateAttrFromTune(attrKey: keyof tune_draft, attr: any): [keyof standard_draft, any]{
-  switch(attrKey){
-    case 'alternativeTitle': {
-      return ["alternative_title", attr];
-    }
-    case 'composers': {
-      //NOTE! THIS ASSUMES THE TUNEDRAFT'S COMPOSERS ARE TIED TO THE DATABASE ALREADY!
-      //TODO: Handle "edge" case referenced above
-      return ["Composers", (attr as List<Composer>).map(comp => comp.dbId)];
-    }
-    default: {
-      //THIS ASSUMES ANY KEY NOT REFERENCED ABOVE IS A SHARED KEY!
-      return [attrKey as keyof standard_draft, attr];
-    }
-  }
-}
 export default function standardTuneDraftReducer(state: any, action: any){
   switch(action.type){
     case 'update_from_other':
@@ -77,15 +62,11 @@ export function comparedAttrEqual(tuneDraftAttrKey: keyof tune_draft, tuneDraftA
   // => [standardKey, attr]
   const translatedAttr = translateAttrFromTune(tuneDraftAttrKey, tuneDraftAttr)
   if(translatedAttr[1] === standard[translatedAttr[0]]) return true;
-  console.log(`${tuneDraftAttrKey} => ${translatedAttr[0]}`);
   if(translatedAttr[1] instanceof Array && translatedAttr[1][0] && standard[translatedAttr[0]] instanceof Array && standard[translatedAttr[0]][0]){
     //Non-empty array comparison
     switch(translatedAttr[0]){
       case "Composers":{
         const standardComps = standard[translatedAttr[0]] as standard_composer[];
-        console.log("COMPARING COMPOSERS");
-        console.log(standardComps.map(sc => sc.id));
-        console.log(translatedAttr);
         return (translatedAttr[1] as Array<number>).every(compId => standardComps.some(standComp => standComp.id === compId));
       }
     }
