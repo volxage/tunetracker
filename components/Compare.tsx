@@ -33,7 +33,7 @@ import composerDraftReducer from '../DraftReducers/ComposerDraftReducer.ts';
 import standardComposerDraftReducer from '../DraftReducers/StandardComposerDraftReducer.ts';
 import {OrderedCollection} from 'realm';
 import {localAttrPresent, onlineAttrPresent} from '../DraftReducers/utils/attrPresent.ts';
-import displayLocalAttr, {displayOnlineAttrs} from '../DraftReducers/utils/displayAttrs.ts';
+import displayLocalAttr, {debugDisplayLocal, debugDisplayOnline, displayOnlineAttrs} from '../DraftReducers/utils/displayAttrs.ts';
 import {translateAttrFromLocal, translateKeyFromLocal} from '../DraftReducers/utils/translate.ts';
 
 //Anything that ends with "confidence" is also excluded
@@ -70,35 +70,6 @@ function AttrBasicRender({attr, attr_key, pretty_attr_key}:{attr: any, attr_key:
     }
   }
 }
-function stringify(value: any): string{
-  if (value instanceof Composer) return value.name;
-  if (Array.isArray(value) || value instanceof OrderedCollection) return value.map(obj => {return stringify(obj)}).join(", ");
-  if(value instanceof Realm.List){
-    try{
-      return JSON.stringify(value.toJSON());
-    }catch{
-      return "geez cyclical object or smth like that";
-    }
-  }
-  switch(typeof value){
-    case "string":
-      return value
-    case "number":
-      return JSON.stringify(value);
-    case "boolean":
-      if(value){
-        return "True"
-      }
-      return "False"
-  }
-  if(Array.isArray(value)){
-    return value.join(", ");
-  }
-  if(value instanceof Date){
-    return(dateDisplay(value))
-  }
-  return "Unable to parse"
-}
 type local_type = tune_draft & composer;
 type local_key = keyof local_type
 type online_type = standard & composer;
@@ -127,13 +98,13 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
   }
   if(comparedAttrEqual(item[0] as keyof tune_draft, currentItem[item[0] as keyof local_type], onlineVersion)){
     return(
-      <AttrBasicRender attr={currentItem[item[0] as keyof local_type]} attr_key={item[0]} pretty_attr_key={item[1]}/>
+      <AttrBasicRender attr={currentItem[item[0] as keyof local_type]} attr_key={item[0] as local_key} pretty_attr_key={item[1]}/>
     );
   }
-  let local_item = currentItem[item[0] as keyof local_type]
-  let online_item = onlineVersion[translatedKey]
-  let local_display = displayLocalAttr(item[0] as keyof local_type, currentItem[item[0] as keyof local_type])
-  let online_display = displayOnlineAttrs(translatedKey, onlineVersion[translatedKey])
+  let local_item = currentItem[item[0] as keyof local_type];
+  let online_item = onlineVersion[translatedKey];
+  let local_display = displayLocalAttr(item[0] as keyof local_type, currentItem[item[0] as keyof local_type]);
+  let online_display = displayOnlineAttrs(translatedKey, onlineVersion[translatedKey]);
   if(item[0] === "birth" || item[0] === "death"){
     if((local_item && online_item) && local_item.toString() === online_item.toString()){
       return(
@@ -166,13 +137,14 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
                       }}
                       onPress={() => {
                         setChoice(0);
-                        dbDispatch({
-                          type: 'update_attr',
-                          attr: item[0],
-                          value: onlineVersion[item[0] as keyof online_type]
-                        });
                         localDispatch({
-                          //type: 'update_from_other',
+                          type: 'update_attr',
+                          //attr: item[0],
+                          attr: item[0],
+                          value: onlineVersion[translatedKey]
+                        });
+                        dbDispatch({
+                        //"Update from other" translates the attr from the online standard
                           type: 'update_from_other',
                           attr: item[0],
                           value: onlineVersion[item[0] as keyof online_type]
@@ -198,13 +170,14 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
                       setChoice(1);
                       dbDispatch({
                         type: 'update_attr',
-                        attr: item[0],
-                        value: local_item
+                        //attr: item[0],
+                        attr: translatedKey,
+                        value: online_item
                       });
                       localDispatch({
                         type: 'update_attr',
                         attr: item[0],
-                        value: online_item
+                        value: local_item
                       });
                     }}
                   >
@@ -217,6 +190,7 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
                   onPress={() => {
                     setChoice(2);
                     dbDispatch({
+                        //"Update from other" translates the attr to the online standard
                       type: 'update_from_other',
                       attr: item[0],
                       value: local_item
@@ -280,8 +254,8 @@ export default function Compare({
   const [uploadResult, setUploadResult] = useState({} as any);
   const resultAsAny = uploadResult as any;
 
-  const comparedTuneChangesDebugString = JSON.stringify(comparedTuneChanges, ["Composers"]).replaceAll(",", "\n");
-  const comparedDbChangesDebugString = JSON.stringify(comparedDbChanges, ["Composers"]).replaceAll(",", "\n");
+  const comparedTuneChangesDebugString = debugDisplayLocal(comparedTuneChanges, isComposer);
+  const comparedDbChangesDebugString = debugDisplayOnline(comparedDbChanges, isComposer);
   const attrs = (isComposer ? composerEditorAttrs : editorAttrs).filter((item) => (!exclude_set.has(item[0]) && !item[0].endsWith("Confidence")))
   return(
   <BackgroundView>

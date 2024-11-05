@@ -1,7 +1,5 @@
 import {tune_draft, standard_draft, tuneDefaults, standardDefaults, standard_composer} from '../types.tsx';
 import Tune from '../model/Tune.ts';
-import {List} from 'realm';
-import Composer from '../model/Composer.ts';
 import {translateAttrFromTune} from './utils/translate.ts';
 
 export default function standardTuneDraftReducer(state: any, action: any){

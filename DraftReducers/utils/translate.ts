@@ -34,6 +34,9 @@ export function translateAttrFromTune(attrKey: keyof tune_draft, attr: any): [ke
     case 'composers': {
       //NOTE! THIS ASSUMES THE TUNEDRAFT'S COMPOSERS ARE TIED TO THE DATABASE ALREADY!
       //TODO: Handle "edge" case referenced above
+      if(typeof attr === "undefined"){
+        return [translatedKey, []]
+      }
       return [translatedKey, (attr as List<Composer>).map(comp => comp.dbId)];
     }
     default: {
