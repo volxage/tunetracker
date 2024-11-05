@@ -1,10 +1,10 @@
-import {tune_draft, standard, tuneDefaults} from '../types.tsx';
+import {tune_draft, standard, tuneDefaults, standard_composer} from '../types.tsx';
 import Tune from '../model/Tune.ts';
 import {useQuery, useRealm} from '@realm/react';
 import Composer from '../model/Composer.ts';
-import {Results} from 'realm';
+import {Results, Realm, BSON} from 'realm';
 
-function translateAttrFromStandardTune(attrKey: keyof standard, attr: any, composerQuery: Results<Composer> | undefined): [keyof tune_draft, any]{
+function translateAttrFromStandardTune(attrKey: keyof standard, attr: any, composerQuery: Results<Composer> | undefined, realm: Realm): [keyof tune_draft, any]{
   switch(attrKey){
     case 'alternative_title': {
       return ["alternativeTitle", attr];
@@ -14,10 +14,34 @@ function translateAttrFromStandardTune(attrKey: keyof standard, attr: any, compo
       //TODO: Handle "edge" case referenced above
       if(!composerQuery){
         console.error("Composer query not passed, cannot translate from standard");
-        return ["composers", composerQuery];
+        return ["composers", []];
       }
-      const filtered = composerQuery.filtered("dbId IN $0", attr.map(c => c.id));
-      return ["composers", filtered]
+      const comps = attr as standard_composer[];
+      if(!comps){
+        console.error("Composer field empty, cannot translate from Standard");
+        return ["composers", []];
+      }
+      let filtered: Results<Composer> | Composer[] = composerQuery.filtered("dbId IN $0", comps.map(c => c.id));
+      const remainingStandardComposers = comps.filter(comp => !filtered.some(C => C.dbId === comp.id));
+      if(remainingStandardComposers.length > 0 && !realm){
+        console.error("Realm was not passed, unable to import missing composers from Standard");
+        return ["composers", filtered];
+      }
+      for(const comp of remainingStandardComposers){
+        realm.write(() => {
+          realm.create(Composer,
+            {
+              id: new BSON.ObjectId(),
+              name: comp.name,
+              bio: comp.bio,
+              birth: comp.birth,
+              death: comp.death,
+              dbId: comp.id
+            }) as Composer;
+          //No need to concatenate, the filter automatically updates!
+        });
+      }
+      return ["composers", filtered];
     }
     default: {
       //THIS ASSUMES ANY KEY NOT REFERENCED ABOVE IS A SHARED KEY!
@@ -33,7 +57,7 @@ export default function tuneDraftReducer(state: any, action: any){
       for(let attr in state["currentDraft"]){
         copy[attr as keyof tune_draft] = state["currentDraft"][attr];
       }
-      const translation = translateAttrFromStandardTune(action["attr"], action["value"], action["composerQuery"]);
+      const translation = translateAttrFromStandardTune(action["attr"], action["value"], action["composerQuery"], action["realm"]);
       copy[translation[0]] = translation[1];
 
       // Mark attr as changed for it to be saved

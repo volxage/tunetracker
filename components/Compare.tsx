@@ -85,8 +85,13 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
   
 }){
   const compQuery = useQuery(Composer);
+  const realm = useRealm();
   let standardAttrPresent = false;
   const translatedKey = translateKeyFromLocal(item[0] as local_key);
+  if(!onlineVersion){
+    console.error("No online version to compare against!")
+    return(<></>);
+  }
   if(translatedKey in onlineVersion){
     standardAttrPresent = onlineAttrPresent(translatedKey, onlineVersion[translatedKey]);
   }
@@ -150,7 +155,8 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
                       type: 'update_from_other',
                       attr: translatedKey,
                       value: onlineVersion[translatedKey],
-                      composerQuery: compQuery 
+                      composerQuery: compQuery,
+                      realm: realm
                     });
                     // (From Editor.tsx) dispatch({type: 'update_attr', attr: attr_key, value: value});
                   }}

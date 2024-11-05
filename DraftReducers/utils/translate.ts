@@ -1,7 +1,6 @@
 import {List} from "realm";
 import { tune_draft, standard_draft, composer, standard_composer } from "../../types";
 import Composer from "../../model/Composer";
-import OnlineDB from "../../OnlineDB";
 type local_key = keyof (tune_draft & composer)
 type online_key = keyof (standard_draft & standard_composer)
 export function translateAttrFromLocal(attrKey: local_key, attr: any, isComposer: boolean): [online_key, any]{
@@ -38,7 +37,7 @@ export function translateAttrFromTune(attrKey: keyof tune_draft, attr: any): [ke
       if(typeof attr === "undefined"){
         return [translatedKey, []]
       }
-      return [translatedKey, (attr as List<Composer>).map(comp => OnlineDB.getComposerById(comp.dbId))];
+      return [translatedKey, (attr as List<Composer>).map(comp => comp.dbId)];
     }
     default: {
       return [translatedKey, attr];
