@@ -15,7 +15,8 @@ import {
   TextInput,
   Button,
   ButtonText,
-  DeleteButton
+  DeleteButton,
+  BackgroundView
 } from '../Style.tsx'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import Fuse from 'fuse.js';

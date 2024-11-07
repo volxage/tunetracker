@@ -1,6 +1,6 @@
 // Copyright 2024 Jonathan Hilliard
 import {createContext} from "react";
-import { composer, standard, standard_draft, Status, tune_draft } from "./types";
+import { composer, standard, standard_composer, standard_draft, Status, tune_draft } from "./types";
 import http from "./http-to-server.ts"
 let standards: standard[] = [];
 let composers: composer[] = [];
@@ -90,7 +90,7 @@ async function createTuneDraft(tuneDraft: tune_draft){
   console.log("Send draft: " + tuneDraft);
   return http.post("/tunes", tuneDraft);
 }
-async function sendUpdateDraft(tuneDraft: standard){
+async function sendUpdateDraft(tuneDraft: standard_draft){
   if(tuneDraft.id){
     console.log(tuneDraft.id);
     return http.put(`/tunes/${tuneDraft.id}`, tuneDraft).catch(error => console.error(error));
@@ -118,7 +118,7 @@ export default {
   },
   getComposerById(id: number) {
     //TODO: Replace with API call
-    return composers.find((comp: composer) => comp.id === id);
+    return composers.find((comp: standard_composer) => comp.id === id);
   },
   update() {
     fetchComposers();

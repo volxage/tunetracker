@@ -1,3 +1,4 @@
+import OnlineDB from "../../OnlineDB";
 import Composer from "../../model/Composer";
 import {tune_draft, composer, standard_composer, standard, tuneDefaults, standardDefaults} from "../../types";
 type local_key = keyof (composer & tune_draft)
@@ -27,8 +28,17 @@ export function displayOnlineAttrs(attrKey: online_key, attr: any){
   }
   switch(attrKey){
     case "Composers": {
-      const comps = attr as composer[];
-      return comps.map(comp => comp.name).join(", ");
+      const comps = attr as number[];
+      return comps.map(comp => {
+        const result = OnlineDB.getComposerById(comp);
+        if(typeof result !== "undefined"){
+          return result.name;
+        }else{
+          //Below is for calls to displayAttrs with "raw" standards that haven't been processed by the Reducer.
+          if(typeof comp !== "number") return ((comp as composer).name);
+          return "ERROR RETRIEVING COMPOSER FROM ID"
+        }
+      }).join(", ");
     }
     default: {
       return attr;

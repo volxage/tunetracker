@@ -25,7 +25,7 @@ export function translateKeyFromLocal(attrKey: local_key): online_key{
     }
   }
 }
-export function translateAttrFromTune(attrKey: keyof tune_draft, attr: any): [keyof standard_draft, any]{
+export function translateAttrFromTune(attrKey: keyof tune_draft, attr: any): [keyof standard_draft, any][]{
   const translatedKey = translateKeyFromLocal(attrKey) as keyof standard_draft;
   switch(attrKey){
     case 'alternativeTitle': {
@@ -35,12 +35,21 @@ export function translateAttrFromTune(attrKey: keyof tune_draft, attr: any): [ke
       //NOTE! THIS ASSUMES THE TUNEDRAFT'S COMPOSERS ARE TIED TO THE DATABASE ALREADY!
       //TODO: Handle "edge" case referenced above
       if(typeof attr === "undefined"){
-        return [translatedKey, []]
+        return [["Composers", []]]
       }
-      return [translatedKey, (attr as List<Composer>).map(comp => comp.dbId)];
+      const ids: number[] = []
+      const namesNoIds: string[] = []
+      for(const comp of (attr as List<Composer>)){
+        if("dbId" in comp && typeof comp.dbId !== "undefined" && comp.dbId !== 0){
+          ids.push(comp.dbId);
+        }else{
+          namesNoIds.push(comp.name);
+        }
+      }
+      return [["Composers", ids], ["composer_placeholder", namesNoIds]];
     }
     default: {
-      return [translatedKey, attr];
+      return [[translatedKey, attr]];
     }
   }
 }
