@@ -1,6 +1,6 @@
-* Tune Tracker (React Native)
+# Tune Tracker (React Native)
 Tune tracker is a tool to help you keep track of the songs you know, and how well you know them.
-This tool interfaces with tunetracker.jhilla.org. It allows you to import songs from the site and enter your confidence in the different avenues of a particular song. The beauty of the app comes when you need to sort the songs by, for instance, how well you know the melody, or the harmony/form. This tool is invaluable in the practice room to brush up on old songs, and also on/near the bandstand when you want to "call" a song that you know well, but can't remember the name of. In both of these situations, there has not yet been a sufficient digital tool to come toy our aid when it comes to tune recall.
+This tool interfaces with tunetracker.jhilla.org. It allows you to import songs from the site and enter your confidence in the different avenues of a particular song. The beauty of the app comes when you need to sort the songs by, for instance, how well you know the melody, or the harmony/form. This tool is valuable in the practice room to brush up on old songs, and also on/near the bandstand when you want to "call" a song that you know well, but can't remember the name of. In both of these situations, there has not yet been a suffcient digital tool to come to our aid when it comes to tune recall.
 
 
 
