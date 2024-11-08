@@ -1,6 +1,7 @@
 import {List} from "realm";
 import { tune_draft, standard_draft, composer, standard_composer } from "../../types";
 import Composer from "../../model/Composer";
+import OnlineDB from "../../OnlineDB";
 type local_key = keyof (tune_draft & composer)
 type online_key = keyof (standard_draft & standard_composer)
 export function translateAttrFromLocal(attrKey: local_key, attr: any, isComposer: boolean): [online_key, any]{
@@ -46,7 +47,8 @@ export function translateAttrFromTune(attrKey: keyof tune_draft, attr: any): [ke
           namesNoIds.push(comp.name);
         }
       }
-      return [["Composers", ids], ["composer_placeholder", namesNoIds]];
+      const results = ids.map(id => OnlineDB.getComposerById(id));
+      return [["Composers", ids], ["composer_placeholder", namesNoIds.join(", ")]];
     }
     default: {
       return [[translatedKey, attr]];

@@ -1,4 +1,4 @@
-//Copyright 2024 Jonathan Hiliard
+//Copyright 2024 Jonathan Hilliard
 import React, {useEffect, useReducer, useState} from 'react';
 import {
   Button,
@@ -13,7 +13,7 @@ import {
 import { Realm, useQuery, useRealm } from '@realm/react'
 const debugMode = true;
 
-import { composer, composerEditorAttrs, editorAttrs, tune_draft, tuneDefaults } from '../types.tsx';
+import { composer, composerEditorAttrs, editorAttrs, standard_draft, tune_draft, tuneDefaults } from '../types.tsx';
 
 import {
   FlatList,
@@ -126,9 +126,9 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
     <View style={{borderWidth: 1, borderColor: "#222222", marginVertical: 12}}>
       <Title style={{alignSelf: "center"}}>{item[1]}</Title>
       <View>
-        {
-          (standardAttrPresent) &&
-          <View style={{flexDirection: "row"}}>
+        <View style={{flexDirection: "row"}}>
+          {
+            (standardAttrPresent) ?
             <SMarginView style={{flex: 1}}>
               <View>
                 <SubText
@@ -136,40 +136,85 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
                     textDecorationLine: choice === 2 ? "line-through" : "none",
                       color: choice === 2 ? "#777" : "white"
                   }}
-                >{online_display}</SubText>
+                >
+                  {online_display}
+                </SubText>
+              {
+                choice === 2 &&
+                <SubText
+                  style={{
+                    color: "#CFC"
+                  }}>
+                    {local_display} <Icon size={20} name='arrow-left'/>
+                  </SubText>
+              }
+            </View>
+          </SMarginView>
+          :
+          <SMarginView style={{flex: 1}}>
+                <SubText
+                  style={{
+                    textDecorationLine: choice === 2 ? "line-through" : "none",
+                      color: choice === 2 ? "#777" : "darkred"
+                  }}
+                >
+                Not defined!
+                </SubText>
+              {
+                choice === 2 &&
+                <SubText
+                  style={{
+                    color: "#CFC"
+                  }}>
+                    {local_display} <Icon size={20} name='arrow-left'/>
+                  </SubText>
+              }
+          </SMarginView>
+        }
+      {
+        (tuneAttrPresent) ?
+        <SMarginView style={{flex: 1}}>
+          <View>
+            <SubText
+              style={{
+                textDecorationLine: choice === 0 ? "line-through" : "none",
+                  color: choice === 0 ? "#777" : "white"
+              }}>
+                {local_display} 
+              </SubText>
+            {
+              choice === 0 &&
+              <SubText
+                style={{
+                  color: "#CFC"
+                }}>
+                  <Icon size={20} name='arrow-right'/>{online_display}
+                </SubText>
+            }
+          </View>
+        </SMarginView>
+        :
+        <SMarginView style={{flex: 1}}>
+          <SubText
+            style={{
+              textDecorationLine: choice === 2 ? "line-through" : "none",
+                color: choice === 2 ? "#777" : "darkred"
+            }}
+          >
+            Not defined!
+          </SubText>
           {
             choice === 2 &&
             <SubText
               style={{
                 color: "#CFC"
               }}>
-                {local_display} <Icon size={20} name='arrow-left'/>
-            </SubText>
+                {online_display} <Icon size={20} name='arrow-left'/>
+              </SubText>
           }
-              </View>
-            </SMarginView>
-            <SMarginView style={{flex: 1}}>
-              <View>
-                <SubText
-                  style={{
-                    textDecorationLine: choice === 0 ? "line-through" : "none",
-                      color: choice === 0 ? "#777" : "white"
-                  }}>
-                    {local_display} 
-                  </SubText>
-          {
-            choice === 0 &&
-            <SubText
-              style={{
-                color: "#CFC"
-              }}>
-                <Icon size={20} name='arrow-right'/>{local_display}
-            </SubText>
-          }
-              </View>
-            </SMarginView>
-          </View>
-        }
+        </SMarginView>
+      }
+    </View>
         <View style={{flexDirection: "row"}}>
           {
             (standardAttrPresent) ?
@@ -299,6 +344,7 @@ export default function Compare({
   const comparedTuneChangesDebugString = debugDisplayLocal(comparedTuneChanges, isComposer);
   const comparedDbChangesDebugString = debugDisplayOnline(comparedDbChanges, isComposer);
   const attrs = (isComposer ? composerEditorAttrs : editorAttrs).filter((item) => (!exclude_set.has(item[0]) && !item[0].endsWith("Confidence")))
+  console.log(uploadResult);
   return(
   <BackgroundView>
   <FlatList
@@ -332,24 +378,22 @@ export default function Compare({
         <View>
           <Button style={{backgroundColor: ("data" in uploadResult) ? "grey" : "cadetblue"}}
             onPress={() => {
-              //TODO: Get the compiler to chill out
               if(!("data" in uploadResult)){
-                const copyToSend = {
-                  title: comparedDbChanges.title,
-                  alternative_title: comparedDbChanges.alternative_title,
-                  id: comparedDbChanges.id,
-                  form: comparedDbChanges.form,
-                  bio: comparedDbChanges.bio,
-                  composers: (comparedDbChanges.Composers ? comparedDbChanges.Composers : comparedDbChanges.composers).map(comp => {
-                    if("dbId" in comp){
-                      return comp["dbId"]
-                    }
-                    return comp.id;
-                  })
+                if(!isComposer){
+                  const toUpload = comparedDbChanges as standard_draft;
+                  const copyToSend = {
+                    title: toUpload.title,
+                    alternative_title: toUpload.alternative_title,
+                    composer_placeholder: toUpload.composer_placeholder,
+                    id: toUpload.id,
+                    form: toUpload.formt,
+                    bio: toUpload.bio,
+                    composers: toUpload.Composers
+                  }
+                  OnlineDB.sendUpdateDraft(copyToSend).then(res => {
+                    setUploadResult(((res as AxiosResponse).data))
+                  });
                 }
-                OnlineDB.sendUpdateDraft(copyToSend).then(res => {
-                  setUploadResult(((res as AxiosResponse).data))
-                });
               }
             }}
           >
@@ -361,6 +405,8 @@ export default function Compare({
           <SubText>Uploaded tune "{uploadResult["data"]["title"]}"</SubText>
           <SubText>Attached to composers:</SubText>
           <SubText style={{fontWeight: 500}}>{uploadResult["composers"].map(comp => comp.name).join(", ")}</SubText>
+          <SubText>Custom composers suggested:</SubText>
+          <SubText>{uploadResult["data"]["composer_placeholder"]}</SubText>
         </View>
       }
         </View>

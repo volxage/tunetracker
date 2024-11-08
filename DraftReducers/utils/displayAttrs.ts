@@ -5,7 +5,7 @@ type local_key = keyof (composer & tune_draft)
 type online_key = keyof (standard_composer & standard)
 export default function displayLocalAttr(attrKey: local_key, attr: any){
   if(typeof attr === "undefined"){
-    return "";
+    return "(Undefined)";
   }
   switch(attrKey){
     case "composers": {
