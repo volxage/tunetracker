@@ -43,12 +43,9 @@ export default function Editor({
   newTune: boolean,
   setNewTune: Function
 }): React.JSX.Element {
-  //Intentional copy to allow cancelling of edits
-  //console.log("Rerender Editor");
   const realm = useRealm();
   const [state, dispatch] = useReducer(tuneDraftReducer, {currentDraft: {}});
   const Stack = createNativeStackNavigator();
-  const [changedAttrsList, setChangedAttrsList]: [string[], Function] = useState([]);
 
   useEffect(() => {
     dispatch({type: "set_to_selected", selectedItem: selectedTune});
@@ -61,9 +58,6 @@ export default function Editor({
   }, []);
 
   function handleSetCurrentTune(attr_key: keyof tune_draft, value: any){
-    if(!changedAttrsList.includes(attr_key)){
-      setChangedAttrsList(changedAttrsList.concat(attr_key));
-    }
     dispatch({type: 'update_attr', attr: attr_key, value: value});
   }
   
@@ -121,7 +115,7 @@ export default function Editor({
                 <Button
                   onPress={() => {
                     realm.write(() => {
-                      for(let attr of changedAttrsList){
+                      for(let attr of state["changedAttrsList"]){
                         selectedTune[attr as keyof (tune_draft | Tune)] = (state["currentDraft"][attr as keyof tune_draft] as any)
                       }
                     });

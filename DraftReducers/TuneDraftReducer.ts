@@ -58,13 +58,18 @@ export default function tuneDraftReducer(state: any, action: any){
         copy[attr as keyof tune_draft] = state["currentDraft"][attr];
       }
       const translations = translateAttrFromStandardTune(action["attr"], action["value"], action["composerQuery"], action["realm"]);
+
+      let newChangedAttrsList = state["changedAttrsList"];
       //This for loop is necessary for translations that may return multiple attributes, but this is uncommon
       for(const t of translations){
         copy[t[0]] = t[1];
+        if(!newChangedAttrsList.includes(t[0])){
+          newChangedAttrsList = newChangedAttrsList.concat(t[0]);
+        }
       }
 
       // Mark attr as changed for it to be saved
-      return {currentDraft: copy};
+      return {currentDraft: copy, changedAttrsList: newChangedAttrsList};
     }
     case 'update_attr':
     {
@@ -74,7 +79,14 @@ export default function tuneDraftReducer(state: any, action: any){
       }
 
       tuneCopy[action["attr"] as keyof tune_draft] = action["value"];
-      return {currentDraft: tuneCopy};
+      let newChangedAttrsList = state["newChangedAttrsList"];
+      if(!newChangedAttrsList){
+        newChangedAttrsList = [];
+      }
+      if(!newChangedAttrsList.includes(action["attr"])){
+        newChangedAttrsList = newChangedAttrsList.concat(action["attr"]);
+      }
+      return {currentDraft: tuneCopy, changedAttrsList: state["changedAttrsList"].concat(action["attr"])};
     }
     case 'set_to_selected':
     {
@@ -102,7 +114,7 @@ export default function tuneDraftReducer(state: any, action: any){
         }
         //tune.dbId = action["selectedItem"]["id"]
       }
-      return {currentDraft: tune};
+      return {currentDraft: tune, changedAttrsList: []};
     }
   }
 }
