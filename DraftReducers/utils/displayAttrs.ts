@@ -1,5 +1,6 @@
 import OnlineDB from "../../OnlineDB";
 import Composer from "../../model/Composer";
+import dateDisplay from "../../textconverters/dateDisplay";
 import {tune_draft, composer, standard_composer, standard, tuneDefaults, standardDefaults} from "../../types";
 type local_key = keyof (composer & tune_draft)
 type online_key = keyof (standard_composer & standard)
@@ -15,6 +16,10 @@ export default function displayLocalAttr(attrKey: local_key, attr: any){
     case "hasLyrics": {
       const hasLyrics = attr as boolean;
       return hasLyrics ? "Has lyrics" : "Does not have lyrics";
+    }
+    case "birth":
+    case "death":{
+      return dateDisplay(attr)
     }
     default: {
       return attr;

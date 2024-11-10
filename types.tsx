@@ -1,6 +1,9 @@
 import {BSON} from "realm"
 import Composer from "./model/Composer"
 
+enum special_values {
+  Empty = "!!EMPTY!!"
+}
 //Copyright 2024 Jonathan Hilliard
 export type tune_draft = {
   "title"?: string
@@ -28,17 +31,18 @@ export type tune_draft = {
   //  "playedAt"?: string[]
 }
 export type composer = {
-  "name"?: string
+  "name"?: string// All enum members in 'E1' and 'E2' are constant.
+ 
   "bio"?: string
-  "birth"?: Date
-  "death"?: Date
+  "birth"?: Date | undefined
+  "death"?: Date | undefined
   "dbId"?: string
 }
 export type standard_composer = {
   "name"?: string
   "bio"?: string
-  "birth"?: Date
-  "death"?: Date
+  "birth"?: Date | undefined
+  "death"?: Date | undefined
   "id": number
 }
 export type standard = {
@@ -115,8 +119,10 @@ export const miniEditorAttrs = new Map<string, string>([
 ])
 export const composerDefaults = new Map<string, any>([
   ["name", ""],
-  ["birth", new Date(0,0,1)],
-  ["death", new Date(0,0,1)],
+  //These need to be undefined so that new composers aren't labeled
+  //as being born on a totally reasonable day of 1900-1-1
+  ["birth", undefined],
+  ["death", undefined],
   ["bio", ""],
   ["dbId", 0]
 ])

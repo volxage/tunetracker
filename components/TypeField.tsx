@@ -116,7 +116,7 @@ function TypeField({
   isComposer
 }: {
   attr: unknown,
-  attrKey: keyof (tune_draft | composer),
+  attrKey: keyof (tune_draft & composer),
   attrName: string,
   handleSetCurrentItem: Function,
   navigation: any,
@@ -141,10 +141,10 @@ function TypeField({
       <ComposerField attr={attr as (Composer | composer)[]} navigation={navigation} />
     );
   }
-  else if (attr instanceof Date){
+  else if (attr instanceof Date || attrKey === "birth" || attrKey === "death"){
     return(
       <DateField
-        attr={attr}
+        attr={attr as (Date | undefined)}
         attrKey={attrKey}
         handleSetCurrentItem={handleSetCurrentItem}
         navigation={navigation}/>

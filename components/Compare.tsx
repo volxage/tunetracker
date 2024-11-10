@@ -64,7 +64,7 @@ function AttrBasicRender({attr, attr_key, pretty_attr_key}:{attr: any, attr_key:
       return(
         <View>
           <Title>{pretty_attr_key}</Title>
-          <SubText>{attr}</SubText>
+          <SubText>{displayLocalAttr(attr_key, attr)}</SubText>
         </View>
       )
     }
