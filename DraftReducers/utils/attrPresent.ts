@@ -1,7 +1,7 @@
 import Composer from "../../model/Composer";
-import {tune_draft, composer, standard_composer, standard} from "../../types";
+import {tune_draft, composer, standard_composer, standard_draft} from "../../types";
 type local_key = keyof (composer & tune_draft)
-type online_key = keyof (standard_composer & standard)
+type online_key = keyof (standard_composer & standard_draft)
 const empty_equivalent = new Set([
   "",
   //Bro what is even going on here???

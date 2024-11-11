@@ -4,7 +4,7 @@ import Composer from "../../model/Composer";
 import OnlineDB from "../../OnlineDB";
 type local_key = keyof (tune_draft & composer)
 type online_key = keyof (standard_draft & standard_composer)
-export function translateAttrFromLocal(attrKey: local_key, attr: any, isComposer: boolean): [online_key, any]{
+export function translateAttrFromLocal(attrKey: local_key, attr: any, isComposer: boolean): [online_key, any][]{
 
   //TODO: Interface for Composers as well!
   if(!isComposer){
@@ -30,7 +30,7 @@ export function translateAttrFromTune(attrKey: keyof tune_draft, attr: any): [ke
   const translatedKey = translateKeyFromLocal(attrKey) as keyof standard_draft;
   switch(attrKey){
     case 'alternativeTitle': {
-      return ["alternative_title", attr];
+      return [["alternative_title", attr]];
     }
     case 'composers': {
       //NOTE! THIS ASSUMES THE TUNEDRAFT'S COMPOSERS ARE TIED TO THE DATABASE ALREADY!

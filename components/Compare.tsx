@@ -72,7 +72,7 @@ function AttrBasicRender({attr, attr_key, pretty_attr_key}:{attr: any, attr_key:
 }
 type local_type = tune_draft & composer;
 type local_key = keyof local_type
-type online_type = standard & composer;
+type online_type = standard_draft & composer;
 type online_key = keyof online_type;
 function CompareField({item, index, onlineVersion, currentItem, localDispatch, dbDispatch}:
 {
@@ -309,7 +309,7 @@ export default function Compare({
   isComposer
 }:
 {
-  currentItem: tune_draft,
+  currentItem: tune_draft | composer,
   onlineVersion: standard,
   navigation: any,
   handleSetCurrentItem: Function,
@@ -335,13 +335,13 @@ export default function Compare({
   //const comparedDbChanges = dbState[isComposer ? "currentStandardComposer" : "currentStandard"]
   const comparedDbChanges = dbState["currentDraft"];
   //  const [comparedDbChanges, setComparedDbChanges] = useState(onlineVersion);
-  //const comparedTuneChanges = localState[isComposer ? "currentComposer" : "currentTune"]
-  const comparedTuneChanges = localState["currentDraft"];
-  //  const [comparedTuneChanges, setComparedTuneChanges] = useState(currentItem);
+  //const comparedLocalChanges = localState[isComposer ? "currentComposer" : "currentTune"]
+  const comparedLocalChanges = localState["currentDraft"];
+  //  const [comparedLocalChanges, setComparedTuneChanges] = useState(currentItem);
   const [uploadResult, setUploadResult] = useState({} as any);
   const resultAsAny = uploadResult as any;
 
-  const comparedTuneChangesDebugString = debugDisplayLocal(comparedTuneChanges, isComposer);
+  const comparedLocalChangesDebugString = debugDisplayLocal(comparedLocalChanges, isComposer);
   const comparedDbChangesDebugString = debugDisplayOnline(comparedDbChanges, isComposer);
   const attrs = (isComposer ? composerEditorAttrs : editorAttrs).filter((item) => (!exclude_set.has(item[0]) && !item[0].endsWith("Confidence")))
   console.log(uploadResult);
@@ -370,7 +370,7 @@ export default function Compare({
           debugMode &&
           <View>
             <Text>Tune changes:</Text>
-            <SubText>{comparedTuneChangesDebugString}</SubText>
+            <SubText>{comparedLocalChangesDebugString}</SubText>
             <Text>Online changes:</Text>
             <SubText>{comparedDbChangesDebugString}</SubText>
           </View>
@@ -414,9 +414,9 @@ export default function Compare({
           <Button style={{flex: 1}}
             onPress={() => {
               navigation.goBack();
-              for(let attr in comparedTuneChanges){
-                if(attr in comparedTuneChanges){
-                  handleSetCurrentItem(attr, comparedTuneChanges[attr as keyof (Tune | tune_draft)]);
+              for(let attr in comparedLocalChanges){
+                if(attr in comparedLocalChanges){
+                  handleSetCurrentItem(attr, comparedLocalChanges[attr as keyof (Tune | tune_draft)]);
                 }
               }
               }}>
