@@ -339,12 +339,10 @@ export default function Compare({
   const comparedLocalChanges = localState["currentDraft"];
   //  const [comparedLocalChanges, setComparedTuneChanges] = useState(currentItem);
   const [uploadResult, setUploadResult] = useState({} as any);
-  const resultAsAny = uploadResult as any;
 
   const comparedLocalChangesDebugString = debugDisplayLocal(comparedLocalChanges, isComposer);
   const comparedDbChangesDebugString = debugDisplayOnline(comparedDbChanges, isComposer);
   const attrs = (isComposer ? composerEditorAttrs : editorAttrs).filter((item) => (!exclude_set.has(item[0]) && !item[0].endsWith("Confidence")))
-  console.log(uploadResult);
   return(
   <BackgroundView>
   <FlatList
@@ -403,7 +401,6 @@ export default function Compare({
                     id: toUpload.id
                   }
                   OnlineDB.sendComposerUpdateDraft(copyToSend).then(res => {
-                    console.log((res as AxiosResponse).data);
                     setUploadResult(((res as AxiosResponse)))
                   });
                 }
@@ -415,7 +412,7 @@ export default function Compare({
       {
         !isComposer && ("data" in uploadResult) &&
         <View style={{borderWidth: 1, borderColor: "grey"}}>
-          <SubText>Uploaded tune "{uploadResult["data"]["title"]}"</SubText>
+          <SubText>Uploaded tune "{uploadResult["data"]["data"]["title"]}"</SubText>
           <SubText>Attached to composers:</SubText>
           <SubText style={{fontWeight: 500}}>{uploadResult["data"]["composers"].map(comp => comp.name).join(", ")}</SubText>
           <SubText>Custom composers suggested:</SubText>
@@ -425,7 +422,7 @@ export default function Compare({
       {
         isComposer && ("data" in uploadResult) &&
         <View style={{borderWidth: 1, borderColor: "grey"}}>
-          <SubText>Uploaded tune "{uploadResult["data"]["name"]}"</SubText>
+          <SubText>Uploaded composer "{uploadResult["data"]["name"]}"</SubText>
         </View>
       }
         </View>
