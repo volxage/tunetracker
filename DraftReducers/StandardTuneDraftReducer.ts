@@ -54,7 +54,7 @@ export default function standardTuneDraftReducer(state: any, action: any){
       }else{
         for(let attr of standardDefaults){
           let key = attr[0] as keyof standard_draft;
-          if(key in action["selectedItem"] && typeof action["selectedItem"][key] !== "undefined"){
+          if(action["selectedItem"] && key in action["selectedItem"] && typeof action["selectedItem"][key] !== "undefined"){
             if(key === "Composers"){
               tune[key] = (action["selectedItem"][key] as standard_composer[]).map(comp => comp.id);
               tune["composer_placeholder"] = action["selectedItem"]["composer_placeholder"]

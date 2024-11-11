@@ -11,9 +11,8 @@ import {
   SMarginView,
 } from '../Style.tsx'
 import { Realm, useQuery, useRealm } from '@realm/react'
-const debugMode = true;
 
-import { composer, composerEditorAttrs, editorAttrs, standard_composer, standard_draft, tune_draft, tuneDefaults } from '../types.tsx';
+import { composer, composerEditorAttrs, editorAttrs, standard_composer, standard_draft, standardEditorAttrs, tune_draft, tuneDefaults } from '../types.tsx';
 
 import {
   FlatList,
@@ -35,6 +34,7 @@ import {OrderedCollection} from 'realm';
 import {localAttrPresent, onlineAttrPresent} from '../DraftReducers/utils/attrPresent.ts';
 import displayLocalAttr, {debugDisplayLocal, debugDisplayOnline, displayOnlineAttrs} from '../DraftReducers/utils/displayAttrs.ts';
 import {translateAttrFromLocal, translateKeyFromLocal} from '../DraftReducers/utils/translate.ts';
+const debugMode = false;
 
 //Anything that ends with "confidence" is also excluded
 const exclude_set = new Set([
@@ -54,17 +54,19 @@ function AttrBasicRender({attr, attr_key, pretty_attr_key}:{attr: any, attr_key:
   switch(attr_key){
     case "composers": {
       return(
-        <View>
-          <Title>Composers</Title>
-          <SubText>{(attr as Composer[]).map(cmp => cmp.name).join(", ")}</SubText>
+        <View style={{borderColor: "#222", borderWidth: 1}}>
+          <Title style={{alignSelf: "center"}}>Composers</Title>
+          <SubText style={{alignSelf: "center"}}>{(attr as Composer[]).map(cmp => cmp.name).join(", ")}</SubText>
+          <SubText style={{alignSelf: "center", color: "#777", margin: 16}}>Your version and the server's version are the same for this item's {pretty_attr_key}</SubText>
         </View>
       );
     }
     default: {
       return(
-        <View>
-          <Title>{pretty_attr_key}</Title>
-          <SubText>{displayLocalAttr(attr_key, attr)}</SubText>
+        <View style={{borderColor: "#222", borderWidth: 1}}>
+          <Title style={{alignSelf: "center"}}>{pretty_attr_key}</Title>
+          <SubText style={{alignSelf: "center"}}>{displayLocalAttr(attr_key, attr)}</SubText>
+          <SubText style={{alignSelf: "center", color: "#777", margin: 16}}>Your version and the server's version are the same for this item's {pretty_attr_key}</SubText>
         </View>
       )
     }
@@ -342,7 +344,7 @@ export default function Compare({
 
   const comparedLocalChangesDebugString = debugDisplayLocal(comparedLocalChanges, isComposer);
   const comparedDbChangesDebugString = debugDisplayOnline(comparedDbChanges, isComposer);
-  const attrs = (isComposer ? composerEditorAttrs : editorAttrs).filter((item) => (!exclude_set.has(item[0]) && !item[0].endsWith("Confidence")))
+  const attrs = (isComposer ? composerEditorAttrs : standardEditorAttrs).filter((item) => (!exclude_set.has(item[0]) && !item[0].endsWith("Confidence")))
   return(
   <BackgroundView>
   <FlatList
@@ -374,58 +376,63 @@ export default function Compare({
           </View>
         }
         <View>
-          <Button style={{backgroundColor: ("data" in uploadResult) ? "grey" : "cadetblue"}}
-            onPress={() => {
-              if(!("data" in uploadResult)){
-                if(!isComposer){
-                  const toUpload = comparedDbChanges as standard_draft;
-                  const copyToSend = {
-                    title: toUpload.title,
-                    alternative_title: toUpload.alternative_title,
-                    composer_placeholder: toUpload.composer_placeholder,
-                    id: toUpload.id,
-                    form: toUpload.form,
-                    bio: toUpload.bio,
-                    composers: toUpload.Composers
-                  }
-                  OnlineDB.sendUpdateDraft(copyToSend).then(res => {
-                    setUploadResult(((res as AxiosResponse)))
-                  });
-                }else{
-                  const toUpload = comparedDbChanges as standard_composer;
-                  const copyToSend = {
-                    name: toUpload.name,
-                    bio: toUpload.bio,
-                    birth: toUpload.birth,
-                    death: toUpload.death,
-                    id: toUpload.id
-                  }
-                  OnlineDB.sendComposerUpdateDraft(copyToSend).then(res => {
-                    setUploadResult(((res as AxiosResponse)))
-                  });
-                }
-              }
-            }}
-          >
-            <ButtonText>Upload</ButtonText>
-          </Button>
       {
         !isComposer && ("data" in uploadResult) &&
-        <View style={{borderWidth: 1, borderColor: "grey"}}>
+        <View style={{borderWidth: 1, borderColor: "green", padding: 16, margin: 8}}>
           <SubText>Uploaded tune "{uploadResult["data"]["data"]["title"]}"</SubText>
           <SubText>Attached to composers:</SubText>
-          <SubText style={{fontWeight: 500}}>{uploadResult["data"]["composers"].map(comp => comp.name).join(", ")}</SubText>
-          <SubText>Custom composers suggested:</SubText>
-          <SubText>{uploadResult["data"]["composer_placeholder"]}</SubText>
+          <SubText>{uploadResult["data"]["composers"].map(comp => comp.name).join(", ")}</SubText>
+        {
+          ("composer_placeholder" in uploadResult["data"] && uploadResult["data"]["composer_placeholder"] != "") && 
+          <View>
+            <SubText>Custom composers suggested:</SubText>
+            <SubText>{uploadResult["data"]["composer_placeholder"]}</SubText>
+          </View>
+        }
         </View>
       }
       {
         isComposer && ("data" in uploadResult) &&
-        <View style={{borderWidth: 1, borderColor: "grey"}}>
+        <View style={{borderWidth: 1, borderColor: "green", padding: 16, margin: 8}}>
           <SubText>Uploaded composer "{uploadResult["data"]["name"]}"</SubText>
         </View>
       }
         </View>
+        <Button style={{backgroundColor: ("data" in uploadResult) ? "grey" : "cadetblue"}}
+          onPress={() => {
+            if(!("data" in uploadResult)){
+              if(!isComposer){
+                const toUpload = comparedDbChanges as standard_draft;
+                const copyToSend = {
+                  title: toUpload.title,
+                  alternative_title: toUpload.alternative_title,
+                  composer_placeholder: toUpload.composer_placeholder,
+                  id: toUpload.id,
+                  form: toUpload.form,
+                  bio: toUpload.bio,
+                  composers: toUpload.Composers
+                }
+                OnlineDB.sendUpdateDraft(copyToSend).then(res => {
+                  setUploadResult(((res as AxiosResponse)))
+                });
+              }else{
+                const toUpload = comparedDbChanges as standard_composer;
+                const copyToSend = {
+                  name: toUpload.name,
+                  bio: toUpload.bio,
+                  birth: toUpload.birth,
+                  death: toUpload.death,
+                  id: toUpload.id
+                }
+                OnlineDB.sendComposerUpdateDraft(copyToSend).then(res => {
+                  setUploadResult(((res as AxiosResponse)))
+                });
+              }
+            }
+          }}
+        >
+          <ButtonText>Upload left side</ButtonText>
+        </Button>
         <View style={{flexDirection: "row"}}>
           <Button style={{flex: 1}}
             onPress={() => {
@@ -435,8 +442,8 @@ export default function Compare({
                   handleSetCurrentItem(attr, comparedLocalChanges[attr as keyof (Tune | tune_draft)]);
                 }
               }
-              }}>
-            <ButtonText>Save to phone</ButtonText>
+            }}>
+            <ButtonText>Save right side</ButtonText>
           </Button>
           <DeleteButton style={{flex: 1}}
             onPress={() => {navigation.goBack()}}

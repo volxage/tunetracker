@@ -1,10 +1,7 @@
+//Copyright 2024 Jonathan Hilliard
 import {BSON} from "realm"
 import Composer from "./model/Composer"
 
-enum special_values {
-  Empty = "!!EMPTY!!"
-}
-//Copyright 2024 Jonathan Hilliard
 export type tune_draft = {
   "title"?: string
   "alternativeTitle"?: string
@@ -113,6 +110,16 @@ export const composerEditorAttrs = [
   ["birth", "Birthday"],
   ["death", "Day of Death"],
   ["bio", "Biography"]
+];
+export const standardEditorAttrs = [
+  ["dbId", "Database Connection"],
+  ["title", "Title"],
+  ["alternativeTitle", "Alternative Title"],
+  ["bio", "Bio"],
+  ["form", "Form"],
+  ["composers", "Composers"],
+  ["birth", "Date of Birth"],
+  ["death", "Date of Death"],
 ];
 export const miniEditorAttrs = new Map<string, string>([
   ["title", "Title"],

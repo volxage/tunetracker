@@ -186,10 +186,17 @@ function ImporterHeader({
             suggestTuneSubmission ?
             <View>
               <SubText>This search doesn't seem to match well with any item from our database. You can submit your draft below.</SubText>
+              {
+                (submissionResult && "data" in submissionResult) &&
+                <View style={{borderColor: "white", borderWidth: 1, padding: 4}}>
+                  <SubText>Submitted your tune "{currentTune.title}" to tunetracker.jhilla.org</SubText>
+                </View>
+              }
               <Button
+                style={{backgroundColor: (submissionResult && "data" in submissionResult) ? "#444" : "cadetblue"}}
                 onPress={() => {
                   //TODO: Move tune conversion to OnlineDB here and in Compare.tsx
-                  if(!("data" in submissionResult)){
+                  if(!submissionResult || !("data" in submissionResult)){
                     const copyToSend = {
                       title: currentTune.title,
                       alternative_title: currentTune.alternativeTitle,
@@ -204,19 +211,18 @@ function ImporterHeader({
                       })
                     }
                     OnlineDB.createTuneDraft(copyToSend).then(res => {
-                      setSubmissionResult(((res as AxiosResponse).data))
+                      setSubmissionResult(((res as AxiosResponse)))
                     });
                   }
                 }}
               >
-                <ButtonText>Add *brand new* item</ButtonText>
+                {
+                  (submissionResult && "data" in submissionResult) ?
+                  <ButtonText style={{color: "#777"}}>(Tune already submitted)</ButtonText>
+                  :
+                  <ButtonText>Add *brand new* item</ButtonText>
+                }
               </Button>
-              {
-                (submissionResult && "data" in submissionResult) &&
-                <View style={{borderColor: "white"}}>
-                  <SubText>{}</SubText>
-                </View>
-              }
             </View>
             :
             <View>

@@ -44,7 +44,7 @@ export default function Editor({
   setNewTune: Function
 }): React.JSX.Element {
   const realm = useRealm();
-  const [state, dispatch] = useReducer(tuneDraftReducer, {currentDraft: {}});
+  const [state, dispatch] = useReducer(tuneDraftReducer, {currentDraft: {}, changedAttrsList: []});
   const Stack = createNativeStackNavigator();
 
   useEffect(() => {
