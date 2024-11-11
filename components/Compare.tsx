@@ -13,7 +13,7 @@ import {
 import { Realm, useQuery, useRealm } from '@realm/react'
 const debugMode = true;
 
-import { composer, composerEditorAttrs, editorAttrs, standard_draft, tune_draft, tuneDefaults } from '../types.tsx';
+import { composer, composerEditorAttrs, editorAttrs, standard_composer, standard_draft, tune_draft, tuneDefaults } from '../types.tsx';
 
 import {
   FlatList,
@@ -386,12 +386,25 @@ export default function Compare({
                     alternative_title: toUpload.alternative_title,
                     composer_placeholder: toUpload.composer_placeholder,
                     id: toUpload.id,
-                    form: toUpload.formt,
+                    form: toUpload.form,
                     bio: toUpload.bio,
                     composers: toUpload.Composers
                   }
                   OnlineDB.sendUpdateDraft(copyToSend).then(res => {
-                    setUploadResult(((res as AxiosResponse).data))
+                    setUploadResult(((res as AxiosResponse)))
+                  });
+                }else{
+                  const toUpload = comparedDbChanges as standard_composer;
+                  const copyToSend = {
+                    name: toUpload.name,
+                    bio: toUpload.bio,
+                    birth: toUpload.birth,
+                    death: toUpload.death,
+                    id: toUpload.id
+                  }
+                  OnlineDB.sendComposerUpdateDraft(copyToSend).then(res => {
+                    console.log((res as AxiosResponse).data);
+                    setUploadResult(((res as AxiosResponse)))
                   });
                 }
               }
@@ -400,13 +413,19 @@ export default function Compare({
             <ButtonText>Upload</ButtonText>
           </Button>
       {
-        "data" in uploadResult &&
+        !isComposer && ("data" in uploadResult) &&
         <View style={{borderWidth: 1, borderColor: "grey"}}>
           <SubText>Uploaded tune "{uploadResult["data"]["title"]}"</SubText>
           <SubText>Attached to composers:</SubText>
-          <SubText style={{fontWeight: 500}}>{uploadResult["composers"].map(comp => comp.name).join(", ")}</SubText>
+          <SubText style={{fontWeight: 500}}>{uploadResult["data"]["composers"].map(comp => comp.name).join(", ")}</SubText>
           <SubText>Custom composers suggested:</SubText>
           <SubText>{uploadResult["data"]["composer_placeholder"]}</SubText>
+        </View>
+      }
+      {
+        isComposer && ("data" in uploadResult) &&
+        <View style={{borderWidth: 1, borderColor: "grey"}}>
+          <SubText>Uploaded tune "{uploadResult["data"]["name"]}"</SubText>
         </View>
       }
         </View>

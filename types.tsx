@@ -32,7 +32,6 @@ export type tune_draft = {
 }
 export type composer = {
   "name"?: string// All enum members in 'E1' and 'E2' are constant.
- 
   "bio"?: string
   "birth"?: Date | undefined
   "death"?: Date | undefined
@@ -44,6 +43,13 @@ export type standard_composer = {
   "birth"?: Date | undefined
   "death"?: Date | undefined
   "id": number
+}
+export type standard_composer_draft = {
+  "name"?: string
+  "bio"?: string
+  "birth"?: Date | undefined
+  "death"?: Date | undefined
+  "id"?: number
 }
 export type standard = {
   "title": string
@@ -159,3 +165,12 @@ export const standardDefaults = new Map<string, any>([
   ["year", 0],
   ["id", 0],
 ]);
+export const standardComposerDefaults = new Map<string, any>([
+  ["name", ""],
+  //These need to be undefined so that new composers aren't labeled
+  //as being born on a totally reasonable day of 1900-1-1
+  ["birth", undefined],
+  ["death", undefined],
+  ["bio", ""],
+  ["id", 0]
+])

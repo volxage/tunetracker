@@ -1,6 +1,6 @@
 // Copyright 2024 Jonathan Hilliard
 import {createContext} from "react";
-import { composer, standard, standard_composer, standard_draft, Status, tune_draft } from "./types";
+import { composer, standard, standard_composer, standard_composer_draft, standard_draft, Status, tune_draft } from "./types";
 import http from "./http-to-server.ts"
 let standards: standard[] = [];
 let composers: composer[] = [];
@@ -92,8 +92,14 @@ async function createTuneDraft(tuneDraft: tune_draft){
 }
 async function sendUpdateDraft(tuneDraft: standard_draft){
   if(tuneDraft.id){
-    console.log(tuneDraft.id);
     return http.put(`/tunes/${tuneDraft.id}`, tuneDraft).catch(error => console.error(error));
+  }else{
+    console.log("dbId is invalid");
+  }
+}
+async function sendComposerUpdateDraft(composerDraft: standard_composer_draft){
+  if(composerDraft.id){
+    return http.put(`/composers/${composerDraft.id}`, composerDraft).catch(error => console.error(error));
   }else{
     console.log("dbId is invalid");
   }
@@ -106,6 +112,7 @@ export default {
   addListener,
   createTuneDraft,
   sendUpdateDraft,
+  sendComposerUpdateDraft,
   getStandards() {
     return standards;
   },
