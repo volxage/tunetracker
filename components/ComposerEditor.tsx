@@ -26,6 +26,7 @@ import Composer from '../model/Composer.ts';
 import Compare from './Compare.tsx';
 import {useRealm} from '@realm/react';
 import composerDraftReducer from '../DraftReducers/ComposerDraftReducer.ts';
+import ComposerDraftContext from '../contexts/ComposerDraftContext.ts';
 
 
 export default function ComposerEditor({
@@ -169,14 +170,16 @@ export default function ComposerEditor({
 <Stack.Screen name={"ComposerImportId"}>
   {props => 
   <SafeAreaView style={{flex: 1}}>
-    <Importer
-      importingComposers={true}
-      navigation={props.navigation}
-      importingId={false}
-      importFn={function(stand: standard, mini: boolean){
-        handleSetCurrentComposer("dbId", stand.id)
-        props.navigation.goBack();
-      }}/>
+    <ComposerDraftContext.Provider value={state["currentDraft"]}>
+      <Importer
+        importingComposers={true}
+        navigation={props.navigation}
+        importingId={true}
+        importFn={function(stand: standard, mini: boolean){
+          handleSetCurrentComposer("dbId", stand.id)
+          props.navigation.goBack();
+        }}/>
+      </ComposerDraftContext.Provider>
     </SafeAreaView>
   }
 </Stack.Screen>

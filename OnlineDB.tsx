@@ -90,6 +90,10 @@ async function createTuneDraft(tuneDraft: tune_draft){
   console.log("Send draft: " + tuneDraft);
   return http.post("/tunes", tuneDraft);
 }
+async function createComposerDraft(composerDraft: composer){
+  console.log("Send draft: " + composerDraft);
+  return http.post("/composers", composerDraft);
+}
 async function sendUpdateDraft(tuneDraft: standard_draft){
   if(tuneDraft.id){
     return http.put(`/tunes/${tuneDraft.id}`, tuneDraft).catch(error => console.error(error));
@@ -111,6 +115,7 @@ export default {
   DbStatusContext,
   addListener,
   createTuneDraft,
+  createComposerDraft,
   sendUpdateDraft,
   sendComposerUpdateDraft,
   getStandards() {

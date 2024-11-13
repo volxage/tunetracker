@@ -41,6 +41,7 @@ import { composer, standard } from '../types.tsx';
 import dateDisplay from '../textconverters/dateDisplay.tsx';
 import TuneDraftContext from '../contexts/TuneDraftContext.ts';
 import {AxiosResponse} from 'axios';
+import ComposerDraftContext from '../contexts/ComposerDraftContext.ts';
 
 const tuneFuseOptions = { // For finetuning the search algorithm
 	// isCaseSensitive: false,
@@ -136,8 +137,9 @@ function ImporterHeader({
   const standardAttrs = importingComposers ? standardComposersAttrs : standardTuneAttrs;
   const selectedAttrItems = Array.from(standardAttrs.entries())
     .map((x) => {return {label: x[1], value: x[0]}});
-  const [createOnlineTuneExpanded, setCreateOnlineTuneExpanded] = useState(false);
+  const [createOnlineItemExpanded, setCreateOnlineItemExpanded] = useState(false);
   const currentTune = useContext(TuneDraftContext);
+  const currentComposer = useContext(ComposerDraftContext);
   const [submissionResult, setSubmissionResult] = useState({} as any);
   return(
     <View style={{backgroundColor: "#222"}}>
@@ -171,25 +173,25 @@ function ImporterHeader({
     {
       importingId &&
       <View>
-        <Button onPress={() => setCreateOnlineTuneExpanded(!createOnlineTuneExpanded)}>
+        <Button onPress={() => setCreateOnlineItemExpanded(!createOnlineItemExpanded)}>
           {
-            createOnlineTuneExpanded ?
+            createOnlineItemExpanded ?
             <ButtonText>(Collapse)</ButtonText>
             :
-            <ButtonText>Can't find my tune below</ButtonText>
+            <ButtonText>Can't find my {importingComposers ? "composer" : "tune"} below</ButtonText>
           }
         </Button>
       {
-        createOnlineTuneExpanded &&
+        createOnlineItemExpanded &&
         <View>
           {
             suggestTuneSubmission ?
             <View>
-              <SubText>This search doesn't seem to match well with any item from our database. You can submit your draft below.</SubText>
+              <SubText>This search doesn't seem to match well with any {importingComposers ? "composer" : "tune"} from our database. You can submit your draft below.</SubText>
               {
                 (submissionResult && "data" in submissionResult) &&
                 <View style={{borderColor: "white", borderWidth: 1, padding: 4}}>
-                  <SubText>Submitted your tune "{currentTune.title}" to tunetracker.jhilla.org</SubText>
+                  <SubText>Submitted your tune "{importingComposers ? currentComposer.name : currentTune.title}" to tunetracker.jhilla.org</SubText>
                 </View>
               }
               <Button
@@ -197,22 +199,42 @@ function ImporterHeader({
                 onPress={() => {
                   //TODO: Move tune conversion to OnlineDB here and in Compare.tsx
                   if(!submissionResult || !("data" in submissionResult)){
-                    const copyToSend = {
-                      title: currentTune.title,
-                      alternative_title: currentTune.alternativeTitle,
-                      id: currentTune.id,
-                      form: currentTune.form,
-                      bio: currentTune.bio,
-                      composers: (currentTune.Composers ? currentTune.Composers : currentTune.composers).map(comp => {
-                        if("dbId" in comp){
-                          return comp["dbId"]
-                        }
-                        return comp.id;
-                      })
+                    if(!importingComposers){
+                      if(!currentTune || !currentTune.title){
+                        console.error("No title in the tune!");
+                        return;
+                      }
+                      const copyToSend = {
+                        title: currentTune.title,
+                        alternative_title: currentTune.alternativeTitle,
+                        id: currentTune.id,
+                        form: currentTune.form,
+                        bio: currentTune.bio,
+                        composers: (currentTune.Composers ? currentTune.Composers : currentTune.composers).map(comp => {
+                          if("dbId" in comp){
+                            return comp["dbId"]
+                          }
+                          return comp.id;
+                        })
+                      }
+                      OnlineDB.createTuneDraft(copyToSend).then(res => {
+                        setSubmissionResult(((res as AxiosResponse)))
+                      });
+                    }else{
+                      if(!currentComposer || !currentComposer.name){
+                        console.error("No name in the composer!");
+                        return;
+                      }
+                      const copyToSend = {
+                        name: currentComposer.name,
+                        bio: currentComposer.bio,
+                        birth: currentComposer.birth,
+                        death: currentComposer.death
+                      }
+                      OnlineDB.createComposerDraft(copyToSend).then(res => {
+                        setSubmissionResult(((res as AxiosResponse)))
+                      });
                     }
-                    OnlineDB.createTuneDraft(copyToSend).then(res => {
-                      setSubmissionResult(((res as AxiosResponse)))
-                    });
                   }
                 }}
               >
@@ -220,7 +242,7 @@ function ImporterHeader({
                   (submissionResult && "data" in submissionResult) ?
                   <ButtonText style={{color: "#777"}}>(Tune already submitted)</ButtonText>
                   :
-                  <ButtonText>Add *brand new* item</ButtonText>
+                  <ButtonText>Upload your {importingComposers ? "composer" : "tune"}</ButtonText>
                 }
               </Button>
             </View>
