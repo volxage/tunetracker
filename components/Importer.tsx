@@ -141,7 +141,9 @@ function ImporterHeader({
   const currentTune = useContext(TuneDraftContext);
   const currentComposer = useContext(ComposerDraftContext);
   const [submissionResult, setSubmissionResult] = useState({} as any);
+  const submissionSuccessful = submissionResult && "data" in submissionResult;
   const [submissionError, setSubmissionError] = useState({} as any);
+  const errorReceived = submissionError && "message" in submissionError;
   return(
     <View style={{backgroundColor: "#222"}}>
       <TextInput
@@ -190,22 +192,22 @@ function ImporterHeader({
             <View>
               <SubText>This search doesn't seem to match well with any {importingComposers ? "composer" : "tune"} from our database. You can submit your draft below.</SubText>
               {
-                (submissionResult && "data" in submissionResult) &&
+                submissionSuccessful &&
                 <View style={{borderColor: "white", borderWidth: 1, padding: 4}}>
                   <SubText>Submitted your tune "{importingComposers ? currentComposer.name : currentTune.title}" to tunetracker.jhilla.org</SubText>
                 </View>
               }
               {
-                (submissionError && "message" in submissionError) &&
+                errorReceived &&
                 <View style={{borderColor: "white", borderWidth: 1, padding: 4}}>
                   <SubText>Error: {submissionError["message"]}</SubText>
                 </View>
               }
               <Button
-                style={{backgroundColor: (submissionResult && "data" in submissionResult) ? "#444" : "cadetblue"}}
+                style={{backgroundColor: (submissionSuccessful || errorReceived) ? "#444" : "cadetblue"}}
                 onPress={() => {
                   //TODO: Move tune conversion to OnlineDB here and in Compare.tsx
-                  if(!submissionResult || !("data" in submissionResult)){
+                  if(!submissionSuccessful && !errorReceived){
                     if(!importingComposers){
                       if(!currentTune || !currentTune.title){
                         console.error("No title in the tune!");

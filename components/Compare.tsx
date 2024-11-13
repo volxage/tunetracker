@@ -342,6 +342,8 @@ export default function Compare({
   //  const [comparedLocalChanges, setComparedTuneChanges] = useState(currentItem);
   const [uploadResult, setUploadResult] = useState({} as any);
   const [uploadError, setUploadError] = useState({} as any);
+  const uploadSuccessful = uploadResult && ("data" in uploadResult);
+  const errorReceived = uploadError && "message" in uploadError;
 
   const comparedLocalChangesDebugString = debugDisplayLocal(comparedLocalChanges, isComposer);
   const comparedDbChangesDebugString = debugDisplayOnline(comparedDbChanges, isComposer);
@@ -378,13 +380,13 @@ export default function Compare({
         }
         <View>
       {
-        !isComposer && uploadResult && ("data" in uploadResult) &&
+        !isComposer && uploadSuccessful &&
         <View style={{borderWidth: 1, borderColor: "green", padding: 16, margin: 8}}>
           <SubText>Uploaded tune "{uploadResult["data"]["data"]["title"]}"</SubText>
           <SubText>Attached to composers:</SubText>
           <SubText>{uploadResult["data"]["composers"].map(comp => comp.name).join(", ")}</SubText>
         {
-          uploadResult && ("composer_placeholder" in uploadResult["data"] && uploadResult["data"]["composer_placeholder"] != "") && 
+          uploadSuccessful && ("composer_placeholder" in uploadResult["data"] && uploadResult["data"]["composer_placeholder"] != "") && 
           <View>
             <SubText>Custom composers suggested:</SubText>
             <SubText>{uploadResult["data"]["composer_placeholder"]}</SubText>
@@ -393,22 +395,22 @@ export default function Compare({
         </View>
       }
       {
-        isComposer && (uploadResult&& "data" in uploadResult) &&
+        isComposer && uploadSuccessful &&
         <View style={{borderWidth: 1, borderColor: "green", padding: 16, margin: 8}}>
           <SubText>Uploaded composer "{uploadResult["data"]["name"]}"</SubText>
         </View>
       }
       {
-        uploadError && ("message" in uploadError) &&
+        errorReceived &&
         <View style={{borderWidth: 1, borderColor: "red", padding: 16, margin: 8}}>
           <SubText>ERROR: {uploadError["message"]}</SubText>
         </View>
       }
         </View>
-        <Button style={{backgroundColor: (uploadResult && "data" in uploadResult) ? "grey" : "cadetblue"}}
+        <Button style={{backgroundColor: (uploadSuccessful || errorReceived) ? "grey" : "cadetblue"}}
           onPress={() => {
             //TODO: Handle other errors besides Axios ones
-            if(!uploadResult || !("data" in uploadResult)){
+            if(!uploadSuccessful && !errorReceived){
               if(!isComposer){
                 const toUpload = comparedDbChanges as standard_draft;
                 const copyToSend = {
