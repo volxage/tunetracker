@@ -69,6 +69,9 @@ export default function standardTuneDraftReducer(state: any, action: any){
       }
       return {currentDraft: tune};
     }
+    default:{
+      return {currentDraft: state["currentDraft"]}
+    }
   }
 }
 export function comparedAttrEqual(tuneDraftAttrKey: keyof tune_draft, tuneDraftAttr: any, standard: standard_draft){

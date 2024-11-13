@@ -12,7 +12,7 @@ import {
 } from '../Style.tsx'
 import { Realm, useQuery, useRealm } from '@realm/react'
 
-import { composer, composerEditorAttrs, editorAttrs, standard_composer, standard_draft, standardEditorAttrs, tune_draft, tuneDefaults } from '../types.tsx';
+import { composer, composerEditorAttrs, editorAttrs, standard_composer, standard_draft, compareTuneEditorAttrs, tune_draft, tuneDefaults } from '../types.tsx';
 
 import {
   FlatList,
@@ -356,7 +356,7 @@ export default function Compare({
 
   const comparedLocalChangesDebugString = debugDisplayLocal(comparedLocalChanges, isComposer);
   const comparedDbChangesDebugString = debugDisplayOnline(comparedDbChanges, isComposer);
-  const attrs = (isComposer ? composerEditorAttrs : standardEditorAttrs).filter((item) => (!exclude_set.has(item[0]) && !item[0].endsWith("Confidence")))
+  const attrs = (isComposer ? composerEditorAttrs : compareTuneEditorAttrs).filter((item) => (!exclude_set.has(item[0]) && !item[0].endsWith("Confidence")))
   return(
   <BackgroundView>
   <FlatList

@@ -116,5 +116,8 @@ export default function tuneDraftReducer(state: any, action: any){
       }
       return {currentDraft: tune, changedAttrsList: []};
     }
+    default: {
+      return {currentDraft: state["currentDraft"], changedAttrsList: state["changedAttrsList"]};
+    }
   }
 }

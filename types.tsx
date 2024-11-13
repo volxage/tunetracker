@@ -1,6 +1,7 @@
 //Copyright 2024 Jonathan Hilliard
 import {BSON} from "realm"
 import Composer from "./model/Composer"
+import Tune from "./model/Tune"
 
 export type tune_draft = {
   "title"?: string
@@ -52,6 +53,7 @@ export type standard = {
   "title": string
   "alternative_title"?: string
   "Composers"?: Array<composer>
+  "composer_placeholder"?: string
   "form"?: string
   "bio"?: string
   "year"?: string
@@ -82,7 +84,7 @@ export enum Status{
   Complete
 }
 
-export const editorAttrs = [
+export const editorAttrs: [keyof Tune, string][] = [
   ["dbId", "Database Connection"],
   ["title", "Title"],
   ["alternativeTitle", "Alternative Title"],
@@ -104,33 +106,30 @@ export const editorAttrs = [
   ["lyricsConfidence", "Lyrics Confidence"],
   ["playedAt", "Last played"]
 ];
-export const composerEditorAttrs = [
+export const composerEditorAttrs: [keyof Composer, string][] = [
   ["dbId", "Database Connection"],
   ["name", "Name"],
   ["birth", "Birthday"],
   ["death", "Day of Death"],
   ["bio", "Biography"]
 ];
-export const standardEditorAttrs = [
-  ["dbId", "Database Connection"],
+export const compareTuneEditorAttrs: [keyof tune_draft, string][] = [
   ["title", "Title"],
   ["alternativeTitle", "Alternative Title"],
   ["bio", "Bio"],
   ["form", "Form"],
   ["composers", "Composers"],
-  ["birth", "Date of Birth"],
-  ["death", "Date of Death"],
 ];
-export const miniEditorAttrs = new Map<string, string>([
+export const miniEditorAttrs = new Map<keyof Tune, string>([
   ["title", "Title"],
   ["melodyConfidence", "Melody Confidence"],
   ["formConfidence", "Form Confidence"],
   ["soloConfidence", "Solo Confidence"],
   ["lyricsConfidence", "Lyrics Confidence"],
   ["playlists", "Playlists"],
-  ["justPlayed", "'I Just Played This'"]
+  //["justPlayed", "'I Just Played This'"]
 ])
-export const composerDefaults = new Map<string, any>([
+export const composerDefaults = new Map<keyof composer, any>([
   ["name", ""],
   //These need to be undefined so that new composers aren't labeled
   //as being born on a totally reasonable day of 1900-1-1
@@ -139,13 +138,13 @@ export const composerDefaults = new Map<string, any>([
   ["bio", ""],
   ["dbId", 0]
 ])
-export const tuneDefaults = new Map<string, any>([
+export const tuneDefaults = new Map<keyof Tune, any>([
   ["title", "New song"],
   ["alternativeTitle", ""],
   ["composers", []],
   ["playlists", []],
   ["form", ""],
-  ["notableRecordings", []],
+  //  ["notableRecordings", []],
   ["mainKey", ""],
   ["mainTempo", 0],
   ["keyCenters", []],
@@ -162,7 +161,7 @@ export const tuneDefaults = new Map<string, any>([
   //  ["id", "THIS SHOULD NOT BE HERE"] // If the user sees this text at any point, there's an error in the progra],
 ]);
 
-export const standardDefaults = new Map<string, any>([
+export const standardDefaults = new Map<keyof standard, any>([
   ["title", "New song"],
   ["alternative_title", ""],
   ["Composers", []],
