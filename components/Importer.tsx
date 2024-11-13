@@ -141,6 +141,7 @@ function ImporterHeader({
   const currentTune = useContext(TuneDraftContext);
   const currentComposer = useContext(ComposerDraftContext);
   const [submissionResult, setSubmissionResult] = useState({} as any);
+  const [submissionError, setSubmissionError] = useState({} as any);
   return(
     <View style={{backgroundColor: "#222"}}>
       <TextInput
@@ -194,6 +195,12 @@ function ImporterHeader({
                   <SubText>Submitted your tune "{importingComposers ? currentComposer.name : currentTune.title}" to tunetracker.jhilla.org</SubText>
                 </View>
               }
+              {
+                (submissionError && "message" in submissionError) &&
+                <View style={{borderColor: "white", borderWidth: 1, padding: 4}}>
+                  <SubText>Error: {submissionError["message"]}</SubText>
+                </View>
+              }
               <Button
                 style={{backgroundColor: (submissionResult && "data" in submissionResult) ? "#444" : "cadetblue"}}
                 onPress={() => {
@@ -218,7 +225,9 @@ function ImporterHeader({
                         })
                       }
                       OnlineDB.createTuneDraft(copyToSend).then(res => {
-                        setSubmissionResult(((res as AxiosResponse)))
+                        setSubmissionResult(res as AxiosResponse)
+                      }).catch(err => {
+                        setSubmissionError(err);
                       });
                     }else{
                       if(!currentComposer || !currentComposer.name){
@@ -233,6 +242,8 @@ function ImporterHeader({
                       }
                       OnlineDB.createComposerDraft(copyToSend).then(res => {
                         setSubmissionResult(((res as AxiosResponse)))
+                      }).catch(err => {
+                        setSubmissionError(err);
                       });
                     }
                   }

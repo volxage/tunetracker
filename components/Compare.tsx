@@ -341,6 +341,7 @@ export default function Compare({
   const comparedLocalChanges = localState["currentDraft"];
   //  const [comparedLocalChanges, setComparedTuneChanges] = useState(currentItem);
   const [uploadResult, setUploadResult] = useState({} as any);
+  const [uploadError, setUploadError] = useState({} as any);
 
   const comparedLocalChangesDebugString = debugDisplayLocal(comparedLocalChanges, isComposer);
   const comparedDbChangesDebugString = debugDisplayOnline(comparedDbChanges, isComposer);
@@ -377,13 +378,13 @@ export default function Compare({
         }
         <View>
       {
-        !isComposer && ("data" in uploadResult) &&
+        !isComposer && uploadResult && ("data" in uploadResult) &&
         <View style={{borderWidth: 1, borderColor: "green", padding: 16, margin: 8}}>
           <SubText>Uploaded tune "{uploadResult["data"]["data"]["title"]}"</SubText>
           <SubText>Attached to composers:</SubText>
           <SubText>{uploadResult["data"]["composers"].map(comp => comp.name).join(", ")}</SubText>
         {
-          ("composer_placeholder" in uploadResult["data"] && uploadResult["data"]["composer_placeholder"] != "") && 
+          uploadResult && ("composer_placeholder" in uploadResult["data"] && uploadResult["data"]["composer_placeholder"] != "") && 
           <View>
             <SubText>Custom composers suggested:</SubText>
             <SubText>{uploadResult["data"]["composer_placeholder"]}</SubText>
@@ -392,15 +393,22 @@ export default function Compare({
         </View>
       }
       {
-        isComposer && ("data" in uploadResult) &&
+        isComposer && (uploadResult&& "data" in uploadResult) &&
         <View style={{borderWidth: 1, borderColor: "green", padding: 16, margin: 8}}>
           <SubText>Uploaded composer "{uploadResult["data"]["name"]}"</SubText>
         </View>
       }
+      {
+        uploadError && ("message" in uploadError) &&
+        <View style={{borderWidth: 1, borderColor: "red", padding: 16, margin: 8}}>
+          <SubText>ERROR: {uploadError["message"]}</SubText>
         </View>
-        <Button style={{backgroundColor: ("data" in uploadResult) ? "grey" : "cadetblue"}}
+      }
+        </View>
+        <Button style={{backgroundColor: (uploadResult && "data" in uploadResult) ? "grey" : "cadetblue"}}
           onPress={() => {
-            if(!("data" in uploadResult)){
+            //TODO: Handle other errors besides Axios ones
+            if(!uploadResult || !("data" in uploadResult)){
               if(!isComposer){
                 const toUpload = comparedDbChanges as standard_draft;
                 const copyToSend = {
@@ -412,9 +420,15 @@ export default function Compare({
                   bio: toUpload.bio,
                   composers: toUpload.Composers
                 }
-                OnlineDB.sendUpdateDraft(copyToSend).then(res => {
-                  setUploadResult(((res as AxiosResponse)))
-                });
+                  OnlineDB.sendUpdateDraft(copyToSend).then(res => {
+                    setUploadResult(((res as AxiosResponse)))
+                  }).catch((e) => {
+                    try{
+                      setUploadError(e);
+                    }catch{
+                      setUploadError("An unknown error occured while submitting the tune.")
+                    }
+                  });
               }else{
                 const toUpload = comparedDbChanges as standard_composer;
                 const copyToSend = {
@@ -424,9 +438,15 @@ export default function Compare({
                   death: toUpload.death,
                   id: toUpload.id
                 }
-                OnlineDB.sendComposerUpdateDraft(copyToSend).then(res => {
-                  setUploadResult(((res as AxiosResponse)))
-                });
+                  OnlineDB.sendComposerUpdateDraft(copyToSend).then(res => {
+                    setUploadResult(((res as AxiosResponse)))
+                  }).catch((e) => {
+                    try{
+                      setUploadError(e);
+                    }catch{
+                      setUploadError("An unknown error occured while submitting the tune.")
+                    }
+                  });
               }
             }
           }}

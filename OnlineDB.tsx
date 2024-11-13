@@ -96,14 +96,14 @@ async function createComposerDraft(composerDraft: composer){
 }
 async function sendUpdateDraft(tuneDraft: standard_draft){
   if(tuneDraft.id){
-    return http.put(`/tunes/${tuneDraft.id}`, tuneDraft).catch(error => console.error(error));
+    return http.put(`/tunes/${tuneDraft.id}`, tuneDraft).catch(r => {throw r})
   }else{
     console.log("dbId is invalid");
   }
 }
 async function sendComposerUpdateDraft(composerDraft: standard_composer_draft){
   if(composerDraft.id){
-    return http.put(`/composers/${composerDraft.id}`, composerDraft).catch(error => console.error(error));
+    return http.put(`/composers/${composerDraft.id}`, composerDraft).catch(r => {throw r})
   }else{
     console.log("dbId is invalid");
   }
