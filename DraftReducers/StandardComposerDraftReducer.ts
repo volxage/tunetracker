@@ -49,5 +49,8 @@ export default function standardComposerDraftReducer(state: any, action: any){
       }
       return {currentDraft: cd};
     }
+    default:{
+      return {currentDraft: state["currentDraft"]}
+    }
   }
 }

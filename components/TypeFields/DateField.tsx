@@ -15,7 +15,6 @@ export default function DateField({
   navigation: any,
   handleSetCurrentItem: Function
 }){
-  console.log(attr);
   const [dateCopy, setDateCopy]: [Date | undefined, Function] = useState(undefined);
   const [dateOpen, setDateOpen] = useState(false);
   useEffect(() => {

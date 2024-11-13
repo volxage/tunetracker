@@ -199,14 +199,14 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
         <SMarginView style={{flex: 1}}>
           <SubText
             style={{
-              textDecorationLine: choice === 2 ? "line-through" : "none",
-                color: choice === 2 ? "#777" : "darkred"
+              textDecorationLine: choice === 0 ? "line-through" : "none",
+                color: choice === 0 ? "#777" : "darkred"
             }}
           >
             Not defined!
           </SubText>
           {
-            choice === 2 &&
+            choice === 0 &&
             <SubText
               style={{
                 color: "#CFC"
@@ -276,6 +276,7 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
           >
             <ButtonText><Icon name="dots-horizontal" size={30} /></ButtonText>
           </Button>
+        { tuneAttrPresent ?
           <Button
             style={{
               backgroundColor: choice === 2 ? "#338" : "#222",
@@ -298,6 +299,14 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
           >
             <ButtonText><Icon name="account" size={30} /></ButtonText>
           </Button>
+          :
+          <Button style={{
+              flex:1,
+              backgroundColor: "#111"
+            }}>
+              <ButtonText><Icon name="account-off" size={30} color="darkred" /></ButtonText>
+          </Button>
+        }
         </View>
       </View>
     </View>
@@ -312,7 +321,7 @@ export default function Compare({
 }:
 {
   currentItem: tune_draft | composer,
-  onlineVersion: standard,
+  onlineVersion: standard | standard_composer,
   navigation: any,
   handleSetCurrentItem: Function,
   isComposer: boolean

@@ -6,6 +6,7 @@ export default function composerDraftReducer(state: any, action: any){
   switch(action.type){
     case 'update_attr':
     {
+      console.log("Update attr");
       const cd: composer = {}
       for(let attr of composerDefaults){
         let key = attr[0] as keyof Composer;
@@ -23,6 +24,7 @@ export default function composerDraftReducer(state: any, action: any){
     }
     case 'set_to_selected':
     {
+      console.log("Set to selected");
       const cd: composer = {}
       if(action["selectedItem"] instanceof Composer){
         for(let attr of composerDefaults){
@@ -47,6 +49,9 @@ export default function composerDraftReducer(state: any, action: any){
         }
       }
       return {currentDraft: cd};
+    }
+    default:{
+      return {currentDraft: state["currentDraft"]}
     }
   }
 }

@@ -28,8 +28,6 @@ export default function DbConnection({
   if(typeof attr !== "undefined" && attr !== 0){
     if(isComposer){
       item = OnlineDB.getComposerById(attr as number);
-      console.log(item);
-      console.log("is compoesr");
     }else{
       item = OnlineDB.getStandardById(attr as number);
     }
@@ -56,7 +54,7 @@ export default function DbConnection({
             <View>
               <SMarginView>
                 <SubText>
-                  You haven't connected this item to the database yet! Connecting an item allows you to request changes to the online copy of the item, meaning other users can use your updated information, and new users can import more accurate information! It also gives you the ability to import changes from the database uploaded from other users.
+                  You haven't connected this {isComposer ? "composer" : "tune"} to the database yet! Connecting an item allows you to request changes to the online copy of the item, meaning other users can use your updated information, and new users can import more accurate information! It also gives you the ability to import changes from the database uploaded from other users.
                 </SubText>
               </SMarginView>
               <Button

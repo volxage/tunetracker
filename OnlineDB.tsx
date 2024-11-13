@@ -3,7 +3,7 @@ import {createContext} from "react";
 import { composer, standard, standard_composer, standard_composer_draft, standard_draft, Status, tune_draft } from "./types";
 import http from "./http-to-server.ts"
 let standards: standard[] = [];
-let composers: composer[] = [];
+let composers: standard_composer[] = [];
 let status = Status.Waiting
 const statusListeners = new Set<Function>();
 
@@ -33,7 +33,7 @@ async function fetchComposers(counter=0){
         if(response.ok){
           //console.log("response ok!");
           response.json().then(json => {
-            composers = (json as composer[]);
+            composers = (json as standard_composer[]);
             //console.log("Standards:");
             //console.log(standards);
             setStatus(Status.Complete);

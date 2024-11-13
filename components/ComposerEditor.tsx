@@ -48,11 +48,11 @@ export default function ComposerEditor({
 }): React.JSX.Element {
   //Intentional copy to allow cancelling of edits
   //  const [currentDraft, setCurrentTune] = useState()
-  console.log("Rerender ComposerEditor");
   //console.log(prettyAttrs);
   const [state, dispatch] = useReducer(composerDraftReducer, {currentDraft: {}});
   const Stack = createNativeStackNavigator();
   const realm = useRealm();
+  console.log("Rerender ComposerEditor");
 
   useEffect(() => {
     dispatch({type: "set_to_selected", selectedItem: selectedComposer});
@@ -62,8 +62,6 @@ export default function ComposerEditor({
     }
   }, []);
 
-  useEffect(() => {
-  }, [])
   function handleSetCurrentComposer(attr_key: keyof composer, value: any){
     dispatch({type: 'update_attr', attr: attr_key, value: value});
   }
