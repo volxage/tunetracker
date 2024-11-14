@@ -41,7 +41,7 @@ const fuseOptions = { // For finetuning the search algorithm
 //		"composers"
 	]
 };
-import {composer, composerEditorAttrs} from '../types.tsx';
+import {composer, composerEditorAttrs} from '../types.ts';
 import Composer from '../model/Composer.ts';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import ComposerEditor from './ComposerEditor.tsx';

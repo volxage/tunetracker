@@ -16,7 +16,7 @@ import {
   Switch,
   View,
 } from 'react-native';
-import { composer, playlist, tune_draft } from '../types.tsx';
+import { composer, playlist, tune_draft } from '../types.ts';
 import DbConnection from './TypeFields/DbConnection.tsx';
 import ComposerField from './TypeFields/ComposerField.tsx';
 import Composer from '../model/Composer.ts';

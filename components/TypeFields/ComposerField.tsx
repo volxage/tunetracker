@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import OnlineDB from '../../OnlineDB.tsx';
 import Composer from '../../model/Composer.js';
-import {composer} from '../../types.tsx';
+import {composer} from '../../types.ts';
 import dateDisplay from '../../textconverters/dateDisplay.tsx';
 
 

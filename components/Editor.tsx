@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 
 import TypeField from './TypeField.tsx';
-import {tune_draft, standard, tuneDefaults} from '../types.tsx';
+import {tune_draft, standard, tuneDefaults} from '../types.ts';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Importer from './Importer.tsx';
 import {BackHandler} from 'react-native';

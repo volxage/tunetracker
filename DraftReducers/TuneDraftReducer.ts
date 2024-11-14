@@ -1,4 +1,4 @@
-import {tune_draft, standard, tuneDefaults, standard_composer} from '../types.tsx';
+import {tune_draft, standard, tuneDefaults, standard_composer} from '../types.ts';
 import Tune from '../model/Tune.ts';
 import {useQuery, useRealm} from '@realm/react';
 import Composer from '../model/Composer.ts';

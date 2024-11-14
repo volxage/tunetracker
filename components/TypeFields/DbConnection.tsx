@@ -7,7 +7,7 @@ import {
 } from '../../Style.tsx'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import React, {useEffect, useState} from 'react';
-import {composer, standard, tune_draft} from '../../types.tsx';
+import {composer, standard, tune_draft} from '../../types.ts';
 import {
   View,
 } from 'react-native';

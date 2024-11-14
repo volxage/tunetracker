@@ -47,7 +47,7 @@ enum playlist_enum {
   AllTunes = "AllTunes"
 }
 
-import { Status, tune_draft } from '../types.tsx';
+import { Status, tune_draft } from '../types.ts';
 import Tune from '../model/Tune.ts';
 import Composer from '../model/Composer.ts';
 import {useQuery, useRealm} from '@realm/react';

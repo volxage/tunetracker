@@ -1,4 +1,4 @@
-import {tune_draft, standard_draft, tuneDefaults, standardDefaults, standard_composer} from '../types.tsx';
+import {tune_draft, standard_draft, tuneDefaults, standardDefaults, standard_composer} from '../types.ts';
 import Tune from '../model/Tune.ts';
 import {translateAttrFromTune} from './utils/translate.ts';
 import {Realm} from 'realm';

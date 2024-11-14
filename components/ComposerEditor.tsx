@@ -16,7 +16,7 @@ import {
 
 import TypeField from './TypeField.tsx';
 import SongsList from '../SongsList.tsx';
-import {composer, standard} from '../types.tsx';
+import {composer, standard} from '../types.ts';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Importer from './Importer.tsx';
 import {BackHandler} from 'react-native';

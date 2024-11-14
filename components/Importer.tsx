@@ -37,7 +37,7 @@ const standardComposersAttrs = new Map<string, string>([
   ["death", "Death"],
 ]);
 
-import { composer, standard } from '../types.tsx';
+import { composer, standard } from '../types.ts';
 import dateDisplay from '../textconverters/dateDisplay.tsx';
 import TuneDraftContext from '../contexts/TuneDraftContext.ts';
 import {AxiosResponse} from 'axios';

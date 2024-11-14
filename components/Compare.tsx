@@ -12,14 +12,13 @@ import {
 } from '../Style.tsx'
 import { Realm, useQuery, useRealm } from '@realm/react'
 
-import { composer, composerEditorAttrs, editorAttrs, standard_composer, standard_draft, compareTuneEditorAttrs, tune_draft, tuneDefaults } from '../types.tsx';
+import { composer, composerEditorAttrs, editorAttrs, standard, standard_composer, standard_draft, compareTuneEditorAttrs, tune_draft, tuneDefaults } from '../types.ts';
 
 import {
   FlatList,
   View,
 } from 'react-native';
 
-import { standard } from '../types.tsx';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import Tune from '../model/Tune.js';
 import dateDisplay from '../textconverters/dateDisplay.tsx';

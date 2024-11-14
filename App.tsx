@@ -37,7 +37,7 @@ import {
   Colors,
 } from 'react-native/Libraries/NewAppScreen';
 
-import {standard, tune_draft, editorAttrs, Status, miniEditorAttrs} from './types.tsx';
+import {standard, tune_draft, editorAttrs, Status, miniEditorAttrs} from './types.ts';
 import OnlineDB from './OnlineDB.tsx';
 import ExtrasMenu from './components/ExtrasMenu.tsx';
 import {RealmProvider, useQuery, useRealm} from '@realm/react';
