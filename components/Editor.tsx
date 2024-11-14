@@ -37,7 +37,7 @@ export default function Editor({
   newTune,
   setNewTune
 }: {
-  prettyAttrs: Array<[string, string]>,
+  prettyAttrs: Array<[keyof tune_draft, string]>,
   navigation: any, //TODO: Find type of "navigation"
   selectedTune: Tune | tune_draft,
   newTune: boolean,
@@ -97,7 +97,7 @@ export default function Editor({
                 <DeleteButton
                   onLongPress={() => {
                     realm.write(() => {
-                      realm.delete(selectedTune as Tune);
+                      realm.delete(selectedTune);
                     })
                     navigation.goBack();
                   }}>
@@ -116,7 +116,7 @@ export default function Editor({
                   onPress={() => {
                     realm.write(() => {
                       for(let attr of state["changedAttrsList"]){
-                        selectedTune[attr as keyof (tune_draft | Tune)] = (state["currentDraft"][attr as keyof tune_draft] as any)
+                        selectedTune[attr as keyof (tune_draft | Tune)] = (state["currentDraft"][attr as keyof tune_draft])
                       }
                     });
                     navigation.goBack();

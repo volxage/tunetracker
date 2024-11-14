@@ -37,7 +37,7 @@ import {
   Colors,
 } from 'react-native/Libraries/NewAppScreen';
 
-import {standard, tune_draft, editorAttrs, Status, miniEditorAttrs} from './types.ts';
+import {standard, tune_draft, editorAttrs, Status, miniEditorAttrs, standardDefaults} from './types.ts';
 import OnlineDB from './OnlineDB.tsx';
 import ExtrasMenu from './components/ExtrasMenu.tsx';
 import {RealmProvider, useQuery, useRealm} from '@realm/react';
@@ -71,7 +71,7 @@ function App(): React.JSX.Element {
 
 function MainMenu({}: {}): React.JSX.Element {
   //TODO: Instantiate selectedTune with any tune, remove "as Tune" in editors.
-  const [selectedTune, setSelectedTune]: [Tune | unknown, Function] = useState(undefined);
+  const [selectedTune, setSelectedTune]: [Tune | unknown, Function] = useState();
   const [selectedTunes, setSelectedTunes]: [Tune[], Function] = useState([]);
   const [newTune, setNewTune] = useState(false);
   const isDarkMode = true;
@@ -81,7 +81,7 @@ function MainMenu({}: {}): React.JSX.Element {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
   let entriesArr = Array.from(miniEditorAttrs.entries());
-  let arr = ((entriesArr as Array<Array<unknown>>) as Array<[string, string]>);
+  let arr = entriesArr;
   const allLocalComposers = useQuery(Composer);
   return(
     <Stack.Navigator
@@ -115,9 +115,11 @@ function MainMenu({}: {}): React.JSX.Element {
             importingId={false}
             importFn={function(stand: standard, mini=false){
               const tn: tune_draft = {};
-              for(let attrPair of editorAttrs){
-                if(attrPair[0] !== "id"){
-                  tn[attrPair[0] as keyof tune_draft] = stand[attrPair[0] as keyof stand];
+              for(let attrPair of standardDefaults){
+                const standardAttr = stand[attrPair[0]];
+                if(attrPair[0] !== "id" && typeof standardAttr !== "undefined"){
+                  //TODO: Translate attr fn from DraftReducers
+                  tn[attrPair[0] as keyof tune_draft] = standardAttr;
                 }
               }
               tn.dbId = stand['id'];
@@ -132,7 +134,7 @@ function MainMenu({}: {}): React.JSX.Element {
                   // Composer(s) are missing from localDB.
                   // Finds all dbIds where there are no corresponding local entries
                   const missingComposersIds = compDbIds.filter(id => 
-                    !localComps.some(dbComposer => (dbComposer as Composer).dbId === id)
+                    !localComps.some(dbComposer => dbComposer.dbId === id)
                   );
                   console.log("Missing composer ids:");
                   console.log(missingComposersIds);

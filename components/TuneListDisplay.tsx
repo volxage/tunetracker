@@ -86,11 +86,11 @@ function ConfidenceBar({
   color
 }: {
   tune: Tune
-  confidenceType: string
+  confidenceType: keyof Tune
   color: string
 }){
-  let confidence = tune[confidenceType as keyof Tune] as number;
-  // TODO: Replace below with dynamically sized View object instead of slider to save on rendering speed
+  //TODO: Add confidence type to remove "as number"
+  let confidence = tune[confidenceType] as number;
   return(
     <ConfidenceBarView>
       <View 
@@ -132,7 +132,7 @@ function ItemRender({
   tune: Tune,
   setSelectedTune: Function,
   navigation: any,
-  selectedAttr: string,
+  selectedAttr: keyof Tune,
   confidenceVisible: boolean,
   separators: any,
   selectMode: boolean,
@@ -165,7 +165,7 @@ function ItemRender({
       <View style={{backgroundColor: isSelected ? "#404040" : "black", padding: 8}}>
         <Text>{tune.title}</Text>
         <SubText>{selectedAttr != "title"
-          ? prettyPrint(tune[selectedAttr as keyof Tune])
+          ? prettyPrint(tune[selectedAttr])
           : prettyPrint(tune["composers"])}</SubText>
       {
         //CONFIDENCE
@@ -388,7 +388,7 @@ export default function TuneListDisplay({
   useEffect(() => {
   })
   const [listReversed, setListReversed] = useState(false);
-  const [selectedAttr, setSelectedAttr] = useState("title");
+  const [selectedAttr, setSelectedAttr] = useState("title" as keyof tune_draft);
   const [selectedPlaylist, setSelectedPlaylist]: [BSON.ObjectId | playlist_enum.AllTunes, Function] = useState(playlist_enum.AllTunes);
   const [search, setSearch] = useState("");
   const [confidenceVisible, setConfidenceVisible] = useState(false);
@@ -400,11 +400,11 @@ export default function TuneListDisplay({
     OnlineDB.addListener(setDbStatus);
   })
   const allSongs = useQuery(Tune);
-  let displaySongs = allSongs;
+  let displaySongs: List<Tune> | Results<Tune> | Tune[] = allSongs;
   if(selectedPlaylist !== playlist_enum.AllTunes){
     displaySongs = allPlaylists.filtered("id == $0", selectedPlaylist)[0].tunes
   }
-  const fuse = new Fuse(displaySongs, fuseOptions);
+  const fuse = new Fuse<Tune>(displaySongs, fuseOptions);
   if(selectMode){
     const selected = displaySongs.filtered("id IN $0", selectedTunes.map(s => s.id));
     const deselected = displaySongs.filtered("!(id IN $0)", selectedTunes.map(s => s.id))
@@ -416,7 +416,7 @@ export default function TuneListDisplay({
   }else{
     displaySongs = fuse.search(search)
       .map(function(value, index){
-        return value.item as Tune;
+        return value.item;
       });
   }
 

@@ -1,18 +1,19 @@
 // Copyright 2024 Jonathan Hilliard
-import {Results} from "realm";
+import {List, Results} from "realm";
 import Composer from "./model/Composer";
 import Tune from "./model/Tune";
 import { composer, standard } from "./types";
 import Realm from "realm";
-function itemSort(songs: Array<Tune | standard | Composer | composer> | Results<Tune>, selected: string, reversed: boolean){
+type possible_items_type = Tune | standard | Composer | composer;
+function itemSort(songs: Array<possible_items_type> | Results<Tune> | List<Tune>, selected: keyof possible_items_type, reversed: boolean){
   let reverse_null_multiplier = 1;
   let reversed_multiplier = reversed ? -1 : 1;
-  if (selected.endsWith("confidence") || selected == "playthroughs"){
+  if ((selected as string).endsWith("confidence") || selected == "playthroughs"){
     reverse_null_multiplier = -1 * reversed_multiplier;
   }
-  function itemCompare(a_item, b_item){
-    let a = a_item[selected as keyof typeof a_item] as unknown;
-    let b = b_item[selected as keyof typeof b_item] as unknown;
+  function itemCompare(a_item: possible_items_type, b_item: possible_items_type){
+    let a = a_item[selected] as unknown;
+    let b = b_item[selected] as unknown;
     if(selected === "Rank" || selected === "Year" || selected === "birth" || selected === "death"){
       if (Number(a) < Number(b)){
         return -1 * reversed_multiplier;
