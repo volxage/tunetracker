@@ -308,7 +308,7 @@ export default function Importer({
     }
   }, []);
   const [listReversed, setListReversed] = useState(false);
-  const [selectedAttr, updateSelectedAttr] = useState(importingComposers ? "name" : "Title");
+  const [selectedAttr, updateSelectedAttr] = useState(importingComposers ? "name" : "title");
   const [search, setSearch] = useState("");
   let standards = importingComposers ? OnlineDB.getComposers() : OnlineDB.getStandards();
 
