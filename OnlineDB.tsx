@@ -19,13 +19,12 @@ function setStatus(newStatus: Status){
   status = newStatus;
 }
 async function fetchComposers(counter=0){
-    console.log("Composer connection attempted, connection #: " + counter);
     if(counter > 6){
       setStatus(Status.Failed);
       return [];
     }
     setStatus(Status.Waiting)
-    fetch("https://api.jhilla.org/tunetracker/composers", {
+    return fetch("https://api.jhilla.org/tunetracker/composers", {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -46,8 +45,6 @@ async function fetchComposers(counter=0){
             fetchComposers(counter + 1);
           });
         }else{
-          console.error("response not ok");
-          console.log(response.status);
           fetchComposers(counter + 1);
         }
       }
@@ -58,14 +55,13 @@ async function fetchComposers(counter=0){
     });
 }
 async function fetchTunes(counter=0){
-  console.log("Tune connection attempted, connection #: " + counter);
   attemptNo = counter;
   if(counter > 6){
     setStatus(Status.Failed);
     return [];
   }
   setStatus(Status.Waiting);
-  fetch("https://api.jhilla.org/tunetracker/tunes", {
+  return fetch("https://api.jhilla.org/tunetracker/tunes", {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -132,10 +128,12 @@ export default {
   },
   getStandardById(id: number) {
     //TODO: Replace with API call
+    if(!standards.length){fetchTunes()}
     return standards.find((stand: standard) => stand.id === id);
   },
   getComposerById(id: number) {
     //TODO: Replace with API call
+    if(!composers.length){fetchComposers()}
     return composers.find((comp: standard_composer) => comp.id === id);
   },
   getAttemptNo(){return attemptNo},

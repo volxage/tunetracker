@@ -6,8 +6,8 @@ import {
   SMarginView
 } from '../../Style.tsx'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import React, {useEffect, useState} from 'react';
-import {composer, standard, tune_draft} from '../../types.ts';
+import React, {useState} from 'react';
+import {composer, standard, standard_composer, tune_draft} from '../../types.ts';
 import {
   View,
 } from 'react-native';
@@ -53,7 +53,7 @@ export default function DbConnection({
         connectTuneExpanded &&
         <View>
           {
-            (item === null || typeof item === "undefined") ?
+            (attr === 0 || typeof attr === "undefined") ?
             <View>
               <SMarginView>
                 <SubText>
@@ -73,12 +73,51 @@ export default function DbConnection({
               </Button>
             </View>
             :
-            <Preview item={item} isComposer={isComposer} navigation={navigation} />
+            (item === null || typeof item === "undefined")
+            ? <View>
+              <Diagnoser item={item} dbIdAttr={attr as number}/>
+              <Button
+                onPress={() => {
+                  if(isComposer){
+                    navigation.navigate("ComposerImportId")
+                  }else {
+                    navigation.navigate("ImportID")}
+                }
+                }
+              >
+                <ButtonText>Connect to database</ButtonText>
+              </Button>
+              </View>
+            : <Preview item={item} isComposer={isComposer} navigation={navigation} />
           }
         </View>
       }
     </View>
   )
+}
+
+function Diagnoser({
+  dbIdAttr,
+  item
+}:
+{
+  dbIdAttr: number,
+  item: standard_composer | standard | undefined | null
+}
+){
+  if(OnlineDB.getComposers().length === 0){
+    return(
+      <View>
+        <SubText>You are not connected to the server right now, so we can't fetch your connected composer. Click below to retry at your connection.</SubText>
+        <Button onPress={() => {OnlineDB.update()}}><ButtonText>Retry connection</ButtonText></Button>
+      </View>
+    );
+  }
+  return(
+    <View>
+      <SubText>You seem to be connected to the server, but the ID doesn't match any of our items, so it may have been deleted. We suggest connecting it again!</SubText>
+    </View>
+  );
 }
 function Preview({
   item, isComposer, navigation
