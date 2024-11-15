@@ -31,23 +31,26 @@ export default function ComposerField({
   const [composerExpanded, setComposerExpanded] = useState(false);
   return(
     <View style={{padding: 8}}>
-      <Title>COMPOSERS</Title>
+      <Title style={{textAlign: "center"}}>COMPOSERS</Title>
       <FlatList
         data={attr}
         renderItem={({item, index, separators}) => (
           <View style={{padding: 8}}>
-            <Text>{item.name}</Text>
-            <SubText>{`B: ${dateDisplay(item.birth)}, D: ${dateDisplay(item.death)}`}</SubText>
+            <Text style={{textAlign: "center", fontWeight: "300"}}>{item.name}</Text>
+            <SubText style={{textAlign: "center"}}>{`B: ${dateDisplay(item.birth)}, D: ${dateDisplay(item.death)}`}</SubText>
           </View>
       )}
     />
     {
-      <View>
+      <View style={{flexDirection: "row"}}>
+        <View style={{flex:1}}></View>
         <Button
           onPress={() => {navigation.navigate("ComposerSelector")}}
+          style={{flex: 3}}
         >
           <ButtonText>Select Composers</ButtonText>
         </Button>
+        <View style={{flex:1}}></View>
       </View>
     }
     </View>

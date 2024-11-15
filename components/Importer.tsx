@@ -37,7 +37,7 @@ const standardComposersAttrs = new Map<string, string>([
   ["death", "Death"],
 ]);
 
-import { composer, standard } from '../types.ts';
+import { Status, composer, standard, standard_composer } from '../types.ts';
 import dateDisplay from '../textconverters/dateDisplay.tsx';
 import TuneDraftContext from '../contexts/TuneDraftContext.ts';
 import {AxiosResponse} from 'axios';
@@ -88,6 +88,11 @@ function prettyPrint(object: unknown): string{
   if (object instanceof Date) return dateDisplay(object);
   return "(Empty)";
 }
+const statusTextMap = new Map([
+  [Status.Waiting, "Connecting to the server! Please wait."],
+  [Status.Failed, 'Connection failed, press the button below to try again. Your internet or the server may be down. Email jhilla@jhilla.org if you believe the server is down. If the server is down, then tunetracker.jhilla.org should also be down!'],
+  [Status.Complete, "Connection complete, but something is wrong."]
+])
 function renderStandard(item: standard | composer, importFn: Function, separators: any, selectedAttr: keyof standard | composer, isComposer: boolean){
   let text = "";
   let subtext = "";
@@ -294,7 +299,9 @@ export default function Importer({
   importingId: boolean,
   importingComposers: boolean
 }){
+  const [dbStatus, setDbStatus] = useState(Status.Waiting);
   useEffect(() => {
+    OnlineDB.addListener(setDbStatus);
     BackHandler.addEventListener('hardwareBackPress', navigation.goBack)
     return () => {
       BackHandler.removeEventListener('hardwareBackPress', navigation.goBack)
@@ -303,11 +310,13 @@ export default function Importer({
   const [listReversed, setListReversed] = useState(false);
   const [selectedAttr, updateSelectedAttr] = useState(importingComposers ? "name" : "Title");
   const [search, setSearch] = useState("");
-  const standards = importingComposers ? OnlineDB.getComposers() : OnlineDB.getStandards();
+  let standards = importingComposers ? OnlineDB.getComposers() : OnlineDB.getStandards();
 
   let displayStandards = standards;
   let suggestTuneSubmission = false;
-  const fuse = new Fuse(standards, importingComposers ? composerFuseOptions : tuneFuseOptions);
+  const fuse = importingComposers ?
+    new Fuse<standard_composer>(standards as standard_composer[], composerFuseOptions) 
+    : new Fuse<standard>(standards as standard[], composerFuseOptions);
   let searchResults: FuseResult<standard | composer>[] = []
   if(search === ""){
     itemSort(displayStandards, selectedAttr, listReversed);
@@ -326,7 +335,7 @@ export default function Importer({
     suggestTuneSubmission = true;
   }
   return (
-    standards.length ?
+    (standards.length || dbStatus === Status.Complete) ?
     <FlatList
       data={displayStandards}
       extraData={selectedAttr}
@@ -362,15 +371,18 @@ export default function Importer({
     }
   />
   : <View style={{flex: 1, display: "flex", justifyContent: "center", alignItems: "center"}}>
-    <SMarginView>
-      <View style={{alignItems: "center"}}>
-        <Text>Loading...</Text>
-      </View>
+    <View style={{flex: 1, backgroundColor: "black"}}>
       <SMarginView>
-        <SubText>Your internet or the server may be down. Email jhilla@jhilla.org if you believe the server is down. If the server is down, then tunetracker.jhilla.org should also be down!</SubText>
+        <SubText>{statusTextMap.get(dbStatus)}</SubText>
       </SMarginView>
+      {
+        dbStatus === Status.Failed &&
+        <Button onPress={() => {OnlineDB.update()}}>
+          <ButtonText>Retry</ButtonText>
+        </Button>
+      }
       <DeleteButton onPress={() => {navigation.goBack()}}><ButtonText>Cancel import</ButtonText></DeleteButton>
-    </SMarginView>
+    </View>
     </View>
   );
 }

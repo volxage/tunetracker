@@ -25,6 +25,7 @@ const Title = styled.Text`
   font-size: 30px;
   color: white;
   font-weight: 400;
+  text-align: center;
 `
 const Text = styled.Text`
   font-size: 24px;

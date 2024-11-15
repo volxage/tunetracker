@@ -34,18 +34,21 @@ export default function DbConnection({
   }
   return(
     <View style={{padding: 8}}>
-      <Title>DATABASE CONNECTION</Title>
-      <Button
-        onPress={() => {setConnectTuneExpanded(!connectTuneExpanded)}}
-        style={{backgroundColor: "#222"}}
-      >
-        <ButtonText>
-          <Icon
-            name={connectTuneExpanded ? "earth-minus" : "earth-plus"}
-            size={30}
-          />
-        </ButtonText>
-      </Button>
+      <View style={{flexDirection: "row"}}>
+        <View style={{flex:1}} />
+        <Button
+          onPress={() => {setConnectTuneExpanded(!connectTuneExpanded)}}
+          style={{backgroundColor: "#222", flex:2}}
+        >
+          <ButtonText>
+            <Icon
+              name={connectTuneExpanded ? "earth-minus" : "earth-plus"}
+              size={30}
+            />Connection Details
+          </ButtonText>
+        </Button>
+        <View style={{flex:1}} />
+      </View>
       {
         connectTuneExpanded &&
         <View>

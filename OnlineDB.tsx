@@ -5,6 +5,7 @@ import http from "./http-to-server.ts"
 let standards: standard[] = [];
 let composers: standard_composer[] = [];
 let status = Status.Waiting
+let attemptNo = 0;
 const statusListeners = new Set<Function>();
 
 function addListener(listener: Function){
@@ -18,10 +19,12 @@ function setStatus(newStatus: Status){
   status = newStatus;
 }
 async function fetchComposers(counter=0){
+    console.log("Composer connection attempted, connection #: " + counter);
     if(counter > 6){
-      status = Status.Failed
+      setStatus(Status.Failed);
       return [];
     }
+    setStatus(Status.Waiting)
     fetch("https://api.jhilla.org/tunetracker/composers", {
       method: 'GET',
       headers: {
@@ -55,10 +58,13 @@ async function fetchComposers(counter=0){
     });
 }
 async function fetchTunes(counter=0){
-    if(counter > 6){
-      setStatus(Status.Failed);
-      return [];
-    }
+  console.log("Tune connection attempted, connection #: " + counter);
+  attemptNo = counter;
+  if(counter > 6){
+    setStatus(Status.Failed);
+    return [];
+  }
+  setStatus(Status.Waiting);
   fetch("https://api.jhilla.org/tunetracker/tunes", {
     method: 'GET',
     headers: {
@@ -132,6 +138,7 @@ export default {
     //TODO: Replace with API call
     return composers.find((comp: standard_composer) => comp.id === id);
   },
+  getAttemptNo(){return attemptNo},
   update() {
     fetchComposers();
     fetchTunes();

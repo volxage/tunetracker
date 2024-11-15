@@ -181,9 +181,9 @@ function TypeField({
           )}
         />
         <View style={{flexDirection:"row", alignSelf: "center"}}>
-          <Text>Existing playlist</Text>
+          <Text style={{fontWeight: "300"}}>Existing playlist</Text>
           <Switch value={newPlaylistOpen} onValueChange={setNewPlaylistOpen}/>
-          <Text>New playlist</Text>
+          <Text style={{fontWeight: "300"}}>New playlist</Text>
         </View>
         <AddPlaylistField
           tunePlaylists={attr as (Playlist | playlist)[]}
@@ -196,9 +196,10 @@ function TypeField({
   else if (typeof attr === "string"){
     return(
       <View style={{backgroundColor: 'black', padding: 8}}>
-        <Title>{attrName.toUpperCase()}</Title>
+        <Title style={{textAlign: "center"}}>{attrName.toUpperCase()}</Title>
         <TextInput defaultValue={attr} placeholderTextColor={"grey"}
           onChangeText={(text) => handleSetCurrentItem(attrKey, text)}
+          style={{textAlign: "center", fontWeight: "300"}}
         />
       </View>
     );
@@ -213,7 +214,7 @@ function TypeField({
           value={attr as number}
           onSlidingComplete={(value) => {handleSetCurrentItem(attrKey, value)}}
           thumbImage={icon}
-          style={{marginVertical: 20}}
+          style={{marginVertical: 20, marginHorizontal: 16}}
           minimumTrackTintColor='cadetblue'
           maximumTrackTintColor='gray'
         />
@@ -224,7 +225,7 @@ function TypeField({
     return(
       <View style={{backgroundColor: 'black', padding: 8}}>
         <Title>{attrName.toUpperCase()}</Title>
-        <View style={{flexDirection: "row"}}>
+        <View style={{flexDirection: "row", alignSelf: 'center'}}>
           <Switch
             onValueChange={(value) => {setBool(value); handleSetCurrentItem(attrKey, value)}}
             value={bool}
@@ -246,7 +247,8 @@ function TypeField({
     return(
       <View style={{backgroundColor: 'black', padding: 8}}>
         <View style={{flexDirection: 'row'}}>
-          <View style={{flex: 3}}>
+          <View style={{flex: 1}}></View>
+          <View style={{flex: 2}}>
             <Title>{attrName.toUpperCase()}</Title>
           </View>
           <View style={{alignContent: 'flex-end', flex: 1}}>
