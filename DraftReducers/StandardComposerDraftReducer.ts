@@ -2,6 +2,7 @@
 //Add "standard" functionality and translation!
 import { standard_composer_draft, composerDefaults, standardComposerDefaults } from "../types"
 import Composer from "../model/Composer";
+import {translateAttrFromComposer} from "./utils/translate";
 export default function standardComposerDraftReducer(state: any, action: any){
   switch(action.type){
     case 'update_attr':
@@ -19,7 +20,32 @@ export default function standardComposerDraftReducer(state: any, action: any){
         }
       }
       cd[action["attr"] as keyof standard_composer_draft] = action["value"];
-      return {currentDraft: cd};
+      let newChangedAttrsList = state["changedAttrsList"];
+      if(!newChangedAttrsList.includes(action["attr"])){
+        newChangedAttrsList = newChangedAttrsList.concat(action["attr"]);
+      }
+      return {currentDraft: cd, changedAttrsList: newChangedAttrsList};
+    }
+    case 'update_from_other':
+    {
+      let copy: standard_composer_draft = {}
+      for(let attr in state["currentDraft"]){
+        copy[attr as keyof standard_composer_draft] = state["currentDraft"][attr];
+      }
+      const translations = translateAttrFromComposer(action["attr"], action["value"]);
+
+      let newChangedAttrsList = state["changedAttrsList"];
+      //This for loop is necessary for translations that may return multiple attributes, but this is uncommon
+      for(const t of translations){
+        console.log(t);
+        copy[t[0]] = t[1];
+        if(!newChangedAttrsList.includes(t[0])){
+          newChangedAttrsList = newChangedAttrsList.concat(t[0]);
+        }
+      }
+
+      // Mark attr as changed for it to be saved
+      return {currentDraft: copy, changedAttrsList: newChangedAttrsList};
     }
     case 'set_to_selected':
     {
@@ -47,10 +73,10 @@ export default function standardComposerDraftReducer(state: any, action: any){
           }
         }
       }
-      return {currentDraft: cd};
+      return {currentDraft: cd, changedAttrsList: []};
     }
     default:{
-      return {currentDraft: state["currentDraft"]}
+      return {currentDraft: state["currentDraft"], changedAttrsList: []}
     }
   }
 }

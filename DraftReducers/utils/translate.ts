@@ -55,11 +55,19 @@ export function translateAttrFromTune(attrKey: keyof tune_draft, attr: any): [ke
     }
   }
 }
-export function translateAttrFromComposer(attrKey: keyof composer, attr: any): [keyof standard_composer, any]{
+export function translateAttrFromComposer(attrKey: keyof composer, attr: any): [keyof standard_composer, any][]{
   switch(attrKey){
     default: {
       //THIS ASSUMES ANY KEY NOT REFERENCED ABOVE IS A SHARED KEY!
-      return [attrKey as keyof standard_composer, attr];
+      return [[attrKey as keyof standard_composer, attr]];
+    }
+  }
+}
+export function translateAttrFromStandardComposer(attrKey: keyof standard_composer, attr: any): [keyof composer, any][]{
+  switch(attrKey){
+    default: {
+      //THIS ASSUMES ANY KEY NOT REFERENCED ABOVE IS A SHARED KEY!
+      return [[attrKey as keyof composer, attr]];
     }
   }
 }

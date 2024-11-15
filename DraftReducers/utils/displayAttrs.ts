@@ -1,7 +1,7 @@
 import OnlineDB from "../../OnlineDB";
 import Composer from "../../model/Composer";
 import dateDisplay from "../../textconverters/dateDisplay";
-import {tune_draft, composer, standard_composer, standard, tuneDefaults, standardDefaults, standard_draft} from "../../types";
+import {tune_draft, composer, standard_composer, standard, tuneDefaults, standardDefaults, standard_draft, composerDefaults, standardComposerDefaults} from "../../types";
 type local_key = keyof (composer & tune_draft)
 type online_key = keyof (standard_composer & standard_draft)
 export default function displayLocalAttr(attrKey: local_key, attr: any){
@@ -52,8 +52,15 @@ export function displayOnlineAttrs(attrKey: online_key, attr: any){
 }
 
 export function debugDisplayLocal(localItem: (composer & tune_draft), isComposer: boolean){
+  let ret = "";
   if(isComposer){
-    return "";
+    for(const keyPair of composerDefaults){
+      if(keyPair[0] in localItem){
+        const key = keyPair[0] as keyof composer;
+        ret += keyPair[0] + ": " + displayLocalAttr(key, localItem[key]) + "\n";
+      }
+    }
+    return ret;
   }else{
     let ret = "";
     for(const keyPair of tuneDefaults){
@@ -67,7 +74,14 @@ export function debugDisplayLocal(localItem: (composer & tune_draft), isComposer
 }
 export function debugDisplayOnline(onlineItem: (standard_composer & standard), isComposer: boolean){
   if(isComposer){
-    return "";
+    let ret = "";
+    for(const keyPair of standardComposerDefaults){
+      if(keyPair[0] in onlineItem){
+        const key = keyPair[0] as keyof standard_composer;
+        ret += keyPair[0] + ": " + displayOnlineAttrs(key, onlineItem[key]) + "\n";
+      }
+    }
+    return ret;
   }else{
     let ret = "";
     for(const keyPair of standardDefaults){

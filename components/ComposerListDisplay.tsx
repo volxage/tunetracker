@@ -253,7 +253,6 @@ export default function ComposerListDisplay({
     ...(onlineComposers.filter(oComp => !localDbIds.includes(oComp.id)))].filter(comp => !isSelected(comp));
   const fuse = new Fuse(displayComposers, fuseOptions);
   if(search === ""){
-    console.log("dC update");
     //itemSort(displayComposers, selectedAttr, listReversed);
     displayComposers = [...selectedComposers, ...selectedOnlineComposers, ...displayComposers]
   }else{

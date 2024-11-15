@@ -83,7 +83,6 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
   currentItem: local_type,
   localDispatch: React.Dispatch<any>; 
   dbDispatch: React.Dispatch<any>;
-  
 }){
   const compQuery = useQuery(Composer);
   const realm = useRealm();
@@ -311,6 +310,7 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
     </View>
   );
 }
+
 export default function Compare({
   currentItem,
   onlineVersion,

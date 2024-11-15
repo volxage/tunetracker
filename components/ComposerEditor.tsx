@@ -52,9 +52,9 @@ export default function ComposerEditor({
   const [state, dispatch] = useReducer(composerDraftReducer, {currentDraft: {}});
   const Stack = createNativeStackNavigator();
   const realm = useRealm();
-  console.log("Rerender ComposerEditor");
 
   useEffect(() => {
+    console.log("Composereditor effect");
     dispatch({type: "set_to_selected", selectedItem: selectedComposer});
     BackHandler.addEventListener('hardwareBackPress', navigation.goBack)
     return () => {

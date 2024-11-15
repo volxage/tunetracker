@@ -117,6 +117,7 @@ export default function tuneDraftReducer(state: any, action: any){
       return {currentDraft: tune, changedAttrsList: []};
     }
     default: {
+      console.error(`${action.type} not implemented for TuneDraftReducer!`)
       return {currentDraft: state["currentDraft"], changedAttrsList: state["changedAttrsList"]};
     }
   }
