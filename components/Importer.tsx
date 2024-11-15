@@ -41,6 +41,9 @@ import dateDisplay from '../textconverters/dateDisplay.tsx';
 import TuneDraftContext from '../contexts/TuneDraftContext.ts';
 import {AxiosResponse} from 'axios';
 import ComposerDraftContext from '../contexts/ComposerDraftContext.ts';
+import {useQuery, useRealm} from '@realm/react';
+import Composer from '../model/Composer.ts';
+import Tune from '../model/Tune.ts';
 
 const tuneFuseOptions = { // For finetuning the search algorithm
 	// isCaseSensitive: false,
@@ -177,6 +180,7 @@ function ImporterHeader({
         <Switch value={listReversed} onValueChange={() => setListReversed(!listReversed)}/>
       </View>
     </View>
+    <SubText>If you already saved/connected to the {importingComposers ? "composer" : "tune"} you're searching for, it won't be available here.</SubText>
     {
       importingId &&
       <View>
@@ -303,6 +307,8 @@ export default function Importer({
   useEffect(() => {
     OnlineDB.addListener(setDbStatus);
   }, []);
+  const composerQuery = useQuery(Composer);
+  const tuneQuery = useQuery(Tune);
   const [listReversed, setListReversed] = useState(false);
   const [selectedAttr, updateSelectedAttr] = useState(importingComposers ? "name" : "title");
   const [search, setSearch] = useState("");
@@ -322,6 +328,15 @@ export default function Importer({
       .map(function(value){
         return value.item;
       });
+  }
+  if(importingComposers){
+    displayStandards = displayStandards.filter(standard => {
+      return !composerQuery.some(C => C.dbId === standard.id);
+    })
+  }else{
+    displayStandards = displayStandards.filter(standard => {
+      return !tuneQuery.some(T => T.dbId === standard.id);
+    })
   }
   suggestTuneSubmission = false;
   if(!searchResults || !searchResults[0]){
