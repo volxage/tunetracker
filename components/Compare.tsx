@@ -421,6 +421,7 @@ export default function Compare({
             if(!uploadSuccessful && !errorReceived){
               if(!isComposer){
                 const toUpload = comparedDbChanges as standard_draft;
+                console.log(toUpload.Composers);
                 const copyToSend = {
                   title: toUpload.title,
                   alternative_title: toUpload.alternative_title,

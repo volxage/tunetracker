@@ -6,7 +6,6 @@ import {
   Switch,
   View,
   TouchableHighlight,
-  BackHandler,
 } from 'react-native';
 
 import {
@@ -224,7 +223,8 @@ function ImporterHeader({
                         id: currentTune.id,
                         form: currentTune.form,
                         bio: currentTune.bio,
-                        composers: (currentTune.Composers ? currentTune.Composers : currentTune.composers).map(comp => {
+                        composers: !currentTune.composers ? undefined : currentTune.composers.map(comp => {
+                          console.log(comp);
                           if("dbId" in comp){
                             return comp["dbId"]
                           }
@@ -302,10 +302,6 @@ export default function Importer({
   const [dbStatus, setDbStatus] = useState(Status.Waiting);
   useEffect(() => {
     OnlineDB.addListener(setDbStatus);
-    BackHandler.addEventListener('hardwareBackPress', navigation.goBack)
-    return () => {
-      BackHandler.removeEventListener('hardwareBackPress', navigation.goBack)
-    }
   }, []);
   const [listReversed, setListReversed] = useState(false);
   const [selectedAttr, updateSelectedAttr] = useState(importingComposers ? "name" : "title");

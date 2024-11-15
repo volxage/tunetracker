@@ -19,7 +19,6 @@ import SongsList from '../SongsList.tsx';
 import {composer, standard} from '../types.ts';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Importer from './Importer.tsx';
-import {BackHandler} from 'react-native';
 import OnlineDB from '../OnlineDB.tsx';
 
 import Composer from '../model/Composer.ts';
@@ -56,10 +55,6 @@ export default function ComposerEditor({
   useEffect(() => {
     console.log("Composereditor effect");
     dispatch({type: "set_to_selected", selectedItem: selectedComposer});
-    BackHandler.addEventListener('hardwareBackPress', navigation.goBack)
-    return () => {
-      BackHandler.removeEventListener('hardwareBackPress', navigation.goBack)
-    }
   }, []);
 
   function handleSetCurrentComposer(attr_key: keyof composer, value: any){

@@ -89,7 +89,7 @@ async function fetchTunes(counter=0){
 }
 
 async function createTuneDraft(tuneDraft: tune_draft){
-  console.log("Send draft: " + tuneDraft);
+  console.log("Send draft: " + JSON.stringify(tuneDraft));
   return http.post("/tunes", tuneDraft);
 }
 async function createComposerDraft(composerDraft: composer){

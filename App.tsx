@@ -28,7 +28,6 @@ import TuneListDisplay from './components/TuneListDisplay.tsx';
 import Editor from './components/Editor.tsx';
 import Importer from './components/Importer.tsx';
 import {
-  BackHandler,
   SafeAreaView,
   View,
 } from 'react-native';
