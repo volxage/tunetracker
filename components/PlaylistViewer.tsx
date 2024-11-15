@@ -23,7 +23,7 @@ export default function PlaylistViewer(
   return(
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name={"PlaylistViewerUnwrapped"} >
-        {props => <SafeAreaView style={{backgroundColor: "black"}}>
+        {props => <SafeAreaView style={{backgroundColor: "black", flex:1}}>
           <Title>Playlists</Title>
           <DeleteButton
             onPress={() => {navigation.goBack()}}>
@@ -52,18 +52,18 @@ export default function PlaylistViewer(
         }
       </Stack.Screen>
       <Stack.Screen name={"PlaylistEditor"}>
-        {props => <SafeAreaView style={{backgroundColor: "black"}}>
+        {props => <SafeAreaView style={{backgroundColor: "black", flex: 1}}>
           <PlaylistEditor navigation={props.navigation} playlist={selectedPlaylist as Playlist} setTuneToEdit={setTuneToEdit}/>
       </SafeAreaView>}
     </Stack.Screen>
  <Stack.Screen name="Editor">
-        {(props) => <Editor
-          prettyAttrs={editorAttrs as Array<[string, string]>}
-          selectedTune={tuneToEdit as unknown as Tune}
-          newTune={false}
-          setNewTune={() => {}}
-          navigation={props.navigation}
-        />}
+   {(props) => <Editor
+     prettyAttrs={editorAttrs as Array<[string, string]>}
+     selectedTune={tuneToEdit as unknown as Tune}
+     newTune={false}
+     setNewTune={() => {}}
+     navigation={props.navigation}
+   />}
     </Stack.Screen>
   </Stack.Navigator>
 );
