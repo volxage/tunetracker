@@ -57,6 +57,7 @@ const ConfidenceBarView = styled.View`
 `;
 const BackgroundView = styled.View`
   background-color: black;
+  flex: 1;
 `;
 
 export {Text, Title, SubText, TextInput, DeleteButton, Button, ButtonText, SMarginView, ConfidenceBarView, BackgroundView};

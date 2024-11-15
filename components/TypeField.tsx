@@ -124,7 +124,7 @@ function TypeField({
 }){
   const allPlaylists = useQuery(Playlist);
   const [icon, setIcon] = useState();
-  const [bool, setBool] = useState(attr)
+  const [bool, setBool] = useState(attr as boolean)
   const [newPlaylistOpen, setNewPlaylistOpen] = useState(false)
   useEffect(() => {
     Icon.getImageSource('circle', 26, 'white')
@@ -228,6 +228,7 @@ function TypeField({
           <Switch
             onValueChange={(value) => {setBool(value); handleSetCurrentItem(attrKey, value)}}
             value={bool}
+            trackColor={{false: "#444"}}
           />
         </View>
       </View>

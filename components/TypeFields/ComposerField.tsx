@@ -30,7 +30,7 @@ export default function ComposerField({
 }){
   const [composerExpanded, setComposerExpanded] = useState(false);
   return(
-    <View>
+    <View style={{padding: 8}}>
       <Title>COMPOSERS</Title>
       <FlatList
         data={attr}

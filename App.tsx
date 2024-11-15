@@ -179,7 +179,7 @@ function MainMenu({}: {}): React.JSX.Element {
       </Stack.Screen>
       <Stack.Screen name="TuneListDisplay">
         {(props) =>
-        <SafeAreaView style={backgroundStyle}>
+        <SafeAreaView style={{backgroundColor: "#000", flex: 1}}>
           <View>
             <TuneListDisplay
               navigation={props.navigation}

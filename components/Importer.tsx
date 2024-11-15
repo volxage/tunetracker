@@ -190,7 +190,7 @@ function ImporterHeader({
           {
             suggestTuneSubmission ?
             <View>
-              <SubText>This search doesn't seem to match well with any {importingComposers ? "composer" : "tune"} from our database. You can submit your draft below.</SubText>
+              <SubText>This search doesn't seem to match well with any {importingComposers ? "composer" : "tune"} from our database. You can submit your draft below. After it is reviewed and accepted, it will be added to the database for everyone to use!</SubText>
               {
                 submissionSuccessful &&
                 <View style={{borderColor: "white", borderWidth: 1, padding: 4}}>

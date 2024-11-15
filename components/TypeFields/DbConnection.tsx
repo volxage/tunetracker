@@ -33,7 +33,7 @@ export default function DbConnection({
     }
   }
   return(
-    <View>
+    <View style={{padding: 8}}>
       <Title>DATABASE CONNECTION</Title>
       <Button
         onPress={() => {setConnectTuneExpanded(!connectTuneExpanded)}}
