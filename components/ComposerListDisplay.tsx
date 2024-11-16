@@ -1,6 +1,6 @@
 // Copyright 2024 Jonathan Hilliard
 
-import React, {isValidElement, useEffect, useState} from 'react';
+import React, {isValidElement, useContext, useEffect, useState} from 'react';
 import {
   FlatList,
   Switch,
@@ -41,14 +41,15 @@ const fuseOptions = { // For finetuning the search algorithm
 //		"composers"
 	]
 };
-import {composer, composerEditorAttrs} from '../types.ts';
-import Composer from '../model/Composer.ts';
+import {Status, composer, composerEditorAttrs} from '../types.ts';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import ComposerEditor from './ComposerEditor.tsx';
 import dateDisplay from '../textconverters/dateDisplay.tsx';
 import {useQuery, useRealm} from '@realm/react';
 import OnlineDB from '../OnlineDB.tsx';
 import {BSON} from 'realm';
+import itemSort from '../itemSort.tsx';
+import Composer from '../model/Composer.ts';
 
 
 type HeaderInputStates = {
@@ -69,6 +70,8 @@ function ComposerListHeader({
 }){
   const [addComposerExpanded, setAddComposerExpanded] = useState(false);
   const realm = useRealm();
+  const dbStatus = useContext(OnlineDB.DbStateContext).status;
+  const dbDispatch = useContext(OnlineDB.DbDispatchContext);
   return(
     <View>
       <View style={{flexDirection: 'row', borderBottomWidth:1, backgroundColor: "#222"}}>
@@ -113,6 +116,32 @@ function ComposerListHeader({
               <ButtonText>Can't find my composer below</ButtonText>
             }
           </Button>
+          {
+            dbStatus === Status.Failed &&
+            <View style={{flexDirection: "row", alignItems: "center"}}>
+              <View style={{flex:1}}>
+                <SubText style={{fontWeight: 300, textAlign: "center", color: "red"}}>
+                  DISCONNECTED
+                </SubText>
+              </View>
+              <Button style={{flex:1}} onPress={() => {OnlineDB.updateDispatch(dbDispatch)}}>
+                <ButtonText>Retry connection</ButtonText>
+              </Button>
+            </View>
+          }
+          {
+            dbStatus === Status.Waiting &&
+            <View style={{flexDirection: "row", alignItems: "center"}}>
+              <View style={{flex:1}}>
+                <SubText style={{fontWeight: 300, textAlign: "center", color: "goldenrod"}}>
+                  CONNECTING
+                </SubText>
+              </View>
+              <Button style={{flex:1, backgroundColor: "#333"}}>
+                <ButtonText style={{color: "777"}}>(Please wait)</ButtonText>
+              </Button>
+            </View>
+          }
           {
             addComposerExpanded &&
               <BackgroundView>
@@ -201,11 +230,7 @@ export default function ComposerListDisplay({
   handleSetCurrentTune: Function,
   originalTuneComposers: Composer[]
 }){
-  console.log("Rerender start");
-  const [onlineComposers, setOnlineComposers]: [(composer)[], Function]= useState([]);
-  useEffect(() => {
-    setOnlineComposers(OnlineDB.getComposers());
-  }, [])
+  const onlineComposers = useContext(OnlineDB.DbStateContext).composers;
   const [selectedAttr, setSelectedAttr] = useState("name");
   const [search, setSearch] = useState("");
   const [selectedComposers, setSelectedComposers]: [Array<Composer>, Function] = useState(originalTuneComposers);
@@ -253,7 +278,7 @@ export default function ComposerListDisplay({
     ...(onlineComposers.filter(oComp => !localDbIds.includes(oComp.id)))].filter(comp => !isSelected(comp));
   const fuse = new Fuse(displayComposers, fuseOptions);
   if(search === ""){
-    //itemSort(displayComposers, selectedAttr, listReversed);
+    itemSort(displayComposers, "name", false);
     displayComposers = [...selectedComposers, ...selectedOnlineComposers, ...displayComposers]
   }else{
     const searchResults = fuse.search(search);

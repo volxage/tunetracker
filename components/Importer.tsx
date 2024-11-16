@@ -303,6 +303,7 @@ export default function Importer({
   importingId: boolean,
   importingComposers: boolean
 }){
+  const dbState = useContext(OnlineDB.DbStateContext);
   const dbStatus = useContext(OnlineDB.DbStateContext).status;
   const dbDispatch = useContext(OnlineDB.DbDispatchContext);
   useEffect(() => {
@@ -312,7 +313,7 @@ export default function Importer({
   const [listReversed, setListReversed] = useState(false);
   const [selectedAttr, updateSelectedAttr] = useState(importingComposers ? "name" : "title");
   const [search, setSearch] = useState("");
-  let standards = importingComposers ? OnlineDB.getComposers() : OnlineDB.getStandards();
+  let standards = importingComposers ? dbState.composers : dbState.standards;
 
   let displayStandards = standards;
   let suggestTuneSubmission = false;

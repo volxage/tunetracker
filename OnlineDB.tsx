@@ -12,11 +12,22 @@ const statusListeners = new Set<Function>();
 function updateDispatch(dispatch: Function){
   console.log("Updating dispatch");
   dispatch({type: "setStatus", value: Status.Waiting});
-  fetchTunes().then(() => {
+  fetchTunes().then(res => {
     //Janky workaround until we get a better idea of how promises work
-    dispatch({type: "updateStandards", value: standards});
-    fetchComposers().then(() => {
-      dispatch({type: "updateComposers", value: composers});
+    if(res){
+      dispatch({type: "updateStandards", value: res});
+    }else{
+
+      console.log("Response from fetchTunes not valid");
+      dispatch({type: "updateStandards", value: standards});
+    }
+    fetchComposers().then(res => {
+      if(res){
+        dispatch({type: "updateComposers", value: res});
+      }else{
+        console.log("Response from fetchComposers not valid");
+        dispatch({type: "updateComposers", value: composers});
+      }
     }).then(() => {
       dispatch({type: "setStatus", value: Status.Complete});
     }).catch(err => {
@@ -36,13 +47,13 @@ function setStatus(newStatus: Status){
   }
   status = newStatus;
 }
-async function fetchComposers(counter=0){
+function fetchComposers(counter=0): Promise<standard_composer[]>{
+  return new Promise( (resolve, reject) => {
     if(counter > 6){
       setStatus(Status.Failed);
-      throw new Error("Too many attempts");
+      reject("Too many attempts");
     }
-    setStatus(Status.Waiting)
-    return fetch("https://api.jhilla.org/tunetracker/composers", {
+    fetch("https://api.jhilla.org/tunetracker/composers", {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -55,55 +66,57 @@ async function fetchComposers(counter=0){
           response.json().then(json => {
             composers = (json as standard_composer[]);
             setStatus(Status.Complete);
-            return composers;
+              resolve(composers);
           }).catch(reason => {
             //console.error("ERROR:");
             //console.error(reason);
-            return fetchComposers(counter + 1);
+            resolve(fetchComposers(counter + 1));
           });
         }else{
-          return fetchComposers(counter + 1);
+          resolve(fetchComposers(counter + 1));
         }
       }
     ).catch(reason => {
       //console.error("ERROR on sending http request");
       //console.error(reason);
-      return fetchComposers(counter + 1);
+      resolve(fetchComposers(counter + 1));
     });
-}
-async function fetchTunes(counter=0){
-  attemptNo = counter;
-  if(counter > 6){
-    setStatus(Status.Failed);
-    throw new Error("Too many attempts");
-  }
-  setStatus(Status.Waiting);
-  return fetch("https://api.jhilla.org/tunetracker/tunes", {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    }
-  }).then(
-    (response) => {
-      //console.log('response');
-      if(response.ok){
-        console.log("response ok!");
-        response.json().then(json => {
-          standards = (json as standard[]);
-          setStatus(Status.Complete);
-          //console.log("Standards:");
-          //console.log(standards);
-          return standards;
-        }).catch(reason => {
-          return fetchTunes(counter + 1);
-        });
-      }else{
-        return fetchTunes(counter + 1);
-      }
-    }
-  ).catch(reason => {
-    fetchTunes(counter + 1);
   });
+}
+//TODO: Figure out why fetch might return a void here but not with composers?
+function fetchTunes(counter=0): Promise<standard[]>{
+  attemptNo = counter;
+  return new Promise<standard[]>( (resolve, reject) => {
+    if(counter > 6){
+      setStatus(Status.Failed);
+      reject("Failed 6 times");
+    }
+    fetch("https://api.jhilla.org/tunetracker/tunes", {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    }).then(
+      (response) => {
+        //console.log('response');
+        if(response.ok){
+          console.log("response ok!");
+          response.json().then(json => {
+            standards = (json as standard[]);
+            setStatus(Status.Complete);
+            resolve(standards);
+          }).catch(reason => {
+            resolve(fetchTunes(counter + 1));
+          });
+        }else{
+          resolve(fetchTunes(counter + 1));
+        }
+      }
+    ).catch(reason => {
+      resolve(fetchTunes(counter + 1));
+    })
+    }
+  );
 }
 
 async function createTuneDraft(tuneDraft: tune_draft){
