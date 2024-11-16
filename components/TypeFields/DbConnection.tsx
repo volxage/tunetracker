@@ -7,7 +7,7 @@ import {
 } from '../../Style.tsx'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import React, {useContext, useState} from 'react';
-import {composer, standard, standard_composer, tune_draft} from '../../types.ts';
+import {Status, composer, standard, standard_composer, tune_draft} from '../../types.ts';
 import {
   View,
 } from 'react-native';
@@ -77,17 +77,20 @@ export default function DbConnection({
             (item === null || typeof item === "undefined")
             ? <View>
               <Diagnoser item={item} dbIdAttr={attr as number}/>
-              <Button
-                onPress={() => {
-                  if(isComposer){
-                    navigation.navigate("ComposerImportId")
-                  }else {
-                    navigation.navigate("ImportID")}
-                }
-                }
-              >
-                <ButtonText>Connect to database</ButtonText>
-              </Button>
+              {
+                status === Status.Complete && 
+                <Button
+                  onPress={() => {
+                    if(isComposer){
+                      navigation.navigate("ComposerImportId")
+                    }else {
+                      navigation.navigate("ImportID")}
+                  }
+                  }
+                >
+                  <ButtonText>Connect to database</ButtonText>
+                </Button>
+              }
               </View>
             : <Preview item={item} isComposer={isComposer} navigation={navigation} />
           }
@@ -107,11 +110,19 @@ function Diagnoser({
 }
 ){
   const dbDispatch = useContext(OnlineDB.DbDispatchContext);
-  if(OnlineDB.getComposers().length === 0){
+  const dbStatus = useContext(OnlineDB.DbStateContext).status;
+  if(dbStatus === Status.Failed){
     return(
       <View>
         <SubText>You are not connected to the server right now, so we can't fetch your connected composer. Click below to retry at your connection.</SubText>
         <Button onPress={() => {OnlineDB.updateDispatch(dbDispatch)}}><ButtonText>Retry connection</ButtonText></Button>
+      </View>
+    );
+  }
+  if(dbStatus === Status.Waiting){
+    return(
+      <View>
+        <SubText>Attempting to connect to the server, please wait...</SubText>
       </View>
     );
   }
