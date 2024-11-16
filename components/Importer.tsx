@@ -109,7 +109,7 @@ function renderStandard(item: standard | composer, importFn: Function, separator
   }else{
     const stand = item as standard;
     text = stand.title;
-    if(selectedAttr !== "Title" as keyof standard){
+    if(selectedAttr !== "title" as keyof standard){
       subtext = prettyPrint(stand[selectedAttr as keyof standard])
     }else{
       if(stand["Composers"]){
