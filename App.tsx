@@ -19,7 +19,7 @@
  */
 
 
-import React, {createContext, isValidElement, useEffect, useState} from 'react';
+import React, {createContext, isValidElement, useEffect, useReducer, useState} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
@@ -51,20 +51,24 @@ import PlaylistImporter from './components/PlaylistImporter.tsx';
 const Stack = createNativeStackNavigator();
 
 function App(): React.JSX.Element {
-  const [rawPlaylists, setRawPlaylists] = useState([])
 
+  const [state, dispatch] = useReducer(OnlineDB.reducer, {composers: [], standards: [], status: Status.Waiting})
   useEffect(() => {
-    OnlineDB.update();
+    OnlineDB.updateDispatch(dispatch);
   }, []);
 
   return(
-    <View style={{flex: 1, backgroundColor: "black"}}>
-      <RealmProvider schema={[Tune, Composer, Playlist]} deleteRealmIfMigrationNeeded={true} >
-        <NavigationContainer>
-            <MainMenu/>
-        </NavigationContainer>
-      </RealmProvider>
-    </View>
+    <OnlineDB.DbDispatchContext.Provider value={dispatch}>
+      <OnlineDB.DbStateContext.Provider value={state}>
+        <View style={{flex: 1, backgroundColor: "black"}}>
+          <RealmProvider schema={[Tune, Composer, Playlist]} deleteRealmIfMigrationNeeded={true} >
+            <NavigationContainer>
+              <MainMenu/>
+            </NavigationContainer>
+          </RealmProvider>
+        </View>
+      </OnlineDB.DbStateContext.Provider>
+    </OnlineDB.DbDispatchContext.Provider>
   );
 }
 

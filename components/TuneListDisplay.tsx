@@ -1,6 +1,6 @@
 // Copyright 2024 Jonathan Hilliard
 
-import React, {isValidElement, useEffect, useState} from 'react';
+import React, {isValidElement, useContext, useEffect, useState} from 'react';
 import {
   FlatList,
   Switch,
@@ -197,15 +197,14 @@ function TuneListHeader({
   setNewTune,
   selectedAttr,
   selectedPlaylist,
-  dbStatus
 }: {
   headerInputStates: HeaderInputStates
   navigation: any,
   setNewTune: Function,
   selectedAttr: String,
   selectedPlaylist: Playlist | playlist_enum,
-  dbStatus: Status
 }){
+  const dbStatus = useContext(OnlineDB.DbStateContext).status;
   const selectedAttrItems = Array.from(selectionAttrs.entries()).map(
     (entry) => {return {label: entry[1], value: entry[0]}}
   );
@@ -392,12 +391,10 @@ export default function TuneListDisplay({
   const [selectedPlaylist, setSelectedPlaylist]: [BSON.ObjectId | playlist_enum.AllTunes, Function] = useState(playlist_enum.AllTunes);
   const [search, setSearch] = useState("");
   const [confidenceVisible, setConfidenceVisible] = useState(false);
-  const [dbStatus, setDbStatus] = useState(Status.Waiting);
   const allPlaylists = useQuery(Playlist)
   let selectedIds: BSON.ObjectId[] = []
 
   useEffect(() => {
-    OnlineDB.addListener(setDbStatus);
   })
   const allSongs = useQuery(Tune);
   let displaySongs: List<Tune> | Results<Tune> | Tune[] = allSongs;
@@ -443,7 +440,6 @@ export default function TuneListDisplay({
           setNewTune={setNewTune}
           selectedAttr={selectedAttr}
           selectedPlaylist={selectedPlaylist}
-          dbStatus={dbStatus}
         />
       }
       ListEmptyComponent={

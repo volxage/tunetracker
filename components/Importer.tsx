@@ -303,9 +303,9 @@ export default function Importer({
   importingId: boolean,
   importingComposers: boolean
 }){
-  const [dbStatus, setDbStatus] = useState(Status.Waiting);
+  const dbStatus = useContext(OnlineDB.DbStateContext).status;
+  const dbDispatch = useContext(OnlineDB.DbDispatchContext);
   useEffect(() => {
-    OnlineDB.addListener(setDbStatus);
   }, []);
   const composerQuery = useQuery(Composer);
   const tuneQuery = useQuery(Tune);
@@ -388,7 +388,7 @@ export default function Importer({
       </SMarginView>
       {
         dbStatus === Status.Failed &&
-        <Button onPress={() => {OnlineDB.update()}}>
+        <Button onPress={() => {OnlineDB.updateDispatch(dbDispatch)}}>
           <ButtonText>Retry</ButtonText>
         </Button>
       }

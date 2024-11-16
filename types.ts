@@ -79,9 +79,9 @@ export type playlist = {
 }
 
 export enum Status{
+  Complete,
   Waiting,
-  Failed,
-  Complete
+  Failed
 }
 
 export const editorAttrs: [keyof Tune, string][] = [
