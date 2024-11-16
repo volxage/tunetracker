@@ -54,7 +54,7 @@ function App(): React.JSX.Element {
 
   const [state, dispatch] = useReducer(OnlineDB.reducer, {composers: [], standards: [], status: Status.Failed})
   useEffect(() => {
-    //OnlineDB.updateDispatch(dispatch);
+    OnlineDB.updateDispatch(dispatch);
   }, []);
 
   return(
