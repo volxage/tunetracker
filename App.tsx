@@ -146,7 +146,7 @@ function MainMenu({}: {}): React.JSX.Element {
                   console.log(missingComposersIds);
                   // Maps missing IDs to onineDB composers
                   const missingComposers = missingComposersIds.map(missingCompId => 
-                    stand["Composers"].find(onlineComp => onlineComp.id === missingCompId)
+                    stand["Composers"]?.find(onlineComp => onlineComp.id === missingCompId)
                   );
                   console.log("Missing composers:");
                   console.log(missingComposers);

@@ -55,7 +55,7 @@ export type standard_composer_draft = {
 export type standard = {
   "title": string
   "alternative_title"?: string
-  "Composers"?: Array<composer>
+  "Composers"?: Array<standard_composer>
   "composer_placeholder"?: string
   "form"?: string
   "bio"?: string
