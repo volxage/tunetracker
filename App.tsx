@@ -46,6 +46,7 @@ import Playlist from './model/Playlist.ts';
 import {BSON} from 'realm';
 import PlaylistViewer from './components/PlaylistViewer.tsx';
 import PlaylistImporter from './components/PlaylistImporter.tsx';
+import {translateAttrFromStandardTune} from './DraftReducers/utils/translate.ts';
 
 
 const Stack = createNativeStackNavigator();
@@ -79,6 +80,7 @@ function MainMenu({}: {}): React.JSX.Element {
   const [newTune, setNewTune] = useState(false);
   const isDarkMode = true;
   const realm = useRealm();
+  const composerQuery = useQuery(Composer);
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -120,9 +122,10 @@ function MainMenu({}: {}): React.JSX.Element {
               const tn: tune_draft = {};
               for(let attrPair of standardDefaults){
                 const standardAttr = stand[attrPair[0]];
+                const tuneAttrPair = translateAttrFromStandardTune(attrPair[0], standardAttr, composerQuery, realm)
                 if(attrPair[0] !== "id" && typeof standardAttr !== "undefined"){
                   //TODO: Translate attr fn from DraftReducers
-                  tn[attrPair[0] as keyof tune_draft] = standardAttr;
+                  tn[tuneAttrPair[0][0]] = tuneAttrPair[0][1];
                 }
               }
               tn.dbId = stand['id'];

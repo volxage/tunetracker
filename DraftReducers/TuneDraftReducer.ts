@@ -3,52 +3,8 @@ import Tune from '../model/Tune.ts';
 import {useQuery, useRealm} from '@realm/react';
 import Composer from '../model/Composer.ts';
 import {Results, Realm, BSON} from 'realm';
+import {translateAttrFromStandardTune} from './utils/translate.ts';
 
-function translateAttrFromStandardTune(attrKey: keyof standard, attr: any, composerQuery: Results<Composer> | undefined, realm: Realm): [keyof tune_draft, any][]{
-  switch(attrKey){
-    case 'alternative_title': {
-      return ["alternativeTitle", attr];
-    }
-    case 'Composers': {
-      //NOTE! THIS ASSUMES THE STANDARD'S COMPOSERS ARE LOCALLY STORED ALREADY!
-      //TODO: Handle "edge" case referenced above
-      if(!composerQuery){
-        console.error("Composer query not passed, cannot translate from standard");
-        return [["composers", []]];
-      }
-      const comps = attr as standard_composer[];
-      if(!comps){
-        console.error("Composer field empty, cannot translate from Standard");
-        return [["composers", []]];
-      }
-      let filtered: Results<Composer> | Composer[] = composerQuery.filtered("dbId IN $0", comps.map(c => c.id));
-      const remainingStandardComposers = comps.filter(comp => !filtered.some(C => C.dbId === comp.id));
-      if(remainingStandardComposers.length > 0 && !realm){
-        console.error("Realm was not passed, unable to import missing composers from Standard");
-        return [["composers", filtered]];
-      }
-      for(const comp of remainingStandardComposers){
-        realm.write(() => {
-          realm.create(Composer,
-            {
-              id: new BSON.ObjectId(),
-              name: comp.name,
-              bio: comp.bio,
-              birth: comp.birth,
-              death: comp.death,
-              dbId: comp.id
-            }) as Composer;
-          //No need to concatenate, the filter automatically updates!
-        });
-      }
-      return [["composers", filtered]];
-    }
-    default: {
-      //THIS ASSUMES ANY KEY NOT REFERENCED ABOVE IS A SHARED KEY!
-      return [[attrKey as keyof tune_draft, attr]];
-    }
-  }
-}
 export default function tuneDraftReducer(state: any, action: any){
   switch(action.type){
     case 'update_from_other':
