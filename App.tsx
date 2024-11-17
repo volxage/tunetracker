@@ -104,7 +104,7 @@ function MainMenu({}: {}): React.JSX.Element {
       </Stack.Screen>
       <Stack.Screen name="Editor">
         {(props) => <Editor
-          prettyAttrs={editorAttrs as Array<[string, string]>}
+          prettyAttrs={editorAttrs}
           selectedTune={selectedTune as Tune}
           newTune={newTune}
           setNewTune={setNewTune}

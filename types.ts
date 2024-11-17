@@ -28,6 +28,9 @@ export type tune_draft = {
   playedAt?: Date
   //  "playedAt"?: string[]
 }
+export type tune_draft_extras = {
+  "playlists"?: undefined
+}
 export type composer = {
   "name"?: string// All enum members in 'E1' and 'E2' are constant.
   "bio"?: string
@@ -84,7 +87,7 @@ export enum Status{
   Failed
 }
 
-export const editorAttrs: [keyof Tune, string][] = [
+export const editorAttrs: [keyof (tune_draft & tune_draft_extras), string][] = [
   ["dbId", "Database Connection"],
   ["title", "Title"],
   ["alternativeTitle", "Alternative Title"],
@@ -120,7 +123,7 @@ export const compareTuneEditorAttrs: [keyof tune_draft, string][] = [
   ["form", "Form"],
   ["composers", "Composers"],
 ];
-export const miniEditorAttrs = new Map<keyof Tune, string>([
+export const miniEditorAttrs = new Map<keyof (tune_draft & tune_draft_extras), string>([
   ["title", "Title"],
   ["melodyConfidence", "Melody Confidence"],
   ["formConfidence", "Form Confidence"],

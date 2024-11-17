@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 
 import TypeField from './TypeField.tsx';
-import {tune_draft, standard, tuneDefaults} from '../types.ts';
+import {tune_draft, standard, tuneDefaults, tune_draft_extras} from '../types.ts';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Importer from './Importer.tsx';
 import Compare from './Compare.tsx';
@@ -36,7 +36,7 @@ export default function Editor({
   newTune,
   setNewTune
 }: {
-  prettyAttrs: Array<[keyof tune_draft, string]>,
+  prettyAttrs: Array<[keyof (tune_draft & tune_draft_extras), string]>,
   navigation: any, //TODO: Find type of "navigation"
   selectedTune: Tune | tune_draft,
   newTune: boolean,
