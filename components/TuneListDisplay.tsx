@@ -238,7 +238,7 @@ function TuneListHeader({
         >
           {
             allPlaylists.map(playlist => 
-              <Picker.Item label={playlist.title} value={playlist.id} key={playlist.id.toString()}
+              <Picker.Item label={playlist.title} value={playlist.title} key={playlist.id.toString()}
                 style={{color: "white", backgroundColor: "#222", fontSize: 20, fontWeight: 200}}
               />
             )
@@ -399,7 +399,7 @@ export default function TuneListDisplay({
   const allSongs = useQuery(Tune);
   let displaySongs: List<Tune> | Results<Tune> | Tune[] = allSongs;
   if(selectedPlaylist !== playlist_enum.AllTunes){
-    displaySongs = allPlaylists.filtered("id == $0", selectedPlaylist)[0].tunes
+    displaySongs = allPlaylists.filtered("title == $0", selectedPlaylist)[0].tunes
   }
   const fuse = new Fuse<Tune>(displaySongs, fuseOptions);
   if(selectMode){

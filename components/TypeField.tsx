@@ -39,7 +39,8 @@ function AddPlaylistField({
   const [newPlaylistTitle, setNewPlaylistTitle] = useState("");
   const tunePlaylistIds = tunePlaylists.map(pl => pl.id);
 
-  const availablePlaylists = useQuery(Playlist)
+  const playlistQuery = useQuery(Playlist);
+  const availablePlaylists = playlistQuery
     .filtered("!(id in $0)", tunePlaylistIds);
   //let availablePlaylists = []
   if(newPlaylist){
@@ -54,7 +55,8 @@ function AddPlaylistField({
         </View>
         <View style={{alignContent: 'flex-end', flex: 1}}>
           <Button onPress={() => {
-            if(newPlaylistTitle.trim().length !== 0){
+            //If playlist name isn't empty and doesn't already exist
+            if(newPlaylistTitle.trim().length !== 0 && !playlistQuery.filtered("title == $0", newPlaylistTitle.trim()).length){
               realm.write(() => {
                 const result = realm.create(Playlist, {title: newPlaylistTitle, id: new BSON.ObjectId()});
                 if(tunePlaylists){
