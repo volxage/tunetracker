@@ -16,7 +16,7 @@ import {
   Switch,
   View,
 } from 'react-native';
-import { composer, playlist, tune_draft } from '../types.ts';
+import { composer, playlist, tune_draft, tune_draft_extras } from '../types.ts';
 import DbConnection from './TypeFields/DbConnection.tsx';
 import ComposerField from './TypeFields/ComposerField.tsx';
 import Composer from '../model/Composer.ts';
@@ -72,29 +72,18 @@ function AddPlaylistField({
       </View>
     );
   }else{
-    //<RNPickerSelect
-    //  items={
-    //    availablePlaylists
-    //      .map((playlist) => {return {label:playlist.title, value: playlist}})
-    //  }
-    //  useNativeAndroidPickerStyle={false}
-    //  placeholder={{label: "Select a playlist to insert tune into", value: ""}}
-    //  style={{inputAndroid:
-    //    {backgroundColor: 'transparent', color: 'white', fontSize: 18, fontWeight: "300"}
-    //  }}
-    ///>
     return (
       <View style={{borderColor: "white", borderWidth: 1, margin: 28}}>
         <Picker
           onValueChange={
             // When the component rerenders, onValueChange is called with a value of "".
-            (value) => {value !== "" && handleSetCurrentItem("playlists", tunePlaylists.concat(value))}
+            (value: Playlist | "") => {value !== "" && handleSetCurrentItem("playlists", tunePlaylists.concat(value))}
           }
         >
           {
             availablePlaylists.map(
               (playlist) => 
-              <Picker.Item label={playlist.title} value={playlist} key={playlist.id}
+              <Picker.Item label={playlist.title} value={playlist} key={playlist.id.toString()}
                 style={{color: "white", backgroundColor:"black"}}
               />
               )
@@ -116,7 +105,7 @@ function TypeField({
   isComposer
 }: {
   attr: unknown,
-  attrKey: keyof (tune_draft & composer),
+  attrKey: keyof (tune_draft & composer & tune_draft_extras),
   attrName: string,
   handleSetCurrentItem: Function,
   navigation: any,
