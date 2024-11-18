@@ -350,7 +350,7 @@ export default function ComposerListDisplay({
         {props =>
           <ComposerEditor
             selectedComposer={composerToEdit}
-            prettyAttrs={(composerEditorAttrs as [string, string][])}
+            prettyAttrs={(composerEditorAttrs)}
             playlists={[]}
             setNewComposer={setNewComposer}
             newComposer={newComposer}

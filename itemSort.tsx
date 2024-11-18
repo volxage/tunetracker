@@ -83,7 +83,7 @@ function itemSort(songs: Array<possible_items_type> | Results<Tune> | List<Tune>
     console.log("Type not found.");
     return 0;
   }
-  if(songs instanceof Results){
+  if(songs instanceof Results || songs instanceof List){
     if(selected === "composers"){
       return songs.map(s => s as Tune).sort(itemCompare)
     }else{

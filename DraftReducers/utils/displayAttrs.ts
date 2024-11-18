@@ -17,6 +17,7 @@ export default function displayLocalAttr(attrKey: local_key, attr: any){
       const hasLyrics = attr as boolean;
       return hasLyrics ? "Has lyrics" : "Does not have lyrics";
     }
+    case "playedAt":
     case "birth":
     case "death":{
       return dateDisplay(attr)
@@ -44,6 +45,10 @@ export function displayOnlineAttrs(attrKey: online_key, attr: any){
           return "ERROR RETRIEVING COMPOSER FROM ID"
         }
       }).join(", ");
+    }
+    case "birth":
+    case "death":{
+      return dateDisplay(attr);
     }
     default: {
       return attr;

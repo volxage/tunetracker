@@ -15,8 +15,7 @@ import {
 } from 'react-native';
 
 import TypeField from './TypeField.tsx';
-import SongsList from '../SongsList.tsx';
-import {composer, standard} from '../types.ts';
+import {composer, standard, standard_composer} from '../types.ts';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Importer from './Importer.tsx';
 import OnlineDB from '../OnlineDB.tsx';
@@ -32,15 +31,13 @@ export default function ComposerEditor({
   prettyAttrs, 
   navigation,
   selectedComposer,
-  songsList,
   playlists,
   newComposer,
   setNewComposer
 }: {
-  prettyAttrs: Array<[string, string]>,
+  prettyAttrs: Array<[keyof Composer, string]>,
   navigation: any, //TODO: Find type of "navigation"
-  selectedComposer: Composer | composer,
-  songsList: SongsList,
+  selectedComposer: Composer | composer | undefined,
   playlists: any,
   newComposer: boolean,
   setNewComposer: Function
@@ -48,7 +45,7 @@ export default function ComposerEditor({
   //Intentional copy to allow cancelling of edits
   //  const [currentDraft, setCurrentTune] = useState()
   //console.log(prettyAttrs);
-  const [state, dispatch] = useReducer(composerDraftReducer, {currentDraft: {}});
+  const [state, dispatch] = useReducer(composerDraftReducer, {currentDraft: {}, changedAttrsList: []});
   const Stack = createNativeStackNavigator();
   const realm = useRealm();
 
@@ -73,7 +70,6 @@ export default function ComposerEditor({
             data={prettyAttrs}
             renderItem={({item, index, separators}) => (
               <View>
-                { (item[0] !== "lyricsConfidence" || state["currentDraft"]["hasLyrics"]) &&
                 <TouchableHighlight
                   key={item[0]}
                   onShowUnderlay={separators.highlight}
@@ -88,7 +84,6 @@ export default function ComposerEditor({
                     isComposer={true}
                   />
                 </TouchableHighlight>
-                }
               </View>
             )}
             ListFooterComponent={
@@ -118,9 +113,9 @@ export default function ComposerEditor({
                 <Button
                   onPress={() => {
                     realm.write(() => {
-                      for(let attr in state["currentDraft"]){
-                        //TODO: Supress compiler warnings here
-                        selectedComposer[attr] = state["currentDraft"][attr];
+                      let attr: keyof composer;
+                      for(attr in state["currentDraft"]){
+                        selectedComposer[attr] = state["currentDraft"][attr]; //as (string & Date | undefined); Why does the model want this type?
                       }
                     });
                     navigation.goBack()
@@ -180,7 +175,7 @@ export default function ComposerEditor({
   {props =>
   <Compare
     currentItem={state["currentDraft"]}
-    onlineVersion={(state["currentDraft"].dbId ? OnlineDB.getComposerById(state["currentDraft"].dbId) : null) as composer}
+    onlineVersion={(state["currentDraft"].dbId ? OnlineDB.getComposerById(state["currentDraft"].dbId) : null) as standard_composer}
     navigation={props.navigation}
     handleSetCurrentItem={handleSetCurrentComposer}
     isComposer={true}

@@ -3,15 +3,33 @@
 import { composer, composerDefaults } from "../types"
 import Composer from "../model/Composer";
 import {translateAttrFromStandardComposer} from "./utils/translate";
-export default function composerDraftReducer(state: any, action: any){
+type state_t= {
+  "currentDraft": composer,
+  "changedAttrsList": (keyof composer)[]
+}
+type action_t= {
+  "value"?: any,
+  "attr"?: keyof composer,
+  "type": string,
+  "selectedItem"?: Composer | composer
+}
+export default function composerDraftReducer(state: state_t, action: action_t){
   switch(action.type){
     case 'update_attr':
     {
-      const cd: composer = {}
-      for(let attr in state["currentDraft"]){
-        cd[attr as keyof composer] = state["currentDraft"][attr];
+      if(!action["attr"]){
+        console.error("update_attr called with missing attr");
+        return {currentDraft: state["currentDraft"], changedAttrsList: state["changedAttrsList"]}
       }
-      cd[action["attr"] as keyof composer] = action["value"];
+
+      const cd: composer = {}
+
+      let attr: keyof composer
+      for(attr in state["currentDraft"]){
+        cd[attr] = state["currentDraft"][attr];
+      }
+      cd[action["attr"]] = action["value"];
+
       let newChangedAttrsList = state["changedAttrsList"];
       if(!newChangedAttrsList.includes(action["attr"])){
         newChangedAttrsList = newChangedAttrsList.concat(action["attr"]);
@@ -21,9 +39,12 @@ export default function composerDraftReducer(state: any, action: any){
     case 'update_from_other':
     {
       let copy: composer = {}
-      for(let attr in state["currentDraft"]){
-        copy[attr as keyof composer] = state["currentDraft"][attr];
+
+      let attr: keyof composer
+      for(attr in state["currentDraft"]){
+        copy[attr] = state["currentDraft"][attr];
       }
+
       const translations = translateAttrFromStandardComposer(action["attr"], action["value"]);
 
       let newChangedAttrsList = state["changedAttrsList"];
@@ -36,7 +57,6 @@ export default function composerDraftReducer(state: any, action: any){
         }
       }
 
-      // Mark attr as changed for it to be saved
       return {currentDraft: copy, changedAttrsList: newChangedAttrsList};
     }
     case 'set_to_selected':
@@ -50,6 +70,7 @@ export default function composerDraftReducer(state: any, action: any){
             && typeof action["selectedItem"][key] !== "undefined"
             && action["selectedItem"][key] !== null
           ){
+            //TODO: Use translator here
             cd[key as keyof composer] = action["selectedItem"][key as keyof Composer]
           }else{
             cd[key as keyof composer] = attr[1]
@@ -58,7 +79,7 @@ export default function composerDraftReducer(state: any, action: any){
       }else{
         for(let attr of composerDefaults){
           let key = attr[0] as keyof Composer;
-          if(key in action["selectedItem"] && typeof action["selectedItem"][key] !== "undefined"){
+          if(action["selectedItem"] && key in action["selectedItem"] && typeof action["selectedItem"][key] !== "undefined"){
             cd[key as keyof composer] = action["selectedItem"][key as keyof Composer]
           }else{
             cd[key as keyof composer] = attr[1]
