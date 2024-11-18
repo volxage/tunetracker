@@ -70,7 +70,7 @@ const selectionAttrs = new Map<string, string>([
   ["soloConfidence", "Solo Confidence"],
   ["lyricsConfidence", "Lyrics Confidence"],
   ["playthroughs", "Playthrough Count"],
-  ["playedAt", "Played At"],
+  ["playedAt", "Last Played"],
 ]);
 
 function prettyPrint(object: unknown): string{
