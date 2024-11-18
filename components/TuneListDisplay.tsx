@@ -53,6 +53,7 @@ import Composer from '../model/Composer.ts';
 import {useQuery, useRealm} from '@realm/react';
 import {BSON, List, OrderedCollection, Results} from 'realm';
 import Playlist from '../model/Playlist.ts';
+import dateDisplay from '../textconverters/dateDisplay.tsx';
 const selectionAttrs = new Map<string, string>([
   ["title", "Title"],
   ["alternativeTitle", "Alternative Title"],
@@ -77,6 +78,10 @@ function prettyPrint(object: unknown): string{
   if (typeof object == "number") return JSON.stringify(object);
   if (object instanceof Composer) return object.name;
   if (Array.isArray(object) || object instanceof OrderedCollection) return object.map(obj => {return prettyPrint(obj)}).join(", ");
+  if (object instanceof Date){
+    if(dateDisplay(object) === dateDisplay(new Date())) return dateDisplay(object) + " (TODAY)"
+    return dateDisplay(object);
+  }
   return "(Empty)";
 }
 

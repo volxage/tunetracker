@@ -132,11 +132,12 @@ function TypeField({
       <ComposerField attr={attr as (Composer | composer)[]} navigation={navigation} />
     );
   }
-  else if (attr instanceof Date || attrKey === "birth" || attrKey === "death"){
+  else if (attr instanceof Date || attrKey === "birth" || attrKey === "death" || attrKey === "playedAt"){
     return(
       <DateField
         attr={attr as (Date | undefined)}
         attrKey={attrKey}
+        attrName={attrName}
         handleSetCurrentItem={handleSetCurrentItem}
         navigation={navigation}/>
     );

@@ -130,7 +130,7 @@ export const miniEditorAttrs = new Map<keyof (tune_draft & tune_draft_extras), s
   ["soloConfidence", "Solo Confidence"],
   ["lyricsConfidence", "Lyrics Confidence"],
   ["playlists", "Playlists"],
-  //["justPlayed", "'I Just Played This'"]
+  ["playedAt", "Last played"]
 ])
 export const composerDefaults = new Map<keyof composer, any>([
   ["name", ""],
@@ -160,7 +160,8 @@ export const tuneDefaults = new Map<keyof Tune, any>([
   ["formConfidence", 0],
   ["soloConfidence", 0],
   ["lyricsConfidence", 0],
-  ["dbId", 0]
+  ["playedAt", undefined],
+  ["dbId", 0],
   //  ["id", "THIS SHOULD NOT BE HERE"] // If the user sees this text at any point, there's an error in the progra],
 ]);
 

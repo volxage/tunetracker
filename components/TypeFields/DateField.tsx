@@ -8,12 +8,14 @@ export default function DateField({
   attr,
   attrKey,
   navigation,
-  handleSetCurrentItem
+  handleSetCurrentItem,
+  attrName
 }:{
   attr: Date | undefined,
   attrKey: string,
   navigation: any,
-  handleSetCurrentItem: Function
+  handleSetCurrentItem: Function,
+  attrName: string
 }){
   const [dateCopy, setDateCopy]: [Date | undefined, Function] = useState(undefined);
   const [dateOpen, setDateOpen] = useState(false);
@@ -26,7 +28,7 @@ export default function DateField({
   if(typeof dateCopy === "undefined"){
     return(
       <View style={{padding: 8}}>
-        <Title>{attrKey.toUpperCase()}</Title>
+        <Title>{attrName.toUpperCase()}</Title>
         <View style={{flexDirection: "row"}}>
           <SubText style={{flex: 1, alignSelf: "center", textAlign: "center", borderWidth: 1, borderColor: "grey", padding: 8}}>Empty Date</SubText>
           <Button style={{flex:1}} onPress={() => {handleSetCurrentItem(attrKey, new Date())}}>
@@ -53,7 +55,7 @@ export default function DateField({
           setDateOpen(false);
         }}
       />
-      <Title>{(attrKey as string).toUpperCase()}</Title>
+      <Title>{attrName.toUpperCase()}</Title>
       <View style={{flexDirection: "row"}}>
         <View style={{flex: 2, alignSelf: "center"}}>
           <View style={{borderColor: "grey", borderWidth: 1, padding: 8}}>
