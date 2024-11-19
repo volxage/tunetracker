@@ -1,4 +1,4 @@
-import {tune_draft, standard_draft, tuneDefaults, standardDefaults, standard_composer} from '../types.ts';
+import {tune_draft, standard_draft, tuneDefaults, standardDefaults, standard_composer, standard} from '../types.ts';
 import Tune from '../model/Tune.ts';
 import {translateAttrFromTune} from './utils/translate.ts';
 import {Realm} from 'realm';
@@ -39,16 +39,19 @@ export default function standardTuneDraftReducer(state: any, action: any){
     {
       const tune: standard_draft = {}
       if(action["selectedItem"] instanceof Tune){
-        //TODO: Use translate functions in this portion, considering it's a Tune converting to a Standard
         for(let attr of tuneDefaults){
-          let key = attr[0] as keyof Tune;
-          if(key in action["selectedItem"]
-            && typeof action["selectedItem"][key] !== "undefined"
-            && action["selectedItem"][key] !== null
-          ){
-            tune[key as keyof standard_draft] = action["selectedItem"][key as keyof Tune]
-          }else{
-            tune[key as keyof standard_draft] = attr[1]
+          //Right now the only reason we have to use "as" here is because mainStyle isn't implemented yet.
+          const translations = translateAttrFromTune(attr[0] as keyof tune_draft, action["selectedItem"][attr[0]])
+          for(let translation of translations){
+            let key = translation[0];
+            if(key in action["selectedItem"]
+              && typeof action["selectedItem"][attr[0]] !== "undefined"
+              && action["selectedItem"][attr[0]] !== null
+            ){
+              tune[key] = translation[1];
+            }else{
+              tune[key] = attr[1]
+            }
           }
         }
       }else{
@@ -74,14 +77,14 @@ export default function standardTuneDraftReducer(state: any, action: any){
     }
   }
 }
-export function comparedAttrEqual(tuneDraftAttrKey: keyof tune_draft, tuneDraftAttr: any, standard: standard_draft){
+export function comparedAttrEqual(tuneDraftAttrKey: keyof tune_draft, tuneDraftAttr: any, standard: standard){
   //The following only takes the first attribute and compares it.
   // => [standardKey, attr][]
   const translatedAttrs = translateAttrFromTune(tuneDraftAttrKey, tuneDraftAttr);
   const translatedAttr = translatedAttrs[0];
   
   if(translatedAttr[1] === standard[translatedAttr[0]]) return true;
-  if(translatedAttr[1] instanceof Array && translatedAttr[1][0] && standard[translatedAttr[0]] instanceof Array && standard[translatedAttr[0]][0]){
+  if(translatedAttr[1] instanceof Array && translatedAttr[1][0] && standard[translatedAttr[0]] instanceof Array && (standard[translatedAttr[0]] as Array<standard_composer>)[0]){
     //Non-empty array comparison
     switch(translatedAttr[0]){
       case "Composers":{

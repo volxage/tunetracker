@@ -12,7 +12,7 @@ import {
 } from '../Style.tsx'
 import { Realm, useQuery, useRealm } from '@realm/react'
 
-import { composer, composerEditorAttrs, editorAttrs, standard, standard_composer, standard_draft, compareTuneEditorAttrs, tune_draft, tuneDefaults } from '../types.ts';
+import { composer, composerEditorAttrs, editorAttrs, standard, standard_composer, standard_draft, compareTuneEditorAttrs, tune_draft, tuneDefaults, standard_composer_draft } from '../types.ts';
 
 import {
   FlatList,
@@ -73,7 +73,7 @@ function AttrBasicRender({attr, attr_key, pretty_attr_key}:{attr: any, attr_key:
 }
 type local_type = tune_draft & composer;
 type local_key = keyof local_type
-type online_type = standard_draft & composer;
+type online_type = standard& standard_composer;
 type online_key = keyof online_type;
 function CompareField({item, index, onlineVersion, currentItem, localDispatch, dbDispatch}:
 {
@@ -320,7 +320,7 @@ export default function Compare({
 }:
 {
   currentItem: tune_draft | composer,
-  onlineVersion: standard | standard_composer,
+  onlineVersion: standard & standard_composer,
   navigation: any,
   handleSetCurrentItem: Function,
   isComposer: boolean
@@ -329,7 +329,7 @@ export default function Compare({
     (isComposer ? standardComposerDraftReducer : standardTuneDraftReducer), {currentDraft: {}}
   );
   const [localState, localDispatch] = useReducer(
-    (isComposer ? composerDraftReducer : tuneDraftReducer), {currentDraft: {}}
+    (isComposer ? composerDraftReducer : tuneDraftReducer), {currentDraft: {}, changedAttrsList: []}
   );
 
   useEffect(() => {
@@ -392,7 +392,7 @@ export default function Compare({
         <View style={{borderWidth: 1, borderColor: "green", padding: 16, margin: 8}}>
           <SubText>Uploaded tune "{uploadResult["data"]["data"]["title"]}"</SubText>
           <SubText>Attached to composers:</SubText>
-          <SubText>{uploadResult["data"]["composers"].map(comp => comp.name).join(", ")}</SubText>
+          <SubText>{uploadResult["data"]["composers"].map((comp: composer)=> comp.name).join(", ")}</SubText>
         {
           uploadSuccessful && ("composer_placeholder" in uploadResult["data"] && uploadResult["data"]["composer_placeholder"] != "") && 
           <View>
