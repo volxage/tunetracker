@@ -1,11 +1,11 @@
-import {FlatList, View} from "react-native";
-import {Title, Text, SubText, TextInput, Button, ButtonText, DeleteButton} from "../Style";
+import {View} from "react-native";
+import {Title, TextInput, Button, ButtonText, DeleteButton} from "../Style";
 import {useQuery, useRealm} from "@realm/react";
 import Playlist from "../model/Playlist";
 import {useState} from "react";
 import TuneListDisplay from "./TuneListDisplay";
 import Tune from "../model/Tune";
-import {List, Results} from "realm";
+import {List} from "realm";
 import RNFS from "react-native-fs";
 import Share from "react-native-share";
 import buff from "buffer";
@@ -119,7 +119,7 @@ export default function PlaylistEditor(
         setNewTune={() => {}}
         allowNewTune={false}
         selectMode={true}
-        selectedTunes={plSelectedTunes}
+        selectedTunes={plSelectedTunes.map(tune => tune)}
         setSelectedTunes={setPlSelectedTunes}
       />
   </View>

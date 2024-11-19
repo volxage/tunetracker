@@ -60,7 +60,7 @@ export type standard = {
   "form"?: string
   "bio"?: string
   "year"?: string
-  "id"?: number
+  "id": number
   //  "Composers": composer[]
 }
 export type standard_draft = {

@@ -58,7 +58,7 @@ export default function PlaylistViewer(
     </Stack.Screen>
  <Stack.Screen name="Editor">
    {(props) => <Editor
-     prettyAttrs={editorAttrs as Array<[string, string]>}
+     prettyAttrs={editorAttrs}
      selectedTune={tuneToEdit as unknown as Tune}
      newTune={false}
      setNewTune={() => {}}
