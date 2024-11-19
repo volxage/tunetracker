@@ -407,6 +407,10 @@ export default function TuneListDisplay({
   if(selectedPlaylist !== playlist_enum.AllTunes){
     displaySongs = allPlaylists.filtered("title == $0", selectedPlaylist)[0].tunes
   }
+  //Workaround for development error "access to invalidated Results"
+  if(!displaySongs){
+    displaySongs = [];
+  }
   const fuse = new Fuse<Tune>(displaySongs, fuseOptions);
   if(selectMode){
     const selected = displaySongs.filtered("id IN $0", selectedTunes.map(s => s.id));
