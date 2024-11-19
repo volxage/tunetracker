@@ -39,7 +39,7 @@ const fuseOptions = { // For finetuning the search algorithm
 	// fieldNormWeight: 1,
 	keys: [
 		"title",
-		"composers"
+    { name: "composerName", getFn: (tn: Tune) => tn.composers?.map(cmp => cmp.name).join(", ")}
 	]
 };
 
@@ -256,15 +256,16 @@ function TuneListHeader({
     }
     </View>
     <View style={{flexDirection: 'row', alignItems: 'center', borderBottomWidth:1}}>
-      <View style={{flex: 4}}>
+      <View style={{flex: 5}}>
         <Picker
           selectedValue={selectedAttr}
           onValueChange={(value) => headerInputStates.setSelectedAttr(value)}
+          numberOfLines={2}
         >
         {
           selectedAttrItems.map(val => 
           <Picker.Item label={val.label} value={val.value} key={val.value}
-            style={{color: "white", backgroundColor: "#222222", fontSize: 20, fontWeight: 200}}
+            style={{color: "white", backgroundColor: "#222222", fontSize: 16, fontWeight: 200, flexWrap: "wrap"}}
           />
           )
         }

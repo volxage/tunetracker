@@ -24,17 +24,20 @@ function updateDispatch(dispatch: Function){
     fetchComposers().then(res => {
       if(res){
         dispatch({type: "updateComposers", value: res});
+        dispatch({type: "setStatus", value: Status.Complete});
       }else{
         console.log("Response from fetchComposers not valid");
         dispatch({type: "updateComposers", value: composers});
       }
-    }).then(() => {
-      dispatch({type: "setStatus", value: Status.Complete});
     }).catch(err => {
+      console.log(err);
       dispatch({type: "setStatus", value: Status.Failed});
+      return err;
     })
   }).catch(err => {
+    console.log(err);
     dispatch({type: "setStatus", value: Status.Failed});
+    return err;
   })
 }
 function addListener(listener: Function){

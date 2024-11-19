@@ -211,7 +211,7 @@ function TypeField({
         <Title style={{textAlign: "center"}}>{attrName.toUpperCase()}</Title>
         <TextInput defaultValue={attr} placeholderTextColor={"grey"}
           onChangeText={(text) => handleSetCurrentItem(attrKey, text)}
-          style={{textAlign: "center", fontWeight: "300"}}
+          style={{textAlign: "center", fontWeight: "300", borderColor: "grey", borderWidth: 1, marginHorizontal: 32}}
         />
       </View>
     );
