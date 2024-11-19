@@ -1,5 +1,5 @@
 import {View} from "react-native";
-import {Title, TextInput, Button, ButtonText, DeleteButton} from "../Style";
+import {Title, TextInput, Button, ButtonText, DeleteButton, SubText} from "../Style";
 import {useQuery, useRealm} from "@realm/react";
 import Playlist from "../model/Playlist";
 import {useState} from "react";
@@ -102,6 +102,17 @@ export default function PlaylistEditor(
           </ButtonText>
         </Button>
       </View>
+      <DeleteButton onLongPress={() => {
+        navigation.goBack();
+        realm.write(() => {
+          realm.delete(playlist);
+        })
+      }}>
+        <ButtonText>Delete Playlist</ButtonText>
+      </DeleteButton>
+      <SubText style={{textAlign: "center", color: "grey", marginBottom: 20}}>
+        Press and hold if sure!
+      </SubText>
       <Title>TITLE</Title>
       <TextInput
         value={newTitle}

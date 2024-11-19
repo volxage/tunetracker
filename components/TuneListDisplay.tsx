@@ -405,7 +405,13 @@ export default function TuneListDisplay({
   const allSongs = useQuery(Tune);
   let displaySongs: List<Tune> | Results<Tune> | Tune[] = allSongs;
   if(selectedPlaylist !== playlist_enum.AllTunes){
-    displaySongs = allPlaylists.filtered("title == $0", selectedPlaylist)[0].tunes
+    //In case the selected playlist was deleted
+    const pl = allPlaylists.filtered("title == $0", selectedPlaylist)[0];
+    if(pl){
+      displaySongs = pl.tunes;
+    }else{
+      setSelectedPlaylist(playlist_enum.AllTunes);
+    }
   }
   //Workaround for development error "access to invalidated Results"
   if(!displaySongs){
