@@ -142,6 +142,26 @@ function TypeField({
         navigation={navigation}/>
     );
   }
+  else if (attrKey === "mainTempo"){
+    return(
+      <View style={{backgroundColor: 'black', padding: 8}}>
+        <Title style={{textAlign: "center"}}>{attrName.toUpperCase()}</Title>
+        <TextInput defaultValue={String(attr as number)} placeholderTextColor={"grey"}
+          keyboardType="numeric"
+          value={String(attr)}
+          onChangeText={(text) => {
+            text = text.replace(/\D/g,'');
+            if(Number.isNaN(Number(text))){
+              text = "0"
+              console.error("Cannot parse number, perhaps non-numeric character snuck through?");
+            }
+            handleSetCurrentItem(attrKey, Number(text))
+          }}
+          style={{textAlign: "center", fontWeight: "300"}}
+        />
+      </View>
+    );
+  }
   else if (attrKey === "playlists" as keyOfEitherDraft && attr){ //Playlists are NOT an attribute of a tune
     const ids = (attr as (Playlist | playlist)[]).map(pl => pl.id);
     //TODO:
