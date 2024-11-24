@@ -11,7 +11,6 @@ import {GoogleSignin, isErrorWithCode, isSuccessResponse, statusCodes} from '@re
 
 GoogleSignin.configure();
 
-// Somewhere in your code
 const signIn = async () => {
   try {
     console.log("trying");
@@ -21,7 +20,7 @@ const signIn = async () => {
       console.log(response);
       //setState({ userInfo: response.data });
     } else {
-      console.log("Cancelled");
+      console.log("Cancelled (or something went wrong)");
       // sign in was cancelled by user
     }
   } catch (error) {

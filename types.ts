@@ -26,10 +26,14 @@ export type tune_draft = {
   "bio"?: string
   "year"?: number
   playedAt?: Date
-  //  "playedAt"?: string[]
 }
 export type tune_draft_extras = {
   "playlists"?: undefined
+}
+export type auth = {
+  "isIos": boolean
+  "iosAuth"?: string
+  "googleIdAuth"?: string
 }
 export type composer = {
   "name"?: string// All enum members in 'E1' and 'E2' are constant.
