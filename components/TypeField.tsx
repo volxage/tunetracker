@@ -162,7 +162,7 @@ function TypeField({
       </View>
     );
   }
-  else if (attrKey === "playlists" as keyOfEitherDraft && attr){ //Playlists are NOT an attribute of a tune
+  else if (attrKey === "playlists" as keyOfEitherDraft && attr){
     const ids = (attr as (Playlist | playlist)[]).map(pl => pl.id);
     //TODO:
     // Delete Button
@@ -204,6 +204,59 @@ function TypeField({
         />
       </View>
     );
+  }
+  else if (attrKey === "tempi"){
+    function handleReplace(value: number, index: number){
+      const newArrAttr = (attr as number[]).map((c, i) => {
+        return i === index ? value : c;
+      });
+      handleSetCurrentItem(attrKey, newArrAttr);
+      //setarrAttr(newArrAttr); handeSetCurrentTune causes a rerender, indirectly updating arrAttr.
+    }
+    return(
+      <View style={{backgroundColor: 'black', padding: 8}}>
+        <View style={{flexDirection: 'row'}}>
+          <View style={{flex: 1}}></View>
+          <View style={{flex: 2}}>
+            <Title>{attrName.toUpperCase()}</Title>
+          </View>
+          <View style={{alignContent: 'flex-end', flex: 1}}>
+            <Button onPress={() => handleSetCurrentItem(attrKey, (attr as number[]).concat([0]))}>
+              <ButtonText><Icon name="plus" size={30}/></ButtonText>
+            </Button>
+          </View>
+        </View>
+        <FlatList
+          data={attr as number[]}
+          renderItem={({item, index, separators}) => (
+            <View style={{flexDirection: 'row'}}>
+              <View style={{flex: 3}}>
+                <TextInput defaultValue={String(attr as number)} placeholderTextColor={"grey"}
+                  keyboardType="numeric"
+                  value={String((attr as number[])[index])}
+                  onChangeText={(text) => {
+                    text = text.replace(/\D/g,'');
+                    if(Number.isNaN(Number(text))){
+                      text = "0"
+                      console.error("Cannot parse number, perhaps non-numeric character snuck through?");
+                    }
+                    handleReplace(Number(text), index)
+                  }}
+                  style={{textAlign: "center", fontWeight: "300"}}
+                />
+              </View>
+              <View style={{flex:1, alignContent: 'flex-end'}}>
+                <DeleteButton onPress={
+                    () => handleSetCurrentItem(attrKey, (attr as number[]).filter((a, i) => i !== index))
+                }>
+                  <ButtonText><Icon name="close" size={30}/></ButtonText>
+                </DeleteButton>
+              </View>
+            </View>
+          )}
+        />
+      </View>
+    )
   }
   else if (typeof attr === "string"){
     return(

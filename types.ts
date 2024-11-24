@@ -13,7 +13,7 @@ export type tune_draft = {
   "keyCenters"?: string[]
   "styles"?: string[]
   "mainTempo"?: number
-  "tempi"?: string[]
+  "tempi"?: number[]
 //  "contrafacts"?: string[] // In the future, these could link to other tunes
   "playthroughs"?: number
   "formConfidence"?: number
