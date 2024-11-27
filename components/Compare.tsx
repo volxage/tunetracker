@@ -25,7 +25,7 @@ import dateDisplay from '../textconverters/dateDisplay.tsx';
 import OnlineDB from '../OnlineDB.tsx';
 import {AxiosResponse} from 'axios';
 import Composer from '../model/Composer.ts';
-import standardTuneDraftReducer, {comparedAttrEqual} from '../DraftReducers/StandardTuneDraftReducer.ts';
+import standardTuneDraftReducer from '../DraftReducers/StandardTuneDraftReducer.ts';
 import tuneDraftReducer from '../DraftReducers/TuneDraftReducer.ts';
 import composerDraftReducer from '../DraftReducers/ComposerDraftReducer.ts';
 import standardComposerDraftReducer from '../DraftReducers/StandardComposerDraftReducer.ts';
@@ -33,6 +33,7 @@ import {OrderedCollection} from 'realm';
 import {localAttrPresent, onlineAttrPresent} from '../DraftReducers/utils/attrPresent.ts';
 import displayLocalAttr, {debugDisplayLocal, debugDisplayOnline, displayOnlineAttrs} from '../DraftReducers/utils/displayAttrs.ts';
 import {translateAttrFromLocal, translateKeyFromLocal} from '../DraftReducers/utils/translate.ts';
+import {comparedAttrEqual} from '../DraftReducers/utils/comparedAttrEqual.ts';
 const debugMode = false;
 
 //Anything that ends with "confidence" is also excluded
