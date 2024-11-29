@@ -9,6 +9,7 @@ import {List} from "realm";
 import RNFS from "react-native-fs";
 import Share from "react-native-share";
 import buff from "buffer";
+import {useNavigation} from "@react-navigation/native";
 const tmpPlaylistPath = RNFS.TemporaryDirectoryPath + "/tmp_playlist.json";
 
 
@@ -17,12 +18,10 @@ const tmpPlaylistPath = RNFS.TemporaryDirectoryPath + "/tmp_playlist.json";
 export default function PlaylistEditor(
   {
     playlist,
-    navigation,
     setTuneToEdit
   }:
   {
     playlist: Playlist,
-    navigation: any,
     setTuneToEdit: Function
   }){
   const [newTitle, setNewTitle] = useState(playlist.title);
@@ -30,6 +29,7 @@ export default function PlaylistEditor(
   const [plSelectedTunes, setPlSelectedTunes]: [(List<Tune>), Function] = useState(playlist.tunes);
   const realm = useRealm();
   const allTunes = useQuery(Tune)
+  const navigation = useNavigation();
   return(
     <View style={{backgroundColor: "black"}}>
       <View style={{flexDirection: "row"}}>
@@ -125,7 +125,6 @@ export default function PlaylistEditor(
       />
       <Title>TUNES</Title>
       <TuneListDisplay
-        navigation={navigation}
         setSelectedTune={setTuneToEdit}
         setNewTune={() => {}}
         allowNewTune={false}

@@ -44,6 +44,7 @@ import ComposerDraftContext from '../contexts/ComposerDraftContext.ts';
 import {useQuery, useRealm} from '@realm/react';
 import Composer from '../model/Composer.ts';
 import Tune from '../model/Tune.ts';
+import {useNavigation} from '@react-navigation/native';
 
 const tuneFuseOptions = { // For finetuning the search algorithm
 	// isCaseSensitive: false,
@@ -126,7 +127,6 @@ function ImporterHeader({
   listReversed,
   setListReversed,
   updateSelectedAttr,
-  navigation,
   setSearch,
   importingId,
   importingComposers,
@@ -135,7 +135,6 @@ function ImporterHeader({
   listReversed: boolean | undefined,
   setListReversed: Function,
   updateSelectedAttr: Function,
-  navigation: any,
   setSearch: Function,
   importingId: boolean,
   importingComposers: boolean,
@@ -151,6 +150,7 @@ function ImporterHeader({
   const submissionSuccessful = submissionResult && "data" in submissionResult;
   const [submissionError, setSubmissionError] = useState({} as any);
   const errorReceived = submissionError && "message" in submissionError;
+  const navigation = useNavigation();
   return(
     <View style={{backgroundColor: "#222"}}>
       <TextInput
@@ -294,12 +294,10 @@ function ImporterHeader({
 
 export default function Importer({
   importFn,
-  navigation,
   importingId,
   importingComposers
 }: {
   importFn: Function,
-  navigation: any,
   importingId: boolean,
   importingComposers: boolean
 }){
@@ -321,6 +319,7 @@ export default function Importer({
     new Fuse<standard_composer>(standards as standard_composer[], composerFuseOptions) 
     : new Fuse<standard>(standards as standard[], composerFuseOptions);
   let searchResults: FuseResult<standard | composer>[] = []
+  const navigation = useNavigation();
   if(search === ""){
     itemSort(displayStandards, selectedAttr, listReversed);
   }else{
@@ -355,7 +354,6 @@ export default function Importer({
         <ImporterHeader listReversed={listReversed}
           setListReversed={setListReversed}
           updateSelectedAttr={updateSelectedAttr}
-          navigation={navigation}
           importingId={importingId}
           importingComposers={importingComposers}
           suggestTuneSubmission={suggestTuneSubmission}

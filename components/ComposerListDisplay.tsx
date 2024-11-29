@@ -50,11 +50,11 @@ import OnlineDB from '../OnlineDB.tsx';
 import {BSON} from 'realm';
 import itemSort from '../itemSort.tsx';
 import Composer from '../model/Composer.ts';
+import {useNavigation} from '@react-navigation/native';
 
 
 type HeaderInputStates = {
   setSearch: Function
-  navigation: any
   setNewComposer: Function
   handleSetCurrentTune: Function
   selectedComposers: Array<Composer>
@@ -72,6 +72,7 @@ function ComposerListHeader({
   const realm = useRealm();
   const dbStatus = useContext(OnlineDB.DbStateContext).status;
   const dbDispatch = useContext(OnlineDB.DbDispatchContext);
+  const navigation = useNavigation() as any;
   return(
     <View>
       <View style={{flexDirection: 'row', borderBottomWidth:1, backgroundColor: "#222"}}>
@@ -98,12 +99,12 @@ function ComposerListHeader({
                 });
               }
               headerInputStates.handleSetCurrentTune("composers", [...composers, ...headerInputStates.selectedComposers]);
-              headerInputStates.navigation.navigate("EditorUnwrapped");
+              navigation.navigate("EditorUnwrapped");
             }}>
               <ButtonText>Save selection</ButtonText>
             </Button>
             <DeleteButton style={{flex: 1}} onPress={() => {
-              headerInputStates.navigation.navigate("EditorUnwrapped");
+              navigation.navigate("EditorUnwrapped");
             }}>
               <ButtonText>Cancel changes</ButtonText>
             </DeleteButton>
@@ -153,7 +154,7 @@ function ComposerListHeader({
                         onPress={() => {
                           headerInputStates.setNewComposer(true);
                           headerInputStates.setComposerToEdit({});
-                          headerInputStates.navigation.navigate("ComposerEditor")
+                          navigation.navigate("ComposerEditor")
                         }}
                       >
                         <ButtonText>Add *Brand New* composer</ButtonText>
@@ -166,7 +167,7 @@ function ComposerListHeader({
                         onLongPress={() => {
                           headerInputStates.setNewComposer(true);
                           headerInputStates.setComposerToEdit({});
-                          headerInputStates.navigation.navigate("ComposerEditor")
+                          navigation.navigate("ComposerEditor")
                         }}
                       >
                         <ButtonText>Add *brand new* composer</ButtonText>
@@ -222,11 +223,9 @@ function LocalityIndicators({
 }
 
 export default function ComposerListDisplay({
-  navigation,
   handleSetCurrentTune,
   originalTuneComposers
 }: {
-  navigation: any,
   handleSetCurrentTune: Function,
   originalTuneComposers: Composer[]
 }){
@@ -301,7 +300,6 @@ export default function ComposerListDisplay({
   const headerInputStates = 
   {
     setSearch: setSearch,
-    navigation: navigation,
     setNewComposer: setNewComposer,
     handleSetCurrentTune: handleSetCurrentTune,
     selectedComposers: selectedComposers,
@@ -309,6 +307,7 @@ export default function ComposerListDisplay({
     setComposerToEdit: setComposerToEdit
   }
   const Stack = createNativeStackNavigator();
+  const navigation = useNavigation() as any;
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name={"ComposerListDisplay"} >
@@ -354,7 +353,6 @@ export default function ComposerListDisplay({
             playlists={[]}
             setNewComposer={setNewComposer}
             newComposer={newComposer}
-            navigation={props.navigation}
           />
         }
       </Stack.Screen>

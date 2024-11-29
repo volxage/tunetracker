@@ -37,7 +37,6 @@ export default function standardComposerDraftReducer(state: any, action: any){
       let newChangedAttrsList = state["changedAttrsList"];
       //This for loop is necessary for translations that may return multiple attributes, but this is uncommon
       for(const t of translations){
-        console.log(t);
         copy[t[0]] = t[1];
         if(!newChangedAttrsList.includes(t[0])){
           newChangedAttrsList = newChangedAttrsList.concat(t[0]);

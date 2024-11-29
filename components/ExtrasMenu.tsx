@@ -3,13 +3,13 @@
 import React, {isValidElement, useEffect, useState} from 'react';
 import {SafeAreaView, View} from 'react-native';
 import {Button, ButtonText, DeleteButton, Title} from '../Style';
+import {useNavigation} from '@react-navigation/native';
 
 // <Button onPress={() => {navigation.navigate("PlaylistImporter")}}>
 export default function ExtrasMenu({
-  navigation,
 }: {
-  navigation: any,
 }){
+  const navigation = useNavigation() as any;
   return (
     <SafeAreaView style={{flex:1, backgroundColor:"black"}}>
       <View>

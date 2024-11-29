@@ -11,13 +11,15 @@ import Share from "react-native-share";
 import RNDP, {DocumentPickerResponse} from "react-native-document-picker";
 import buff from "buffer";
 import {tune_draft} from "../types";
+import {useNavigation} from "@react-navigation/native";
 const tmpPlaylistPath = RNFS.TemporaryDirectoryPath + "/tmp_playlist.json";
 
 
-export default function PlaylistImporter({navigation}: {navigation: any}){
+export default function PlaylistImporter({}: {}){
   const [importedPlaylist, setImportedPlaylist]: [tune_draft[], Function] = useState([]);
   const [commonSongs, setCommonSongs]: [Tune[], Function] = useState([]);
   const [unlearnedSongs, setUnlearnedSongs]: [tune_draft[], Function] = useState([]);
+  const navigation = useNavigation();
   return (
     <View>
       <Text>Common Songs</Text>
@@ -66,12 +68,10 @@ export default function PlaylistImporter({navigation}: {navigation: any}){
 function ImportedPlaylistViewer(
   {
     playlist,
-    navigation,
     setTuneToEdit
   }:
   {
     playlist: Playlist,
-    navigation: any,
     setTuneToEdit: Function
   }){
 }

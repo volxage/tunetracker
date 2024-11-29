@@ -54,6 +54,7 @@ import {useQuery, useRealm} from '@realm/react';
 import {BSON, List, OrderedCollection, Results} from 'realm';
 import Playlist from '../model/Playlist.ts';
 import dateDisplay from '../textconverters/dateDisplay.tsx';
+import {useNavigation} from '@react-navigation/native';
 const selectionAttrs = new Map<string, string>([
   ["title", "Title"],
   ["alternativeTitle", "Alternative Title"],
@@ -126,7 +127,6 @@ function ConfidenceBars({
 function ItemRender({
   tune,
   setSelectedTune,
-  navigation,
   selectedAttr,
   confidenceVisible,
   separators,
@@ -136,7 +136,6 @@ function ItemRender({
 }: {
   tune: Tune,
   setSelectedTune: Function,
-  navigation: any,
   selectedAttr: keyof Tune,
   confidenceVisible: boolean,
   separators: any,
@@ -146,6 +145,7 @@ function ItemRender({
 }){
   const composers = useQuery(Composer)
   const isSelected = selected.some(id => tune.id.equals(id))
+  const navigation = useNavigation() as any;
   return(
   <TouchableHighlight
     key={tune.title}
@@ -198,13 +198,11 @@ type HeaderInputStates = {
 
 function TuneListHeader({
   headerInputStates,
-  navigation,
   setNewTune,
   selectedAttr,
   selectedPlaylist,
 }: {
   headerInputStates: HeaderInputStates
-  navigation: any,
   setNewTune: Function,
   selectedAttr: String,
   selectedPlaylist: Playlist | playlist_enum,
@@ -224,6 +222,7 @@ function TuneListHeader({
     [Status.Complete, "cadetblue"],
     [Status.Failed, "darkred"]
   ]);
+  const navigation = useNavigation() as any;
 
   return(
     <View style={{backgroundColor: "#222"}}>
@@ -374,7 +373,6 @@ function TuneListHeader({
 );
 }
 export default function TuneListDisplay({
-  navigation,
   setSelectedTune,
   setNewTune,
   allowNewTune,
@@ -382,7 +380,6 @@ export default function TuneListDisplay({
   selectedTunes,
   setSelectedTunes
 }: {
-  navigation: any,
   setSelectedTune: Function,
   setNewTune: Function,
   allowNewTune: boolean,
@@ -445,6 +442,7 @@ export default function TuneListDisplay({
     setSelectedPlaylist: setSelectedPlaylist,
     allowNewTune: allowNewTune
   }
+  const navigation = useNavigation();
   return (
     <FlatList
       data={displaySongs}
@@ -452,7 +450,6 @@ export default function TuneListDisplay({
       ListHeaderComponent={
         <TuneListHeader
           headerInputStates={headerInputStates}
-          navigation={navigation}
           setNewTune={setNewTune}
           selectedAttr={selectedAttr}
           selectedPlaylist={selectedPlaylist}
@@ -467,7 +464,6 @@ export default function TuneListDisplay({
         <ItemRender 
           tune={item}
           setSelectedTune={setSelectedTune}
-          navigation={navigation}
           selectedAttr={selectedAttr}
           confidenceVisible={confidenceVisible}
           separators={separators}

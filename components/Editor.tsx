@@ -27,17 +27,16 @@ import {useRealm} from '@realm/react';
 import {BSON} from 'realm';
 import TuneDraftContext from '../contexts/TuneDraftContext.ts';
 import tuneDraftReducer from '../DraftReducers/TuneDraftReducer.ts';
+import {useNavigation} from '@react-navigation/native';
 
 
 export default function Editor({
   prettyAttrs, 
-  navigation,
   selectedTune,
   newTune,
   setNewTune
 }: {
   prettyAttrs: Array<[keyof (tune_draft & tune_draft_extras), string]>,
-  navigation: any, //TODO: Find type of "navigation"
   selectedTune: Tune | tune_draft,
   newTune: boolean,
   setNewTune: Function
@@ -45,6 +44,7 @@ export default function Editor({
   const realm = useRealm();
   const [state, dispatch] = useReducer(tuneDraftReducer, {currentDraft: {}, changedAttrsList: []});
   const Stack = createNativeStackNavigator();
+  const navigation = useNavigation();
 
   useEffect(() => {
     dispatch({type: "set_to_selected", selectedItem: selectedTune});
@@ -75,7 +75,6 @@ export default function Editor({
                     attrKey={item[0]}
                     attrName={item[1]}
                     handleSetCurrentItem={handleSetCurrentTune}
-                    navigation={navigation}
                     isComposer={false}
                   />
                 </TouchableHighlight>
@@ -169,7 +168,6 @@ export default function Editor({
     <TuneDraftContext.Provider value={state["currentDraft"]}>
       <Importer
         importingComposers={false}
-        navigation={props.navigation}
         importingId={true}
         importFn={function(stand: standard, mini: boolean){
           handleSetCurrentTune("dbId", stand.id)
@@ -185,7 +183,6 @@ export default function Editor({
     <Compare
       currentItem={state["currentDraft"]}
       onlineVersion={(state["currentDraft"].dbId ? OnlineDB.getStandardById(state["currentDraft"].dbId) : null) as standard}
-      navigation={props.navigation}
       handleSetCurrentItem={handleSetCurrentTune}
       isComposer={false}
     />
@@ -196,7 +193,6 @@ export default function Editor({
   <SafeAreaView style={{flex: 1}}>
     <ComposerListDisplay
       originalTuneComposers={state["currentDraft"]["composers"] ? state["currentDraft"]["composers"] : []}
-      navigation={navigation}
       handleSetCurrentTune={handleSetCurrentTune}
     />
   </SafeAreaView>

@@ -34,6 +34,7 @@ import {localAttrPresent, onlineAttrPresent} from '../DraftReducers/utils/attrPr
 import displayLocalAttr, {debugDisplayLocal, debugDisplayOnline, displayOnlineAttrs} from '../DraftReducers/utils/displayAttrs.ts';
 import {translateAttrFromLocal, translateKeyFromLocal} from '../DraftReducers/utils/translate.ts';
 import {comparedAttrEqual} from '../DraftReducers/utils/comparedAttrEqual.ts';
+import {useNavigation} from '@react-navigation/native';
 const debugMode = false;
 
 //Anything that ends with "confidence" is also excluded
@@ -315,17 +316,16 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
 export default function Compare({
   currentItem,
   onlineVersion,
-  navigation,
   handleSetCurrentItem,
   isComposer
 }:
 {
   currentItem: tune_draft | composer,
   onlineVersion: standard & standard_composer,
-  navigation: any,
   handleSetCurrentItem: Function,
   isComposer: boolean
 }){
+  const navigation = useNavigation() as any;
   const [dbState, dbDispatch] = useReducer(
     (isComposer ? standardComposerDraftReducer : standardTuneDraftReducer), {currentDraft: {}}
   );

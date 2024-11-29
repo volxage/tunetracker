@@ -75,3 +75,6 @@ yarn-error.log
 
 tags
 .vscode/
+
+# Secrets
+clientcerts.js

@@ -25,18 +25,17 @@ import Compare from './Compare.tsx';
 import {useRealm} from '@realm/react';
 import composerDraftReducer from '../DraftReducers/ComposerDraftReducer.ts';
 import ComposerDraftContext from '../contexts/ComposerDraftContext.ts';
+import {useNavigation} from '@react-navigation/native';
 
 
 export default function ComposerEditor({
   prettyAttrs, 
-  navigation,
   selectedComposer,
   playlists,
   newComposer,
   setNewComposer
 }: {
   prettyAttrs: Array<[keyof Composer, string]>,
-  navigation: any, //TODO: Find type of "navigation"
   selectedComposer: Composer | composer | undefined,
   playlists: any,
   newComposer: boolean,
@@ -48,6 +47,7 @@ export default function ComposerEditor({
   const [state, dispatch] = useReducer(composerDraftReducer, {currentDraft: {}, changedAttrsList: []});
   const Stack = createNativeStackNavigator();
   const realm = useRealm();
+    const navigation = useNavigation();
 
   useEffect(() => {
     console.log("Composereditor effect");
@@ -80,7 +80,6 @@ export default function ComposerEditor({
                     attrKey={item[0]}
                     attrName={item[1]}
                     handleSetCurrentItem={handleSetCurrentComposer}
-                    navigation={navigation}
                     isComposer={true}
                   />
                 </TouchableHighlight>
@@ -161,7 +160,6 @@ export default function ComposerEditor({
     <ComposerDraftContext.Provider value={state["currentDraft"]}>
       <Importer
         importingComposers={true}
-        navigation={props.navigation}
         importingId={true}
         importFn={function(stand: standard, mini: boolean){
           handleSetCurrentComposer("dbId", stand.id)
@@ -176,7 +174,6 @@ export default function ComposerEditor({
   <Compare
     currentItem={state["currentDraft"]}
     onlineVersion={(state["currentDraft"].dbId ? OnlineDB.getComposerById(state["currentDraft"].dbId) : null) as standard_composer}
-    navigation={props.navigation}
     handleSetCurrentItem={handleSetCurrentComposer}
     isComposer={true}
   />

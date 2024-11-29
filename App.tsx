@@ -99,7 +99,6 @@ function MainMenu({}: {}): React.JSX.Element {
           selectedTune={selectedTune as Tune}
           newTune={newTune}
           setNewTune={setNewTune}
-          navigation={props.navigation}
         />}
       </Stack.Screen>
       <Stack.Screen name="Editor">
@@ -108,7 +107,6 @@ function MainMenu({}: {}): React.JSX.Element {
           selectedTune={selectedTune as Tune}
           newTune={newTune}
           setNewTune={setNewTune}
-          navigation={props.navigation}
         />}
       </Stack.Screen>
       <Stack.Screen name="Importer">
@@ -116,7 +114,6 @@ function MainMenu({}: {}): React.JSX.Element {
         <SafeAreaView style={{flex: 1, backgroundColor: "black"}}>
           <Importer
             importingComposers={false}
-            navigation={props.navigation}
             importingId={false}
             importFn={function(stand: standard, mini=false){
               const tn: tune_draft = {};
@@ -188,7 +185,6 @@ function MainMenu({}: {}): React.JSX.Element {
         <SafeAreaView style={{backgroundColor: "#000", flex: 1}}>
           <View>
             <TuneListDisplay
-              navigation={props.navigation}
               setSelectedTune={setSelectedTune}
               setNewTune={setNewTune}
               allowNewTune={true}
@@ -205,7 +201,6 @@ function MainMenu({}: {}): React.JSX.Element {
         <SafeAreaView style={{flex: 1, backgroundColor: "black"}}>
           <View style={{flex:1}}>
             <ExtrasMenu
-              navigation={props.navigation}
             />
           </View>
         </SafeAreaView>
@@ -216,7 +211,6 @@ function MainMenu({}: {}): React.JSX.Element {
         <SafeAreaView style={{flex: 1, backgroundColor: "black"}}>
           <View style={{flex:1}}>
             <PlaylistViewer
-              navigation={props.navigation}
             />
           </View>
         </SafeAreaView>
@@ -227,7 +221,6 @@ function MainMenu({}: {}): React.JSX.Element {
         <SafeAreaView style={{flex: 1, backgroundColor: "black"}}>
           <View style={{flex:1}}>
             <PlaylistImporter
-              navigation={props.navigation}
             />
           </View>
         </SafeAreaView>

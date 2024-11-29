@@ -25,6 +25,7 @@ import {useQuery, useRealm} from '@realm/react';
 import {BSON, List} from 'realm';
 import { Picker } from '@react-native-picker/picker';
 import DateField from './TypeFields/DateField.tsx';
+import {useNavigation} from '@react-navigation/native';
 
 function AddPlaylistField({
   newPlaylist,
@@ -103,20 +104,19 @@ function TypeField({
   attrKey,
   attrName,
   handleSetCurrentItem,
-  navigation,
   isComposer
 }: {
   attr: unknown,
   attrKey: keyof (tune_draft & composer & tune_draft_extras),
   attrName: string,
   handleSetCurrentItem: Function,
-  navigation: any,
   isComposer: boolean
 }){
   const allPlaylists = useQuery(Playlist);
   const [icon, setIcon] = useState();
   const [bool, setBool] = useState(attr as boolean)
   const [newPlaylistOpen, setNewPlaylistOpen] = useState(false)
+  const navigation = useNavigation();
   useEffect(() => {
     Icon.getImageSource('circle', 26, 'white')
       .then(setIcon);

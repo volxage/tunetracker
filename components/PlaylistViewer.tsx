@@ -8,18 +8,18 @@ import {useState} from "react";
 import {editorAttrs} from "../types";
 import Tune from "../model/Tune";
 import Editor from "./Editor";
+import {useNavigation} from "@react-navigation/native";
 
 export default function PlaylistViewer(
   {
-    navigation
   }:
   {
-    navigation: any
   }){
   const allPlaylists = useQuery(Playlist);
   const Stack = createNativeStackNavigator();
   let selectedPlaylist = allPlaylists.length > 0 ? allPlaylists[0] : undefined
   const [tuneToEdit, setTuneToEdit] = useState();
+  const navigation = useNavigation() as any;
   return(
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name={"PlaylistViewerUnwrapped"} >
@@ -53,7 +53,7 @@ export default function PlaylistViewer(
       </Stack.Screen>
       <Stack.Screen name={"PlaylistEditor"}>
         {props => <SafeAreaView style={{backgroundColor: "black", flex: 1}}>
-          <PlaylistEditor navigation={props.navigation} playlist={selectedPlaylist as Playlist} setTuneToEdit={setTuneToEdit}/>
+          <PlaylistEditor playlist={selectedPlaylist as Playlist} setTuneToEdit={setTuneToEdit}/>
       </SafeAreaView>}
     </Stack.Screen>
  <Stack.Screen name="Editor">
@@ -62,7 +62,6 @@ export default function PlaylistViewer(
      selectedTune={tuneToEdit as unknown as Tune}
      newTune={false}
      setNewTune={() => {}}
-     navigation={props.navigation}
    />}
     </Stack.Screen>
   </Stack.Navigator>
