@@ -7,9 +7,12 @@ import {AppRegistry, DevSettings, NativeModules} from 'react-native';
 import App from './App';
 import {name as appName} from './app.json';
 import {GoogleSignin, isErrorWithCode, isSuccessResponse, statusCodes} from '@react-native-google-signin/google-signin';
+import {devSigningCert, webSigningCert} from './clientcerts';
 
 
-GoogleSignin.configure();
+GoogleSignin.configure({
+  webClientId: webSigningCert,
+})
 
 const signIn = async () => {
   try {
@@ -36,6 +39,7 @@ const signIn = async () => {
           break;
         default:
           console.log(error);
+          console.log(error.message);
           console.log("Some google sign in error occured");
         // some other error happened
       }
