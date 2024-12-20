@@ -14,6 +14,7 @@ GoogleSignin.configure({
   webClientId: webSigningCert,
 })
 
+// Somewhere in your code
 const signIn = async () => {
   try {
     console.log("trying");
@@ -23,7 +24,7 @@ const signIn = async () => {
       console.log(response);
       //setState({ userInfo: response.data });
     } else {
-      console.log("Cancelled (or something went wrong)");
+      console.log("Cancelled");
       // sign in was cancelled by user
     }
   } catch (error) {

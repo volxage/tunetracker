@@ -1,9 +1,9 @@
 // Copyright 2024 Jonathan Hilliard
 import {createContext} from "react";
-import { Platform } from "react-native";
-import { composer, auth, standard, standard_composer, standard_composer_draft, standard_draft, Status, tune_draft } from "./types";
+import { composer, standard, standard_composer, standard_composer_draft, standard_draft, Status, tune_draft } from "./types";
 import http from "./http-to-server.ts"
-import {GoogleSignin, isErrorWithCode, isSuccessResponse, statusCodes} from '@react-native-google-signin/google-signin';
+let standards: standard[] = [];
+let composers: standard_composer[] = [];
 let status = Status.Waiting
 let attemptNo = 0;
 const statusListeners = new Set<Function>();
@@ -121,100 +121,28 @@ function fetchTunes(counter=0): Promise<standard[]>{
     }
   );
 }
-async function getAuth(): Promise<string>{
-  if(Platform.OS === "ios"){
-    return "";
-  }else{
-    if(GoogleSignin.hasPreviousSignIn()){
-      let currentUser = GoogleSignin.getCurrentUser();
-      if(currentUser !== null){
-        console.log(currentUser);
-        GoogleSignin.getTokens().then(toks => {return toks.idToken});
-      }else{
-        GoogleSignin.signInSilently().then(res => {
-          if(res.type === "success"){
-            return res.data.idToken;
-          }else{
-            GoogleSignin.signIn().then(res => {
-              if(res.type === "success"){
-                return res.data.idToken;
-              }else{
-                throw new Error("Signin error");
-              }
-            });
-          }
-        });
-      }
-    }
-  }
-  return "";
-}
+
 async function createTuneDraft(tuneDraft: tune_draft){
-  const tdAndAuth = tuneDraft as tune_draft & auth;
-  const isIos = Platform.OS === "ios";
-  getAuth().then(res => {
-    if(isIos){
-      tdAndAuth["isIos"] = true;
-      tdAndAuth["iosAuth"] = res;
-    }else{
-      tdAndAuth["isIos"] = false;
-      tdAndAuth["googleIdAuth"] = res;
-    }
-    console.log("Send draft: " + JSON.stringify(tdAndAuth));
-    return http.post("/tunes", tdAndAuth);
-  })
+  console.log("Send draft: " + JSON.stringify(tuneDraft));
+  return http.post("/tunes", tuneDraft);
 }
 async function createComposerDraft(composerDraft: composer){
-  const cdAndAuth = composerDraft as tune_draft & auth;
-  const isIos = Platform.OS === "ios";
-  getAuth().then(res => {
-    if(isIos){
-      cdAndAuth["isIos"] = true;
-      cdAndAuth["iosAuth"] = res;
-    }else{
-      cdAndAuth["isIos"] = false;
-      cdAndAuth["googleIdAuth"] = res;
-    }
-    console.log("Send draft: " + cdAndAuth);
-    return http.post("/composers", cdAndAuth);
-  });
+  console.log("Send draft: " + composerDraft);
+  return http.post("/composers", composerDraft);
 }
 async function sendUpdateDraft(tuneDraft: standard_draft){
-  const tdAndAuth = tuneDraft as tune_draft & auth;
-  const isIos = Platform.OS === "ios";
-  getAuth().then(res => {
-    if(isIos){
-      tdAndAuth["isIos"] = true;
-      tdAndAuth["iosAuth"] = res;
-    }else{
-      tdAndAuth["isIos"] = false;
-      tdAndAuth["googleIdAuth"] = res;
-    }
-    if(tdAndAuth.id){
-      console.log(tdAndAuth);
-      return http.put(`/tunes/${tdAndAuth.id}`, tdAndAuth).catch(r => {throw r})
-    }else{
-      console.log("dbId is invalid");
-    }
-  });
+  if(tuneDraft.id){
+    return http.put(`/tunes/${tuneDraft.id}`, tuneDraft).catch(r => {throw r})
+  }else{
+    console.log("dbId is invalid");
+  }
 }
 async function sendComposerUpdateDraft(composerDraft: standard_composer_draft){
-  const cdAndAuth = composerDraft as tune_draft & auth;
-  const isIos = Platform.OS === "ios";
-  getAuth().then(res => {
-    if(isIos){
-      cdAndAuth["isIos"] = true;
-      cdAndAuth["iosAuth"] = res;
-    }else{
-      cdAndAuth["isIos"] = false;
-      cdAndAuth["googleIdAuth"] = res;
-    }
-    if(cdAndAuth.id){
-      return http.put(`/composers/${cdAndAuth.id}`, cdAndAuth).catch(r => {throw r})
-    }else{
-      console.log("dbId is invalid");
-    }
-  });
+  if(composerDraft.id){
+    return http.put(`/composers/${composerDraft.id}`, composerDraft).catch(r => {throw r})
+  }else{
+    console.log("dbId is invalid");
+  }
 }
 
 type state_t = {
