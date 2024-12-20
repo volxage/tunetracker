@@ -2,12 +2,95 @@
 import {createContext} from "react";
 import { composer, standard, standard_composer, standard_composer_draft, standard_draft, Status, tune_draft } from "./types";
 import http from "./http-to-server.ts"
+import {Platform} from "react-native";
+import {GoogleSignin, isErrorWithCode, isSuccessResponse, statusCodes} from '@react-native-google-signin/google-signin';
 let standards: standard[] = [];
 let composers: standard_composer[] = [];
 let status = Status.Waiting
 let attemptNo = 0;
 const statusListeners = new Set<Function>();
 
+async function firstTimeGoogleAuth(): Promise<string>{
+  await GoogleSignin.hasPlayServices();
+  const response = await GoogleSignin.signIn();
+  if (isSuccessResponse(response)) {
+    if(response.data.idToken){
+      return response.data.idToken;
+    }else{
+      throw Error("Invalid response from google api");
+    }
+    //setState({ userInfo: response.data });
+  } else {
+    console.log("Cancelled");
+    return "";
+    // sign in was cancelled by user
+  }
+}
+async function getAuth(): Promise<string>{
+  if(Platform.OS === "ios"){
+    return "";
+  }else{
+    if(GoogleSignin.hasPreviousSignIn()){
+      console.log("Has previous signin");
+      let currentUser = GoogleSignin.getCurrentUser();
+      if(currentUser !== null){
+        console.log("currentUser");
+        if(currentUser.idToken){return currentUser.idToken;}
+        GoogleSignin.getTokens().then(toks => {return toks.idToken});
+      }else{
+        console.log("No current User");
+        GoogleSignin.signInSilently().then(res => {
+          if(res.type === "success"){
+            console.log("Successful silent signin");
+            console.log(res.data.idToken);
+            return res.data.idToken;
+          }else{
+            console.log("Unsuccessful silent signin");
+            GoogleSignin.signIn().then(res => {
+              if(res.type === "success"){
+                console.log("Successful first-time signin");
+                console.log(res.data.idToken);
+                return res.data.idToken;
+              }else{
+                throw new Error("Signin error");
+              }
+            });
+          }
+        });
+      }
+    }else{
+      console.log("First time auth");
+      firstTimeGoogleAuth().then(result => {
+        return result;
+      });
+    }
+  }
+  return "";
+}
+
+//TODO:
+//What are we returning? Anything? Or just making sure there's no rejections?
+async function login(): Promise<void>{
+  getAuth().then(auth => {
+    console.log("auth:");
+    console.log(auth);
+    if(Platform.OS === "ios"){
+      throw Error("iOS login not implemented yet");
+    }else{
+      console.log("Attempting login with: ");
+      console.log(auth);
+      http.post("/users/login", {
+        "google_token": auth
+      }).then(val => {
+        return;
+      }).catch(err => {
+        console.error("TT web signin error: " + err);
+      })
+    }
+  });
+  return;
+
+}
 
 function updateDispatch(dispatch: Function){
   console.log("Updating dispatch");
@@ -174,6 +257,7 @@ export function reducer(state: state_t, action: action_t){
 const DbDispatchContext = createContext((() => {}) as Function);
 const DbStateContext = createContext({} as state_t)
 export default {
+  login,
   status,
   reducer,
   DbDispatchContext,

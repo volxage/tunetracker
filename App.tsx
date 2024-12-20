@@ -47,6 +47,9 @@ import {BSON} from 'realm';
 import PlaylistViewer from './components/PlaylistViewer.tsx';
 import PlaylistImporter from './components/PlaylistImporter.tsx';
 import {translateAttrFromStandardTune} from './DraftReducers/utils/translate.ts';
+import {Modal} from 'react-native';
+import {SubText, Text} from './Style.tsx';
+import Register from './components/Register.tsx';
 
 
 const Stack = createNativeStackNavigator();
@@ -93,6 +96,13 @@ function MainMenu({}: {}): React.JSX.Element {
       screenOptions={{headerShown: false}}
       initialRouteName='TuneListDisplay'
     >
+      <Stack.Group screenOptions={{presentation: "modal"}}>
+        <Stack.Screen name="Register">
+          {(props) =>
+          <Register/>
+        }
+        </Stack.Screen>
+      </Stack.Group>
       <Stack.Screen name="MiniEditor">
         {(props) => <Editor
           prettyAttrs={arr}
@@ -131,22 +141,16 @@ function MainMenu({}: {}): React.JSX.Element {
                 const localComps = allLocalComposers.filter(comp => comp.dbId && compDbIds.includes(comp.dbId));
                 tn.composers = localComps;
                 if(tn.composers.length !== stand["Composers"].length){
-                  console.log(tn.composers);
-                  console.log("Past inequality");
                   //TODO: Optimize
                   // Composer(s) are missing from localDB.
                   // Finds all dbIds where there are no corresponding local entries
                   const missingComposersIds = compDbIds.filter(id => 
                     !localComps.some(dbComposer => dbComposer.dbId === id)
                   );
-                  console.log("Missing composer ids:");
-                  console.log(missingComposersIds);
                   // Maps missing IDs to onineDB composers
                   const missingComposers = missingComposersIds.map(missingCompId => 
                     stand["Composers"]?.find(onlineComp => onlineComp.id === missingCompId)
                   );
-                  console.log("Missing composers:");
-                  console.log(missingComposers);
                   realm.write(() => {
                     for(const missingComp of missingComposers){
                       if(!missingComp){
