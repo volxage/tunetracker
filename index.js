@@ -14,5 +14,4 @@ import OnlineDB from './OnlineDB';
 GoogleSignin.configure({
   webClientId: webSigningCert,
 })
-OnlineDB.login();
 AppRegistry.registerComponent(appName, () => App);

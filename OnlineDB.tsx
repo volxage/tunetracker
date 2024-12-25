@@ -3,13 +3,16 @@ import {createContext} from "react";
 import { composer, standard, standard_composer, standard_composer_draft, standard_draft, Status, tune_draft } from "./types";
 import http from "./http-to-server.ts"
 import {Platform} from "react-native";
-import {GoogleSignin, isErrorWithCode, isSuccessResponse, statusCodes} from '@react-native-google-signin/google-signin';
+import {GoogleSignin, isErrorWithCode, isSuccessResponse, statusCodes, User} from '@react-native-google-signin/google-signin';
 let standards: standard[] = [];
 let composers: standard_composer[] = [];
 let status = Status.Waiting
 let attemptNo = 0;
 const statusListeners = new Set<Function>();
 
+async function googleSignOut(): Promise<void>{
+  GoogleSignin.signOut();
+}
 async function firstTimeGoogleAuth(): Promise<string>{
   await GoogleSignin.hasPlayServices();
   const response = await GoogleSignin.signIn();
@@ -26,7 +29,7 @@ async function firstTimeGoogleAuth(): Promise<string>{
     // sign in was cancelled by user
   }
 }
-async function getAuth(): Promise<string>{
+async function getUser(): Promise<User | string>{
   if(Platform.OS === "ios"){
     return "";
   }else{
@@ -34,23 +37,21 @@ async function getAuth(): Promise<string>{
       console.log("Has previous signin");
       let currentUser = GoogleSignin.getCurrentUser();
       if(currentUser !== null){
-        console.log("currentUser");
-        if(currentUser.idToken){return currentUser.idToken;}
-        GoogleSignin.getTokens().then(toks => {return toks.idToken});
+        return currentUser;
       }else{
         console.log("No current User");
         GoogleSignin.signInSilently().then(res => {
           if(res.type === "success"){
             console.log("Successful silent signin");
             console.log(res.data.idToken);
-            return res.data.idToken;
+            return res.data;
           }else{
             console.log("Unsuccessful silent signin");
             GoogleSignin.signIn().then(res => {
               if(res.type === "success"){
                 console.log("Successful first-time signin");
                 console.log(res.data.idToken);
-                return res.data.idToken;
+                return res.data;
               }else{
                 throw new Error("Signin error");
               }
@@ -59,7 +60,6 @@ async function getAuth(): Promise<string>{
         });
       }
     }else{
-      console.log("First time auth");
       firstTimeGoogleAuth().then(result => {
         return result;
       });
@@ -70,27 +70,22 @@ async function getAuth(): Promise<string>{
 
 //TODO:
 //What are we returning? Anything? Or just making sure there's no rejections?
-async function login(): Promise<void>{
-  getAuth().then(auth => {
-    console.log("auth:");
-    console.log(auth);
+async function login(dispatch: Function): Promise<User | void>{
+  return getUser().then(user => {
     if(Platform.OS === "ios"){
       throw Error("iOS login not implemented yet");
     }else{
-      console.log("Attempting login with: ");
-      console.log(auth);
-      http.post("/users/login", {
-        "google_token": auth
+      const googleUser = user as User;
+      dispatch({type: "setGoogleUser", value: googleUser});
+      console.log("Attempting login");
+      return http.post("/users/login", {
+        "google_token": googleUser.idToken
       }).then(val => {
-        return;
-      }).catch(err => {
-        console.error("TT web signin error: " + err);
       })
     }
   });
-  return;
-
 }
+
 
 function updateDispatch(dispatch: Function){
   console.log("Updating dispatch");
@@ -231,7 +226,8 @@ async function sendComposerUpdateDraft(composerDraft: standard_composer_draft){
 type state_t = {
   composers: standard_composer[],
   standards: standard[],
-  status: Status
+  status: Status,
+  googleUser: User
 }
 type action_t = {
   type: string,
@@ -248,6 +244,9 @@ export function reducer(state: state_t, action: action_t){
     case "setStatus": {
       return {composers: state.composers, standards: state.standards, status: action.value}
     }
+    case "setGoogleUser": {
+      return {composers: state.composers, standards: state.standards, status: action.value, googleUser: action.value}
+    }
     default: {
       return {composers: composers, standards: standards, status: status};
     }
@@ -258,6 +257,7 @@ const DbDispatchContext = createContext((() => {}) as Function);
 const DbStateContext = createContext({} as state_t)
 export default {
   login,
+  getUser,
   status,
   reducer,
   DbDispatchContext,
@@ -284,5 +284,6 @@ export default {
     return composers.find((comp: standard_composer) => comp.id === id);
   },
   getAttemptNo(){return attemptNo},
-  updateDispatch
+  updateDispatch,
+  googleSignOut
 }

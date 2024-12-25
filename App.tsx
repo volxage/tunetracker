@@ -19,8 +19,8 @@
  */
 
 
-import React, {createContext, isValidElement, useEffect, useReducer, useState} from 'react';
-import {NavigationContainer} from '@react-navigation/native';
+import React, {createContext, isValidElement, useContext, useEffect, useReducer, useState} from 'react';
+import {NavigationContainer, NavigationState, useNavigation} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 
@@ -50,6 +50,8 @@ import {translateAttrFromStandardTune} from './DraftReducers/utils/translate.ts'
 import {Modal} from 'react-native';
 import {SubText, Text} from './Style.tsx';
 import Register from './components/Register.tsx';
+import {AxiosError, isAxiosError} from 'axios';
+import {User} from '@react-native-google-signin/google-signin';
 
 
 const Stack = createNativeStackNavigator();
@@ -91,6 +93,36 @@ function MainMenu({}: {}): React.JSX.Element {
   let entriesArr = Array.from(miniEditorAttrs.entries());
   let arr = entriesArr;
   const allLocalComposers = useQuery(Composer);
+  const navigation = useNavigation();
+  const dbDispatch= useContext(OnlineDB.DbDispatchContext);
+  function tryLogin(navigation: any, counter = 0){
+    OnlineDB.login(dbDispatch).then(() => {
+      console.log("Login successful! (Authenticated with TuneTracker)");
+    }).catch(err => {
+      console.log("Login error");
+      console.log(err);
+      console.log((err as AxiosError).response);
+      if(isAxiosError(err)){
+        switch(err.response?.status){
+          case 404:
+          {
+            navigation.navigate("Register");
+          }
+          case 401:
+          {
+            const data = err.response?.data as any;
+            if((data["message"] as string).startsWith("Google token error: Token used too late, ")){
+              OnlineDB.googleSignOut();
+              tryLogin(1)
+            }
+          }
+        }
+      }
+    })
+  }
+  useEffect(() => {
+    tryLogin(navigation);
+  }, []);
   return(
     <Stack.Navigator
       screenOptions={{headerShown: false}}
