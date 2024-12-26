@@ -1,5 +1,5 @@
 //Copyright 2024 Jonathan Hilliard
-import React, {useEffect, useReducer, useState} from 'react';
+import React, {useContext, useEffect, useReducer, useState} from 'react';
 import {
   Button,
   DeleteButton,
@@ -357,6 +357,8 @@ export default function Compare({
   const comparedLocalChangesDebugString = debugDisplayLocal(comparedLocalChanges, isComposer);
   const comparedDbChangesDebugString = debugDisplayOnline(comparedDbChanges, isComposer);
   const attrs = (isComposer ? composerEditorAttrs : compareTuneEditorAttrs).filter((item) => (!exclude_set.has(item[0]) && !item[0].endsWith("Confidence")))
+  const onlineDbState = useContext(OnlineDB.DbStateContext);
+  const onlineDbDispatch = useContext(OnlineDB.DbDispatchContext);
   return(
   <BackgroundView>
   <FlatList
@@ -417,7 +419,10 @@ export default function Compare({
       }
         </View>
         <Button style={{backgroundColor: (uploadSuccessful || errorReceived) ? "grey" : "cadetblue"}}
-          onPress={() => {
+          onPress={async () => {
+            if(!OnlineDB.checkLoggedIn(onlineDbState)){
+              await OnlineDB.login(onlineDbDispatch);
+            }
             //TODO: Handle other errors besides Axios ones
             if(!uploadSuccessful && !errorReceived){
               if(!isComposer){

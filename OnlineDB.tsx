@@ -86,6 +86,14 @@ async function login(dispatch: Function): Promise<User | void>{
   });
 }
 
+function checkLoggedIn(state: state_t){
+  if(Platform.OS === "android"){
+    if(state.googleUser){return true};
+    
+  }
+  return false;
+}
+
 
 function updateDispatch(dispatch: Function){
   console.log("Updating dispatch");
@@ -227,7 +235,7 @@ type state_t = {
   composers: standard_composer[],
   standards: standard[],
   status: Status,
-  googleUser: User
+  googleUser?: User
 }
 type action_t = {
   type: string,
@@ -267,6 +275,7 @@ export default {
   createComposerDraft,
   sendUpdateDraft,
   sendComposerUpdateDraft,
+  checkLoggedIn,
   getStandards() {
     return standards;
   },
