@@ -5,7 +5,7 @@ import Tune from "./model/Tune";
 import { composer, standard } from "./types";
 import Realm from "realm";
 type possible_items_type = Tune | standard | Composer | composer;
-function itemSort(songs: Array<possible_items_type> | Results<Tune> | List<Tune>, selected: keyof possible_items_type, reversed: boolean){
+function itemSort(songs: Array<possible_items_type> | Results<Tune> | List<Tune>, selected: keyof (Tune & standard & Composer | composer), reversed: boolean){
   let reverse_null_multiplier = 1;
   let reversed_multiplier = reversed ? -1 : 1;
   if ((selected as string).endsWith("confidence") || selected == "playthroughs"){
@@ -14,7 +14,7 @@ function itemSort(songs: Array<possible_items_type> | Results<Tune> | List<Tune>
   function itemCompare(a_item: possible_items_type, b_item: possible_items_type){
     let a = a_item[selected] as unknown;
     let b = b_item[selected] as unknown;
-    if(selected === "Rank" || selected === "Year" || selected === "birth" || selected === "death"){
+    if(selected === "birth" || selected === "death"){
       if (Number(a) < Number(b)){
         return -1 * reversed_multiplier;
       }
