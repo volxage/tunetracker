@@ -95,33 +95,7 @@ function MainMenu({}: {}): React.JSX.Element {
   const allLocalComposers = useQuery(Composer);
   const navigation = useNavigation();
   const dbDispatch= useContext(OnlineDB.DbDispatchContext);
-  function tryLogin(navigation: any, counter = 0){
-    OnlineDB.login(dbDispatch).then(() => {
-      console.log("Login successful! (Authenticated with TuneTracker)");
-    }).catch(err => {
-      console.log("Login error");
-      console.log(err);
-      console.log((err as AxiosError).response);
-      if(isAxiosError(err)){
-        switch(err.response?.status){
-          case 404:
-          {
-            navigation.navigate("Register");
-          }
-          case 401:
-          {
-            const data = err.response?.data as any;
-            if((data["message"] as string).startsWith("Google token error: Token used too late, ")){
-              OnlineDB.googleSignOut();
-              tryLogin(1)
-            }
-          }
-        }
-      }
-    })
-  }
   useEffect(() => {
-    tryLogin(navigation);
   }, []);
   return(
     <Stack.Navigator

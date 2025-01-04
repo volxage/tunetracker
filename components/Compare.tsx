@@ -23,7 +23,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import Tune from '../model/Tune.js';
 import dateDisplay from '../textconverters/dateDisplay.tsx';
 import OnlineDB from '../OnlineDB.tsx';
-import {AxiosResponse} from 'axios';
+import {AxiosError, AxiosResponse, isAxiosError} from 'axios';
 import Composer from '../model/Composer.ts';
 import standardTuneDraftReducer from '../DraftReducers/StandardTuneDraftReducer.ts';
 import tuneDraftReducer from '../DraftReducers/TuneDraftReducer.ts';
@@ -350,7 +350,7 @@ export default function Compare({
   const comparedLocalChanges = localState["currentDraft"];
   //  const [comparedLocalChanges, setComparedTuneChanges] = useState(currentItem);
   const [uploadResult, setUploadResult] = useState({} as any);
-  const [uploadError, setUploadError] = useState({} as any);
+  const [uploadError, setUploadError] = useState({} as AxiosError);
   const uploadSuccessful = uploadResult && ("data" in uploadResult);
   const errorReceived = uploadError && "message" in uploadError;
 
@@ -414,56 +414,67 @@ export default function Compare({
       {
         errorReceived &&
         <View style={{borderWidth: 1, borderColor: "red", padding: 16, margin: 8}}>
-          <SubText>ERROR: {uploadError["message"]}</SubText>
+          <SubText>ERROR: {uploadError.response?.data.message}</SubText>
         </View>
       }
         </View>
         <Button style={{backgroundColor: (uploadSuccessful || errorReceived) ? "grey" : "cadetblue"}}
-          onPress={async () => {
-            if(!OnlineDB.checkLoggedIn(onlineDbState)){
-              await OnlineDB.login(onlineDbDispatch);
-            }
-            //TODO: Handle other errors besides Axios ones
-            if(!uploadSuccessful && !errorReceived){
-              if(!isComposer){
-                const toUpload = comparedDbChanges as standard_draft;
-                console.log(toUpload.Composers);
-                const copyToSend = {
-                  title: toUpload.title,
-                  alternative_title: toUpload.alternative_title,
-                  composer_placeholder: toUpload.composer_placeholder,
-                  id: toUpload.id,
-                  form: toUpload.form,
-                  bio: toUpload.bio,
-                  composers: toUpload.Composers
-                }
+          onPress={() => {
+            //TODO: Add type for tunetracker server responses/errors
+            submit();
+            function submit(first=true){
+              if(!uploadSuccessful && !errorReceived){
+                if(!isComposer){
+                  const toUpload = comparedDbChanges as standard_draft;
+                  console.log(toUpload.Composers);
+                  const copyToSend = {
+                    title: toUpload.title,
+                    alternative_title: toUpload.alternative_title,
+                    composer_placeholder: toUpload.composer_placeholder,
+                    id: toUpload.id,
+                    form: toUpload.form,
+                    bio: toUpload.bio,
+                    composers: toUpload.Composers
+                  }
                   OnlineDB.sendUpdateDraft(copyToSend).then(res => {
                     setUploadResult(((res as AxiosResponse)))
                   }).catch((e) => {
-                    try{
+                    if(!first){
+                      console.error("Sumission failed twice. Giving up");
+                      console.log("Second error:");
+                      console.log(e);
                       setUploadError(e);
-                    }catch{
-                      setUploadError("An unknown error occured while submitting the tune.")
+                      return;
+                    }
+                    else{
+                      console.log("First submission error:");
+                      console.log(e);
+                    }
+                    if(isAxiosError(e)){
+                      switch(e.response?.status){
+                        case 401: {
+                          OnlineDB.tryLogin(navigation, dbDispatch).then(() => {
+                            submit(false);
+                          });
+                        }
+                      }
                     }
                   });
-              }else{
-                const toUpload = comparedDbChanges as standard_composer;
-                const copyToSend = {
-                  name: toUpload.name,
-                  bio: toUpload.bio,
-                  birth: toUpload.birth,
-                  death: toUpload.death,
-                  id: toUpload.id
-                }
+                }else{
+                  const toUpload = comparedDbChanges as standard_composer;
+                  const copyToSend = {
+                    name: toUpload.name,
+                    bio: toUpload.bio,
+                    birth: toUpload.birth,
+                    death: toUpload.death,
+                    id: toUpload.id
+                  }
                   OnlineDB.sendComposerUpdateDraft(copyToSend).then(res => {
                     setUploadResult(((res as AxiosResponse)))
                   }).catch((e) => {
-                    try{
-                      setUploadError(e);
-                    }catch{
-                      setUploadError("An unknown error occured while submitting the tune.")
-                    }
+                    setUploadError(e);
                   });
+                }
               }
             }
           }}

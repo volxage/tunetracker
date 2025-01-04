@@ -4,14 +4,15 @@ import { composer, standard, standard_composer, standard_composer_draft, standar
 import http from "./http-to-server.ts"
 import {Platform} from "react-native";
 import {GoogleSignin, isErrorWithCode, isSuccessResponse, statusCodes, User} from '@react-native-google-signin/google-signin';
+import {AxiosError, isAxiosError} from "axios";
 let standards: standard[] = [];
 let composers: standard_composer[] = [];
 let status = Status.Waiting
 let attemptNo = 0;
 const statusListeners = new Set<Function>();
 
-async function googleSignOut(): Promise<void>{
-  GoogleSignin.signOut();
+async function googleSignOut(): Promise<null>{
+  return GoogleSignin.signOut();
 }
 async function firstTimeGoogleAuth(): Promise<string>{
   await GoogleSignin.hasPlayServices();
@@ -36,67 +37,96 @@ async function getUser(): Promise<User | string>{
     if(GoogleSignin.hasPreviousSignIn()){
       console.log("Has previous signin");
       let currentUser = GoogleSignin.getCurrentUser();
-      if(currentUser !== null){
+      if(currentUser !== null && currentUser.idToken !== null){
         return currentUser;
-      }else{
-        console.log("No current User");
-        GoogleSignin.signInSilently().then(res => {
-          if(res.type === "success"){
-            console.log("Successful silent signin");
-            console.log(res.data.idToken);
-            return res.data;
-          }else{
-            console.log("Unsuccessful silent signin");
-            GoogleSignin.signIn().then(res => {
-              if(res.type === "success"){
-                console.log("Successful first-time signin");
-                console.log(res.data.idToken);
-                return res.data;
-              }else{
-                throw new Error("Signin error");
-              }
-            });
-          }
-        });
       }
+      console.log("No current User, or invalidated user idToken");
+      await GoogleSignin.signInSilently().then(async res => {
+        if(res.type === "success"){
+          console.log("Successful silent signin");
+          console.log(res.data.idToken);
+          return res.data;
+        }else{
+          console.log("Unsuccessful silent signin");
+          await GoogleSignin.signIn().then(res => {
+            if(res.type === "success"){
+              console.log("Successful first-time signin");
+              console.log(res.data.idToken);
+              return res.data;
+            }else{
+              throw new Error("Signin error");
+            }
+          });
+        }
+      });
     }else{
-      firstTimeGoogleAuth().then(result => {
+      await firstTimeGoogleAuth().then(result => {
         return result;
       });
     }
   }
   return "";
 }
+async function tryLogin(navigation: any, dispatch: Function, counter = 0){
+  await login(dispatch).then(() => {
+    console.log("Login function successfully completed");
+    return;
+  }).catch((err: AxiosError) => {
+    console.log("Login error caught in tryLogin");
+    console.log(err);
+    navigation.navigate("Register");
+  })
+}
 
 //TODO:
 //What are we returning? Anything? Or just making sure there's no rejections?
-async function login(dispatch: Function): Promise<User | void>{
-  return getUser().then(user => {
+async function login(dispatch: Function, counter=0): Promise<User>{
+  console.log("Login function begin");
+  if(counter > 5){
+    console.log("5th login attempt failed, giving up");
+    throw Error("5 failed login attempts");
+  }
+  return getUser().then(async user => {
     if(Platform.OS === "ios"){
       throw Error("iOS login not implemented yet");
     }else{
       const googleUser = user as User;
-      dispatch({type: "setGoogleUser", value: googleUser});
-      console.log("Attempting login");
-      return http.post("/users/login", {
+      const result = await http.post("/users/login", {
         "google_token": googleUser.idToken
-      }).then(val => {
-      })
+      });
+      console.log("Server authenticated user, session created");
+      dispatch({type: "setGoogleUser", value: googleUser});
+      return googleUser;
     }
+  }).catch(async err => {
+    console.log("Login error");
+    console.log(err);
+    if(isAxiosError(err)){
+      switch(err.response?.status){
+        case 404:
+        {
+          throw Error("User not found in login function");
+        }
+        case 401:
+        {
+          const data = err.response?.data as any;
+          if((data["message"] as string).startsWith("Google token error: Token used too late, ")){
+            console.log("Token used too late");
+            await googleSignOut()
+            const user = await login(dispatch, counter + 1);
+            return user;
+          }
+        }
+      }
+    }
+    throw (err);
   });
-}
-
-function checkLoggedIn(state: state_t){
-  if(Platform.OS === "android"){
-    if(state.googleUser){return true};
-    
-  }
-  return false;
+  throw new Error("getUser function call finished without returning a User")
 }
 
 
 function updateDispatch(dispatch: Function){
-  console.log("Updating dispatch");
+  console.log("Updating dispatch (Fetching standards and composers)");
   dispatch({type: "setStatus", value: Status.Waiting});
   fetchTunes().then(res => {
     //Janky workaround until we get a better idea of how promises work
@@ -151,7 +181,6 @@ function fetchComposers(counter=0): Promise<standard_composer[]>{
       (response) => {
         //console.log('response');
         if(response.ok){
-          //console.log("response ok!");
           response.json().then(json => {
             composers = (json as standard_composer[]);
             setStatus(Status.Complete);
@@ -189,7 +218,6 @@ function fetchTunes(counter=0): Promise<standard[]>{
       (response) => {
         //console.log('response');
         if(response.ok){
-          console.log("response ok!");
           response.json().then(json => {
             standards = (json as standard[]);
             setStatus(Status.Complete);
@@ -265,6 +293,7 @@ const DbDispatchContext = createContext((() => {}) as Function);
 const DbStateContext = createContext({} as state_t)
 export default {
   login,
+  tryLogin,
   getUser,
   status,
   reducer,
@@ -275,7 +304,6 @@ export default {
   createComposerDraft,
   sendUpdateDraft,
   sendComposerUpdateDraft,
-  checkLoggedIn,
   getStandards() {
     return standards;
   },
