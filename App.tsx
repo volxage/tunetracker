@@ -61,6 +61,8 @@ function App(): React.JSX.Element {
   const [state, dispatch] = useReducer(OnlineDB.reducer, {composers: [], standards: [], status: Status.Failed})
   useEffect(() => {
     OnlineDB.updateDispatch(dispatch);
+    //TODO: Remove this! This is for testing only, makes you login every time you restart the app
+    OnlineDB.googleSignOut();
   }, []);
 
   return(

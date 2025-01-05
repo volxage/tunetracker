@@ -16,43 +16,38 @@ async function googleSignOut(): Promise<null>{
 }
 async function firstTimeGoogleAuth(): Promise<string>{
   await GoogleSignin.hasPlayServices();
-  const response = await GoogleSignin.signIn();
-  if (isSuccessResponse(response)) {
-    if(response.data.idToken){
-      return response.data.idToken;
+  return GoogleSignin.signIn().then(res => {
+    if(res.type === "success" && res.data.idToken){
+      return res.data.idToken;
     }else{
-      throw Error("Invalid response from google api");
+      throw new Error("Signin error");
     }
-    //setState({ userInfo: response.data });
-  } else {
-    console.log("Cancelled");
-    return "";
-    // sign in was cancelled by user
-  }
+  });
+  throw Error("User cancelled google auth")
 }
-async function getUser(): Promise<User | string>{
+async function getUserToken(): Promise<string>{
   if(Platform.OS === "ios"){
-    return "";
+    throw("iOS login not supported yet")
   }else{
     if(GoogleSignin.hasPreviousSignIn()){
       console.log("Has previous signin");
       let currentUser = GoogleSignin.getCurrentUser();
       if(currentUser !== null && currentUser.idToken !== null){
-        return currentUser;
+        return currentUser.idToken;
       }
       console.log("No current User, or invalidated user idToken");
       await GoogleSignin.signInSilently().then(async res => {
         if(res.type === "success"){
           console.log("Successful silent signin");
           console.log(res.data.idToken);
-          return res.data;
+          return res.data.idToken;
         }else{
           console.log("Unsuccessful silent signin");
           await GoogleSignin.signIn().then(res => {
             if(res.type === "success"){
               console.log("Successful first-time signin");
               console.log(res.data.idToken);
-              return res.data;
+              return res.data.idToken;
             }else{
               throw new Error("Signin error");
             }
@@ -60,7 +55,7 @@ async function getUser(): Promise<User | string>{
         }
       });
     }else{
-      await firstTimeGoogleAuth().then(result => {
+      return firstTimeGoogleAuth().then(result => {
         return result;
       });
     }
@@ -74,29 +69,38 @@ async function tryLogin(navigation: any, dispatch: Function, counter = 0){
   }).catch((err: AxiosError) => {
     console.log("Login error caught in tryLogin");
     console.log(err);
-    navigation.navigate("Register");
+    switch(err.status){
+      case 400: {
+        console.log("Login attempted to use empty user token");
+        throw(err);
+      }
+      case 404: {
+        console.log("User token was processed and doesn't match any of TT's registered  users.");
+        navigation.navigate("Register");
+      }
+    }
   })
 }
 
 //TODO:
 //What are we returning? Anything? Or just making sure there's no rejections?
-async function login(dispatch: Function, counter=0): Promise<User>{
+async function login(dispatch: Function, counter=0): Promise<string>{
   console.log("Login function begin");
   if(counter > 5){
     console.log("5th login attempt failed, giving up");
     throw Error("5 failed login attempts");
   }
-  return getUser().then(async user => {
+  return getUserToken().then(async user => {
     if(Platform.OS === "ios"){
       throw Error("iOS login not implemented yet");
     }else{
-      const googleUser = user as User;
+      const googleUserToken = user as string;
       const result = await http.post("/users/login", {
-        "google_token": googleUser.idToken
+        "google_token": googleUserToken
       });
       console.log("Server authenticated user, session created");
-      dispatch({type: "setGoogleUser", value: googleUser});
-      return googleUser;
+      dispatch({type: "setGoogleUser", value: googleUserToken});
+      return googleUserToken;
     }
   }).catch(async err => {
     console.log("Login error");
@@ -117,11 +121,17 @@ async function login(dispatch: Function, counter=0): Promise<User>{
             return user;
           }
         }
+        case 400:
+        {
+          const data = err.response?.data as any;
+          console.log(data["message"]);
+        }
       }
     }
+    console.log("Login error not resolved, bubbling error up");
     throw (err);
   });
-  throw new Error("getUser function call finished without returning a User")
+  throw new Error("getUserToken function call finished without returning a User")
 }
 
 
@@ -294,7 +304,7 @@ const DbStateContext = createContext({} as state_t)
 export default {
   login,
   tryLogin,
-  getUser,
+  getUserToken,
   status,
   reducer,
   DbDispatchContext,
