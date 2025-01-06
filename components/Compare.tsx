@@ -414,13 +414,14 @@ export default function Compare({
       {
         errorReceived &&
         <View style={{borderWidth: 1, borderColor: "red", padding: 16, margin: 8}}>
-          <SubText>ERROR: {uploadError.response?.data.message}</SubText>
+          <SubText>ERROR: {uploadError.response?.data.message ? uploadError.response?.data.message : uploadError.message}</SubText>
         </View>
       }
         </View>
         <Button style={{backgroundColor: (uploadSuccessful || errorReceived) ? "grey" : "cadetblue"}}
           onPress={() => {
             //TODO: Add type for tunetracker server responses/errors
+            //Abstract error handling to a service?
             submit();
             function submit(first=true){
               if(!uploadSuccessful && !errorReceived){
@@ -456,6 +457,10 @@ export default function Compare({
                             submit(false);
                           });
                         }
+                      }
+                      if(e.message === "Network Error"){
+                        setUploadError(e);
+                        console.log("Network error");
                       }
                     }
                   });
