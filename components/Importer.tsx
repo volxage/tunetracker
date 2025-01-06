@@ -39,7 +39,7 @@ const standardComposersAttrs = new Map<string, string>([
 import { Status, composer, standard, standard_composer } from '../types.ts';
 import dateDisplay from '../textconverters/dateDisplay.tsx';
 import TuneDraftContext from '../contexts/TuneDraftContext.ts';
-import {AxiosResponse} from 'axios';
+import {AxiosError, AxiosResponse, isAxiosError} from 'axios';
 import ComposerDraftContext from '../contexts/ComposerDraftContext.ts';
 import {useQuery, useRealm} from '@realm/react';
 import Composer from '../model/Composer.ts';
@@ -141,6 +141,7 @@ function ImporterHeader({
   suggestTuneSubmission: boolean
 }){
   const standardAttrs = importingComposers ? standardComposersAttrs : standardTuneAttrs;
+  const dbDispatch = useContext(OnlineDB.DbDispatchContext);
   const selectedAttrItems = Array.from(standardAttrs.entries())
     .map((x) => {return {label: x[1], value: x[0]}});
   const [createOnlineItemExpanded, setCreateOnlineItemExpanded] = useState(false);
@@ -214,48 +215,73 @@ function ImporterHeader({
               <Button
                 style={{backgroundColor: (submissionSuccessful || errorReceived) ? "#444" : "cadetblue"}}
                 onPress={() => {
+                  submit();
                   //TODO: Move tune conversion to OnlineDB here and in Compare.tsx
-                  if(!submissionSuccessful && !errorReceived){
-                    if(!importingComposers){
-                      if(!currentTune || !currentTune.title){
-                        console.error("No title in the tune!");
-                        return;
+                  function submit(first=true){
+                    if(!submissionSuccessful && !errorReceived){
+                      if(!importingComposers){
+                        if(!currentTune || !currentTune.title){
+                          console.error("No title in the tune!");
+                          return;
+                        }
+                        const copyToSend = {
+                          title: currentTune.title,
+                          alternative_title: currentTune.alternativeTitle,
+                          id: currentTune.id,
+                          form: currentTune.form,
+                          bio: currentTune.bio,
+                          composers: !currentTune.composers ? undefined : currentTune.composers.map(comp => {
+                            console.log(comp);
+                            if("dbId" in comp){
+                              return comp["dbId"]
+                            }
+                            return comp.id;
+                          })
+                        }
+                        OnlineDB.createTuneDraft(copyToSend).then(res => {
+                          setSubmissionResult(res as AxiosResponse)
+                        }).catch(err => {catchFunc(err, first)});
+                      }else{
+                        if(!currentComposer || !currentComposer.name){
+                          console.error("No name in the composer!");
+                          return;
+                        }
+                        const copyToSend = {
+                          name: currentComposer.name,
+                          bio: currentComposer.bio,
+                          birth: currentComposer.birth,
+                          death: currentComposer.death
+                        }
+                        OnlineDB.createComposerDraft(copyToSend).then(res => {
+                          setSubmissionResult(((res as AxiosResponse)))
+                        }).catch((e) => {catchFunc(e, first)});
                       }
-                      const copyToSend = {
-                        title: currentTune.title,
-                        alternative_title: currentTune.alternativeTitle,
-                        id: currentTune.id,
-                        form: currentTune.form,
-                        bio: currentTune.bio,
-                        composers: !currentTune.composers ? undefined : currentTune.composers.map(comp => {
-                          console.log(comp);
-                          if("dbId" in comp){
-                            return comp["dbId"]
-                          }
-                          return comp.id;
-                        })
+                    }
+                  }
+                  function catchFunc(e: AxiosError, first: boolean){
+                    if(!first){
+                      console.error("Sumission failed twice. Giving up");
+                      console.log("Second error:");
+                      console.log(e);
+                      setSubmissionError(e);
+                      return;
+                    }
+                    else{
+                      console.log("First submission error:");
+                      console.log(e);
+                    }
+                    if(isAxiosError(e)){
+                      switch(e.response?.status){
+                        case 401: {
+                          OnlineDB.tryLogin(navigation, dbDispatch).then(() => {
+                            submit(false);
+                          });
+                        }
                       }
-                      OnlineDB.createTuneDraft(copyToSend).then(res => {
-                        setSubmissionResult(res as AxiosResponse)
-                      }).catch(err => {
-                        setSubmissionError(err);
-                      });
-                    }else{
-                      if(!currentComposer || !currentComposer.name){
-                        console.error("No name in the composer!");
-                        return;
+                      if(e.message === "Network Error"){
+                        setSubmissionError(e);
+                        console.log("Network error");
                       }
-                      const copyToSend = {
-                        name: currentComposer.name,
-                        bio: currentComposer.bio,
-                        birth: currentComposer.birth,
-                        death: currentComposer.death
-                      }
-                      OnlineDB.createComposerDraft(copyToSend).then(res => {
-                        setSubmissionResult(((res as AxiosResponse)))
-                      }).catch(err => {
-                        setSubmissionError(err);
-                      });
                     }
                   }
                 }}

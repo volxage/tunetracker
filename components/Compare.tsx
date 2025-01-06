@@ -438,32 +438,7 @@ export default function Compare({
                   }
                   OnlineDB.sendUpdateDraft(copyToSend).then(res => {
                     setUploadResult(((res as AxiosResponse)))
-                  }).catch((e) => {
-                    if(!first){
-                      console.error("Sumission failed twice. Giving up");
-                      console.log("Second error:");
-                      console.log(e);
-                      setUploadError(e);
-                      return;
-                    }
-                    else{
-                      console.log("First submission error:");
-                      console.log(e);
-                    }
-                    if(isAxiosError(e)){
-                      switch(e.response?.status){
-                        case 401: {
-                          OnlineDB.tryLogin(navigation, dbDispatch).then(() => {
-                            submit(false);
-                          });
-                        }
-                      }
-                      if(e.message === "Network Error"){
-                        setUploadError(e);
-                        console.log("Network error");
-                      }
-                    }
-                  });
+                  }).catch(e => {catchFunc(e, first)});
                 }else{
                   const toUpload = comparedDbChanges as standard_composer;
                   const copyToSend = {
@@ -475,9 +450,32 @@ export default function Compare({
                   }
                   OnlineDB.sendComposerUpdateDraft(copyToSend).then(res => {
                     setUploadResult(((res as AxiosResponse)))
-                  }).catch((e) => {
-                    setUploadError(e);
-                  });
+                  }).catch(e => {catchFunc(e, first)})               }
+              }
+            }
+            function catchFunc(e: AxiosError, first: boolean){
+              if(!first){
+                console.error("Sumission failed twice. Giving up");
+                console.log("Second error:");
+                console.log(e);
+                setUploadError(e);
+                return;
+              }
+              else{
+                console.log("First submission error:");
+                console.log(e);
+              }
+              if(isAxiosError(e)){
+                switch(e.response?.status){
+                  case 401: {
+                    OnlineDB.tryLogin(navigation, dbDispatch).then(() => {
+                      submit(false);
+                    });
+                  }
+                }
+                if(e.message === "Network Error"){
+                  setUploadError(e);
+                  console.log("Network error");
                 }
               }
             }

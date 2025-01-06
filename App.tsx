@@ -63,6 +63,7 @@ function App(): React.JSX.Element {
     OnlineDB.updateDispatch(dispatch);
     //TODO: Remove this! This is for testing only, makes you login every time you restart the app
     OnlineDB.googleSignOut();
+    console.log("Signing out of google");
   }, []);
 
   return(
