@@ -52,6 +52,7 @@ import {SubText, Text} from './Style.tsx';
 import Register from './components/Register.tsx';
 import {AxiosError, isAxiosError} from 'axios';
 import {User} from '@react-native-google-signin/google-signin';
+import ProfileMenu from './components/ProfileMenu.tsx';
 
 
 const Stack = createNativeStackNavigator();
@@ -106,11 +107,7 @@ function MainMenu({}: {}): React.JSX.Element {
       initialRouteName='TuneListDisplay'
     >
       <Stack.Group screenOptions={{presentation: "modal"}}>
-        <Stack.Screen name="Register">
-          {(props) =>
-          <Register/>
-        }
-        </Stack.Screen>
+        <Stack.Screen name="Register" component={Register}/>
       </Stack.Group>
       <Stack.Screen name="MiniEditor">
         {(props) => <Editor
@@ -209,16 +206,8 @@ function MainMenu({}: {}): React.JSX.Element {
         </SafeAreaView>
       }
     </Stack.Screen>
-    <Stack.Screen name="ExtrasMenu">
-        {(props) =>
-        <SafeAreaView style={{flex: 1, backgroundColor: "black"}}>
-          <View style={{flex:1}}>
-            <ExtrasMenu
-            />
-          </View>
-        </SafeAreaView>
-        }
-    </Stack.Screen>
+    <Stack.Screen name="ExtrasMenu" component={ExtrasMenu}/>
+    <Stack.Screen name="ProfileMenu" component={ProfileMenu}/>
     <Stack.Screen name="PlaylistViewer">
         {(props) =>
         <SafeAreaView style={{flex: 1, backgroundColor: "black"}}>

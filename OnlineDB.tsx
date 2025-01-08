@@ -212,7 +212,7 @@ function fetchComposers(counter=0): Promise<standard_composer[]>{
   });
 }
 //TODO: Figure out why fetch might return a void here but not with composers?
-function fetchTunes(counter=0): Promise<standard[]>{
+async function fetchTunes(counter=0): Promise<standard[]>{
   attemptNo = counter;
   return new Promise<standard[]>( (resolve, reject) => {
     if(counter > 6){

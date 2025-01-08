@@ -16,6 +16,9 @@ export default function ExtrasMenu({
         <View style={{alignSelf: "center"}}>
           <Title>Extras Menu</Title>
         </View>
+        <Button onPress={() => {navigation.navigate("ProfileMenu")}}>
+          <ButtonText>Profile</ButtonText>
+        </Button>
         <Button onPress={() => {navigation.navigate("PlaylistViewer")}}>
           <ButtonText>Playlist Viewer</ButtonText>
         </Button>
