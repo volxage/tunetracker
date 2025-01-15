@@ -35,6 +35,7 @@ import displayLocalAttr, {debugDisplayLocal, debugDisplayOnline, displayOnlineAt
 import {translateAttrFromLocal, translateKeyFromLocal} from '../DraftReducers/utils/translate.ts';
 import {comparedAttrEqual} from '../DraftReducers/utils/comparedAttrEqual.ts';
 import {useNavigation} from '@react-navigation/native';
+import ResponseBox from './ResponseBox.tsx';
 const debugMode = false;
 
 //Anything that ends with "confidence" is also excluded
@@ -351,6 +352,8 @@ export default function Compare({
   //  const [comparedLocalChanges, setComparedTuneChanges] = useState(currentItem);
   const [uploadResult, setUploadResult] = useState({} as any);
   const [uploadError, setUploadError] = useState({} as AxiosError);
+  const [isFirstAttempt, setIsFirstAttempt] = useState(true);
+  const [promise, setPromise]: [null | Promise<AxiosResponse>, Function] = useState(null);
   const uploadSuccessful = uploadResult && ("data" in uploadResult);
   const errorReceived = uploadError && "message" in uploadError;
 
@@ -359,6 +362,66 @@ export default function Compare({
   const attrs = (isComposer ? composerEditorAttrs : compareTuneEditorAttrs).filter((item) => (!exclude_set.has(item[0]) && !item[0].endsWith("Confidence")))
   const onlineDbState = useContext(OnlineDB.DbStateContext);
   const onlineDbDispatch = useContext(OnlineDB.DbDispatchContext);
+
+  function submit(first=true){
+    console.log("submit called");
+    if(!uploadSuccessful && !errorReceived){
+      if(!isComposer){
+        const toUpload = comparedDbChanges as standard_draft;
+        const copyToSend = {
+          title: toUpload.title,
+          alternative_title: toUpload.alternative_title,
+          composer_placeholder: toUpload.composer_placeholder,
+          id: toUpload.id,
+          form: toUpload.form,
+          bio: toUpload.bio,
+          composers: toUpload.Composers
+        }
+        setPromise(OnlineDB.sendUpdateDraft(copyToSend));
+        //OnlineDB.sendUpdateDraft(copyToSend).then(res => {
+        //  setUploadResult(((res as AxiosResponse)))
+        //}).catch(e => {catchFunc(e, first)});
+      }else{
+        const toUpload = comparedDbChanges as standard_composer;
+        const copyToSend = {
+          name: toUpload.name,
+          bio: toUpload.bio,
+          birth: toUpload.birth,
+          death: toUpload.death,
+          id: toUpload.id
+        }
+        OnlineDB.sendComposerUpdateDraft(copyToSend).then(res => {
+          setUploadResult(((res as AxiosResponse)))
+        }).catch(e => {catchFunc(e, first)})               }
+    }
+  }
+  function catchFunc(e: AxiosError, first: boolean){
+    if(!first){
+      console.error("Sumission failed twice. Giving up");
+      console.log("Second error:");
+      console.log(e);
+      setUploadError(e);
+      return;
+    }
+    else{
+      console.log("First submission error:");
+      console.log(e);
+    }
+    if(isAxiosError(e)){
+      switch(e.response?.status){
+        case 401: {
+          OnlineDB.tryLogin(navigation, dbDispatch).then(() => {
+            submit(false);
+          });
+        }
+      }
+      if(e.message === "Network Error"){
+        setUploadError(e);
+        console.log("Network error");
+      }
+    }
+  }
+
   return(
   <BackgroundView>
   <FlatList
@@ -417,68 +480,19 @@ export default function Compare({
           <SubText>ERROR: {uploadError.response?.data.message ? uploadError.response?.data.message : uploadError.message}</SubText>
         </View>
       }
+      <ResponseBox
+        promise={promise}
+        successToString={res => {
+          return res.message;
+        }}
+        retry={submit}
+      />
         </View>
         <Button style={{backgroundColor: (uploadSuccessful || errorReceived) ? "grey" : "cadetblue"}}
           onPress={() => {
             //TODO: Add type for tunetracker server responses/errors
             //Abstract error handling to a service?
             submit();
-            function submit(first=true){
-              if(!uploadSuccessful && !errorReceived){
-                if(!isComposer){
-                  const toUpload = comparedDbChanges as standard_draft;
-                  const copyToSend = {
-                    title: toUpload.title,
-                    alternative_title: toUpload.alternative_title,
-                    composer_placeholder: toUpload.composer_placeholder,
-                    id: toUpload.id,
-                    form: toUpload.form,
-                    bio: toUpload.bio,
-                    composers: toUpload.Composers
-                  }
-                  OnlineDB.sendUpdateDraft(copyToSend).then(res => {
-                    setUploadResult(((res as AxiosResponse)))
-                  }).catch(e => {catchFunc(e, first)});
-                }else{
-                  const toUpload = comparedDbChanges as standard_composer;
-                  const copyToSend = {
-                    name: toUpload.name,
-                    bio: toUpload.bio,
-                    birth: toUpload.birth,
-                    death: toUpload.death,
-                    id: toUpload.id
-                  }
-                  OnlineDB.sendComposerUpdateDraft(copyToSend).then(res => {
-                    setUploadResult(((res as AxiosResponse)))
-                  }).catch(e => {catchFunc(e, first)})               }
-              }
-            }
-            function catchFunc(e: AxiosError, first: boolean){
-              if(!first){
-                console.error("Sumission failed twice. Giving up");
-                console.log("Second error:");
-                console.log(e);
-                setUploadError(e);
-                return;
-              }
-              else{
-                console.log("First submission error:");
-                console.log(e);
-              }
-              if(isAxiosError(e)){
-                switch(e.response?.status){
-                  case 401: {
-                    OnlineDB.tryLogin(navigation, dbDispatch).then(() => {
-                      submit(false);
-                    });
-                  }
-                }
-                if(e.message === "Network Error"){
-                  setUploadError(e);
-                  console.log("Network error");
-                }
-              }
-            }
           }}
         >
           <ButtonText>Upload left side</ButtonText>

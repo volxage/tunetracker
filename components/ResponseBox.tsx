@@ -1,7 +1,9 @@
 import {AxiosError, AxiosResponse, isAxiosError} from 'axios';
-import {useState} from 'react';
+import {useContext, useEffect, useState} from 'react';
 import {SubText} from '../Style';
 import {View} from 'react-native';
+import OnlineDB from '../OnlineDB';
+import {useNavigation} from '@react-navigation/native';
 
 type response_t = {
   "message": string
@@ -14,27 +16,21 @@ export default function ResponseBox({
   promise,
   successToString,
   retry,
-  firstAttempt
 }:{
-  promise: Promise<AxiosResponse>,
+  promise: Promise<AxiosResponse> | null,
   successToString: (response: response_t) => string,
   retry: Function,
-  firstAttempt: boolean
 }){
   const [resultString, setResultString] = useState("");
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  promise.then(res => {
-    setResultString(successToString(res.data));
-  }).catch((err: AxiosError) => {
-    const data = err.response?.data as error_data_t;
-    if(!firstAttempt){
-      console.error("Sumission failed twice. Giving up");
-      console.log("Second error:");
-      console.log(err);
-      setResultString(data.message)
-    }
-  })
+  const [isFirstAttempt, setIsFirstAttempt] = useState(true);
+  const onlineDbState = useContext(OnlineDB.DbStateContext);
+  const onlineDbDispatch = useContext(OnlineDB.DbDispatchContext);
+  const navigation = useNavigation();
+  if(!promise){
+    return(<></>);
+  }
   if(isLoading){
     return(
       <SubText>Loading...</SubText>
