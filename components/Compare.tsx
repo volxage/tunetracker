@@ -404,9 +404,20 @@ export default function Compare({
           death: toUpload.death,
           id: toUpload.id
         }
-        OnlineDB.sendComposerUpdateDraft(copyToSend).then(res => {
-          setUploadResult(((res as AxiosResponse)))
-        }).catch(e => {catchFunc(e, first)})               }
+        ResponseHandler(
+          OnlineDB.sendComposerUpdateDraft(copyToSend),
+          (response => {
+            return `Successfully uploaded your vesion of ${response.data.name}`;
+          }),
+          submit,
+          isFirstAttempt,
+          navigation,
+          onlineDbDispatch
+        ).then(res => {
+          setUploadResult(res.result);
+          setUploadErrorPresent(res.isError);
+        })
+      }
     }
   }
   function catchFunc(e: AxiosError, first: boolean){

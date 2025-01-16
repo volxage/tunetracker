@@ -261,9 +261,9 @@ async function sendUpdateDraft(tuneDraft: standard_draft): Promise<AxiosResponse
 }
 async function sendComposerUpdateDraft(composerDraft: standard_composer_draft){
   if(composerDraft.id){
-    return http.put(`/composers/${composerDraft.id}`, composerDraft).catch(r => {throw r})
+    return http.put(`/composers/${composerDraft.id}`, composerDraft).catch(r => {throw r});
   }else{
-    console.log("dbId is invalid");
+    throw("dbId is invalid");
   }
 }
 
