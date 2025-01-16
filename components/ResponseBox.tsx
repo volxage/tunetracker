@@ -13,42 +13,25 @@ type error_data_t = {
 }
 
 export default function ResponseBox({
-  promise,
-  successToString,
-  retry,
+  result,
+  isError
 }:{
-  promise: Promise<AxiosResponse> | null,
-  successToString: (response: response_t) => string,
-  retry: Function,
+  result: string
+  isError: boolean
 }){
-  const [resultString, setResultString] = useState("");
-  const [isError, setIsError] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isFirstAttempt, setIsFirstAttempt] = useState(true);
-  const onlineDbState = useContext(OnlineDB.DbStateContext);
-  const onlineDbDispatch = useContext(OnlineDB.DbDispatchContext);
-  const navigation = useNavigation();
-  if(!promise){
+  if(!result || result === ""){
     return(<></>);
-  }
-  if(isLoading){
-    return(
-      <SubText>Loading...</SubText>
-    );
   }
   if(isError){
     return(
-      <View>
-        <SubText>Error!</SubText>
-        <SubText>{resultString}</SubText>
-        <SubText>ERROR: {resultString}</SubText>
+      <View style={{borderWidth: 1, borderColor: "red", padding: 16, margin: 8}}>
+        <SubText>{result}</SubText>
       </View>
     );
   }
   return(
-    <View>
-        <SubText>Success!</SubText>
-      <SubText>{resultString}</SubText>
+    <View style={{borderWidth: 1, borderColor: "green", padding: 16, margin: 8}}>
+      <SubText>{result}</SubText>
     </View>
-  );
+  )
 }

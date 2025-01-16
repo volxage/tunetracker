@@ -36,6 +36,7 @@ import {translateAttrFromLocal, translateKeyFromLocal} from '../DraftReducers/ut
 import {comparedAttrEqual} from '../DraftReducers/utils/comparedAttrEqual.ts';
 import {useNavigation} from '@react-navigation/native';
 import ResponseBox from './ResponseBox.tsx';
+import ResponseHandler from '../services/ResponseHandler.ts';
 const debugMode = false;
 
 //Anything that ends with "confidence" is also excluded
@@ -350,11 +351,12 @@ export default function Compare({
   //const comparedLocalChanges = localState[isComposer ? "currentComposer" : "currentTune"]
   const comparedLocalChanges = localState["currentDraft"];
   //  const [comparedLocalChanges, setComparedTuneChanges] = useState(currentItem);
-  const [uploadResult, setUploadResult] = useState({} as any);
+  const [uploadResult, setUploadResult] = useState("");
   const [uploadError, setUploadError] = useState({} as AxiosError);
   const [isFirstAttempt, setIsFirstAttempt] = useState(true);
-  const [promise, setPromise]: [null | Promise<AxiosResponse>, Function] = useState(null);
-  const uploadSuccessful = uploadResult && ("data" in uploadResult);
+  //const uploadSuccessful = uploadResult && ("data" in uploadResult);
+  const uploadSuccessful = false;
+  const [uploadErrorPresent, setUploadErrorPresent] = useState(false);
   const errorReceived = uploadError && "message" in uploadError;
 
   const comparedLocalChangesDebugString = debugDisplayLocal(comparedLocalChanges, isComposer);
@@ -377,7 +379,19 @@ export default function Compare({
           bio: toUpload.bio,
           composers: toUpload.Composers
         }
-        setPromise(OnlineDB.sendUpdateDraft(copyToSend));
+        ResponseHandler(
+          OnlineDB.sendUpdateDraft(copyToSend), 
+          (response => {
+            return `Successfully uploaded your version of ${response.data.title}`;
+          }),
+          submit,
+          isFirstAttempt,
+          navigation,
+          onlineDbDispatch
+        ).then(res => {
+          setUploadResult(res.result);
+          setUploadErrorPresent(res.isError);
+        })
         //OnlineDB.sendUpdateDraft(copyToSend).then(res => {
         //  setUploadResult(((res as AxiosResponse)))
         //}).catch(e => {catchFunc(e, first)});
@@ -452,47 +466,17 @@ export default function Compare({
             <SubText>{comparedDbChangesDebugString}</SubText>
           </View>
         }
-        <View>
-      {
-        !isComposer && uploadSuccessful &&
-        <View style={{borderWidth: 1, borderColor: "green", padding: 16, margin: 8}}>
-          <SubText>Uploaded tune "{uploadResult["data"]["data"]["title"]}"</SubText>
-          <SubText>Attached to composers:</SubText>
-          <SubText>{uploadResult["data"]["composers"].map((comp: composer)=> comp.name).join(", ")}</SubText>
-        {
-          uploadSuccessful && ("composer_placeholder" in uploadResult["data"] && uploadResult["data"]["composer_placeholder"] != "") && 
-          <View>
-            <SubText>Custom composers suggested:</SubText>
-            <SubText>{uploadResult["data"]["composer_placeholder"]}</SubText>
-          </View>
-        }
-        </View>
-      }
-      {
-        isComposer && uploadSuccessful &&
-        <View style={{borderWidth: 1, borderColor: "green", padding: 16, margin: 8}}>
-          <SubText>Uploaded composer "{uploadResult["data"]["name"]}"</SubText>
-        </View>
-      }
-      {
-        errorReceived &&
-        <View style={{borderWidth: 1, borderColor: "red", padding: 16, margin: 8}}>
-          <SubText>ERROR: {uploadError.response?.data.message ? uploadError.response?.data.message : uploadError.message}</SubText>
-        </View>
-      }
-      <ResponseBox
-        promise={promise}
-        successToString={res => {
-          return res.message;
-        }}
-        retry={submit}
-      />
-        </View>
-        <Button style={{backgroundColor: (uploadSuccessful || errorReceived) ? "grey" : "cadetblue"}}
+        <ResponseBox
+          result={uploadResult}
+          isError={uploadErrorPresent}
+        />
+        <Button style={{backgroundColor: (uploadResult === "") ? "cadetblue" : "grey"}}
           onPress={() => {
             //TODO: Add type for tunetracker server responses/errors
             //Abstract error handling to a service?
-            submit();
+            if(uploadResult === ""){
+              submit();
+            }
           }}
         >
           <ButtonText>Upload left side</ButtonText>

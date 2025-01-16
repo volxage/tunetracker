@@ -4,7 +4,7 @@ import { composer, standard, standard_composer, standard_composer_draft, standar
 import http from "./http-to-server.ts"
 import {Platform} from "react-native";
 import {GoogleSignin, isErrorWithCode, isSuccessResponse, statusCodes, User} from '@react-native-google-signin/google-signin';
-import {AxiosError, isAxiosError} from "axios";
+import {AxiosError, AxiosResponse, isAxiosError} from "axios";
 let standards: standard[] = [];
 let composers: standard_composer[] = [];
 let status = Status.Waiting
@@ -252,11 +252,11 @@ async function createTuneDraft(tuneDraft: tune_draft){
 async function createComposerDraft(composerDraft: composer){
   return http.post("/composers", composerDraft);
 }
-async function sendUpdateDraft(tuneDraft: standard_draft){
+async function sendUpdateDraft(tuneDraft: standard_draft): Promise<AxiosResponse>{
   if(tuneDraft.id){
-    return http.put(`/tunes/${tuneDraft.id}`, tuneDraft).catch(r => {throw r})
+    return http.put(`/tunes/${tuneDraft.id}`, tuneDraft)
   }else{
-    console.log("dbId is invalid");
+    throw("dbId is invalid");
   }
 }
 async function sendComposerUpdateDraft(composerDraft: standard_composer_draft){
