@@ -36,7 +36,7 @@ const standardComposersAttrs = new Map<string, string>([
   ["death", "Death"],
 ]);
 
-import { Status, composer, standard, standard_composer } from '../types.ts';
+import { Status, composer, standard, standard_composer, tune_draft } from '../types.ts';
 import dateDisplay from '../textconverters/dateDisplay.tsx';
 import TuneDraftContext from '../contexts/TuneDraftContext.ts';
 import {AxiosError, AxiosResponse, isAxiosError} from 'axios';
@@ -45,6 +45,8 @@ import {useQuery, useRealm} from '@realm/react';
 import Composer from '../model/Composer.ts';
 import Tune from '../model/Tune.ts';
 import {useNavigation} from '@react-navigation/native';
+import ResponseHandler from '../services/ResponseHandler.ts';
+import ResponseBox from './ResponseBox.tsx';
 
 const tuneFuseOptions = { // For finetuning the search algorithm
 	// isCaseSensitive: false,
@@ -147,10 +149,8 @@ function ImporterHeader({
   const [createOnlineItemExpanded, setCreateOnlineItemExpanded] = useState(false);
   const currentTune = useContext(TuneDraftContext);
   const currentComposer = useContext(ComposerDraftContext);
-  const [submissionResult, setSubmissionResult] = useState({} as any);
-  const submissionSuccessful = submissionResult && "data" in submissionResult;
-  const [submissionError, setSubmissionError] = useState({} as any);
-  const errorReceived = submissionError && "message" in submissionError;
+  const [submissionResult, setSubmissionResult] = useState("");
+  const [errorPresent, setErrorPresent] = useState(false);
   const navigation = useNavigation();
   return(
     <View style={{backgroundColor: "#222"}}>
@@ -200,25 +200,14 @@ function ImporterHeader({
             suggestTuneSubmission ?
             <View>
               <SubText>This search doesn't seem to match well with any {importingComposers ? "composer" : "tune"} from our database. You can submit your draft below. After it is reviewed and accepted, it will be added to the database for everyone to use!</SubText>
-              {
-                submissionSuccessful &&
-                <View style={{borderColor: "white", borderWidth: 1, padding: 4}}>
-                  <SubText>Submitted your tune "{importingComposers ? currentComposer.name : currentTune.title}" to tunetracker.jhilla.org</SubText>
-                </View>
-              }
-              {
-                errorReceived &&
-                <View style={{borderColor: "white", borderWidth: 1, padding: 4}}>
-                  <SubText>Error: {submissionError["message"]}</SubText>
-                </View>
-              }
+              <ResponseBox result={submissionResult} isError={errorPresent}/>
               <Button
-                style={{backgroundColor: (submissionSuccessful || errorReceived) ? "#444" : "cadetblue"}}
+                style={{backgroundColor: (submissionResult !== "") ? "#444" : "cadetblue"}}
                 onPress={() => {
                   submit();
                   //TODO: Move tune conversion to OnlineDB here and in Compare.tsx
                   function submit(first=true){
-                    if(!submissionSuccessful && !errorReceived){
+                    if(submissionResult === ""){
                       if(!importingComposers){
                         if(!currentTune || !currentTune.title){
                           console.error("No title in the tune!");
@@ -237,10 +226,18 @@ function ImporterHeader({
                             }
                             return comp.id;
                           })
-                        }
-                        OnlineDB.createTuneDraft(copyToSend).then(res => {
-                          setSubmissionResult(res as AxiosResponse)
-                        }).catch(err => {catchFunc(err, first)});
+                        } as tune_draft;
+                        ResponseHandler(
+                          OnlineDB.createTuneDraft(copyToSend),
+                          (res) => {return `Successfully submitted your draft of ${res.data.title}`},
+                          submit,
+                          first,
+                          navigation,
+                          dbDispatch
+                        ).then(res => {
+                          setSubmissionResult(res.result);
+                          setErrorPresent(res.isError);
+                        })
                       }else{
                         if(!currentComposer || !currentComposer.name){
                           console.error("No name in the composer!");
@@ -252,42 +249,24 @@ function ImporterHeader({
                           birth: currentComposer.birth,
                           death: currentComposer.death
                         }
-                        OnlineDB.createComposerDraft(copyToSend).then(res => {
-                          setSubmissionResult(((res as AxiosResponse)))
-                        }).catch((e) => {catchFunc(e, first)});
-                      }
-                    }
-                  }
-                  function catchFunc(e: AxiosError, first: boolean){
-                    if(!first){
-                      console.error("Sumission failed twice. Giving up");
-                      console.log("Second error:");
-                      console.log(e);
-                      setSubmissionError(e);
-                      return;
-                    }
-                    else{
-                      console.log("First submission error:");
-                      console.log(e);
-                    }
-                    if(isAxiosError(e)){
-                      switch(e.response?.status){
-                        case 401: {
-                          OnlineDB.tryLogin(navigation, dbDispatch).then(() => {
-                            submit(false);
-                          });
-                        }
-                      }
-                      if(e.message === "Network Error"){
-                        setSubmissionError(e);
-                        console.log("Network error");
+                          ResponseHandler(
+                            OnlineDB.createComposerDraft(copyToSend),
+                            (res) => {return `Successfully submitted your draft of ${res.data.name}`},
+                            submit,
+                            first,
+                            navigation,
+                            dbDispatch
+                          ).then(res => {
+                            setSubmissionResult(res.result);
+                            setErrorPresent(res.isError);
+                          })
                       }
                     }
                   }
                 }}
               >
                 {
-                  (submissionResult && "data" in submissionResult) ?
+                  (submissionResult !== "") ?
                   <ButtonText style={{color: "#777"}}>(Tune already submitted)</ButtonText>
                   :
                   <ButtonText>Upload your {importingComposers ? "composer" : "tune"}</ButtonText>
