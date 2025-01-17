@@ -28,6 +28,15 @@ export type tune_draft = {
   playedAt?: Date
   //  "playedAt"?: string[]
 }
+type submitted_draft = {
+  "pending_review"?: boolean
+  "accepted"?: boolean
+}
+type submitted_tune_draft_composer_extension = {
+  "Composers"?: Array<standard_composer>
+}
+export type submitted_tune_draft = tune_draft & submitted_draft & submitted_tune_draft_composer_extension;
+export type submitted_composer_draft = composer & submitted_draft;
 export type tune_draft_extras = {
   "playlists"?: undefined
 }

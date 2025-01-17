@@ -164,8 +164,6 @@ function TypeField({
   }
   else if (attrKey === "playlists" as keyOfEitherDraft && attr){
     const ids = (attr as (Playlist | playlist)[]).map(pl => pl.id);
-    //TODO:
-    // Delete Button
     return(
       <View style={{padding: 8}}>
         <View style={{paddingBottom:20}}>
