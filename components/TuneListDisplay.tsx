@@ -157,7 +157,7 @@ function ItemRender({
         setSelectedTune(tune);
       }
       if(!selectMode){
-        navigation.navigate("MiniEditor");
+        navigation.navigate("Editor");
       }
     }}
     onLongPress={() => {
