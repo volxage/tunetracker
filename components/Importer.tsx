@@ -16,7 +16,9 @@ import {
   DeleteButton,
   ButtonText,
   SMarginView,
-  BackgroundView
+  BackgroundView,
+  RowView,
+  SubBoldText
 } from '../Style.tsx'
 import itemSort from '../itemSort.tsx'
 import {Picker} from '@react-native-picker/picker';
@@ -98,6 +100,32 @@ const statusTextMap = new Map([
   [Status.Failed, 'Connection failed, press the button below to try again. Your internet or the server may be down. Email jhilla@jhilla.org if you believe the server is down. If the server is down, then tunetracker.jhilla.org should also be down!'],
   [Status.Complete, "Connection complete, but something is wrong."]
 ])
+function StandardDetails({
+  std
+}: {
+  std: standard
+}){
+  return(
+    <SMarginView>
+      <RowView>
+        <SubBoldText>Alternative title: </SubBoldText>
+        <SubText>{std.alternative_title}</SubText>
+      </RowView>
+      <RowView>
+        <SubBoldText>Year: </SubBoldText>
+        <SubText>{std.year}</SubText>
+      </RowView>
+      <RowView>
+        <SubBoldText>Form: </SubBoldText>
+        <SubText>{std.form}</SubText>
+      </RowView>
+      <RowView>
+        <SubBoldText>Form: </SubBoldText>
+        <SubText>{std.bio}</SubText>
+      </RowView>
+    </SMarginView>
+  )
+}
 function renderStandard(item: standard | composer, importFn: Function, separators: any, selectedAttr: keyof standard | composer, isComposer: boolean){
   let text = "";
   let subtext = "";
@@ -370,7 +398,6 @@ export default function Importer({
           <TouchableHighlight
             key={item.name}
             onPress={() => {
-              importFn(item, true);
             }}
             onLongPress={() => {
               importFn(item);
