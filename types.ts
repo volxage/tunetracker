@@ -48,7 +48,7 @@ export type composer = {
   "dbId"?: number
 }
 export type standard_composer = {
-  "name"?: string
+  "name": string
   "bio"?: string
   "birth"?: Date | undefined
   "death"?: Date | undefined

@@ -100,6 +100,28 @@ const statusTextMap = new Map([
   [Status.Failed, 'Connection failed, press the button below to try again. Your internet or the server may be down. Email jhilla@jhilla.org if you believe the server is down. If the server is down, then tunetracker.jhilla.org should also be down!'],
   [Status.Complete, "Connection complete, but something is wrong."]
 ])
+function StandardComposerDetails({
+  std
+}: {
+  std: standard_composer
+}){
+  return(
+    <SMarginView>
+      <RowView>
+        <SubBoldText>Bio: </SubBoldText>
+        <SubText>{std.bio}</SubText>
+      </RowView>
+      <RowView>
+        <SubBoldText>Birthday: </SubBoldText>
+        <SubText>{dateDisplay(std.birth)}</SubText>
+      </RowView>
+      <RowView>
+        <SubBoldText>Date of death: </SubBoldText>
+        <SubText>{dateDisplay(std.death)}</SubText>
+      </RowView>
+    </SMarginView>
+  )
+}
 function StandardDetails({
   std
 }: {
@@ -120,11 +142,90 @@ function StandardDetails({
         <SubText>{std.form}</SubText>
       </RowView>
       <RowView>
-        <SubBoldText>Form: </SubBoldText>
+        <SubBoldText>Bio: </SubBoldText>
         <SubText>{std.bio}</SubText>
       </RowView>
     </SMarginView>
   )
+}
+function StandardRender({
+  item,
+  importFn,
+  separators,
+  selectedAttr,
+  isComposer
+}:{
+  item: standard | standard_composer,
+  importFn: Function,
+  separators: any,
+  selectedAttr: keyof (standard & standard_composer),
+  isComposer: boolean
+}){
+  let text = "";
+  let subtext = "";
+  const [detailsShown, setDetailsShown] = useState(false);
+  if(isComposer){
+    const comp = item as standard_composer;
+    text = comp.name;
+    if(selectedAttr !== "name" as keyof standard_composer){
+      subtext = prettyPrint(comp[selectedAttr as keyof standard_composer])
+    }else{
+      subtext = dateDisplay(comp["birth"])
+    }
+    return (
+      <TouchableHighlight
+        key={comp.name}
+        onPress={() => {
+        }}
+        onLongPress={() => {
+          importFn(item);
+        }}
+        onShowUnderlay={separators.highlight}
+        onHideUnderlay={separators.unhighlight}>
+        <View style={{backgroundColor: 'black', padding: 8}}>
+          <Text>{text}</Text>
+          <SubText>{subtext}</SubText>
+          {
+            detailsShown &&
+            <StandardComposerDetails std={comp}/>
+          }
+        </View>
+      </TouchableHighlight>
+    )
+  }else{
+    const stand = item as standard;
+    text = stand.title;
+    if(selectedAttr !== "title" as keyof standard){
+      subtext = prettyPrint(stand[selectedAttr as keyof standard])
+    }else{
+      if(stand["Composers"]){
+        subtext = prettyPrint(stand["Composers"].map(comp => comp.name).join(", "));
+      }else{
+        subtext = "(No composers listed)"
+      }
+    }
+    return (
+      <TouchableHighlight
+        key={stand.title}
+        onPress={() => {
+          setDetailsShown(!detailsShown);
+        }}
+        onLongPress={() => {
+          importFn(item);
+        }}
+        onShowUnderlay={separators.highlight}
+        onHideUnderlay={separators.unhighlight}>
+        <View style={{backgroundColor: 'black', padding: 8}}>
+          <Text>{text}</Text>
+          <SubText>{subtext}</SubText>
+          {
+            detailsShown &&
+            <StandardDetails std={stand}/>
+          }
+        </View>
+      </TouchableHighlight>
+    )
+  }
 }
 function renderStandard(item: standard | composer, importFn: Function, separators: any, selectedAttr: keyof standard | composer, isComposer: boolean){
   let text = "";
@@ -393,23 +494,10 @@ export default function Importer({
           setSearch={setSearch}/>
       }
       renderItem={({item, index, separators}) => {
-        let texts = renderStandard(item, importFn, separators, selectedAttr as keyof standard | composer, importingComposers)
         return (
-          <TouchableHighlight
-            key={item.name}
-            onPress={() => {
-            }}
-            onLongPress={() => {
-              importFn(item);
-            }}
-            onShowUnderlay={separators.highlight}
-            onHideUnderlay={separators.unhighlight}>
-            <View style={{backgroundColor: 'black', padding: 8}}>
-              <Text>{texts?.text}</Text>
-              <SubText>{texts?.subtext}</SubText>
-            </View>
-          </TouchableHighlight>
-      )}
+          <StandardRender item={item} importFn={importFn} separators={separators} selectedAttr={selectedAttr as keyof (standard & standard_composer)} isComposer={importingComposers} />
+        )
+      }
     }
   />
   : <View style={{flex: 1, display: "flex", justifyContent: "center", alignItems: "center"}}>
