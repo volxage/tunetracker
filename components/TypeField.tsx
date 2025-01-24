@@ -124,7 +124,7 @@ function TypeField({
   type keyOfEitherDraft = keyof (tune_draft | composer)
   if (attrKey === "dbId" as keyOfEitherDraft){
     return(
-      <DbConnection attr={attr} navigation={navigation} isComposer={isComposer} />
+      <DbConnection attr={attr} navigation={navigation} isComposer={isComposer} handleSetCurrentItem={handleSetCurrentItem}/>
     );
   }
   else if (attrKey === "composers" as keyOfEitherDraft){

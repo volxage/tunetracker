@@ -3,7 +3,8 @@ import {
   Button,
   Title,
   SubText,
-  SMarginView
+  SMarginView,
+  DeleteButton
 } from '../../Style.tsx'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import React, {useContext, useState} from 'react';
@@ -17,11 +18,13 @@ import dateDisplay from '../../textconverters/dateDisplay.tsx';
 export default function DbConnection({
   attr,
   navigation,
-  isComposer
+  isComposer,
+  handleSetCurrentItem
 }:{
   attr: unknown,
   navigation: any,
-  isComposer: boolean
+  isComposer: boolean,
+  handleSetCurrentItem: Function
 }){
   const [connectTuneExpanded, setConnectTuneExpanded] = useState(false);
   const status = useContext(OnlineDB.DbStateContext).status;
@@ -92,7 +95,7 @@ export default function DbConnection({
                 </Button>
               }
               </View>
-            : <Preview item={item} isComposer={isComposer} navigation={navigation} />
+            : <Preview item={item} isComposer={isComposer} navigation={navigation} handleSetCurrentItem={handleSetCurrentItem}/>
           }
         </View>
       }
@@ -133,12 +136,13 @@ function Diagnoser({
   );
 }
 function Preview({
-  item, isComposer, navigation
+  item, isComposer, navigation, handleSetCurrentItem
 }:
 {
   item: composer | standard,
   isComposer: boolean,
-  navigation: any
+  navigation: any,
+  handleSetCurrentItem: Function
 }
 ){
   if(isComposer){
@@ -150,6 +154,12 @@ function Preview({
         <SubText>Bio: {comp.bio}</SubText>
         <SubText>Birth: {dateDisplay(comp.birth)}</SubText>
         <SubText>Death: {dateDisplay(comp.death)}</SubText>
+        <SubText style={{fontSize: 20, color:'grey', alignSelf: 'center'}}>
+          Press and hold to disconnect this Composer from the online version above
+        </SubText>
+        <DeleteButton onLongPress={() => {
+            handleSetCurrentItem("dbId", undefined);
+        }}><ButtonText>Detach</ButtonText></DeleteButton>
         <Button onPress={() => {navigation.navigate("ComposerCompare")}}>
           <ButtonText>Compare and Change</ButtonText>
         </Button>
@@ -164,6 +174,12 @@ function Preview({
         <SubText>Title: {tn.title}</SubText>
         <SubText>Bio: {tn.bio}</SubText>
         <SubText>Year: {tn.year}</SubText>
+        <SubText style={{fontSize: 20, color:'grey', alignSelf: 'center'}}>
+          Press and hold to disconnect this Tune from the online version above
+        </SubText>
+        <DeleteButton onLongPress={() => {
+            handleSetCurrentItem("dbId", undefined);
+        }}><ButtonText>Detach</ButtonText></DeleteButton>
         <Button onPress={() => {navigation.navigate("Compare")}}>
           <ButtonText>Compare and Change</ButtonText>
         </Button>
