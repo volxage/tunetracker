@@ -413,6 +413,7 @@ export default function Compare({
         ).then(res => {
           setUploadResult(res.result);
           setUploadErrorPresent(res.isError);
+          //TODO: Save tunedraft id to local tune
         })
       }
     }
