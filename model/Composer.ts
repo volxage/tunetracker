@@ -10,6 +10,7 @@ export default class Composer extends Realm.Object<Composer, 'name'> {
   death?: Date;
   bio?: string;
   dbId?: number;
+  dbDraftIds?: number[];
   tunes?: Realm.List<Tune>;
 
   static generate(tn: composer){
@@ -31,6 +32,7 @@ export default class Composer extends Realm.Object<Composer, 'name'> {
       death: "date?",
       bio: "string?",
       dbId: {type: "int", indexed: true, optional: true},
+      dbDraftIds: "int?[]",
       tunes: {type: "linkingObjects", objectType: "Tune", property: "composers"}
     },
     primaryKey: 'id'
