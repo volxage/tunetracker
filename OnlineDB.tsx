@@ -1,6 +1,6 @@
 // Copyright 2024 Jonathan Hilliard
 import {createContext} from "react";
-import { composer, standard, standard_composer, standard_composer_draft, standard_draft, Status, tune_draft } from "./types";
+import { composer, playlist, standard, standard_composer, standard_composer_draft, standard_draft, Status, tune_draft } from "./types";
 import http from "./http-to-server.ts"
 import {Platform} from "react-native";
 import {GoogleSignin, isErrorWithCode, isSuccessResponse, statusCodes, User} from '@react-native-google-signin/google-signin';
@@ -265,6 +265,10 @@ async function sendComposerUpdateDraft(composerDraft: standard_composer_draft){
   }else{
     throw("dbId is invalid");
   }
+}
+
+async function sendPlaylist(playlist: playlist){
+
 }
 
 type state_t = {
