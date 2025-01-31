@@ -17,7 +17,7 @@ export default async function ResponseHandler(
   isFirstAttempt: boolean,
   navigation: any,
   onlineDbDispatch: Function
-): Promise<{result: string, isError: boolean, data?: object}>{
+): Promise<{result: string, isError: boolean, data?: any}>{
   return promise.then(res => {
     console.log("Promise resolved");
     return({result: successToString(res.data), isError: false, data: res.data});

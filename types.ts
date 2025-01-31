@@ -23,6 +23,7 @@ export type tune_draft = {
   "hasLyrics"?: boolean
   "id"?: BSON.ObjectId
   "dbId"?: number
+  "dbDraftIds"?: number[]
   "bio"?: string
   "year"?: number
   playedAt?: Date
@@ -46,6 +47,7 @@ export type composer = {
   "birth"?: Date | undefined
   "death"?: Date | undefined
   "dbId"?: number
+  "dbDraftIds"?: number[]
 }
 export type standard_composer = {
   "name": string

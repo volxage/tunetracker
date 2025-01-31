@@ -364,6 +364,7 @@ export default function Compare({
   const attrs = (isComposer ? composerEditorAttrs : compareTuneEditorAttrs).filter((item) => (!exclude_set.has(item[0]) && !item[0].endsWith("Confidence")))
   const onlineDbState = useContext(OnlineDB.DbStateContext);
   const onlineDbDispatch = useContext(OnlineDB.DbDispatchContext);
+  const realm = useRealm();
 
   function submit(first=true){
     console.log("submit called");
@@ -391,6 +392,7 @@ export default function Compare({
         ).then(res => {
           setUploadResult(res.result);
           setUploadErrorPresent(res.isError);
+          handleSetCurrentItem("dbDraftIds", currentItem.dbDraftIds ? currentItem.dbDraftIds.concat(res.data.id) : [res.data.id]);
         })
       }else{
         const toUpload = comparedDbChanges as standard_composer;
@@ -413,7 +415,7 @@ export default function Compare({
         ).then(res => {
           setUploadResult(res.result);
           setUploadErrorPresent(res.isError);
-          //TODO: Save tunedraft id to local tune
+          handleSetCurrentItem("dbDraftIds", currentItem.dbDraftIds ? currentItem.dbDraftIds.concat(res.data.id) : [res.data.id]);
         })
       }
     }

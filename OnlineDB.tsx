@@ -94,6 +94,7 @@ async function login(dispatch: Function, counter=0): Promise<string>{
     if(Platform.OS === "ios"){
       throw Error("iOS login not implemented yet");
     }else{
+      console.log(user);
       const googleUserToken = user as string;
       const result = await http.post("/users/login", {
         "google_token": googleUserToken
