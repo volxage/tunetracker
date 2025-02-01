@@ -23,7 +23,7 @@ export type tune_draft = {
   "hasLyrics"?: boolean
   "id"?: BSON.ObjectId
   "dbId"?: number
-  "dbDraftIds"?: number[]
+  "dbDraftId"?: number
   "bio"?: string
   "year"?: number
   playedAt?: Date
@@ -47,7 +47,7 @@ export type composer = {
   "birth"?: Date | undefined
   "death"?: Date | undefined
   "dbId"?: number
-  "dbDraftIds"?: number[]
+  "dbDraftId"?: number
 }
 export type standard_composer = {
   "name": string
@@ -100,6 +100,7 @@ export enum Status{
 
 export const editorAttrs: [keyof (tune_draft & tune_draft_extras), string][] = [
   ["dbId", "Database Connection"],
+  ["dbDraftId", "Submitted Draft"],
   ["title", "Title"],
   ["alternativeTitle", "Alternative Title"],
   ["composers", "Composers"],
@@ -173,7 +174,7 @@ export const tuneDefaults = new Map<keyof Tune, any>([
   ["lyricsConfidence", 0],
   ["playedAt", undefined],
   ["dbId", 0],
-  //  ["id", "THIS SHOULD NOT BE HERE"] // If the user sees this text at any point, there's an error in the progra],
+  ["dbDraftId", 0]
 ]);
 
 export const standardDefaults = new Map<keyof standard, any>([

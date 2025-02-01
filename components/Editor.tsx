@@ -53,9 +53,17 @@ export default function Editor({
     }
   }, []);
 
-  function handleSetCurrentTune(attr_key: keyof tune_draft, value: any){
+  function handleSetCurrentTune(attr_key: keyof tune_draft, value: any, immediate = false){
+    if(immediate){
+      if(selectedTune instanceof Tune){
+        realm.write(() => {
+          selectedTune[attr_key] = value
+        })
+      }
+    }
     dispatch({type: 'update_attr', attr: attr_key, value: value});
   }
+
   
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>

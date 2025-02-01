@@ -26,6 +26,7 @@ import {BSON, List} from 'realm';
 import { Picker } from '@react-native-picker/picker';
 import DateField from './TypeFields/DateField.tsx';
 import {useNavigation} from '@react-navigation/native';
+import DbDrafts from './TypeFields/DbDrafts.tsx';
 
 function AddPlaylistField({
   newPlaylist,
@@ -126,6 +127,12 @@ function TypeField({
     return(
       <DbConnection attr={attr} navigation={navigation} isComposer={isComposer} handleSetCurrentItem={handleSetCurrentItem}/>
     );
+  }
+  else if (attrKey === "dbDraftId" as keyOfEitherDraft){
+    return(
+      <DbDrafts attr={attr} navigation={navigation} isComposer={isComposer} handleSetCurrentItem={handleSetCurrentItem}/>
+    )
+
   }
   else if (attrKey === "composers" as keyOfEitherDraft){
     return(

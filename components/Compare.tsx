@@ -353,7 +353,6 @@ export default function Compare({
   //  const [comparedLocalChanges, setComparedTuneChanges] = useState(currentItem);
   const [uploadResult, setUploadResult] = useState("");
   const [uploadError, setUploadError] = useState({} as AxiosError);
-  const [isFirstAttempt, setIsFirstAttempt] = useState(true);
   //const uploadSuccessful = uploadResult && ("data" in uploadResult);
   const uploadSuccessful = false;
   const [uploadErrorPresent, setUploadErrorPresent] = useState(false);
@@ -386,13 +385,13 @@ export default function Compare({
             return `Successfully uploaded your version of ${response.data.title}`;
           }),
           submit,
-          isFirstAttempt,
+          first,
           navigation,
           onlineDbDispatch
         ).then(res => {
           setUploadResult(res.result);
           setUploadErrorPresent(res.isError);
-          handleSetCurrentItem("dbDraftIds", currentItem.dbDraftIds ? currentItem.dbDraftIds.concat(res.data.id) : [res.data.id]);
+          handleSetCurrentItem("dbDraftId", res.data.data.id, true);
         })
       }else{
         const toUpload = comparedDbChanges as standard_composer;
@@ -409,13 +408,13 @@ export default function Compare({
             return `Successfully uploaded your vesion of ${response.data.name}`;
           }),
           submit,
-          isFirstAttempt,
+          first,
           navigation,
           onlineDbDispatch
         ).then(res => {
           setUploadResult(res.result);
           setUploadErrorPresent(res.isError);
-          handleSetCurrentItem("dbDraftIds", currentItem.dbDraftIds ? currentItem.dbDraftIds.concat(res.data.id) : [res.data.id]);
+          handleSetCurrentItem("dbDraftId", res.data.data.id, true);
         })
       }
     }
