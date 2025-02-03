@@ -268,6 +268,14 @@ async function sendComposerUpdateDraft(composerDraft: standard_composer_draft){
   }
 }
 
+async function getTuneDraft(tuneDraftId: number){
+  if(tuneDraftId){
+    return http.get(`/drafts/${tuneDraftId}`);
+  }else{
+    throw("Draft id is invalid");
+  }
+}
+
 async function sendPlaylist(playlist: playlist){
 
 }
@@ -333,6 +341,7 @@ export default {
     if(!composers.length){return null}
     return composers.find((comp: standard_composer) => comp.id === id);
   },
+  getTuneDraft,
   getAttemptNo(){return attemptNo},
   updateDispatch,
   googleSignOut

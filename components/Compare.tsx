@@ -37,6 +37,7 @@ import {comparedAttrEqual} from '../DraftReducers/utils/comparedAttrEqual.ts';
 import {useNavigation} from '@react-navigation/native';
 import ResponseBox from './ResponseBox.tsx';
 import ResponseHandler from '../services/ResponseHandler.ts';
+import InformationExpand from './InformationExpand.tsx';
 const debugMode = false;
 
 //Anything that ends with "confidence" is also excluded
@@ -425,10 +426,12 @@ export default function Compare({
   <FlatList
     data={attrs}
     ListHeaderComponent={(props) => (
-      <SMarginView>
-        <SubText>Here, you can assess the differences between the online version of the tune (on the left in each category) and your local version (on the right of each category) and choose which one you think to be more accurate. If you think neither are accurate, return to the Editor (via Cancel changes) to fix your version and then come back to upload your changes! Categories where both your local tune and the online tune are empty won't show up here.</SubText>
-        <SubText>When you're finished, you can save what you changed on the right side to your phone, and you can upload what's on the left side to tunetracker.jhilla.org for others to use!</SubText>
-      </SMarginView>
+      <InformationExpand Content={() =>
+          <View>
+            <SubText>Here, you can assess the differences between the online version of the tune (on the left in each category) and your local version (on the right of each category) and choose which one you think to be more accurate. If you think neither are accurate, return to the Editor (via Cancel changes) to fix your version and then come back to upload your changes! Categories where both your local tune and the online tune are empty won't show up here.</SubText>
+            <SubText>When you're finished, you can save what you changed on the right side to your phone, and you can upload (or update a previous upload) for what's on the left side to tunetracker.jhilla.org for others to use!</SubText>
+          </View>
+        }/>
     )}
     renderItem={({item, index, separators}) => (
       <CompareField item={item}
@@ -463,7 +466,7 @@ export default function Compare({
             }
           }}
         >
-          <ButtonText>Upload left side</ButtonText>
+          <ButtonText>Upload/Update left side</ButtonText>
         </Button>
         <View style={{flexDirection: "row"}}>
           <Button style={{flex: 1}}
