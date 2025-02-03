@@ -354,7 +354,6 @@ export default function Compare({
   //  const [comparedLocalChanges, setComparedTuneChanges] = useState(currentItem);
   const [uploadResult, setUploadResult] = useState("");
   const [uploadError, setUploadError] = useState({} as AxiosError);
-  //const uploadSuccessful = uploadResult && ("data" in uploadResult);
   const uploadSuccessful = false;
   const [uploadErrorPresent, setUploadErrorPresent] = useState(false);
   const errorReceived = uploadError && "message" in uploadError;
