@@ -74,37 +74,42 @@ export default function PlaylistEditor(
       </View>
       <View style={{flexDirection: "row"}}>
         {
-          !playlistUploaded ?
-          <View style={{flexDirection: "row", flex:1}}>
-            <Button style={{flex: 1, backgroundColor: "#111"}} onPress={() => {
-            }}>
-              <ButtonText style={{color: "#777"}}>
-                Delete From TT
-              </ButtonText>
-            </Button>
+          false &&
+          <View>
             {
-              playlistPublic ?
-              <Button style={{flex:1}}>
-                <ButtonText>
-                  Make private
-                </ButtonText>
-              </Button>
+              !playlistUploaded ?
+              <View style={{flexDirection: "row", flex:1}}>
+                <Button style={{flex: 1, backgroundColor: "#111"}} onPress={() => {
+                }}>
+                  <ButtonText style={{color: "#777"}}>
+                    Delete From TT
+                  </ButtonText>
+                </Button>
+                {
+                  playlistPublic ?
+                  <Button style={{flex:1}}>
+                    <ButtonText>
+                      Make private
+                    </ButtonText>
+                  </Button>
+                  :
+                  <Button style={{flex:1}}>
+                    <ButtonText>
+                      Make public
+                    </ButtonText>
+                  </Button>
+                }
+              </View>
               :
-              <Button style={{flex:1}}>
-                <ButtonText>
-                  Make public
-                </ButtonText>
-              </Button>
+              <View style={{flex:1}}>
+                <DeleteButton style={{backgroundColor: "#111"}} onPress={() => {
+                }}>
+                  <ButtonText style={{color: "#777"}}>
+                    Upload
+                  </ButtonText>
+                </DeleteButton>
+              </View>
             }
-          </View>
-          :
-          <View style={{flex:1}}>
-            <DeleteButton style={{backgroundColor: "#111"}} onPress={() => {
-            }}>
-              <ButtonText style={{color: "#777"}}>
-                Upload
-              </ButtonText>
-            </DeleteButton>
           </View>
         }
       </View>
