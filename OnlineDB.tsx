@@ -270,7 +270,7 @@ async function sendComposerUpdateDraft(composerDraft: standard_composer_draft){
 
 async function getTuneDraft(tuneDraftId: number){
   if(tuneDraftId){
-    return http.get(`/drafts/${tuneDraftId}`);
+    return http.get(`/tunes/drafts/${tuneDraftId}`);
   }else{
     throw("Draft id is invalid");
   }

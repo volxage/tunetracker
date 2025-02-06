@@ -72,26 +72,28 @@ export default function DbDrafts({
               <View>
                 <ResponseBox result={fetchResult} isError={true}/>
                 <DeleteButton onPress={() => {
-                  handleSetCurrentItem("dbDraftId", 0);
+                  handleSetCurrentItem("dbDraftId", 0, true);
                 }}>
                   <ButtonText>Detach from Server Submission</ButtonText>
                 </DeleteButton>
               </View>
               :
               <View>
-                isComposer ?
-                <SubText>
+                {
+                  isComposer ?
+                  <SubText>
+                  </SubText>
+                  :
+                  <SubText>
+                    Uploaded Tune-draft details:{"\n\n"}
+                  Title: {draft.title + "\n"}
+                  Alternative Title: {draft.alternativeTitle || "(none)" + "\n"}
+                  Composers: {draft.Composers?.map(comp => comp.name).join(", ") + "\n"}
+                  Bio: {draft.bio || "(none)".concat("\n")}
+                  Form: {(draft.form || "(none)").concat("\n")}
+                  Year: {(String(draft.year) !== "null" ? String(draft.year) : "(none)").concat("\n")}
                 </SubText>
-              :
-              <SubText>
-                Uploaded Tune-draft details:{"\n\n"}
-                Title: {draft.title + "\n"}
-                Alternative Title: {draft.alternativeTitle + "\n"}
-                Composers: {draft.Composers?.map(comp => {comp.name}).join(", ") + "\n"}
-                Bio: {draft.bio + "\n"}
-                Form: {draft.form + "\n"}
-                Year: {draft.year + "\n"}
-            </SubText>
+                }
             </View>
             }
           </View>
