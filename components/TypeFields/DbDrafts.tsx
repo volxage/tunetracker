@@ -74,7 +74,7 @@ export default function DbDrafts({
                 <DeleteButton onPress={() => {
                   handleSetCurrentItem("dbDraftId", 0);
                 }}>
-                  <ButtonText>Clear</ButtonText>
+                  <ButtonText>Detach from Server Submission</ButtonText>
                 </DeleteButton>
               </View>
               :
@@ -85,14 +85,14 @@ export default function DbDrafts({
               :
               <SubText>
                 Uploaded Tune-draft details:{"\n\n"}
-              Title: {draft.title + "\n"}
-              Alternative Title: {draft.alternativeTitle + "\n"}
-              Composers: {draft.Composers?.map(comp => {comp.name}).join(", ") + "\n"}
-              Bio: {draft.bio + "\n"}
-              Form: {draft.form + "\n"}
-              Year: {draft.year + "\n"}
+                Title: {draft.title + "\n"}
+                Alternative Title: {draft.alternativeTitle + "\n"}
+                Composers: {draft.Composers?.map(comp => {comp.name}).join(", ") + "\n"}
+                Bio: {draft.bio + "\n"}
+                Form: {draft.form + "\n"}
+                Year: {draft.year + "\n"}
             </SubText>
-          </View>
+            </View>
             }
           </View>
         }
