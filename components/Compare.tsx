@@ -366,7 +366,6 @@ export default function Compare({
   const realm = useRealm();
 
   function submit(first=true){
-    console.log("submit called");
     if(!uploadSuccessful && !errorReceived){
       if(!isComposer){
         const toUpload = comparedDbChanges as standard_draft;
@@ -471,10 +470,8 @@ export default function Compare({
           <Button style={{flex: 1}}
             onPress={() => {
               navigation.goBack();
-              for(let attr in comparedLocalChanges){
-                if(attr in comparedLocalChanges){
-                  handleSetCurrentItem(attr, comparedLocalChanges[attr as keyof (Tune | tune_draft)]);
-                }
+              for(let attr of localState.changedAttrsList){
+                handleSetCurrentItem(attr, comparedLocalChanges[attr as keyof (Tune | tune_draft)]);
               }
             }}>
             <ButtonText>Save right side</ButtonText>
