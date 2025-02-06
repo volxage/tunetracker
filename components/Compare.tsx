@@ -35,6 +35,9 @@ import displayLocalAttr, {debugDisplayLocal, debugDisplayOnline, displayOnlineAt
 import {translateAttrFromLocal, translateKeyFromLocal} from '../DraftReducers/utils/translate.ts';
 import {comparedAttrEqual} from '../DraftReducers/utils/comparedAttrEqual.ts';
 import {useNavigation} from '@react-navigation/native';
+import ResponseBox from './ResponseBox.tsx';
+import ResponseHandler from '../services/ResponseHandler.ts';
+import InformationExpand from './InformationExpand.tsx';
 const debugMode = false;
 
 //Anything that ends with "confidence" is also excluded
@@ -349,9 +352,10 @@ export default function Compare({
   //const comparedLocalChanges = localState[isComposer ? "currentComposer" : "currentTune"]
   const comparedLocalChanges = localState["currentDraft"];
   //  const [comparedLocalChanges, setComparedTuneChanges] = useState(currentItem);
-  const [uploadResult, setUploadResult] = useState({} as any);
+  const [uploadResult, setUploadResult] = useState("");
   const [uploadError, setUploadError] = useState({} as AxiosError);
-  const uploadSuccessful = uploadResult && ("data" in uploadResult);
+  const uploadSuccessful = false;
+  const [uploadErrorPresent, setUploadErrorPresent] = useState(false);
   const errorReceived = uploadError && "message" in uploadError;
 
   const comparedLocalChangesDebugString = debugDisplayLocal(comparedLocalChanges, isComposer);
@@ -359,15 +363,73 @@ export default function Compare({
   const attrs = (isComposer ? composerEditorAttrs : compareTuneEditorAttrs).filter((item) => (!exclude_set.has(item[0]) && !item[0].endsWith("Confidence")))
   const onlineDbState = useContext(OnlineDB.DbStateContext);
   const onlineDbDispatch = useContext(OnlineDB.DbDispatchContext);
+  const realm = useRealm();
+
+  function submit(first=true){
+    if(!uploadSuccessful && !errorReceived){
+      if(!isComposer){
+        const toUpload = comparedDbChanges as standard_draft;
+        const copyToSend = {
+          title: toUpload.title,
+          alternative_title: toUpload.alternative_title,
+          composer_placeholder: toUpload.composer_placeholder,
+          id: toUpload.id,
+          form: toUpload.form,
+          bio: toUpload.bio,
+          composers: toUpload.Composers
+        }
+        ResponseHandler(
+          OnlineDB.sendUpdateDraft(copyToSend), 
+          (response => {
+            return `Successfully uploaded your version of ${response.data.title}`;
+          }),
+          submit,
+          first,
+          navigation,
+          onlineDbDispatch
+        ).then(res => {
+          setUploadResult(res.result);
+          setUploadErrorPresent(res.isError);
+          handleSetCurrentItem("dbDraftId", res.data.data.id, true);
+        })
+      }else{
+        const toUpload = comparedDbChanges as standard_composer;
+        const copyToSend = {
+          name: toUpload.name,
+          bio: toUpload.bio,
+          birth: toUpload.birth,
+          death: toUpload.death,
+          id: toUpload.id
+        }
+        ResponseHandler(
+          OnlineDB.sendComposerUpdateDraft(copyToSend),
+          (response => {
+            return `Successfully uploaded your vesion of ${response.data.name}`;
+          }),
+          submit,
+          first,
+          navigation,
+          onlineDbDispatch
+        ).then(res => {
+          setUploadResult(res.result);
+          setUploadErrorPresent(res.isError);
+          handleSetCurrentItem("dbDraftId", res.data.data.id, true);
+        })
+      }
+    }
+  }
+
   return(
   <BackgroundView>
   <FlatList
     data={attrs}
     ListHeaderComponent={(props) => (
-      <SMarginView>
-        <SubText>Here, you can assess the differences between the online version of the tune (on the left in each category) and your local version (on the right of each category) and choose which one you think to be more accurate. If you think neither are accurate, return to the Editor (via Cancel changes) to fix your version and then come back to upload your changes! Categories where both your local tune and the online tune are empty won't show up here.</SubText>
-        <SubText>When you're finished, you can save what you changed on the right side to your phone, and you can upload what's on the left side to tunetracker.jhilla.org for others to use!</SubText>
-      </SMarginView>
+      <InformationExpand Content={() =>
+          <View>
+            <SubText>Here, you can assess the differences between the online version of the tune (on the left in each category) and your local version (on the right of each category) and choose which one you think to be more accurate. If you think neither are accurate, return to the Editor (via Cancel changes) to fix your version and then come back to upload your changes! Categories where both your local tune and the online tune are empty won't show up here.</SubText>
+            <SubText>When you're finished, you can save what you changed on the right side to your phone, and you can upload (or update a previous upload) for what's on the left side to tunetracker.jhilla.org for others to use!</SubText>
+          </View>
+        }/>
     )}
     renderItem={({item, index, separators}) => (
       <CompareField item={item}
@@ -389,108 +451,27 @@ export default function Compare({
             <SubText>{comparedDbChangesDebugString}</SubText>
           </View>
         }
-        <View>
-      {
-        !isComposer && uploadSuccessful &&
-        <View style={{borderWidth: 1, borderColor: "green", padding: 16, margin: 8}}>
-          <SubText>Uploaded tune "{uploadResult["data"]["data"]["title"]}"</SubText>
-          <SubText>Attached to composers:</SubText>
-          <SubText>{uploadResult["data"]["composers"].map((comp: composer)=> comp.name).join(", ")}</SubText>
-        {
-          uploadSuccessful && ("composer_placeholder" in uploadResult["data"] && uploadResult["data"]["composer_placeholder"] != "") && 
-          <View>
-            <SubText>Custom composers suggested:</SubText>
-            <SubText>{uploadResult["data"]["composer_placeholder"]}</SubText>
-          </View>
-        }
-        </View>
-      }
-      {
-        isComposer && uploadSuccessful &&
-        <View style={{borderWidth: 1, borderColor: "green", padding: 16, margin: 8}}>
-          <SubText>Uploaded composer "{uploadResult["data"]["name"]}"</SubText>
-        </View>
-      }
-      {
-        errorReceived &&
-        <View style={{borderWidth: 1, borderColor: "red", padding: 16, margin: 8}}>
-          <SubText>ERROR: {uploadError.response?.data.message ? uploadError.response?.data.message : uploadError.message}</SubText>
-        </View>
-      }
-        </View>
-        <Button style={{backgroundColor: (uploadSuccessful || errorReceived) ? "grey" : "cadetblue"}}
+        <ResponseBox
+          result={uploadResult}
+          isError={uploadErrorPresent}
+        />
+        <Button style={{backgroundColor: (uploadResult === "") ? "cadetblue" : "grey"}}
           onPress={() => {
             //TODO: Add type for tunetracker server responses/errors
             //Abstract error handling to a service?
-            submit();
-            function submit(first=true){
-              if(!uploadSuccessful && !errorReceived){
-                if(!isComposer){
-                  const toUpload = comparedDbChanges as standard_draft;
-                  const copyToSend = {
-                    title: toUpload.title,
-                    alternative_title: toUpload.alternative_title,
-                    composer_placeholder: toUpload.composer_placeholder,
-                    id: toUpload.id,
-                    form: toUpload.form,
-                    bio: toUpload.bio,
-                    composers: toUpload.Composers
-                  }
-                  OnlineDB.sendUpdateDraft(copyToSend).then(res => {
-                    setUploadResult(((res as AxiosResponse)))
-                  }).catch(e => {catchFunc(e, first)});
-                }else{
-                  const toUpload = comparedDbChanges as standard_composer;
-                  const copyToSend = {
-                    name: toUpload.name,
-                    bio: toUpload.bio,
-                    birth: toUpload.birth,
-                    death: toUpload.death,
-                    id: toUpload.id
-                  }
-                  OnlineDB.sendComposerUpdateDraft(copyToSend).then(res => {
-                    setUploadResult(((res as AxiosResponse)))
-                  }).catch(e => {catchFunc(e, first)})               }
-              }
-            }
-            function catchFunc(e: AxiosError, first: boolean){
-              if(!first){
-                console.error("Sumission failed twice. Giving up");
-                console.log("Second error:");
-                console.log(e);
-                setUploadError(e);
-                return;
-              }
-              else{
-                console.log("First submission error:");
-                console.log(e);
-              }
-              if(isAxiosError(e)){
-                switch(e.response?.status){
-                  case 401: {
-                    OnlineDB.tryLogin(navigation, dbDispatch).then(() => {
-                      submit(false);
-                    });
-                  }
-                }
-                if(e.message === "Network Error"){
-                  setUploadError(e);
-                  console.log("Network error");
-                }
-              }
+            if(uploadResult === ""){
+              submit();
             }
           }}
         >
-          <ButtonText>Upload left side</ButtonText>
+          <ButtonText>Upload/Update left side</ButtonText>
         </Button>
         <View style={{flexDirection: "row"}}>
           <Button style={{flex: 1}}
             onPress={() => {
               navigation.goBack();
-              for(let attr in comparedLocalChanges){
-                if(attr in comparedLocalChanges){
-                  handleSetCurrentItem(attr, comparedLocalChanges[attr as keyof (Tune | tune_draft)]);
-                }
+              for(let attr of localState.changedAttrsList){
+                handleSetCurrentItem(attr, comparedLocalChanges[attr as keyof (Tune | tune_draft)]);
               }
             }}>
             <ButtonText>Save right side</ButtonText>

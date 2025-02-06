@@ -1,10 +1,10 @@
 // Copyright 2024 Jonathan Hilliard
 import {createContext} from "react";
-import { composer, standard, standard_composer, standard_composer_draft, standard_draft, Status, tune_draft } from "./types";
+import { composer, playlist, standard, standard_composer, standard_composer_draft, standard_draft, Status, tune_draft } from "./types";
 import http from "./http-to-server.ts"
 import {Platform} from "react-native";
 import {GoogleSignin, isErrorWithCode, isSuccessResponse, statusCodes, User} from '@react-native-google-signin/google-signin';
-import {AxiosError, isAxiosError} from "axios";
+import {AxiosError, AxiosResponse, isAxiosError} from "axios";
 let standards: standard[] = [];
 let composers: standard_composer[] = [];
 let status = Status.Waiting
@@ -94,6 +94,7 @@ async function login(dispatch: Function, counter=0): Promise<string>{
     if(Platform.OS === "ios"){
       throw Error("iOS login not implemented yet");
     }else{
+      console.log(user);
       const googleUserToken = user as string;
       const result = await http.post("/users/login", {
         "google_token": googleUserToken
@@ -212,7 +213,7 @@ function fetchComposers(counter=0): Promise<standard_composer[]>{
   });
 }
 //TODO: Figure out why fetch might return a void here but not with composers?
-function fetchTunes(counter=0): Promise<standard[]>{
+async function fetchTunes(counter=0): Promise<standard[]>{
   attemptNo = counter;
   return new Promise<standard[]>( (resolve, reject) => {
     if(counter > 6){
@@ -252,19 +253,31 @@ async function createTuneDraft(tuneDraft: tune_draft){
 async function createComposerDraft(composerDraft: composer){
   return http.post("/composers", composerDraft);
 }
-async function sendUpdateDraft(tuneDraft: standard_draft){
+async function sendUpdateDraft(tuneDraft: standard_draft): Promise<AxiosResponse>{
   if(tuneDraft.id){
-    return http.put(`/tunes/${tuneDraft.id}`, tuneDraft).catch(r => {throw r})
+    return http.put(`/tunes/${tuneDraft.id}`, tuneDraft)
   }else{
-    console.log("dbId is invalid");
+    throw("dbId is invalid");
   }
 }
 async function sendComposerUpdateDraft(composerDraft: standard_composer_draft){
   if(composerDraft.id){
-    return http.put(`/composers/${composerDraft.id}`, composerDraft).catch(r => {throw r})
+    return http.put(`/composers/${composerDraft.id}`, composerDraft).catch(r => {throw r});
   }else{
-    console.log("dbId is invalid");
+    throw("dbId is invalid");
   }
+}
+
+async function getTuneDraft(tuneDraftId: number){
+  if(tuneDraftId){
+    return http.get(`/tunes/drafts/${tuneDraftId}`);
+  }else{
+    throw("Draft id is invalid");
+  }
+}
+
+async function sendPlaylist(playlist: playlist){
+
 }
 
 type state_t = {
@@ -328,6 +341,7 @@ export default {
     if(!composers.length){return null}
     return composers.find((comp: standard_composer) => comp.id === id);
   },
+  getTuneDraft,
   getAttemptNo(){return attemptNo},
   updateDispatch,
   googleSignOut

@@ -15,7 +15,10 @@ import {
   Button,
   ButtonText,
   ConfidenceBarView,
-  DeleteButton
+  DeleteButton,
+  RowView,
+  SubBoldText,
+  SMarginView
 } from '../Style.tsx'
 import itemSort from '../itemSort.tsx'
 import { Picker } from '@react-native-picker/picker';
@@ -92,16 +95,29 @@ function ConfidenceBar({
   color
 }: {
   tune: Tune
-  confidenceType: keyof Tune
+  confidenceType: "melodyConfidence" | "formConfidence" | "soloConfidence" | "lyricsConfidence"
   color: string
 }){
+  const iconMap = {
+    "melodyConfidence": "music",
+    "formConfidence": "file-music-outline",
+    "soloConfidence": "alpha-s-circle-outline",
+    "lyricsConfidence": "script-text"
+  }
   //TODO: Add confidence type to remove "as number"
   let confidence = tune[confidenceType] as number;
+  if(confidence === 0){
+    return;
+  }
   return(
     <ConfidenceBarView>
       <View 
-        style={{width: `${confidence}%`, backgroundColor: color, height:10, margin:4}}
-      />
+        style={{width: `${confidence}%`, backgroundColor: color, height:20, margin:4}}
+      >
+      <ButtonText>
+        <Icon size={20} name={iconMap[confidenceType]}/>
+      </ButtonText>
+      </View>
     </ConfidenceBarView>
   );
 }
@@ -122,6 +138,43 @@ function ConfidenceBars({
       }
     </View>
   );
+}
+function ExtraInfo({
+
+}: {
+}){
+
+}
+
+function TuneDetails({
+  tune
+}: {
+  tune: Tune
+}){
+  return(
+    <SMarginView>
+      <RowView>
+        <SubBoldText>Alternative title: </SubBoldText>
+        <SubText>{tune.alternativeTitle}</SubText>
+      </RowView>
+      <RowView>
+        <SubBoldText>Form: </SubBoldText>
+        <SubText>{tune.form}</SubText>
+      </RowView>
+      <RowView>
+        <SubBoldText>Main key: </SubBoldText>
+        <SubText>{tune.mainKey}</SubText>
+      </RowView>
+      <RowView>
+        <SubBoldText>Main tempo: </SubBoldText>
+        <SubText>{tune.mainTempo}</SubText>
+      </RowView>
+      <RowView>
+        <SubBoldText>Last played: </SubBoldText>
+        <SubText>{dateDisplay(tune.playedAt)}</SubText>
+      </RowView>
+    </SMarginView>
+  )
 }
 
 function ItemRender({
@@ -146,18 +199,15 @@ function ItemRender({
   const composers = useQuery(Composer)
   const isSelected = selected.some(id => tune.id.equals(id))
   const navigation = useNavigation() as any;
+  const [isExpanded, setIsExpanded] = useState(false);
   return(
   <TouchableHighlight
     key={tune.title}
     onPress={() => {
-      setSelectedTune(tune);
       if(selectMode){
         selectTune(tune)
       }else{
-        setSelectedTune(tune);
-      }
-      if(!selectMode){
-        navigation.navigate("MiniEditor");
+        setIsExpanded(!isExpanded);
       }
     }}
     onLongPress={() => {
@@ -178,7 +228,12 @@ function ItemRender({
         <View>
           <ConfidenceBars tune={tune} />
         </View>
-    }
+      }
+      {
+        isExpanded && 
+        //EXTRA INFO
+        <TuneDetails tune={tune}/>
+      }
     </View>
   }
 </TouchableHighlight>

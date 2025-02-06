@@ -19,8 +19,8 @@
  */
 
 
-import React, {createContext, isValidElement, useContext, useEffect, useReducer, useState} from 'react';
-import {NavigationContainer, NavigationState, useNavigation} from '@react-navigation/native';
+import React, {useEffect, useReducer, useState} from 'react';
+import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 
@@ -32,11 +32,8 @@ import {
   View,
 } from 'react-native';
 
-import {
-  Colors,
-} from 'react-native/Libraries/NewAppScreen';
 
-import {standard, tune_draft, editorAttrs, Status, miniEditorAttrs, standardDefaults} from './types.ts';
+import {standard, tune_draft, Status, standardDefaults} from './types.ts';
 import OnlineDB from './OnlineDB.tsx';
 import ExtrasMenu from './components/ExtrasMenu.tsx';
 import {RealmProvider, useQuery, useRealm} from '@realm/react';
@@ -47,11 +44,8 @@ import {BSON} from 'realm';
 import PlaylistViewer from './components/PlaylistViewer.tsx';
 import PlaylistImporter from './components/PlaylistImporter.tsx';
 import {translateAttrFromStandardTune} from './DraftReducers/utils/translate.ts';
-import {Modal} from 'react-native';
-import {SubText, Text} from './Style.tsx';
 import Register from './components/Register.tsx';
-import {AxiosError, isAxiosError} from 'axios';
-import {User} from '@react-native-google-signin/google-signin';
+import ProfileMenu from './components/ProfileMenu.tsx';
 
 
 const Stack = createNativeStackNavigator();
@@ -61,16 +55,13 @@ function App(): React.JSX.Element {
   const [state, dispatch] = useReducer(OnlineDB.reducer, {composers: [], standards: [], status: Status.Failed})
   useEffect(() => {
     OnlineDB.updateDispatch(dispatch);
-    //TODO: Remove this! This is for testing only, makes you login every time you restart the app
-    OnlineDB.googleSignOut();
-    console.log("Signing out of google");
   }, []);
 
   return(
     <OnlineDB.DbDispatchContext.Provider value={dispatch}>
       <OnlineDB.DbStateContext.Provider value={state}>
         <View style={{flex: 1, backgroundColor: "black"}}>
-          <RealmProvider schema={[Tune, Composer, Playlist]} deleteRealmIfMigrationNeeded={true} >
+          <RealmProvider schema={[Tune, Composer, Playlist]} schemaVersion={4}>
             <NavigationContainer>
               <MainMenu/>
             </NavigationContainer>
@@ -82,47 +73,23 @@ function App(): React.JSX.Element {
 }
 
 function MainMenu({}: {}): React.JSX.Element {
-  //TODO: Instantiate selectedTune with any tune, remove "as Tune" in editors.
   const [selectedTune, setSelectedTune]: [Tune | unknown, Function] = useState();
   const [selectedTunes, setSelectedTunes]: [Tune[], Function] = useState([]);
   const [newTune, setNewTune] = useState(false);
-  const isDarkMode = true;
   const realm = useRealm();
   const composerQuery = useQuery(Composer);
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-  let entriesArr = Array.from(miniEditorAttrs.entries());
-  let arr = entriesArr;
   const allLocalComposers = useQuery(Composer);
-  const navigation = useNavigation();
-  const dbDispatch= useContext(OnlineDB.DbDispatchContext);
-  useEffect(() => {
-  }, []);
   return(
     <Stack.Navigator
       screenOptions={{headerShown: false}}
       initialRouteName='TuneListDisplay'
     >
       <Stack.Group screenOptions={{presentation: "modal"}}>
-        <Stack.Screen name="Register">
-          {(props) =>
-          <Register/>
-        }
-        </Stack.Screen>
+        <Stack.Screen name="Register" component={Register}/>
       </Stack.Group>
-      <Stack.Screen name="MiniEditor">
-        {(props) => <Editor
-          prettyAttrs={arr}
-          selectedTune={selectedTune as Tune}
-          newTune={newTune}
-          setNewTune={setNewTune}
-        />}
-      </Stack.Screen>
       <Stack.Screen name="Editor">
         {(props) => <Editor
-          prettyAttrs={editorAttrs}
           selectedTune={selectedTune as Tune}
           newTune={newTune}
           setNewTune={setNewTune}
@@ -140,7 +107,6 @@ function MainMenu({}: {}): React.JSX.Element {
                 const standardAttr = stand[attrPair[0]];
                 const tuneAttrPair = translateAttrFromStandardTune(attrPair[0], standardAttr, composerQuery, realm)
                 if(attrPair[0] !== "id" && typeof standardAttr !== "undefined"){
-                  //TODO: Translate attr fn from DraftReducers
                   tn[tuneAttrPair[0][0]] = tuneAttrPair[0][1];
                 }
               }
@@ -176,8 +142,7 @@ function MainMenu({}: {}): React.JSX.Element {
                         setSelectedTune(tn);
                         setNewTune(true);
                         props.navigation.goBack();
-                        mini ? props.navigation.navigate("MiniEditor")
-                          :props.navigation.navigate("Editor")
+                        props.navigation.navigate("Editor")
                       }
                     }
                   });
@@ -185,8 +150,7 @@ function MainMenu({}: {}): React.JSX.Element {
                   setSelectedTune(tn);
                   setNewTune(true);
                   props.navigation.goBack();
-                  mini ? props.navigation.navigate("MiniEditor")
-                    :props.navigation.navigate("Editor")
+                  props.navigation.navigate("Editor")
                 }
               }
             }}/>
@@ -209,16 +173,8 @@ function MainMenu({}: {}): React.JSX.Element {
         </SafeAreaView>
       }
     </Stack.Screen>
-    <Stack.Screen name="ExtrasMenu">
-        {(props) =>
-        <SafeAreaView style={{flex: 1, backgroundColor: "black"}}>
-          <View style={{flex:1}}>
-            <ExtrasMenu
-            />
-          </View>
-        </SafeAreaView>
-        }
-    </Stack.Screen>
+    <Stack.Screen name="ExtrasMenu" component={ExtrasMenu}/>
+    <Stack.Screen name="ProfileMenu" component={ProfileMenu}/>
     <Stack.Screen name="PlaylistViewer">
         {(props) =>
         <SafeAreaView style={{flex: 1, backgroundColor: "black"}}>

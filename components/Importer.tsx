@@ -16,7 +16,9 @@ import {
   DeleteButton,
   ButtonText,
   SMarginView,
-  BackgroundView
+  BackgroundView,
+  RowView,
+  SubBoldText
 } from '../Style.tsx'
 import itemSort from '../itemSort.tsx'
 import {Picker} from '@react-native-picker/picker';
@@ -36,7 +38,7 @@ const standardComposersAttrs = new Map<string, string>([
   ["death", "Death"],
 ]);
 
-import { Status, composer, standard, standard_composer } from '../types.ts';
+import { Status, composer, standard, standard_composer, tune_draft } from '../types.ts';
 import dateDisplay from '../textconverters/dateDisplay.tsx';
 import TuneDraftContext from '../contexts/TuneDraftContext.ts';
 import {AxiosError, AxiosResponse, isAxiosError} from 'axios';
@@ -45,6 +47,8 @@ import {useQuery, useRealm} from '@realm/react';
 import Composer from '../model/Composer.ts';
 import Tune from '../model/Tune.ts';
 import {useNavigation} from '@react-navigation/native';
+import ResponseHandler from '../services/ResponseHandler.ts';
+import ResponseBox from './ResponseBox.tsx';
 
 const tuneFuseOptions = { // For finetuning the search algorithm
 	// isCaseSensitive: false,
@@ -96,6 +100,133 @@ const statusTextMap = new Map([
   [Status.Failed, 'Connection failed, press the button below to try again. Your internet or the server may be down. Email jhilla@jhilla.org if you believe the server is down. If the server is down, then tunetracker.jhilla.org should also be down!'],
   [Status.Complete, "Connection complete, but something is wrong."]
 ])
+function StandardComposerDetails({
+  std
+}: {
+  std: standard_composer
+}){
+  return(
+    <SMarginView>
+      <RowView>
+        <SubBoldText>Bio: </SubBoldText>
+        <SubText>{std.bio}</SubText>
+      </RowView>
+      <RowView>
+        <SubBoldText>Birthday: </SubBoldText>
+        <SubText>{dateDisplay(std.birth)}</SubText>
+      </RowView>
+      <RowView>
+        <SubBoldText>Date of death: </SubBoldText>
+        <SubText>{dateDisplay(std.death)}</SubText>
+      </RowView>
+    </SMarginView>
+  )
+}
+function StandardDetails({
+  std
+}: {
+  std: standard
+}){
+  return(
+    <SMarginView>
+      <RowView>
+        <SubBoldText>Alternative title: </SubBoldText>
+        <SubText>{std.alternative_title}</SubText>
+      </RowView>
+      <RowView>
+        <SubBoldText>Year: </SubBoldText>
+        <SubText>{std.year}</SubText>
+      </RowView>
+      <RowView>
+        <SubBoldText>Form: </SubBoldText>
+        <SubText>{std.form}</SubText>
+      </RowView>
+      <RowView>
+        <SubBoldText>Bio: </SubBoldText>
+        <SubText>{std.bio}</SubText>
+      </RowView>
+    </SMarginView>
+  )
+}
+function StandardRender({
+  item,
+  importFn,
+  separators,
+  selectedAttr,
+  isComposer
+}:{
+  item: standard | standard_composer,
+  importFn: Function,
+  separators: any,
+  selectedAttr: keyof (standard & standard_composer),
+  isComposer: boolean
+}){
+  let text = "";
+  let subtext = "";
+  const [detailsShown, setDetailsShown] = useState(false);
+  if(isComposer){
+    const comp = item as standard_composer;
+    text = comp.name;
+    if(selectedAttr !== "name" as keyof standard_composer){
+      subtext = prettyPrint(comp[selectedAttr as keyof standard_composer])
+    }else{
+      subtext = dateDisplay(comp["birth"])
+    }
+    return (
+      <TouchableHighlight
+        key={comp.name}
+        onPress={() => {
+        }}
+        onLongPress={() => {
+          importFn(item);
+        }}
+        onShowUnderlay={separators.highlight}
+        onHideUnderlay={separators.unhighlight}>
+        <View style={{backgroundColor: 'black', padding: 8}}>
+          <Text>{text}</Text>
+          <SubText>{subtext}</SubText>
+          {
+            detailsShown &&
+            <StandardComposerDetails std={comp}/>
+          }
+        </View>
+      </TouchableHighlight>
+    )
+  }else{
+    const stand = item as standard;
+    text = stand.title;
+    if(selectedAttr !== "title" as keyof standard){
+      subtext = prettyPrint(stand[selectedAttr as keyof standard])
+    }else{
+      if(stand["Composers"]){
+        subtext = prettyPrint(stand["Composers"].map(comp => comp.name).join(", "));
+      }else{
+        subtext = "(No composers listed)"
+      }
+    }
+    return (
+      <TouchableHighlight
+        key={stand.title}
+        onPress={() => {
+          setDetailsShown(!detailsShown);
+        }}
+        onLongPress={() => {
+          importFn(item);
+        }}
+        onShowUnderlay={separators.highlight}
+        onHideUnderlay={separators.unhighlight}>
+        <View style={{backgroundColor: 'black', padding: 8}}>
+          <Text>{text}</Text>
+          <SubText>{subtext}</SubText>
+          {
+            detailsShown &&
+            <StandardDetails std={stand}/>
+          }
+        </View>
+      </TouchableHighlight>
+    )
+  }
+}
 function renderStandard(item: standard | composer, importFn: Function, separators: any, selectedAttr: keyof standard | composer, isComposer: boolean){
   let text = "";
   let subtext = "";
@@ -147,10 +278,8 @@ function ImporterHeader({
   const [createOnlineItemExpanded, setCreateOnlineItemExpanded] = useState(false);
   const currentTune = useContext(TuneDraftContext);
   const currentComposer = useContext(ComposerDraftContext);
-  const [submissionResult, setSubmissionResult] = useState({} as any);
-  const submissionSuccessful = submissionResult && "data" in submissionResult;
-  const [submissionError, setSubmissionError] = useState({} as any);
-  const errorReceived = submissionError && "message" in submissionError;
+  const [submissionResult, setSubmissionResult] = useState("");
+  const [errorPresent, setErrorPresent] = useState(false);
   const navigation = useNavigation();
   return(
     <View style={{backgroundColor: "#222"}}>
@@ -200,25 +329,14 @@ function ImporterHeader({
             suggestTuneSubmission ?
             <View>
               <SubText>This search doesn't seem to match well with any {importingComposers ? "composer" : "tune"} from our database. You can submit your draft below. After it is reviewed and accepted, it will be added to the database for everyone to use!</SubText>
-              {
-                submissionSuccessful &&
-                <View style={{borderColor: "white", borderWidth: 1, padding: 4}}>
-                  <SubText>Submitted your tune "{importingComposers ? currentComposer.name : currentTune.title}" to tunetracker.jhilla.org</SubText>
-                </View>
-              }
-              {
-                errorReceived &&
-                <View style={{borderColor: "white", borderWidth: 1, padding: 4}}>
-                  <SubText>Error: {submissionError["message"]}</SubText>
-                </View>
-              }
+              <ResponseBox result={submissionResult} isError={errorPresent}/>
               <Button
-                style={{backgroundColor: (submissionSuccessful || errorReceived) ? "#444" : "cadetblue"}}
+                style={{backgroundColor: (submissionResult !== "") ? "#444" : "cadetblue"}}
                 onPress={() => {
                   submit();
                   //TODO: Move tune conversion to OnlineDB here and in Compare.tsx
                   function submit(first=true){
-                    if(!submissionSuccessful && !errorReceived){
+                    if(submissionResult === ""){
                       if(!importingComposers){
                         if(!currentTune || !currentTune.title){
                           console.error("No title in the tune!");
@@ -237,10 +355,18 @@ function ImporterHeader({
                             }
                             return comp.id;
                           })
-                        }
-                        OnlineDB.createTuneDraft(copyToSend).then(res => {
-                          setSubmissionResult(res as AxiosResponse)
-                        }).catch(err => {catchFunc(err, first)});
+                        } as tune_draft;
+                        ResponseHandler(
+                          OnlineDB.createTuneDraft(copyToSend),
+                          (res) => {return `Successfully submitted your draft of ${res.data.title}`},
+                          submit,
+                          first,
+                          navigation,
+                          dbDispatch
+                        ).then(res => {
+                          setSubmissionResult(res.result);
+                          setErrorPresent(res.isError);
+                        })
                       }else{
                         if(!currentComposer || !currentComposer.name){
                           console.error("No name in the composer!");
@@ -252,42 +378,24 @@ function ImporterHeader({
                           birth: currentComposer.birth,
                           death: currentComposer.death
                         }
-                        OnlineDB.createComposerDraft(copyToSend).then(res => {
-                          setSubmissionResult(((res as AxiosResponse)))
-                        }).catch((e) => {catchFunc(e, first)});
-                      }
-                    }
-                  }
-                  function catchFunc(e: AxiosError, first: boolean){
-                    if(!first){
-                      console.error("Sumission failed twice. Giving up");
-                      console.log("Second error:");
-                      console.log(e);
-                      setSubmissionError(e);
-                      return;
-                    }
-                    else{
-                      console.log("First submission error:");
-                      console.log(e);
-                    }
-                    if(isAxiosError(e)){
-                      switch(e.response?.status){
-                        case 401: {
-                          OnlineDB.tryLogin(navigation, dbDispatch).then(() => {
-                            submit(false);
-                          });
-                        }
-                      }
-                      if(e.message === "Network Error"){
-                        setSubmissionError(e);
-                        console.log("Network error");
+                          ResponseHandler(
+                            OnlineDB.createComposerDraft(copyToSend),
+                            (res) => {return `Successfully submitted your draft of ${res.data.name}`},
+                            submit,
+                            first,
+                            navigation,
+                            dbDispatch
+                          ).then(res => {
+                            setSubmissionResult(res.result);
+                            setErrorPresent(res.isError);
+                          })
                       }
                     }
                   }
                 }}
               >
                 {
-                  (submissionResult && "data" in submissionResult) ?
+                  (submissionResult !== "") ?
                   <ButtonText style={{color: "#777"}}>(Tune already submitted)</ButtonText>
                   :
                   <ButtonText>Upload your {importingComposers ? "composer" : "tune"}</ButtonText>
@@ -386,24 +494,10 @@ export default function Importer({
           setSearch={setSearch}/>
       }
       renderItem={({item, index, separators}) => {
-        let texts = renderStandard(item, importFn, separators, selectedAttr as keyof standard | composer, importingComposers)
         return (
-          <TouchableHighlight
-            key={item.name}
-            onPress={() => {
-              importFn(item, true);
-            }}
-            onLongPress={() => {
-              importFn(item);
-            }}
-            onShowUnderlay={separators.highlight}
-            onHideUnderlay={separators.unhighlight}>
-            <View style={{backgroundColor: 'black', padding: 8}}>
-              <Text>{texts?.text}</Text>
-              <SubText>{texts?.subtext}</SubText>
-            </View>
-          </TouchableHighlight>
-      )}
+          <StandardRender item={item} importFn={importFn} separators={separators} selectedAttr={selectedAttr as keyof (standard & standard_composer)} isComposer={importingComposers} />
+        )
+      }
     }
   />
   : <View style={{flex: 1, display: "flex", justifyContent: "center", alignItems: "center"}}>

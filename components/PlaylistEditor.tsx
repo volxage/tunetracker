@@ -30,6 +30,8 @@ export default function PlaylistEditor(
   const realm = useRealm();
   const allTunes = useQuery(Tune)
   const navigation = useNavigation();
+  const [playlistUploaded, setPlaylistUploaded] = useState(false);
+  const [playlistPublic, setPlaylistPublic] = useState(false);
   return(
     <View style={{backgroundColor: "black"}}>
       <View style={{flexDirection: "row"}}>
@@ -71,36 +73,45 @@ export default function PlaylistEditor(
         </DeleteButton>
       </View>
       <View style={{flexDirection: "row"}}>
-        <Button style={{flex: 1, backgroundColor: "#111"}} onPress={() => {
-        //const json = plSelectedTunes.map(tune => {
-        //  return {
-        //    "dbId": tune.dbId,
-        //    "title": tune.title,
-        //    "alternativeTitle": tune.alternativeTitle,
-        //    "composers": tune.composers?.map(comp => {return {"name": comp.name, "dbId": comp.dbId}}),
-        //    "form": tune.form,
-        //    "year": tune.year,
-        //    "hasLyrics": tune.hasLyrics,
-        //    "mainKey": tune.mainKey,
-        //    "keys": tune.keyCenters, 
-        //    "mainTempo": tune.mainTempo,
-        //    "tempi": tune.tempi,
-        //  }
-        //});
-        //const base64 = new buff.Buffer(JSON.stringify(json)).toString("base64");
-        //Share.open({url: `data:application/json;base64,${base64}`}).catch(err => {
-        //});
-        //RNFS.writeFile(tmpPlaylistPath, JSON.stringify(json), "base64")
-        //  .then(() => {
-        //    RNFS.readFile(tmpPlaylistPath, "base64").then(result => {
-        //      
-        //  });
-        //  });
-        }}>
-          <ButtonText style={{color: "#777"}}>
-            Share (Coming soon!)
-          </ButtonText>
-        </Button>
+        {
+          false &&
+          <View>
+            {
+              !playlistUploaded ?
+              <View style={{flexDirection: "row", flex:1}}>
+                <Button style={{flex: 1, backgroundColor: "#111"}} onPress={() => {
+                }}>
+                  <ButtonText style={{color: "#777"}}>
+                    Delete From TT
+                  </ButtonText>
+                </Button>
+                {
+                  playlistPublic ?
+                  <Button style={{flex:1}}>
+                    <ButtonText>
+                      Make private
+                    </ButtonText>
+                  </Button>
+                  :
+                  <Button style={{flex:1}}>
+                    <ButtonText>
+                      Make public
+                    </ButtonText>
+                  </Button>
+                }
+              </View>
+              :
+              <View style={{flex:1}}>
+                <DeleteButton style={{backgroundColor: "#111"}} onPress={() => {
+                }}>
+                  <ButtonText style={{color: "#777"}}>
+                    Upload
+                  </ButtonText>
+                </DeleteButton>
+              </View>
+            }
+          </View>
+        }
       </View>
       <DeleteButton onLongPress={() => {
         navigation.goBack();
@@ -108,7 +119,7 @@ export default function PlaylistEditor(
           realm.delete(playlist);
         })
       }}>
-        <ButtonText>Delete Playlist</ButtonText>
+        <ButtonText>Delete From Phone</ButtonText>
       </DeleteButton>
       <SubText style={{textAlign: "center", color: "grey", marginBottom: 20}}>
         Press and hold if sure!

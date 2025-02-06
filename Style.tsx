@@ -37,6 +37,11 @@ const SubText = styled.Text`
   color: white;
   font-weight: 200;
 `;
+const SubBoldText = styled.Text`
+  font-size: 20px;
+  color: white;
+  font-weight: 350;
+`;
 const ButtonText = styled.Text`
   font-size: 20px;
   color: white;
@@ -60,5 +65,8 @@ const BackgroundView = styled.View`
   background-color: black;
   flex: 1;
 `;
+const RowView = styled.View`
+  flex-direction: row;
+`;
 
-export {Text, Title, SubText, TextInput, DeleteButton, Button, ButtonText, SMarginView, ConfidenceBarView, BackgroundView};
+export {Text, Title, SubText, SubBoldText, TextInput, DeleteButton, Button, ButtonText, SMarginView, ConfidenceBarView, BackgroundView, RowView};

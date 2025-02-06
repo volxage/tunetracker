@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 
 import TypeField from './TypeField.tsx';
-import {tune_draft, standard, tuneDefaults, tune_draft_extras} from '../types.ts';
+import {tune_draft, standard, tuneDefaults, tune_draft_extras, miniEditorAttrs, editorAttrs} from '../types.ts';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Importer from './Importer.tsx';
 import Compare from './Compare.tsx';
@@ -31,20 +31,21 @@ import {useNavigation} from '@react-navigation/native';
 
 
 export default function Editor({
-  prettyAttrs, 
   selectedTune,
   newTune,
   setNewTune
 }: {
-  prettyAttrs: Array<[keyof (tune_draft & tune_draft_extras), string]>,
   selectedTune: Tune | tune_draft,
   newTune: boolean,
   setNewTune: Function
 }): React.JSX.Element {
   const realm = useRealm();
   const [state, dispatch] = useReducer(tuneDraftReducer, {currentDraft: {}, changedAttrsList: []});
+  const [advancedSelected, setAdvancedSelected] = useState(false);
   const Stack = createNativeStackNavigator();
   const navigation = useNavigation();
+
+  let basicEditorArr = Array.from(miniEditorAttrs.entries());
 
   useEffect(() => {
     dispatch({type: "set_to_selected", selectedItem: selectedTune});
@@ -52,16 +53,29 @@ export default function Editor({
     }
   }, []);
 
-  function handleSetCurrentTune(attr_key: keyof tune_draft, value: any){
+  function handleSetCurrentTune(attr_key: keyof tune_draft, value: any, immediate = false){
+    if(immediate){
+      if(selectedTune instanceof Tune){
+        realm.write(() => {
+          selectedTune[attr_key] = value
+        })
+      }
+    }
     dispatch({type: 'update_attr', attr: attr_key, value: value});
   }
+
   
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name={"EditorUnwrapped"} >
         {props => <SafeAreaView style={{flex: 1, backgroundColor: "black"}}>
           <FlatList
-            data={prettyAttrs}
+            data={advancedSelected ? editorAttrs : basicEditorArr}
+            ListHeaderComponent={
+              <Button onPress={() => {setAdvancedSelected(!advancedSelected)}}>
+                <ButtonText>{advancedSelected ? "Edit only confidence" : "Edit everything"}</ButtonText>
+              </Button>
+            }
             renderItem={({item, index, separators}) => (
               <View>
                 { (item[0] !== "lyricsConfidence" || state["currentDraft"]["hasLyrics"]) &&

@@ -25,6 +25,7 @@ export default class Tune extends Realm.Object<Tune, 'title'> {
   soloConfidence?: number;
   lyricsConfidence?: number;
   dbId?: number;
+  dbDraftId?: number;
   playlists?: Realm.List<Playlist>;
   playedAt?: Date;
 
@@ -70,7 +71,7 @@ export default class Tune extends Realm.Object<Tune, 'title'> {
       lyricsConfidence: "double?",
       playedAt: "date?",
       dbId: {type: "int", indexed: true, optional: true},
-
+      dbDraftId: "int?",
       composers: 'Composer[]',
       playlists: 'Playlist[]'
     },
