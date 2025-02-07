@@ -53,6 +53,7 @@ function AddPlaylistField({
             placeholder='Enter New Playlist Name'
             placeholderTextColor={"grey"}
             onChangeText={setNewPlaylistTitle}
+            accessibilityLabel='Enter new playlist name'
           />
         </View>
         <View style={{alignContent: 'flex-end', flex: 1}}>
@@ -164,6 +165,7 @@ function TypeField({
             }
             handleSetCurrentItem(attrKey, Number(text))
           }}
+          accessibilityLabel={"Enter main tempo"}
           style={{textAlign: "center", fontWeight: "300"}}
         />
       </View>
@@ -238,6 +240,7 @@ function TypeField({
               <View style={{flex: 3}}>
                 <TextInput defaultValue={String(attr as number)} placeholderTextColor={"grey"}
                   keyboardType="numeric"
+                  accessibilityLabel='Enter a tempo'
                   value={String((attr as number[])[index])}
                   onChangeText={(text) => {
                     text = text.replace(/\D/g,'');
@@ -270,6 +273,7 @@ function TypeField({
         <TextInput defaultValue={attr} placeholderTextColor={"grey"}
           onChangeText={(text) => handleSetCurrentItem(attrKey, text)}
           style={{textAlign: "center", fontWeight: "300", borderColor: "grey", borderWidth: 1, marginHorizontal: 32}}
+          accessibilityLabel={"Enter " + attrName}
         />
       </View>
     );
@@ -336,6 +340,7 @@ function TypeField({
                   placeholder={"Type new value here"}
                   placeholderTextColor={"grey"}
                   defaultValue={item}
+                  accessibilityLabel={"Enter one of this item's " + attrName}
                   onChangeText={(text) => handleReplace(text, index)}/>
               </View>
               <View style={{flex:1, alignContent: 'flex-end'}}>

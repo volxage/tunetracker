@@ -33,6 +33,7 @@ export default function PlaylistViewer(
             data={allPlaylists}
             renderItem={({item}) => 
             <TouchableHighlight
+              accessibilityLabel={"Playlist named " + item.title}
               onPress={() => {
                 // Preconditions:
                 // selectedPlaylist needs to be defined, otherwise we shouldn't load the menu.
@@ -40,7 +41,8 @@ export default function PlaylistViewer(
                   "Selected playlist in PlaylistViewer is undefined");
                 selectedPlaylist = item;
                 navigation.navigate("PlaylistEditor");
-              }}>
+              }}
+            >
               <View>
                 <Text>{item.title}</Text>
                 <SubText>{item.description ? item.description : "(No description provided)"}</SubText>

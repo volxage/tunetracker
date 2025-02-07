@@ -127,11 +127,13 @@ export default function PlaylistEditor(
       <Title>TITLE</Title>
       <TextInput
         value={newTitle}
+        accessibilityLabel="Enter title"
         onChangeText={text => {setNewTitle(text)}}
       />
       <Title>DESCRIPTION</Title>
       <TextInput
         value={newDescription}
+        accessibilityLabel="Enter description"
         onChangeText={text => {setNewDescription(text)}}
       />
       <Title>TUNES</Title>
