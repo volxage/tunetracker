@@ -84,6 +84,7 @@ function AddPlaylistField({
             // When the component rerenders, onValueChange is called with a value of "".
             (value: Playlist | "") => {value !== "" && handleSetCurrentItem("playlists", tunePlaylists.concat(value))}
           }
+          accessibilityLabel='Select existing playlist'
         >
           {
             availablePlaylists.map(
@@ -200,9 +201,7 @@ function TypeField({
           )}
         />
         <View style={{flexDirection:"row", alignSelf: "center"}}>
-          <Text style={{fontWeight: "300"}}>Existing playlist</Text>
-          <Switch value={newPlaylistOpen} onValueChange={setNewPlaylistOpen}/>
-          <Text style={{fontWeight: "300"}}>New playlist</Text>
+          <Button onPress={() => {setNewPlaylistOpen(!newPlaylistOpen)}}><ButtonText>{newPlaylistOpen ? "Switch to adding existing Playlists" : "Switch to creating new Playlist"}</ButtonText></Button>
         </View>
         <AddPlaylistField
           tunePlaylists={attr as (Playlist | playlist)[]}
@@ -326,7 +325,10 @@ function TypeField({
             <Title>{attrName.toUpperCase()}</Title>
           </View>
           <View style={{alignContent: 'flex-end', flex: 1}}>
-            <Button onPress={() => handleSetCurrentItem(attrKey, (attr as string[]).concat(["New item"]))}>
+            <Button
+              onPress={() => handleSetCurrentItem(attrKey, (attr as string[]).concat(["New item"]))}
+              accessibilityLabel={"Create new entry for the " + attrName}
+            >
               <ButtonText><Icon name="plus" size={30}/></ButtonText>
             </Button>
           </View>
@@ -340,13 +342,16 @@ function TypeField({
                   placeholder={"Type new value here"}
                   placeholderTextColor={"grey"}
                   defaultValue={item}
-                  accessibilityLabel={"Enter one of this item's " + attrName}
+                  accessibilityLabel={"Enter entry " + index + " for this item's " + attrName}
                   onChangeText={(text) => handleReplace(text, index)}/>
               </View>
               <View style={{flex:1, alignContent: 'flex-end'}}>
-                <DeleteButton onPress={
+                <DeleteButton
+                  onPress={
                     () => handleSetCurrentItem(attrKey, (attr as string[]).filter((a, i) => i !== index))
-                }>
+                  }
+                  accessibilityLabel={"Delete " + attrName + " entry " + index + " which says: " + item}
+                >
                   <ButtonText><Icon name="close" size={30}/></ButtonText>
                 </DeleteButton>
               </View>

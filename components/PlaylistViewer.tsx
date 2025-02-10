@@ -31,6 +31,11 @@ export default function PlaylistViewer(
           </DeleteButton>
           <FlatList 
             data={allPlaylists}
+            ListEmptyComponent={
+              <View>
+                <SubText>No playlists saved on this device!</SubText>
+              </View>
+            }
             renderItem={({item}) => 
             <TouchableHighlight
               accessibilityLabel={"Playlist named " + item.title}

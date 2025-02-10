@@ -303,12 +303,16 @@ function ImporterHeader({
           }
         </Picker>
       </View>
-      <View style={{alignItems: "flex-end"}}>
-        <SubText style={{fontWeight: "medium"}}>{"Reverse sort:"}</SubText>
-      </View>
-      <View style={{flex: 1, alignItems: "center"}}>
-        <Switch value={listReversed} onValueChange={() => setListReversed(!listReversed)}/>
-      </View>
+      <Button
+        onPress={() => {
+          setListReversed(!listReversed);
+        }}
+        style={{
+            backgroundColor: !listReversed
+            ? "darkgreen"
+            : "darkred",
+      }}
+    ><ButtonText>Reverse Sort</ButtonText></Button>
     </View>
     <SubText>If you already saved/connected to the {importingComposers ? "composer" : "tune"} you're searching for, it won't be available here.</SubText>
     {
