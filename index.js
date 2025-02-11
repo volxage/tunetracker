@@ -9,6 +9,7 @@ import {name as appName} from './app.json';
 import {GoogleSignin, isErrorWithCode, isSuccessResponse, statusCodes} from '@react-native-google-signin/google-signin';
 import {devSigningCert, webSigningCert} from './clientcerts';
 import OnlineDB from './OnlineDB';
+import SplashScreen from 'react-native-splash-screen';
 
 
 GoogleSignin.configure({

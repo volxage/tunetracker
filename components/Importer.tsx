@@ -24,6 +24,7 @@ import itemSort from '../itemSort.tsx'
 import {Picker} from '@react-native-picker/picker';
 import Fuse, {FuseResult} from 'fuse.js';
 import OnlineDB from '../OnlineDB.tsx';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 
 const standardTuneAttrs = new Map<string, string>([
   ["title", "Title"],
@@ -308,11 +309,12 @@ function ImporterHeader({
           setListReversed(!listReversed);
         }}
         style={{
+          flex: 1,
             backgroundColor: !listReversed
             ? "darkgreen"
             : "darkred",
       }}
-    ><ButtonText>Reverse Sort</ButtonText></Button>
+    ><ButtonText><Icon name="segment" size={20}/></ButtonText></Button>
     </View>
     <SubText>If you already saved/connected to the {importingComposers ? "composer" : "tune"} you're searching for, it won't be available here.</SubText>
     {

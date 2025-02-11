@@ -19,7 +19,7 @@
  */
 
 
-import React, {useEffect, useReducer, useState} from 'react';
+import React, {useEffect, useLayoutEffect, useReducer, useState} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
@@ -46,13 +46,16 @@ import PlaylistImporter from './components/PlaylistImporter.tsx';
 import {translateAttrFromStandardTune} from './DraftReducers/utils/translate.ts';
 import Register from './components/Register.tsx';
 import ProfileMenu from './components/ProfileMenu.tsx';
+import SplashScreen from 'react-native-splash-screen';
 
 
 const Stack = createNativeStackNavigator();
 
 function App(): React.JSX.Element {
-
   const [state, dispatch] = useReducer(OnlineDB.reducer, {composers: [], standards: [], status: Status.Failed})
+  useLayoutEffect(() => {
+    SplashScreen.hide();
+  }, [])
   useEffect(() => {
     OnlineDB.updateDispatch(dispatch);
   }, []);

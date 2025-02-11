@@ -319,7 +319,7 @@ function TuneListHeader({
         {
           selectedAttrItems.map(val => 
           <Picker.Item label={val.label} value={val.value} key={val.value}
-            style={{color: "white", backgroundColor: "#222222", fontSize: 16, fontWeight: 200, flexWrap: "wrap"}}
+            style={{color: "white", backgroundColor: "#222", fontSize: 16, fontWeight: 200, flexWrap: "wrap"}}
           />
           )
         }
@@ -328,7 +328,7 @@ function TuneListHeader({
       <Button
         style={{
           flex:1,
-            backgroundColor: "purple"
+            borderColor: "purple"
         }}
         onPress={() => {
           headerInputStates.setSelectedAttr("melodyConfidence");
@@ -340,7 +340,7 @@ function TuneListHeader({
       <Button
         style={{
           flex:1,
-            backgroundColor: "darkblue"
+            borderColor: "darkblue"
         }}
         onPress={() => {
           headerInputStates.setSelectedAttr("formConfidence");
@@ -352,7 +352,7 @@ function TuneListHeader({
       <Button
         style={{
           flex:1,
-            backgroundColor: "darkcyan"
+            borderColor: "darkcyan"
         }}
         onPress={() => {
           headerInputStates.setSelectedAttr("soloConfidence");
@@ -362,7 +362,7 @@ function TuneListHeader({
       <Button
         style={{
           flex:1,
-            backgroundColor: "darkgreen"
+            borderColor: "darkgreen"
         }}
         onPress={() => {
           headerInputStates.setSelectedAttr("lyricsConfidence");
@@ -374,7 +374,7 @@ function TuneListHeader({
       <Button
         style={{
           flex:1,
-            backgroundColor: !headerInputStates.confidenceVisible
+            borderColor: !headerInputStates.confidenceVisible
             ? "darkgreen"
             : "darkred",
         }}
@@ -386,7 +386,7 @@ function TuneListHeader({
       <Button
         style={{
           flex:1,
-            backgroundColor: !headerInputStates.listReversed
+            borderColor: !headerInputStates.listReversed
             ? "darkgreen"
             : "darkred",
         }}
@@ -410,7 +410,7 @@ function TuneListHeader({
           </Button>
           <Button style={{
             flex:1,
-              backgroundColor: statusColorMap.get(dbStatus)
+              borderColor: statusColorMap.get(dbStatus)
           }}
           onPress={() => navigation.navigate("Importer")}>
           <ButtonText><Icon name="database-arrow-down" size={30}/></ButtonText>
