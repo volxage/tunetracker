@@ -1,5 +1,5 @@
 import {FlatList, View} from "react-native";
-import {Title, Text, SubText, TextInput, Button, ButtonText, DeleteButton} from "../Style";
+import {Title, Text, SubText, TextInput, DeleteButton} from "../Style";
 import {useQuery, useRealm} from "@realm/react";
 import Playlist from "../model/Playlist";
 import {useState} from "react";
@@ -12,6 +12,7 @@ import RNDP, {DocumentPickerResponse} from "react-native-document-picker";
 import buff from "buffer";
 import {tune_draft} from "../types";
 import {useNavigation} from "@react-navigation/native";
+import {Button} from "../simple_components/Button";
 const tmpPlaylistPath = RNFS.TemporaryDirectoryPath + "/tmp_playlist.json";
 
 
@@ -54,9 +55,8 @@ export default function PlaylistImporter({}: {}){
             console.log(result);
           })
         }}
-      >
-        <ButtonText>Try opening</ButtonText>
-      </Button>
+        text="Try opening"
+      />
       <DeleteButton onPress={() => navigation.goBack()}>
         <ButtonText>Go back</ButtonText>
       </DeleteButton>

@@ -1,7 +1,8 @@
 import { FC, ReactNode, useState } from "react"
-import {Button, ButtonText, SMarginView} from "../Style"
+import {ButtonText, SMarginView} from "../Style"
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import {View} from "react-native";
+import { Button } from "../simple_components/Button";
 export default function InformationExpand({
   Content
 }: {
@@ -11,9 +12,7 @@ export default function InformationExpand({
   return(
     <View>
       <View style={{paddingHorizontal: 80}}>
-        <Button onPress={() => {setExpanded(!expanded)}} style={{backgroundColor: "#222"}}>
-          <ButtonText><Icon name={expanded ? "information-off" : "information"} size={30}/></ButtonText>
-        </Button>
+        <Button onPress={() => {setExpanded(!expanded)}} style={{backgroundColor: "#222"}} iconName={expanded ? "information-off" : "information"}/>
       </View>
       {
         expanded &&

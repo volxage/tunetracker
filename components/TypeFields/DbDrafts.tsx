@@ -1,11 +1,12 @@
 import {View} from "react-native";
-import {Button, ButtonText, DeleteButton, SMarginView, SubText} from "../../Style";
+import {ButtonText, DeleteButton, SMarginView, SubText} from "../../Style";
 import {useContext, useEffect, useState} from "react";
 import {submitted_tune_draft} from "../../types";
 import OnlineDB from "../../OnlineDB";
 import ResponseHandler from "../../services/ResponseHandler";
 import {useNavigation} from "@react-navigation/native";
 import ResponseBox from "../ResponseBox";
+import {Button} from "../../simple_components/Button";
 
 async function tuneDraftFetch(id: number, navigation: any, onlineDbDispatch: any){
   async function attempt(first: boolean){
@@ -60,9 +61,10 @@ export default function DbDrafts({
     <SMarginView>
       <SubText>You've submitted a version of this tune to tunetracker.jhilla.org!</SubText>
       <Button
-          onPress={() => {setIsExpanded(!isExpanded)}}
-          style={{backgroundColor: "#222", flex:2}}
-        ><ButtonText>{isExpanded ? "Hide uploaded details" : "Show uploaded details"}</ButtonText></Button>
+        onPress={() => {setIsExpanded(!isExpanded)}}
+        style={{backgroundColor: "#222", flex:2}}
+        text={isExpanded ? "Hide uploaded details" : "Show uploaded details"}
+      />
       <SMarginView>
         {
           isExpanded &&

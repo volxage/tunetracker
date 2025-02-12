@@ -2,7 +2,6 @@ import {
   TextInput,
   DeleteButton,
   ButtonText,
-  Button,
   Title,
   Text,
   SubText,
@@ -19,6 +18,7 @@ import OnlineDB from '../../OnlineDB.tsx';
 import Composer from '../../model/Composer.js';
 import {composer} from '../../types.ts';
 import dateDisplay from '../../textconverters/dateDisplay.tsx';
+import { Button } from '../../simple_components/Button.tsx';
 
 
 export default function ComposerField({
@@ -47,9 +47,8 @@ export default function ComposerField({
         <Button
           onPress={() => {navigation.navigate("ComposerSelector")}}
           style={{flex: 3}}
-        >
-          <ButtonText>Select Composers</ButtonText>
-        </Button>
+          text='Select Composers'
+        />
         <View style={{flex:1}}></View>
       </View>
     }

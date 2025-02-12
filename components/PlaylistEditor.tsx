@@ -1,5 +1,6 @@
 import {View} from "react-native";
-import {Title, TextInput, Button, ButtonText, DeleteButton, SubText} from "../Style";
+import {Title, TextInput, ButtonText, DeleteButton, SubText} from "../Style";
+import {Button} from "../simple_components/Button"
 import {useQuery, useRealm} from "@realm/react";
 import Playlist from "../model/Playlist";
 import {useState} from "react";
@@ -61,11 +62,9 @@ export default function PlaylistEditor(
             playlist.description = newDescription;
           });
           navigation.goBack();
-        }}>
-          <ButtonText>
-            Save
-          </ButtonText>
-        </Button>
+        }}
+        text="Save"
+      />
         <DeleteButton style={{flex:1}} onPress={() => {navigation.goBack()}}>
           <ButtonText>
             Cancel
@@ -80,24 +79,12 @@ export default function PlaylistEditor(
               !playlistUploaded ?
               <View style={{flexDirection: "row", flex:1}}>
                 <Button style={{flex: 1, backgroundColor: "#111"}} onPress={() => {
-                }}>
-                  <ButtonText style={{color: "#777"}}>
-                    Delete From TT
-                  </ButtonText>
-                </Button>
+                }} text="Delete from TT" textStyle={{color: "#777"}}/>
                 {
                   playlistPublic ?
-                  <Button style={{flex:1}}>
-                    <ButtonText>
-                      Make private
-                    </ButtonText>
-                  </Button>
+                  <Button style={{flex:1}} text="Make private"/>
                   :
-                  <Button style={{flex:1}}>
-                    <ButtonText>
-                      Make public
-                    </ButtonText>
-                  </Button>
+                  <Button style={{flex:1}} text="Make public"/>
                 }
               </View>
               :

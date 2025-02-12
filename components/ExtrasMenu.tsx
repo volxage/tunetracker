@@ -2,8 +2,9 @@
 
 import React, {isValidElement, useEffect, useState} from 'react';
 import {SafeAreaView, View} from 'react-native';
-import {Button, ButtonText, DeleteButton, Title} from '../Style';
+import {ButtonText, DeleteButton, Title} from '../Style';
 import {useNavigation} from '@react-navigation/native';
+import {Button} from '../simple_components/Button';
 
 // <Button onPress={() => {navigation.navigate("PlaylistImporter")}}>
 export default function ExtrasMenu({
@@ -16,15 +17,11 @@ export default function ExtrasMenu({
         <View style={{alignSelf: "center"}}>
           <Title>Extras Menu</Title>
         </View>
-        <Button onPress={() => {navigation.navigate("ProfileMenu")}}>
-          <ButtonText>Profile</ButtonText>
-        </Button>
-        <Button onPress={() => {navigation.navigate("PlaylistViewer")}}>
-          <ButtonText>Playlist Viewer</ButtonText>
-        </Button>
-        <Button style={{backgroundColor: "#111"}}>
-          <ButtonText style={{color: "#777"}}>Import Playlist (Coming soon!)</ButtonText>
-        </Button>
+        <Button text="Profile" onPress={() => {navigation.navigate("ProfileMenu")}}/>
+        <Button text="Playlist Viewer" 
+          onPress={() => {navigation.navigate("PlaylistViewer")}}
+        />
+        <Button style={{backgroundColor: "#111"}} text='Import Playlist (Coming soon!)'/>
         <DeleteButton onPress={() => {navigation.goBack()}}>
           <ButtonText>Back</ButtonText>
         </DeleteButton>

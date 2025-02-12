@@ -2,7 +2,6 @@
 
 import React, {isValidElement, useEffect, useReducer, useState} from 'react';
 import {
-  Button,
   DeleteButton,
   ButtonText,
   SubText,
@@ -28,6 +27,7 @@ import {BSON} from 'realm';
 import TuneDraftContext from '../contexts/TuneDraftContext.ts';
 import tuneDraftReducer from '../DraftReducers/TuneDraftReducer.ts';
 import {useNavigation} from '@react-navigation/native';
+import { Button } from '../simple_components/Button.tsx';
 
 
 export default function Editor({
@@ -72,9 +72,10 @@ export default function Editor({
           <FlatList
             data={advancedSelected ? editorAttrs : basicEditorArr}
             ListHeaderComponent={
-              <Button onPress={() => {setAdvancedSelected(!advancedSelected)}}>
-                <ButtonText>{advancedSelected ? "Edit only confidence" : "Edit everything"}</ButtonText>
-              </Button>
+              <Button
+                onPress={() => {setAdvancedSelected(!advancedSelected)}}
+                text={advancedSelected ? "Edit only confidence" : "Edit everything"}
+              />
             }
             renderItem={({item, index, separators}) => (
               <View>
@@ -130,8 +131,8 @@ export default function Editor({
                     navigation.goBack();
                   //});
                   }}
-                ><ButtonText>Save</ButtonText>
-              </Button>
+                  text='Save'
+                />
             }
               {
                 newTune &&
@@ -147,8 +148,8 @@ export default function Editor({
                     navigation.goBack();
                     setNewTune(false);
                   }}
-                ><ButtonText>Save</ButtonText>
-              </Button>
+                  text='Save'
+                />
             }
 
           </View>

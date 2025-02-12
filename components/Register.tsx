@@ -1,11 +1,12 @@
 import {Platform, SafeAreaView, View} from "react-native";
-import {Button, ButtonText, SubText, Text, TextInput} from "../Style";
+import {ButtonText, SubText, Text, TextInput} from "../Style";
 import {useContext, useEffect, useState} from "react";
 import OnlineDB from "../OnlineDB";
 import httpToServer from "../http-to-server";
 import {useNavigation} from "@react-navigation/native";
 import {AxiosError} from "axios";
 import {User} from "@react-native-google-signin/google-signin";
+import { Button } from "../simple_components/Button";
 
 function register(token: string, nickname: string, navigation: any, login: Function, counter: number = 0){
   if(counter > 10){
@@ -59,7 +60,7 @@ export default function Register({}: {}){
       <SubText>We can't find the email {email} on TuneTracker yet. Pick an appropriate nickname if you'd like, and press submit to register your email to TuneTracker.</SubText>
       <Text>Nickname:</Text>
       <TextInput placeholder="Unnamed Tracker" placeholderTextColor="grey" style={{borderColor: "white", borderWidth: 1, margin: 8}}/>
-      <Button  onPress={() => {register(token, nicknameField, navigation, login)}}><ButtonText>Submit</ButtonText></Button>
+      <Button onPress={() => {register(token, nicknameField, navigation, login)}} text="Submit"/>
     </SafeAreaView>
   )
 }

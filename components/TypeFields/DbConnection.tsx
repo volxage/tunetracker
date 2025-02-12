@@ -1,6 +1,5 @@
 import {
   ButtonText,
-  Button,
   Title,
   SubText,
   SMarginView,
@@ -14,6 +13,7 @@ import {
 } from 'react-native';
 import OnlineDB from '../../OnlineDB.tsx';
 import dateDisplay from '../../textconverters/dateDisplay.tsx';
+import {Button} from '../../simple_components/Button.tsx';
 
 export default function DbConnection({
   attr,
@@ -43,14 +43,8 @@ export default function DbConnection({
         <Button
           onPress={() => {setConnectTuneExpanded(!connectTuneExpanded)}}
           style={{backgroundColor: "#222", flex:2}}
-        >
-          <ButtonText>
-            <Icon
-              name={connectTuneExpanded ? "earth-minus" : "earth-plus"}
-              size={30}
-            />Connection Details
-          </ButtonText>
-        </Button>
+          iconName={connectTuneExpanded ? "earth-minus" : "earth-plus"}
+        />
         <View style={{flex:1}} />
       </View>
       {
@@ -72,9 +66,8 @@ export default function DbConnection({
                     navigation.navigate("ImportID")}
                   }
                 }
-              >
-                <ButtonText>Connect to database</ButtonText>
-              </Button>
+                text='Connect to database'
+              />
             </View>
             :
             (item === null || typeof item === "undefined")
@@ -88,11 +81,9 @@ export default function DbConnection({
                       navigation.navigate("ComposerImportId")
                     }else {
                       navigation.navigate("ImportID")}
-                  }
-                  }
-                >
-                  <ButtonText>Connect to database</ButtonText>
-                </Button>
+                  }}
+                  text='Connect to database'
+                />
               }
               </View>
             : <Preview item={item} isComposer={isComposer} navigation={navigation} handleSetCurrentItem={handleSetCurrentItem}/>
@@ -118,7 +109,7 @@ function Diagnoser({
     return(
       <View>
         <SubText>You are not connected to the server right now, so we can't fetch your connected composer. Click below to retry at your connection.</SubText>
-        <Button onPress={() => {OnlineDB.updateDispatch(dbDispatch)}}><ButtonText>Retry connection</ButtonText></Button>
+        <Button onPress={() => {OnlineDB.updateDispatch(dbDispatch)}} text='Retry connection'/>
       </View>
     );
   }
@@ -160,9 +151,9 @@ function Preview({
         <DeleteButton onLongPress={() => {
             handleSetCurrentItem("dbId", undefined);
         }}><ButtonText>Detach</ButtonText></DeleteButton>
-        <Button onPress={() => {navigation.navigate("ComposerCompare")}}>
-          <ButtonText>Compare and Change</ButtonText>
-        </Button>
+        <Button onPress={() => {navigation.navigate("ComposerCompare")}}
+          text='Compare and Change'
+        />
       </View>
     );
   }
@@ -180,9 +171,9 @@ function Preview({
         <DeleteButton onLongPress={() => {
             handleSetCurrentItem("dbId", undefined);
         }}><ButtonText>Detach</ButtonText></DeleteButton>
-        <Button onPress={() => {navigation.navigate("Compare")}}>
-          <ButtonText>Compare and Change</ButtonText>
-        </Button>
+        <Button onPress={() => {navigation.navigate("Compare")}}
+          text='Compare and Change'
+        />
       </View>
     );
   }

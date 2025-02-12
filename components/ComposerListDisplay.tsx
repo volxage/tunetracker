@@ -13,13 +13,13 @@ import {
   Text,
   SubText,
   TextInput,
-  Button,
   ButtonText,
   DeleteButton,
   BackgroundView
 } from '../Style.tsx'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import Fuse from 'fuse.js';
+import {Button} from '../simple_components/Button.tsx'
 
 
 const fuseOptions = { // For finetuning the search algorithm
@@ -100,23 +100,18 @@ function ComposerListHeader({
               }
               headerInputStates.handleSetCurrentTune("composers", [...composers, ...headerInputStates.selectedComposers]);
               navigation.navigate("EditorUnwrapped");
-            }}>
-              <ButtonText>Save selection</ButtonText>
-            </Button>
+            }}
+            text='Save selection'
+          />
             <DeleteButton style={{flex: 1}} onPress={() => {
               navigation.navigate("EditorUnwrapped");
             }}>
               <ButtonText>Cancel changes</ButtonText>
             </DeleteButton>
           </View>
-          <Button onPress={() => setAddComposerExpanded(!addComposerExpanded)}>
-            {
-              addComposerExpanded ?
-              <ButtonText>(Collapse)</ButtonText>
-              :
-              <ButtonText>Can't find my composer below</ButtonText>
-            }
-          </Button>
+          <Button onPress={() => setAddComposerExpanded(!addComposerExpanded)}
+            text={addComposerExpanded ? "(Collapse)" : "Can't find my composer below"}
+          />
           {
             dbStatus === Status.Failed &&
             <View style={{flexDirection: "row", alignItems: "center"}}>
@@ -125,9 +120,9 @@ function ComposerListHeader({
                   DISCONNECTED
                 </SubText>
               </View>
-              <Button style={{flex:1}} onPress={() => {OnlineDB.updateDispatch(dbDispatch)}}>
-                <ButtonText>Retry connection</ButtonText>
-              </Button>
+              <Button style={{flex:1}} onPress={() => {OnlineDB.updateDispatch(dbDispatch)}}
+                text='Retry connection'
+              />
             </View>
           }
           {
@@ -138,9 +133,10 @@ function ComposerListHeader({
                   CONNECTING
                 </SubText>
               </View>
-              <Button style={{flex:1, backgroundColor: "#333"}}>
-                <ButtonText style={{color: "777"}}>(Please wait)</ButtonText>
-              </Button>
+              <Button style={{flex:1, backgroundColor: "#333"}}
+                textStyle={{color: "777"}}
+                text='(Please wait)'
+              />
             </View>
           }
           {
@@ -156,9 +152,8 @@ function ComposerListHeader({
                           headerInputStates.setComposerToEdit({});
                           navigation.navigate("ComposerEditor")
                         }}
-                      >
-                        <ButtonText>Add *Brand New* composer</ButtonText>
-                      </Button>
+                        text='Add *Brand New* composer'
+                      />
                     </View>
                     :
                     <View>
@@ -169,9 +164,8 @@ function ComposerListHeader({
                           headerInputStates.setComposerToEdit({});
                           navigation.navigate("ComposerEditor")
                         }}
-                      >
-                        <ButtonText>Add *brand new* composer</ButtonText>
-                      </Button>
+                        text='Add *brand new* composer'
+                      />
                     </View>
                 }
               </BackgroundView>

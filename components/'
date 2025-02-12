@@ -321,15 +321,14 @@ function ImporterHeader({
     {
       importingId &&
       <View>
-        <Button
-          onPress={() => setCreateOnlineItemExpanded(!createOnlineItemExpanded)}
-          text={
+        <Button onPress={() => setCreateOnlineItemExpanded(!createOnlineItemExpanded)}>
+          {
             createOnlineItemExpanded ?
-            "(Collapse)"
+            <ButtonText>(Collapse)</ButtonText>
             :
-            `Can't find my ${importingComposers ? "composer" : "tune"} below`
+            <ButtonText>Can't find my {importingComposers ? "composer" : "tune"} below</ButtonText>
           }
-        />
+        </Button>
       {
         createOnlineItemExpanded &&
         <View>
@@ -401,12 +400,14 @@ function ImporterHeader({
                     }
                   }
                 }}
-                text={submissionResult !== "" ?
-                  "(Tune already submitted)"
+              >
+                {
+                  (submissionResult !== "") ?
+                  <ButtonText style={{color: "#777"}}>(Tune already submitted)</ButtonText>
                   :
-                  `Upload your ${importingComposers ? "composer" : "tune"}`
+                  <ButtonText>Upload your {importingComposers ? "composer" : "tune"}</ButtonText>
                 }
-            />
+              </Button>
             </View>
             :
             <View>
@@ -416,8 +417,9 @@ function ImporterHeader({
                   OnlineDB.createTuneDraft(currentTune);
                   navigation.goBack();
                 }}
-                text='Submit your Tune to TuneTracker'
-              />
+              >
+                <ButtonText>Submit your Tune to TuneTracker</ButtonText>
+              </Button>
             </View>
           }
         </View>
@@ -512,7 +514,9 @@ export default function Importer({
       </SMarginView>
       {
         dbStatus === Status.Failed &&
-        <Button onPress={() => {OnlineDB.updateDispatch(dbDispatch)}} text='Retry'/>
+        <Button onPress={() => {OnlineDB.updateDispatch(dbDispatch)}}>
+          <ButtonText>Retry</ButtonText>
+        </Button>
       }
       <DeleteButton onPress={() => {navigation.goBack()}}><ButtonText>Cancel import</ButtonText></DeleteButton>
     </View>

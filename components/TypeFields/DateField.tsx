@@ -1,8 +1,9 @@
 import {useEffect, useState} from "react";
 import {View} from "react-native";
 import DatePicker from "react-native-date-picker";
-import {Button, ButtonText, DeleteButton, SubText, Title} from "../../Style";
+import { ButtonText, DeleteButton, SubText, Title} from "../../Style";
 import dateDisplay from "../../textconverters/dateDisplay";
+import { Button } from "../../simple_components/Button";
 
 export default function DateField({
   attr,
@@ -31,9 +32,9 @@ export default function DateField({
         <Title>{attrName.toUpperCase()}</Title>
         <View style={{flexDirection: "row"}}>
           <SubText style={{flex: 1, alignSelf: "center", textAlign: "center", borderWidth: 1, borderColor: "grey", padding: 8}}>Empty Date</SubText>
-          <Button style={{flex:1}} onPress={() => {handleSetCurrentItem(attrKey, new Date())}}>
-            <ButtonText>Add date</ButtonText>
-          </Button>
+          <Button style={{flex:1}} onPress={() => {handleSetCurrentItem(attrKey, new Date())}}
+            text="Add date"
+          />
         </View>
       </View>
     )
@@ -62,9 +63,9 @@ export default function DateField({
             <SubText style={{textAlign: "center"}}>{dateDisplay(attr)}</SubText>
           </View>
         </View>
-        <Button style={{flex:1}} onPress={() => setDateOpen(true)}>
-          <ButtonText>Set date</ButtonText>
-        </Button>
+        <Button style={{flex:1}} onPress={() => setDateOpen(true)}
+          text="Set date"
+        />
         <DeleteButton style={{flex: 1}} onPress={() => {handleSetCurrentItem(attrKey, undefined); setDateCopy(undefined);}}>
           <ButtonText>Delete</ButtonText>
         </DeleteButton>

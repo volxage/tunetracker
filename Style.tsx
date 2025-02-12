@@ -6,23 +6,23 @@ import styled from 'styled-components/native'
 
 const minButtonSize = PixelRatio.getPixelSizeForLayoutSize(24);
 const fontScale = PixelRatio.getFontScale();
-const Button = styled.Pressable`
+export const DarkButton = styled.Pressable`
   padding-vertical: 6px;
   border-radius: 4px;
   elevation: 3;
-  border-width: 4px;
+  border-width: 2px;
   border-color: cadetblue;
   margin: 4px;
   min-height: ${minButtonSize}px;
   min-length: ${minButtonSize}px;
   justify-content: center;
 `
-const DeleteButton = styled.Pressable`
+export const DeleteButton = styled.Pressable`
   align-items: 'center';
   justify-content: 'center';
   padding-vertical: 6px;
   border-radius: 4px;
-  border-width: 4px;
+  border-width: 2px;
   elevation: 3;
   font-size: 20px;
   border-color: maroon;
@@ -31,36 +31,42 @@ const DeleteButton = styled.Pressable`
   min-length: ${minButtonSize}px;
   justifyContent: center;
 `
-const Title = styled.Text`
+export const Title = styled.Text`
   font-size: 30px;
   color: white;
   font-weight: 400;
   text-align: center;
 `
-const Text = styled.Text`
+export const Text = styled.Text`
   font-size: 24px;
   color: white;
   font-weight: 500;
 `;
-const SubText = styled.Text`
+export const SubText = styled.Text`
   font-size: ${fontScale * 20}px;
   color: white;
   font-weight: 200;
 `;
-const SubBoldText = styled.Text`
+export const SubBoldText = styled.Text`
   font-size: ${fontScale * 20}px;
   color: white;
   font-weight: 350;
   min-height: ${minButtonSize}px;
   min-length: ${minButtonSize}px;
 `;
-const ButtonText = styled.Text`
+export const ButtonText = styled.Text`
   font-size: ${20 * fontScale}px;
   color: white;
   font-weight: 500;
   text-align: center;
 `
-const TextInput = styled.TextInput`
+export const DarkButtonText = styled.Text`
+  font-size: ${20 * fontScale}px;
+  color: white;
+  font-weight: 500;
+  text-align: center;
+`
+export const TextInput = styled.TextInput`
   font-size: ${fontScale * 20}px;
   font-size: 20px;
   color: white;
@@ -68,20 +74,19 @@ const TextInput = styled.TextInput`
   min-height: ${minButtonSize}px;
   min-length: ${minButtonSize}px;
 `;
-const SMarginView = styled.View`
+export const SMarginView = styled.View`
   background-color: black;
   margin: 16px;
 `;
-const ConfidenceBarView = styled.View`
+export const ConfidenceBarView = styled.View`
   margin-vertical: -4px;
   margin-horizontal: -12px;
 `;
-const BackgroundView = styled.View`
+export const BackgroundView = styled.View`
   background-color: black;
   flex: 1;
 `;
-const RowView = styled.View`
+export const RowView = styled.View`
   flex-direction: row;
 `;
 
-export {Text, Title, SubText, SubBoldText, TextInput, DeleteButton, Button, ButtonText, SMarginView, ConfidenceBarView, BackgroundView, RowView};

@@ -3,11 +3,11 @@ import {
   TextInput,
   DeleteButton,
   ButtonText,
-  Button,
   Title,
   Text,
   SubText,
 } from '../Style.tsx'
+import { Button } from '../simple_components/Button.tsx';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import React, {useEffect, useState} from 'react';
 import Slider from '@react-native-community/slider';
@@ -57,7 +57,8 @@ function AddPlaylistField({
           />
         </View>
         <View style={{alignContent: 'flex-end', flex: 1}}>
-          <Button onPress={() => {
+          <Button
+            onPress={() => {
             //If playlist name isn't empty and doesn't already exist
             if(newPlaylistTitle.trim().length !== 0 && !playlistQuery.filtered("title == $0", newPlaylistTitle.trim()).length){
               realm.write(() => {
@@ -70,9 +71,9 @@ function AddPlaylistField({
               })
               setNewPlaylistTitle("")
             }
-          }}>
-            <ButtonText><Icon name="plus" size={30}/></ButtonText>
-          </Button>
+            }}
+            iconName='plus'
+          />
         </View>
       </View>
     );
@@ -201,7 +202,9 @@ function TypeField({
           )}
         />
         <View style={{flexDirection:"row", alignSelf: "center"}}>
-          <Button onPress={() => {setNewPlaylistOpen(!newPlaylistOpen)}}><ButtonText>{newPlaylistOpen ? "Switch to adding existing Playlists" : "Switch to creating new Playlist"}</ButtonText></Button>
+          <Button onPress={() => {setNewPlaylistOpen(!newPlaylistOpen)}}
+            text={newPlaylistOpen ? "Switch to adding existing Playlists" : "Switch to creating new Playlist"}
+          />
         </View>
         <AddPlaylistField
           tunePlaylists={attr as (Playlist | playlist)[]}
@@ -227,9 +230,10 @@ function TypeField({
             <Title>{attrName.toUpperCase()}</Title>
           </View>
           <View style={{alignContent: 'flex-end', flex: 1}}>
-            <Button onPress={() => handleSetCurrentItem(attrKey, (attr as number[]).concat([0]))}>
-              <ButtonText><Icon name="plus" size={30}/></ButtonText>
-            </Button>
+            <Button
+              onPress={() => handleSetCurrentItem(attrKey, (attr as number[]).concat([0]))}
+              iconName="plus"
+            />
           </View>
         </View>
         <FlatList
@@ -328,9 +332,8 @@ function TypeField({
             <Button
               onPress={() => handleSetCurrentItem(attrKey, (attr as string[]).concat(["New item"]))}
               accessibilityLabel={"Create new entry for the " + attrName}
-            >
-              <ButtonText><Icon name="plus" size={30}/></ButtonText>
-            </Button>
+              iconName='plus'
+            />
           </View>
         </View>
         <FlatList

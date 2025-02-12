@@ -1,4 +1,4 @@
-import {Button, FlatList, SafeAreaView, TouchableHighlight, View} from "react-native";
+import {FlatList, SafeAreaView, TouchableHighlight, View} from "react-native";
 import {ButtonText, DeleteButton, SMarginView, SubText, Text, Title} from "../Style";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import {useNavigation} from "@react-navigation/native";

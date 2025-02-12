@@ -1,7 +1,6 @@
 //Copyright 2024 Jonathan Hilliard
 import React, {useContext, useEffect, useReducer, useState} from 'react';
 import {
-  Button,
   DeleteButton,
   ButtonText,
   SubText,
@@ -38,6 +37,7 @@ import {useNavigation} from '@react-navigation/native';
 import ResponseBox from './ResponseBox.tsx';
 import ResponseHandler from '../services/ResponseHandler.ts';
 import InformationExpand from './InformationExpand.tsx';
+import {Button} from '../simple_components/Button.tsx';
 const debugMode = false;
 
 //Anything that ends with "confidence" is also excluded
@@ -246,16 +246,17 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
                 });
                 // (From Editor.tsx) dispatch({type: 'update_attr', attr: attr_key, value: value});
               }}
-            >
-              <ButtonText><Icon name="database" size={30} /></ButtonText>
-            </Button>
+              iconName='database'
+            />
             :
-            <Button style={{
-              flex:1,
-                backgroundColor: "#111"
-            }}>
-              <ButtonText><Icon name="database-off" size={30} color="darkred" /></ButtonText>
-            </Button>
+            <Button 
+              style={{
+                flex:1,
+                  backgroundColor: "#111"
+              }}
+              iconName='database-off'
+              iconColor='darkred'
+            />
           }
           <Button
             style={{
@@ -276,9 +277,8 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
                 value: local_item
               });
             }}
-          >
-            <ButtonText><Icon name="dots-horizontal" size={30} /></ButtonText>
-          </Button>
+            iconName='dots-horizontal'
+          />
         { tuneAttrPresent ?
           <Button
             style={{
@@ -299,17 +299,17 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
                 value: local_item
               });
             }}
-          >
-            <ButtonText><Icon name="account" size={30} /></ButtonText>
-          </Button>
+            iconName="account"
+          />
           :
           <Button style={{
-              flex:1,
+            flex:1,
               backgroundColor: "#111"
-            }}>
-              <ButtonText><Icon name="account-off" size={30} color="darkred" /></ButtonText>
-          </Button>
-        }
+          }}
+          iconName='account-off'
+          iconColor='darkred'
+        />
+      }
         </View>
       </View>
     </View>
@@ -463,9 +463,8 @@ export default function Compare({
               submit();
             }
           }}
-        >
-          <ButtonText>Upload/Update left side</ButtonText>
-        </Button>
+          text='Upload/Update left side'
+        />
         <View style={{flexDirection: "row"}}>
           <Button style={{flex: 1}}
             onPress={() => {
@@ -473,9 +472,9 @@ export default function Compare({
               for(let attr of localState.changedAttrsList){
                 handleSetCurrentItem(attr, comparedLocalChanges[attr as keyof (Tune | tune_draft)]);
               }
-            }}>
-            <ButtonText>Save right side</ButtonText>
-          </Button>
+            }}
+            text='Save right side'
+          />
           <DeleteButton style={{flex: 1}}
             onPress={() => {navigation.goBack()}}
           >

@@ -12,7 +12,6 @@ import {
   Text,
   SubText,
   TextInput,
-  Button,
   ButtonText,
   ConfidenceBarView,
   DeleteButton,
@@ -24,6 +23,7 @@ import itemSort from '../itemSort.tsx'
 import { Picker } from '@react-native-picker/picker';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import OnlineDB from '../OnlineDB.tsx';
+import {Button} from '../simple_components/Button.tsx';
 
 import Fuse from 'fuse.js';
 const fuseOptions = { // For finetuning the search algorithm
@@ -330,13 +330,10 @@ function TuneListHeader({
           flex:1,
             borderColor: "purple"
         }}
+        iconName='music'
         onPress={() => {
           headerInputStates.setSelectedAttr("melodyConfidence");
-        }}>
-          <ButtonText>
-            <Icon name="music" size={30} />
-          </ButtonText>
-      </Button>
+        }}/>
       <Button
         style={{
           flex:1,
@@ -344,11 +341,9 @@ function TuneListHeader({
         }}
         onPress={() => {
           headerInputStates.setSelectedAttr("formConfidence");
-        }}>
-          <ButtonText>
-              <Icon name="file-music-outline" size={30}/>
-          </ButtonText>
-      </Button>
+        }}
+        iconName='file-music-outline'
+      />
       <Button
         style={{
           flex:1,
@@ -356,9 +351,9 @@ function TuneListHeader({
         }}
         onPress={() => {
           headerInputStates.setSelectedAttr("soloConfidence");
-        }}>
-        <ButtonText><Icon name="alpha-s-circle-outline" size={30} /></ButtonText>
-      </Button>
+        }}
+        iconName='alpha-s-circle-outline'
+      />
       <Button
         style={{
           flex:1,
@@ -366,9 +361,9 @@ function TuneListHeader({
         }}
         onPress={() => {
           headerInputStates.setSelectedAttr("lyricsConfidence");
-        }}>
-        <ButtonText><Icon name="script-text" size={30} /></ButtonText>
-      </Button>
+        }}
+        iconName='script-text'
+      />
     </View>
     <View style={{flexDirection: "row", flex: 3}}>
       <Button
@@ -380,9 +375,9 @@ function TuneListHeader({
         }}
         onPress={() => {
           headerInputStates.setConfidenceVisible(!headerInputStates.confidenceVisible)
-        }}>
-        <ButtonText><Icon name="segment" size={30} /></ButtonText>
-      </Button>
+        }}
+        iconName='segment'
+      />
       <Button
         style={{
           flex:1,
@@ -392,9 +387,9 @@ function TuneListHeader({
         }}
         onPress={() => {
           headerInputStates.setListReversed(!headerInputStates.listReversed)
-        }}>
-        <ButtonText><Icon name="menu-swap" size={30} /></ButtonText>
-      </Button>
+        }}
+        iconName='menu-swap'
+      />
       {
         headerInputStates.allowNewTune &&
         <View style={{flexDirection: "row", flex: 3}}>
@@ -405,22 +400,23 @@ function TuneListHeader({
             setNewTune(true);
 
             navigation.navigate("Editor");
-          }}>
-            <ButtonText><Icon name="plus" size={30}/></ButtonText>
-          </Button>
+          }}
+          iconName='plus'
+        />
           <Button style={{
             flex:1,
               borderColor: statusColorMap.get(dbStatus)
           }}
-          onPress={() => navigation.navigate("Importer")}>
-          <ButtonText><Icon name="database-arrow-down" size={30}/></ButtonText>
-        </Button>
-        <Button style={{
-          flex:1
-        }}
-        onPress={() => navigation.navigate("ExtrasMenu")}>
-        <ButtonText><Icon name="dots-horizontal" size={30}/></ButtonText>
-      </Button>
+          onPress={() => navigation.navigate("Importer")}
+          iconName='database-arrow-down'
+        />
+        <Button 
+          style={{
+            flex:1
+          }}
+          onPress={() => navigation.navigate("ExtrasMenu")}
+          iconName="dots-horizontal"
+        />
     </View>
     }
     </View>

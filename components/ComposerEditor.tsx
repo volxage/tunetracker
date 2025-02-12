@@ -2,7 +2,6 @@
 
 import React, {useEffect, useReducer, useState} from 'react';
 import {
-  Button,
   DeleteButton,
   ButtonText,
   SubText,
@@ -26,6 +25,7 @@ import {useRealm} from '@realm/react';
 import composerDraftReducer from '../DraftReducers/ComposerDraftReducer.ts';
 import ComposerDraftContext from '../contexts/ComposerDraftContext.ts';
 import {useNavigation} from '@react-navigation/native';
+import {Button} from '../simple_components/Button.tsx';
 
 
 export default function ComposerEditor({
@@ -119,8 +119,8 @@ export default function ComposerEditor({
                     });
                     navigation.goBack()
                   }}
-                ><ButtonText>Save</ButtonText>
-              </Button>
+                  text='Save'
+                />
             }
               {
                 newComposer &&
@@ -137,8 +137,8 @@ export default function ComposerEditor({
                     navigation.goBack();
                     setNewComposer(false);
                   }}
-                ><ButtonText>Save</ButtonText>
-              </Button>
+                  text='Save'
+                />
             }
 
 
