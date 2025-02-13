@@ -1,5 +1,5 @@
-import {FlatList, SafeAreaView, TouchableHighlight, View} from "react-native";
-import {ButtonText, DeleteButton, SMarginView, SubText, Text, Title} from "../Style";
+import {FlatList, TouchableHighlight, View} from "react-native";
+import {ButtonText, DeleteButton, SMarginView, SafeBgView, SubText, Text, Title} from "../Style";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import {useNavigation} from "@react-navigation/native";
 import {useContext, useEffect, useState} from "react";
@@ -138,7 +138,7 @@ export default function ProfileMenu({}:{}){
     getUserInfo();
   }, []);
   return(
-    <SafeAreaView style={{backgroundColor: "black", flex:1}}>
+    <SafeBgView>
       <SMarginView style={{flexDirection: "row"}}>
         <View style={{flex:1}}>
           <Text style={{"textAlign": "center"}}><Icon name={"account-music"} size={64}/></Text>
@@ -193,6 +193,6 @@ export default function ProfileMenu({}:{}){
         )}
       />   
           <DeleteButton onPress={navigation.goBack}><ButtonText>Go back</ButtonText></DeleteButton>
-        </SafeAreaView>
+        </SafeBgView>
   );
 }

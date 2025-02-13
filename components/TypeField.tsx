@@ -6,6 +6,7 @@ import {
   Title,
   Text,
   SubText,
+  BgView
 } from '../Style.tsx'
 import { Button } from '../simple_components/Button.tsx';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
@@ -27,6 +28,7 @@ import { Picker } from '@react-native-picker/picker';
 import DateField from './TypeFields/DateField.tsx';
 import {useNavigation} from '@react-navigation/native';
 import DbDrafts from './TypeFields/DbDrafts.tsx';
+import {useTheme} from 'styled-components';
 
 function AddPlaylistField({
   newPlaylist,
@@ -37,6 +39,7 @@ function AddPlaylistField({
   tunePlaylists: (playlist | Playlist)[],
   handleSetCurrentItem: Function
 }){
+  const theme = useTheme();
   const realm = useRealm();
   const [newPlaylistTitle, setNewPlaylistTitle] = useState("");
   const tunePlaylistIds = tunePlaylists.map(pl => pl.id);
@@ -79,7 +82,7 @@ function AddPlaylistField({
     );
   }else{
     return (
-      <View style={{borderColor: "white", borderWidth: 1, margin: 28}}>
+      <View style={{borderColor: theme.text, borderWidth: 1, margin: 28}}>
         <Picker
           onValueChange={
             // When the component rerenders, onValueChange is called with a value of "".
@@ -91,7 +94,7 @@ function AddPlaylistField({
             availablePlaylists.map(
               (playlist) => 
               <Picker.Item label={playlist.title} value={playlist} key={playlist.id.toString()}
-                style={{color: "white", backgroundColor:"black"}}
+                style={{color: theme.text, backgroundColor:theme.bg}}
               />
               )
           }
@@ -116,6 +119,7 @@ function TypeField({
   handleSetCurrentItem: Function,
   isComposer: boolean
 }){
+  const theme = useTheme();
   const allPlaylists = useQuery(Playlist);
   const [icon, setIcon] = useState();
   const [bool, setBool] = useState(attr as boolean)
@@ -154,7 +158,7 @@ function TypeField({
   }
   else if (attrKey === "mainTempo"){
     return(
-      <View style={{backgroundColor: 'black', padding: 8}}>
+      <BgView style={{padding: 8}}>
         <Title style={{textAlign: "center"}}>{attrName.toUpperCase()}</Title>
         <TextInput defaultValue={String(attr as number)} placeholderTextColor={"grey"}
           keyboardType="numeric"
@@ -170,7 +174,7 @@ function TypeField({
           accessibilityLabel={"Enter main tempo"}
           style={{textAlign: "center", fontWeight: "300"}}
         />
-      </View>
+      </BgView>
     );
   }
   else if (attrKey === "playlists" as keyOfEitherDraft && attr){
@@ -223,7 +227,7 @@ function TypeField({
       //setarrAttr(newArrAttr); handeSetCurrentTune causes a rerender, indirectly updating arrAttr.
     }
     return(
-      <View style={{backgroundColor: 'black', padding: 8}}>
+      <View style={{padding: 8}}>
         <View style={{flexDirection: 'row'}}>
           <View style={{flex: 1}}></View>
           <View style={{flex: 2}}>
@@ -271,7 +275,7 @@ function TypeField({
   }
   else if (typeof attr === "string"){
     return(
-      <View style={{backgroundColor: 'black', padding: 8}}>
+      <View style={{padding: 8}}>
         <Title style={{textAlign: "center"}}>{attrName.toUpperCase()}</Title>
         <TextInput defaultValue={attr} placeholderTextColor={"grey"}
           onChangeText={(text) => handleSetCurrentItem(attrKey, text)}
@@ -282,7 +286,7 @@ function TypeField({
     );
   }else if (typeof attr == "number"){
     return(
-      <View style={{backgroundColor: 'black', padding: 8}}>
+      <View style={{padding: 8}}>
         <Title>{attrName.toUpperCase()}</Title>
         <Slider
           minimumValue={0}
@@ -291,16 +295,17 @@ function TypeField({
           value={attr as number}
           onSlidingComplete={(value) => {handleSetCurrentItem(attrKey, value)}}
           thumbImage={icon}
-          style={{marginVertical: 20, marginHorizontal: 16}}
+          style={{marginVertical: 20, marginHorizontal: 16, backgroundColor: "black"}}
           minimumTrackTintColor='cadetblue'
           maximumTrackTintColor='gray'
+          thumbTintColor={theme.text || "gray"}
         />
       </View>
     );
   }
   else if (typeof attr === "boolean") {
     return(
-      <View style={{backgroundColor: 'black', padding: 8}}>
+      <View style={{padding: 8}}>
         <Title>{attrName.toUpperCase()}</Title>
         <View style={{flexDirection: "row", alignSelf: 'center'}}>
           <Switch
@@ -322,7 +327,7 @@ function TypeField({
       //setarrAttr(newArrAttr); handeSetCurrentTune causes a rerender, indirectly updating arrAttr.
     }
     return(
-      <View style={{backgroundColor: 'black', padding: 8}}>
+      <BgView style={{padding: 8}}>
         <View style={{flexDirection: 'row'}}>
           <View style={{flex: 1}}></View>
           <View style={{flex: 2}}>
@@ -361,7 +366,7 @@ function TypeField({
             </View>
           )}
         />
-      </View>
+      </BgView>
     )
   }
 }

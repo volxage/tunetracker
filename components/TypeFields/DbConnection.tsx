@@ -14,6 +14,7 @@ import {
 import OnlineDB from '../../OnlineDB.tsx';
 import dateDisplay from '../../textconverters/dateDisplay.tsx';
 import {Button} from '../../simple_components/Button.tsx';
+import {useTheme} from 'styled-components';
 
 export default function DbConnection({
   attr,
@@ -28,6 +29,7 @@ export default function DbConnection({
 }){
   const [connectTuneExpanded, setConnectTuneExpanded] = useState(false);
   const status = useContext(OnlineDB.DbStateContext).status;
+  const theme = useTheme();
   let item = null;
   if(typeof attr !== "undefined" && attr !== 0){
     if(isComposer){
@@ -42,7 +44,7 @@ export default function DbConnection({
         <View style={{flex:1}} />
         <Button
           onPress={() => {setConnectTuneExpanded(!connectTuneExpanded)}}
-          style={{backgroundColor: "#222", flex:2}}
+          style={{backgroundColor: theme.panelBg, flex:2}}
           iconName={connectTuneExpanded ? "earth-minus" : "earth-plus"}
         />
         <View style={{flex:1}} />

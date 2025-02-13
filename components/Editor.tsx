@@ -5,6 +5,7 @@ import {
   DeleteButton,
   ButtonText,
   SubText,
+  SafeBgView,
 } from '../Style.tsx'
 import {
   SafeAreaView,
@@ -68,7 +69,7 @@ export default function Editor({
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name={"EditorUnwrapped"} >
-        {props => <SafeAreaView style={{flex: 1, backgroundColor: "black"}}>
+        {props => <SafeBgView>
           <FlatList
             data={advancedSelected ? editorAttrs : basicEditorArr}
             ListHeaderComponent={
@@ -113,7 +114,7 @@ export default function Editor({
                     <ButtonText>DELETE TUNE (CAN'T UNDO!)</ButtonText>
                   </DeleteButton>
                 }
-                <View style={{flexDirection: "row", backgroundColor: "black"}}>
+                <View style={{flexDirection: "row"}}>
                   <View style={{flex: 1}}>
 
                     {
@@ -175,7 +176,7 @@ export default function Editor({
     </View>
   }
 />
-</SafeAreaView>}
+</SafeBgView>}
 </Stack.Screen>
 <Stack.Screen name={"ImportID"}>
   {props => 

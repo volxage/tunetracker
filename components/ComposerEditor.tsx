@@ -5,6 +5,7 @@ import {
   DeleteButton,
   ButtonText,
   SubText,
+  SafeBgView,
 } from '../Style.tsx'
 import {
   SafeAreaView,
@@ -65,7 +66,7 @@ export default function ComposerEditor({
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name={"EditorUnwrapped"} >
-        {props => <SafeAreaView style={{flex: 1, backgroundColor: "black"}}>
+        {props => <SafeBgView>
           <FlatList
             data={prettyAttrs}
             renderItem={({item, index, separators}) => (
@@ -102,7 +103,7 @@ export default function ComposerEditor({
                     <ButtonText>DELETE COMPOSER (CAN'T UNDO!)</ButtonText>
                   </DeleteButton>
                 }
-                <View style={{flexDirection: "row", backgroundColor: "black"}}>
+                <View style={{flexDirection: "row"}}>
                   <View style={{flex: 1}}>
 
                     {
@@ -152,7 +153,7 @@ export default function ComposerEditor({
     </View>
   }
 />
-</SafeAreaView>}
+</SafeBgView>}
 </Stack.Screen>
 <Stack.Screen name={"ComposerImportId"}>
   {props => 

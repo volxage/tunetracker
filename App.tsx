@@ -47,6 +47,9 @@ import {translateAttrFromStandardTune} from './DraftReducers/utils/translate.ts'
 import Register from './components/Register.tsx';
 import ProfileMenu from './components/ProfileMenu.tsx';
 import SplashScreen from 'react-native-splash-screen';
+import {ThemeProvider} from 'styled-components';
+import {light, dark} from './Themes.tsx';
+import {BgView, SafeBgView} from './Style.tsx';
 
 
 const Stack = createNativeStackNavigator();
@@ -61,17 +64,19 @@ function App(): React.JSX.Element {
   }, []);
 
   return(
-    <OnlineDB.DbDispatchContext.Provider value={dispatch}>
-      <OnlineDB.DbStateContext.Provider value={state}>
-        <View style={{flex: 1, backgroundColor: "black"}}>
-          <RealmProvider schema={[Tune, Composer, Playlist]} schemaVersion={4}>
-            <NavigationContainer>
-              <MainMenu/>
-            </NavigationContainer>
-          </RealmProvider>
-        </View>
-      </OnlineDB.DbStateContext.Provider>
-    </OnlineDB.DbDispatchContext.Provider>
+    <ThemeProvider theme={dark}>
+      <OnlineDB.DbDispatchContext.Provider value={dispatch}>
+        <OnlineDB.DbStateContext.Provider value={state}>
+          <BgView style={{flex: 1}}>
+            <RealmProvider schema={[Tune, Composer, Playlist]} schemaVersion={4}>
+              <NavigationContainer>
+                <MainMenu/>
+              </NavigationContainer>
+            </RealmProvider>
+          </BgView>
+        </OnlineDB.DbStateContext.Provider>
+      </OnlineDB.DbDispatchContext.Provider>
+    </ThemeProvider>
   );
 }
 
@@ -100,7 +105,7 @@ function MainMenu({}: {}): React.JSX.Element {
       </Stack.Screen>
       <Stack.Screen name="Importer">
         {(props) =>
-        <SafeAreaView style={{flex: 1, backgroundColor: "black"}}>
+        <SafeBgView>
           <Importer
             importingComposers={false}
             importingId={false}
@@ -157,12 +162,12 @@ function MainMenu({}: {}): React.JSX.Element {
                 }
               }
             }}/>
-          </SafeAreaView>
+          </SafeBgView>
         }
       </Stack.Screen>
       <Stack.Screen name="TuneListDisplay">
         {(props) =>
-        <SafeAreaView style={{backgroundColor: "#000", flex: 1}}>
+        <SafeBgView>
           <View>
             <TuneListDisplay
               setSelectedTune={setSelectedTune}
@@ -173,29 +178,29 @@ function MainMenu({}: {}): React.JSX.Element {
               setSelectedTunes={setSelectedTunes}
             />
           </View>
-        </SafeAreaView>
+        </SafeBgView>
       }
     </Stack.Screen>
     <Stack.Screen name="ExtrasMenu" component={ExtrasMenu}/>
     <Stack.Screen name="ProfileMenu" component={ProfileMenu}/>
     <Stack.Screen name="PlaylistViewer">
         {(props) =>
-        <SafeAreaView style={{flex: 1, backgroundColor: "black"}}>
+        <SafeBgView>
           <View style={{flex:1}}>
             <PlaylistViewer
             />
           </View>
-        </SafeAreaView>
+        </SafeBgView>
         }
     </Stack.Screen>
     <Stack.Screen name="PlaylistImporter">
         {(props) =>
-        <SafeAreaView style={{flex: 1, backgroundColor: "black"}}>
+        <SafeBgView>
           <View style={{flex:1}}>
             <PlaylistImporter
             />
           </View>
-        </SafeAreaView>
+        </SafeBgView>
         }
     </Stack.Screen>
   </Stack.Navigator>

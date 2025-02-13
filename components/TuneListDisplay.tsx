@@ -13,11 +13,10 @@ import {
   SubText,
   TextInput,
   ButtonText,
-  ConfidenceBarView,
-  DeleteButton,
   RowView,
   SubBoldText,
-  SMarginView
+  SMarginView,
+  PanelView
 } from '../Style.tsx'
 import itemSort from '../itemSort.tsx'
 import { Picker } from '@react-native-picker/picker';
@@ -58,6 +57,8 @@ import {BSON, List, OrderedCollection, Results} from 'realm';
 import Playlist from '../model/Playlist.ts';
 import dateDisplay from '../textconverters/dateDisplay.tsx';
 import {useNavigation} from '@react-navigation/native';
+import {BgView} from '../Style.tsx';
+import {useTheme} from 'styled-components';
 const selectionAttrs = new Map<string, string>([
   ["title", "Title"],
   ["alternativeTitle", "Alternative Title"],
@@ -110,15 +111,15 @@ function ConfidenceBar({
     return;
   }
   return(
-    <ConfidenceBarView>
+    <View style={{margin:0}}>
       <View 
-        style={{width: `${confidence}%`, backgroundColor: color, height:20, margin:4}}
+        style={{width: `${confidence}%`, backgroundColor: color, height:20}}
       >
       <ButtonText>
         <Icon size={20} name={iconMap[confidenceType]}/>
       </ButtonText>
       </View>
-    </ConfidenceBarView>
+    </View>
   );
 }
 
@@ -127,14 +128,15 @@ function ConfidenceBars({
 }: {
   tune: Tune
 }){
+  const theme = useTheme();
   return(
     <View style={{flexDirection: "column", padding: 4}}>
-      <ConfidenceBar tune={tune} confidenceType='melodyConfidence' color='purple'/>
-      <ConfidenceBar tune={tune} confidenceType='formConfidence' color='blue'/>
-      <ConfidenceBar tune={tune} confidenceType='soloConfidence' color='darkcyan'/>
+      <ConfidenceBar tune={tune} confidenceType='melodyConfidence' color={theme.melodyConf}/>
+      <ConfidenceBar tune={tune} confidenceType='formConfidence' color={theme.formConf}/>
+      <ConfidenceBar tune={tune} confidenceType='soloConfidence' color={theme.soloConf}/>
       {
         tune.hasLyrics &&
-        <ConfidenceBar tune={tune} confidenceType='lyricsConfidence' color='darkgreen'/>
+        <ConfidenceBar tune={tune} confidenceType='lyricsConfidence' color={theme.lyricsConf}/>
       }
     </View>
   );
@@ -200,6 +202,7 @@ function ItemRender({
   const isSelected = selected.some(id => tune.id.equals(id))
   const navigation = useNavigation() as any;
   const [isExpanded, setIsExpanded] = useState(false);
+  const theme = useTheme();
   return(
   <TouchableHighlight
     key={tune.title}
@@ -217,7 +220,7 @@ function ItemRender({
     onShowUnderlay={separators.highlight}
     onHideUnderlay={separators.unhighlight}>
     {
-      <View style={{backgroundColor: isSelected ? "#404040" : "black", padding: 8}}>
+      <BgView style={{backgroundColor: isSelected ? theme.panelBg : theme.bg, padding: 8}}>
         <Text>{tune.title}</Text>
         <SubText>{selectedAttr != "title"
           ? prettyPrint(tune[selectedAttr])
@@ -234,7 +237,7 @@ function ItemRender({
         //EXTRA INFO
         <TuneDetails tune={tune}/>
       }
-    </View>
+    </BgView>
   }
 </TouchableHighlight>
   )
@@ -262,6 +265,7 @@ function TuneListHeader({
   selectedAttr: String,
   selectedPlaylist: Playlist | playlist_enum,
 }){
+  const theme = useTheme();
   const dbStatus = useContext(OnlineDB.DbStateContext).status;
   const selectedAttrItems = Array.from(selectionAttrs.entries()).map(
     (entry) => {return {label: entry[1], value: entry[0]}}
@@ -280,15 +284,15 @@ function TuneListHeader({
   const navigation = useNavigation() as any;
 
   return(
-    <View style={{backgroundColor: "#222"}}>
-    <View style={{flexDirection: 'row', borderBottomWidth:1}}>
-      <View style={{flex:1}}>
-        <TextInput
-          placeholder={"Search"}
-          placeholderTextColor={"white"}
-          onChangeText={(text) => {headerInputStates.setSearch(text)}}
-        />
-      </View>
+    <PanelView>
+      <View style={{flexDirection: 'row', borderBottomWidth:1}}>
+        <View style={{flex:1}}>
+          <TextInput
+            placeholder={"Search"}
+            placeholderTextColor={theme.text}
+            onChangeText={(text) => {headerInputStates.setSearch(text)}}
+          />
+        </View>
     {
       <View style={{flex:1}}>
         <Picker
@@ -298,12 +302,12 @@ function TuneListHeader({
           {
             allPlaylists.map(playlist => 
               <Picker.Item label={playlist.title} value={playlist.title} key={playlist.id.toString()}
-                style={{color: "white", backgroundColor: "#222", fontSize: 20, fontWeight: 200}}
+                style={{color: theme.text, backgroundColor: theme.panelBg, fontSize: 20, fontWeight: 200}}
               />
             )
           }
           <Picker.Item label="No playlist" value={playlist_enum.AllTunes}
-            style={{color: "white", backgroundColor: "#222", fontSize: 20, fontWeight: 200}}
+            style={{color: theme.text, backgroundColor: theme.panelBg, fontSize: 20, fontWeight: 200}}
           />
         </Picker>
       </View>
@@ -319,7 +323,7 @@ function TuneListHeader({
         {
           selectedAttrItems.map(val => 
           <Picker.Item label={val.label} value={val.value} key={val.value}
-            style={{color: "white", backgroundColor: "#222", fontSize: 16, fontWeight: 200, flexWrap: "wrap"}}
+            style={{color: theme.text, backgroundColor: theme.panelBg, fontSize: 20, fontWeight: 200}}
           />
           )
         }
@@ -328,7 +332,7 @@ function TuneListHeader({
       <Button
         style={{
           flex:1,
-            borderColor: "purple"
+          borderColor: theme.melodyConf
         }}
         iconName='music'
         onPress={() => {
@@ -337,7 +341,7 @@ function TuneListHeader({
       <Button
         style={{
           flex:1,
-            borderColor: "darkblue"
+          borderColor: theme.formConf
         }}
         onPress={() => {
           headerInputStates.setSelectedAttr("formConfidence");
@@ -347,7 +351,7 @@ function TuneListHeader({
       <Button
         style={{
           flex:1,
-            borderColor: "darkcyan"
+          borderColor: theme.soloConf
         }}
         onPress={() => {
           headerInputStates.setSelectedAttr("soloConfidence");
@@ -357,7 +361,7 @@ function TuneListHeader({
       <Button
         style={{
           flex:1,
-            borderColor: "darkgreen"
+          borderColor: theme.lyricsConf
         }}
         onPress={() => {
           headerInputStates.setSelectedAttr("lyricsConfidence");
@@ -420,7 +424,7 @@ function TuneListHeader({
     </View>
     }
     </View>
-  </View>
+  </PanelView>
 );
 }
 export default function TuneListDisplay({
@@ -507,9 +511,9 @@ export default function TuneListDisplay({
         />
       }
       ListEmptyComponent={
-        <View style={{backgroundColor: "black", flex: 1}}>
+        <BgView style={{flex: 1}}>
           <SubText>Click the blue database icon to download a tune from tunetracker.jhilla.org, or click the plus icon to make a new one!</SubText>
-        </View>
+        </BgView>
       }
       renderItem={({item, index, separators}) => (
         <ItemRender 

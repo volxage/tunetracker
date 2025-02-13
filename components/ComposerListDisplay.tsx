@@ -15,7 +15,7 @@ import {
   TextInput,
   ButtonText,
   DeleteButton,
-  BackgroundView
+  BgView,
 } from '../Style.tsx'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import Fuse from 'fuse.js';
@@ -51,6 +51,7 @@ import {BSON} from 'realm';
 import itemSort from '../itemSort.tsx';
 import Composer from '../model/Composer.ts';
 import {useNavigation} from '@react-navigation/native';
+import {useTheme} from 'styled-components';
 
 
 type HeaderInputStates = {
@@ -73,13 +74,14 @@ function ComposerListHeader({
   const dbStatus = useContext(OnlineDB.DbStateContext).status;
   const dbDispatch = useContext(OnlineDB.DbDispatchContext);
   const navigation = useNavigation() as any;
+  const theme = useTheme();
   return(
     <View>
-      <View style={{flexDirection: 'row', borderBottomWidth:1, backgroundColor: "#222"}}>
+      <View style={{flexDirection: 'row', borderBottomWidth:1, backgroundColor: theme.panelBg}}>
         <View style={{flex:1}}>
           <TextInput
             placeholder={"Enter your composer here"}
-            placeholderTextColor={"white"}
+            placeholderTextColor={theme.text}
             onChangeText={(text) => {headerInputStates.setSearch(text)}}
           />
           <View style={{flexDirection: "row"}}>
@@ -141,7 +143,7 @@ function ComposerListHeader({
           }
           {
             addComposerExpanded &&
-              <BackgroundView>
+              <BgView>
                 {
                   addComposerOptionFlag ?
                     <View>
@@ -168,7 +170,7 @@ function ComposerListHeader({
                       />
                     </View>
                 }
-              </BackgroundView>
+              </BgView>
           }
         </View>
         {
@@ -302,6 +304,7 @@ export default function ComposerListDisplay({
   }
   const Stack = createNativeStackNavigator();
   const navigation = useNavigation() as any;
+  const theme = useTheme();
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name={"ComposerListDisplay"} >
@@ -328,7 +331,7 @@ export default function ComposerListDisplay({
                   }}
                   onShowUnderlay={separators.highlight}
                   onHideUnderlay={separators.unhighlight}>
-                  <View style={{backgroundColor: (isSelected(item) ? '#404040' : 'black'), padding: 8}}>
+                  <View style={{backgroundColor: (isSelected(item) ? theme.panelBg : theme.bg), padding: 8}}>
                     <Text>{item.name}</Text>
                     <LocalityIndicators item={item}/>
                     <SubText>{dateDisplay(item.birth)}</SubText>

@@ -1,5 +1,5 @@
 import {FlatList, SafeAreaView, TouchableHighlight, View} from "react-native";
-import {Title, Text, SubText, DeleteButton, ButtonText} from "../Style";
+import {Title, Text, SubText, DeleteButton, ButtonText, SafeBgView} from "../Style";
 import {useQuery} from "@realm/react";
 import Playlist from "../model/Playlist";
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
@@ -23,7 +23,7 @@ export default function PlaylistViewer(
   return(
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name={"PlaylistViewerUnwrapped"} >
-        {props => <SafeAreaView style={{backgroundColor: "black", flex:1}}>
+        {props => <SafeBgView>
           <Title>Playlists</Title>
           <DeleteButton
             onPress={() => {navigation.goBack()}}>
@@ -55,13 +55,13 @@ export default function PlaylistViewer(
               </View>
             </TouchableHighlight>}
         />
-      </SafeAreaView>
+      </SafeBgView>
         }
       </Stack.Screen>
       <Stack.Screen name={"PlaylistEditor"}>
-        {props => <SafeAreaView style={{backgroundColor: "black", flex: 1}}>
+        {props => <SafeBgView style={{flex: 1}}>
           <PlaylistEditor playlist={selectedPlaylist as Playlist} setTuneToEdit={setTuneToEdit}/>
-      </SafeAreaView>}
+      </SafeBgView>}
     </Stack.Screen>
  <Stack.Screen name="Editor">
    {(props) => <Editor

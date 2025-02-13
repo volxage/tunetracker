@@ -15,9 +15,9 @@ import {
   DeleteButton,
   ButtonText,
   SMarginView,
-  BackgroundView,
   RowView,
-  SubBoldText
+  SubBoldText,
+  BgView
 } from '../Style.tsx'
 import { Button } from '../simple_components/Button.tsx'
 import itemSort from '../itemSort.tsx'
@@ -50,6 +50,7 @@ import Tune from '../model/Tune.ts';
 import {useNavigation} from '@react-navigation/native';
 import ResponseHandler from '../services/ResponseHandler.ts';
 import ResponseBox from './ResponseBox.tsx';
+import {useTheme} from 'styled-components';
 
 const tuneFuseOptions = { // For finetuning the search algorithm
 	// isCaseSensitive: false,
@@ -183,14 +184,14 @@ function StandardRender({
         }}
         onShowUnderlay={separators.highlight}
         onHideUnderlay={separators.unhighlight}>
-        <View style={{backgroundColor: 'black', padding: 8}}>
+        <BgView style={{padding: 8}}>
           <Text>{text}</Text>
           <SubText>{subtext}</SubText>
           {
             detailsShown &&
             <StandardComposerDetails std={comp}/>
           }
-        </View>
+        </BgView>
       </TouchableHighlight>
     )
   }else{
@@ -216,14 +217,14 @@ function StandardRender({
         }}
         onShowUnderlay={separators.highlight}
         onHideUnderlay={separators.unhighlight}>
-        <View style={{backgroundColor: 'black', padding: 8}}>
+        <BgView style={{padding: 8}}>
           <Text>{text}</Text>
           <SubText>{subtext}</SubText>
           {
             detailsShown &&
             <StandardDetails std={stand}/>
           }
-        </View>
+        </BgView>
       </TouchableHighlight>
     )
   }
@@ -282,11 +283,12 @@ function ImporterHeader({
   const [submissionResult, setSubmissionResult] = useState("");
   const [errorPresent, setErrorPresent] = useState(false);
   const navigation = useNavigation();
+  const theme = useTheme();
   return(
-    <View style={{backgroundColor: "#222"}}>
+    <View style={{backgroundColor: theme.panelBg}}>
       <TextInput
         placeholder={"Search"}
-        placeholderTextColor={"white"}
+        placeholderTextColor={theme.text}
         onChangeText={(text) => setSearch(text)}
       />
     <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -298,7 +300,7 @@ function ImporterHeader({
             (selectedAttrItems).map(
               (attrPair) => 
               <Picker.Item label={attrPair.label} value={attrPair.value} key={attrPair.value}
-                style={{color: "white", backgroundColor: "#222", fontSize: 20, fontWeight: 200}}
+                style={{color: theme.text, backgroundColor: theme.panelBg, fontSize: 20, fontWeight: 200}}
               />
               )
           }
@@ -310,11 +312,11 @@ function ImporterHeader({
         }}
         style={{
           flex: 1,
-            backgroundColor: !listReversed
+            borderColor: !listReversed
             ? "darkgreen"
             : "darkred",
         }}
-        iconName='segment'
+        iconName='menu-swap'
       />
     </View>
     <SubText>If you already saved/connected to the {importingComposers ? "composer" : "tune"} you're searching for, it won't be available here.</SubText>
@@ -339,7 +341,7 @@ function ImporterHeader({
               <SubText>This search doesn't seem to match well with any {importingComposers ? "composer" : "tune"} from our database. You can submit your draft below. After it is reviewed and accepted, it will be added to the database for everyone to use!</SubText>
               <ResponseBox result={submissionResult} isError={errorPresent}/>
               <Button
-                style={{backgroundColor: (submissionResult !== "") ? "#444" : "cadetblue"}}
+                style={{borderColor: (submissionResult !== "") ? "#444" : "cadetblue"}}
                 onPress={() => {
                   submit();
                   //TODO: Move tune conversion to OnlineDB here and in Compare.tsx
@@ -506,7 +508,7 @@ export default function Importer({
     }
   />
   : <View style={{flex: 1, display: "flex", justifyContent: "center", alignItems: "center"}}>
-    <View style={{flex: 1, backgroundColor: "black"}}>
+    <BgView>
       <SMarginView>
         <SubText>{statusTextMap.get(dbStatus)}</SubText>
       </SMarginView>
@@ -515,7 +517,7 @@ export default function Importer({
         <Button onPress={() => {OnlineDB.updateDispatch(dbDispatch)}} text='Retry'/>
       }
       <DeleteButton onPress={() => {navigation.goBack()}}><ButtonText>Cancel import</ButtonText></DeleteButton>
-    </View>
+    </BgView>
     </View>
   );
 }

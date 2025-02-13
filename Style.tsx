@@ -6,6 +6,17 @@ import styled from 'styled-components/native'
 
 const minButtonSize = PixelRatio.getPixelSizeForLayoutSize(24);
 const fontScale = PixelRatio.getFontScale();
+export const ThemedButton = styled.Pressable`
+  padding-vertical: 6px;
+  border-radius: 4px;
+  elevation: 3;
+  border-width: 2px;
+  border-color: ${({ theme }) => theme.defaultButton};
+  margin: 4px;
+  min-height: ${minButtonSize}px;
+  min-length: ${minButtonSize}px;
+  justify-content: center;
+`
 export const DarkButton = styled.Pressable`
   padding-vertical: 6px;
   border-radius: 4px;
@@ -33,59 +44,53 @@ export const DeleteButton = styled.Pressable`
 `
 export const Title = styled.Text`
   font-size: 30px;
-  color: white;
+  color: ${({ theme }) => theme.text};
   font-weight: 400;
   text-align: center;
 `
 export const Text = styled.Text`
   font-size: 24px;
-  color: white;
+  color: ${({ theme }) => theme.text};
   font-weight: 500;
 `;
 export const SubText = styled.Text`
   font-size: ${fontScale * 20}px;
-  color: white;
+  color: ${({ theme }) => theme.text};
   font-weight: 200;
 `;
 export const SubBoldText = styled.Text`
   font-size: ${fontScale * 20}px;
-  color: white;
+  color: ${({ theme }) => theme.text};
   font-weight: 350;
-  min-height: ${minButtonSize}px;
-  min-length: ${minButtonSize}px;
 `;
 export const ButtonText = styled.Text`
   font-size: ${20 * fontScale}px;
-  color: white;
-  font-weight: 500;
-  text-align: center;
-`
-export const DarkButtonText = styled.Text`
-  font-size: ${20 * fontScale}px;
-  color: white;
+  color: ${({ theme }) => theme.text};
   font-weight: 500;
   text-align: center;
 `
 export const TextInput = styled.TextInput`
   font-size: ${fontScale * 20}px;
   font-size: 20px;
-  color: white;
+  color: ${({ theme }) => theme.text};
   padding: 16px;
   min-height: ${minButtonSize}px;
   min-length: ${minButtonSize}px;
 `;
+export const BgView = styled.View`
+  background-color: ${({ theme }) =>  theme.bg};
+`
 export const SMarginView = styled.View`
-  background-color: black;
+  background-color: ${({ theme }) => theme.bg};
   margin: 16px;
 `;
-export const ConfidenceBarView = styled.View`
-  margin-vertical: -4px;
-  margin-horizontal: -12px;
-`;
-export const BackgroundView = styled.View`
-  background-color: black;
-  flex: 1;
-`;
+export const SafeBgView = styled.SafeAreaView`
+  background-color: ${({ theme }) => theme.bg};
+  flex:1
+`
+export const PanelView = styled.View`
+  background-color: ${({theme}) => theme.panelBg};
+`
 export const RowView = styled.View`
   flex-direction: row;
 `;

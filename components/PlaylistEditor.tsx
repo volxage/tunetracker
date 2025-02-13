@@ -1,5 +1,5 @@
 import {View} from "react-native";
-import {Title, TextInput, ButtonText, DeleteButton, SubText} from "../Style";
+import {Title, TextInput, ButtonText, DeleteButton, SubText, BgView} from "../Style";
 import {Button} from "../simple_components/Button"
 import {useQuery, useRealm} from "@realm/react";
 import Playlist from "../model/Playlist";
@@ -34,7 +34,7 @@ export default function PlaylistEditor(
   const [playlistUploaded, setPlaylistUploaded] = useState(false);
   const [playlistPublic, setPlaylistPublic] = useState(false);
   return(
-    <View style={{backgroundColor: "black"}}>
+    <BgView>
       <View style={{flexDirection: "row"}}>
         <Button style={{flex:1}} onPress={() => {
           realm.write(() => {
@@ -132,6 +132,6 @@ export default function PlaylistEditor(
         selectedTunes={plSelectedTunes.map(tune => tune)}
         setSelectedTunes={setPlSelectedTunes}
       />
-  </View>
+  </BgView>
   );
 }
