@@ -50,27 +50,59 @@ import SplashScreen from 'react-native-splash-screen';
 import {ThemeProvider} from 'styled-components';
 import {light, dark} from './Themes.tsx';
 import {BgView, SafeBgView} from './Style.tsx';
+import AsyncStorage from '@react-native-community/async-storage';
 
 
 const Stack = createNativeStackNavigator();
 
 function App(): React.JSX.Element {
   const [state, dispatch] = useReducer(OnlineDB.reducer, {composers: [], standards: [], status: Status.Failed})
+  const [theme, setTheme] = useState(dark);
   useEffect(() => {
     SplashScreen.hide();
   }, [])
   useEffect(() => {
+    try{
+      AsyncStorage.getItem("theme").then(thm => {
+        if(thm !== null){
+          setTheme(JSON.parse(thm));
+        }else{
+          setTheme(dark);
+        }
+      })
+    }catch(e){
+      console.error("Error reading ");
+      setTheme(dark);
+    }
     OnlineDB.updateDispatch(dispatch);
   }, []);
 
   return(
-    <ThemeProvider theme={dark}>
+    <ThemeProvider theme={theme}>
       <OnlineDB.DbDispatchContext.Provider value={dispatch}>
         <OnlineDB.DbStateContext.Provider value={state}>
           <BgView style={{flex: 1}}>
             <RealmProvider schema={[Tune, Composer, Playlist]} schemaVersion={4}>
               <NavigationContainer>
-                <MainMenu/>
+                <MainMenu 
+                  toggleTheme={() => {
+                    if(theme === dark){
+                      try {
+                        AsyncStorage.setItem('theme', JSON.stringify(light));
+                      } catch (e) {
+                        console.error("Error saving theme");
+                      }
+                      setTheme(light);
+                    }else{
+                      try {
+                        AsyncStorage.setItem('theme', JSON.stringify(dark));
+                      } catch (e) {
+                        console.error("Error saving theme");
+                      }
+                      setTheme(dark);
+                    }
+                  }}
+                />
               </NavigationContainer>
             </RealmProvider>
           </BgView>
@@ -80,7 +112,7 @@ function App(): React.JSX.Element {
   );
 }
 
-function MainMenu({}: {}): React.JSX.Element {
+function MainMenu({toggleTheme}: {toggleTheme: Function}): React.JSX.Element {
   const [selectedTune, setSelectedTune]: [Tune | unknown, Function] = useState();
   const [selectedTunes, setSelectedTunes]: [Tune[], Function] = useState([]);
   const [newTune, setNewTune] = useState(false);
@@ -181,14 +213,19 @@ function MainMenu({}: {}): React.JSX.Element {
         </SafeBgView>
       }
     </Stack.Screen>
-    <Stack.Screen name="ExtrasMenu" component={ExtrasMenu}/>
+    <Stack.Screen name="ExtrasMenu">
+      {(props) => 
+      <ExtrasMenu
+        toggleTheme={toggleTheme}
+      />
+      }
+    </Stack.Screen>
     <Stack.Screen name="ProfileMenu" component={ProfileMenu}/>
     <Stack.Screen name="PlaylistViewer">
         {(props) =>
         <SafeBgView>
           <View style={{flex:1}}>
-            <PlaylistViewer
-            />
+            <PlaylistViewer/>
           </View>
         </SafeBgView>
         }

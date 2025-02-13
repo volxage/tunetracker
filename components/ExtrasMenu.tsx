@@ -9,7 +9,9 @@ import {useTheme} from 'styled-components';
 
 // <Button onPress={() => {navigation.navigate("PlaylistImporter")}}>
 export default function ExtrasMenu({
+  toggleTheme
 }: {
+  toggleTheme: Function
 }){
   const navigation = useNavigation() as any;
   const theme = useTheme();
@@ -24,6 +26,8 @@ export default function ExtrasMenu({
           onPress={() => {navigation.navigate("PlaylistViewer")}}
         />
         <Button style={{backgroundColor: theme.panelBg}} text='Import Playlist (Coming soon!)'/>
+        <Button text='Tutorial'/>
+        <Button text='Toggle Light mode / Dark mode' onPress={() => {toggleTheme()}}/>
         <DeleteButton onPress={() => {navigation.goBack()}}>
           <ButtonText>Back</ButtonText>
         </DeleteButton>
