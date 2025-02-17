@@ -6,7 +6,8 @@ import {
   Title,
   Text,
   SubText,
-  BgView
+  BgView,
+  SMarginView
 } from '../Style.tsx'
 import { Button } from '../simple_components/Button.tsx';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
@@ -82,23 +83,29 @@ function AddPlaylistField({
     );
   }else{
     return (
-      <View style={{borderColor: theme.text, borderWidth: 1, margin: 28}}>
-        <Picker
-          onValueChange={
-            // When the component rerenders, onValueChange is called with a value of "".
-            (value: Playlist | "") => {value !== "" && handleSetCurrentItem("playlists", tunePlaylists.concat(value))}
-          }
-          accessibilityLabel='Select existing playlist'
-        >
-          {
-            availablePlaylists.map(
-              (playlist) => 
-              <Picker.Item label={playlist.title} value={playlist} key={playlist.id.toString()}
-                style={{color: theme.text, backgroundColor:theme.bg}}
-              />
-              )
-          }
-        </Picker>
+      <View>
+        <SMarginView>
+          <SubText style={{textAlign: "center", marginTop: 8}}>Select an existing playlist below, if there are any. If not, press above to create a new playlist.</SubText>
+        </SMarginView>
+        <View style={{borderColor: theme.text, borderWidth: 1, margin: 28}}>
+          <Picker
+            onValueChange={
+              // When the component rerenders, onValueChange is called with a value of "".
+              (value: Playlist | "") => {value !== "" && handleSetCurrentItem("playlists", tunePlaylists.concat(value))}
+            }
+            accessibilityLabel='Select existing playlist'
+            placeholder='Select an existing playlist'
+          >
+            {
+              availablePlaylists.map(
+                (playlist) => 
+                <Picker.Item label={playlist.title} value={playlist} key={playlist.id.toString()}
+                  style={{color: theme.text, backgroundColor:theme.bg}}
+                />
+                )
+            }
+          </Picker>
+        </View>
       </View>
     );
   }
@@ -156,7 +163,7 @@ function TypeField({
         navigation={navigation}/>
     );
   }
-  else if (attrKey === "mainTempo"){
+  else if (attrKey === "mainTempo" || attrKey === "playthroughs"){
     return(
       <BgView style={{padding: 8}}>
         <Title style={{textAlign: "center"}}>{attrName.toUpperCase()}</Title>

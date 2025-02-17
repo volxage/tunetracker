@@ -6,9 +6,35 @@ import {ButtonText, DeleteButton, SafeBgView, Title} from '../Style';
 import {useNavigation} from '@react-navigation/native';
 import {Button} from '../simple_components/Button';
 import {useTheme} from 'styled-components';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import TempTutorial from './Tutorials/TempTutorial';
 
 // <Button onPress={() => {navigation.navigate("PlaylistImporter")}}>
 export default function ExtrasMenu({
+  toggleTheme
+}: {
+  toggleTheme: Function
+}){
+  const Stack = createNativeStackNavigator();
+  return(
+    <Stack.Navigator screenOptions={{headerShown: false}}>
+      <Stack.Screen name={"EditorUnwrapped"} >
+        {
+          (props) => 
+          <ExtrasMenuUnwrapped toggleTheme={toggleTheme}/>
+        }
+      </Stack.Screen>
+      <Stack.Screen name="TempTutorial">
+        {(props) =>
+        <TempTutorial>
+        </TempTutorial>
+        }
+      </Stack.Screen>
+    </Stack.Navigator>
+  );
+}
+
+function ExtrasMenuUnwrapped({
   toggleTheme
 }: {
   toggleTheme: Function
@@ -26,7 +52,9 @@ export default function ExtrasMenu({
           onPress={() => {navigation.navigate("PlaylistViewer")}}
         />
         <Button style={{backgroundColor: theme.panelBg}} text='Import Playlist (Coming soon!)'/>
-        <Button text='Tutorial'/>
+        <Button text='Tutorial'
+          onPress={() => {navigation.navigate("TempTutorial")}}
+        />
         <Button text='Toggle Light mode / Dark mode' onPress={() => {toggleTheme()}}/>
         <DeleteButton onPress={() => {navigation.goBack()}}>
           <ButtonText>Back</ButtonText>

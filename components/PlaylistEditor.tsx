@@ -123,7 +123,8 @@ export default function PlaylistEditor(
         accessibilityLabel="Enter description"
         onChangeText={text => {setNewDescription(text)}}
       />
-      <Title>TUNES</Title>
+      <Title>TUTORIAL:</Title>
+      <Title>Tune List (Main menu)</Title>
       <TuneListDisplay
         setSelectedTune={setTuneToEdit}
         setNewTune={() => {}}
