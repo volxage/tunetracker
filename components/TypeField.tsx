@@ -85,7 +85,7 @@ function AddPlaylistField({
     return (
       <View>
         <SMarginView>
-          <SubText style={{textAlign: "center", marginTop: 8}}>Select an existing playlist below, if there are any. If not, press above to create a new playlist.</SubText>
+          <SubText style={{textAlign: "center", marginTop: 8}}>Select an existing playlist below, if there are any left. If not, press above to create a new playlist.</SubText>
         </SMarginView>
         <View style={{borderColor: theme.text, borderWidth: 1, margin: 28}}>
           <Picker

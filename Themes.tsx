@@ -29,6 +29,7 @@ export const dark = {
   delete: "maroon",
   on: "green",
   off: "darkred",
+  pending: "goldenrod",
   melodyConf: "purple",
   formConf: "#573bd8",
   soloConf: "darkcyan",

@@ -11,9 +11,17 @@ import RNFS from "react-native-fs";
 import Share from "react-native-share";
 import buff from "buffer";
 import {useNavigation} from "@react-navigation/native";
+import {tune_draft} from "../types";
+import OnlineDB from "../OnlineDB";
 const tmpPlaylistPath = RNFS.TemporaryDirectoryPath + "/tmp_playlist.json";
 
 
+type playlist_submission = {
+  //Tunes by dbId
+  onlineTunes: number[],
+  //Drafts that haven't been accepted (or submitted)
+  userTunes: tune_draft[]
+}
 
 
 export default function PlaylistEditor(
@@ -38,7 +46,6 @@ export default function PlaylistEditor(
       <View style={{flexDirection: "row"}}>
         <Button style={{flex:1}} onPress={() => {
           realm.write(() => {
-            const idsToRemove = []
             for(const tuneToRemove of playlist.tunes){
               if(!plSelectedTunes.some(plSelected => plSelected.id.equals(tuneToRemove.id))){
                 if(tuneToRemove.playlists){
@@ -74,9 +81,9 @@ export default function PlaylistEditor(
       <View style={{flexDirection: "row"}}>
         {
           false &&
-          <View>
+          <>
             {
-              !playlistUploaded ?
+              playlistUploaded ?
               <View style={{flexDirection: "row", flex:1}}>
                 <Button style={{flex: 1, backgroundColor: "#111"}} onPress={() => {
                 }} text="Delete from TT" textStyle={{color: "#777"}}/>
@@ -84,20 +91,41 @@ export default function PlaylistEditor(
                   playlistPublic ?
                   <Button style={{flex:1}} text="Make private"/>
                   :
-                  <Button style={{flex:1}} text="Make public"/>
+                  <Button style={{flex:1}} text="Make public" onPress={() => {
+
+                  }}/>
                 }
               </View>
               :
               <View style={{flex:1}}>
-                <DeleteButton style={{backgroundColor: "#111"}} onPress={() => {
-                }}>
-                  <ButtonText style={{color: "#777"}}>
-                    Upload
-                  </ButtonText>
-                </DeleteButton>
+                <Button text='Upload' style={{backgroundColor: "#111"}} onPress={() => {
+                  const newSubmission = {onlineTunes: [], userTunes: []} as playlist_submission;
+                  for(let tn of plSelectedTunes){
+                    if(tn.dbId && tn.dbId !== 0){
+                      newSubmission.onlineTunes.push(tn.dbId);
+                    }else{
+                      newSubmission.userTunes.push(
+                        {
+                          title: tn.title,
+                          alternative_title: tn.alternativeTitle,
+                          id: tn.id,
+                          form: tn.form,
+                          //bio: tn.bio,
+                          composers: !tn.composers ? undefined : tn.composers.map(comp => {
+                            if("dbId" in comp){
+                              return comp["dbId"]
+                            }
+                            return comp.id;
+                          })
+                        } as tune_draft
+                      )
+                    }
+                  }
+                  console.log(newSubmission);
+                }}/>
               </View>
             }
-          </View>
+          </>
         }
       </View>
       <DeleteButton onLongPress={() => {
@@ -123,8 +151,6 @@ export default function PlaylistEditor(
         accessibilityLabel="Enter description"
         onChangeText={text => {setNewDescription(text)}}
       />
-      <Title>TUTORIAL:</Title>
-      <Title>Tune List (Main menu)</Title>
       <TuneListDisplay
         setSelectedTune={setTuneToEdit}
         setNewTune={() => {}}
