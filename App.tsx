@@ -62,6 +62,7 @@ function App(): React.JSX.Element {
     SplashScreen.hide();
   }, [])
   useEffect(() => {
+    console.log("App open")
     try{
       AsyncStorage.getItem("theme").then(thm => {
         if(thm !== null){
