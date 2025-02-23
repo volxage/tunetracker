@@ -174,19 +174,6 @@ function ComposerListHeader({
           }
         </View>
         {
-          //<View style={{flex:1}}>
-          //  <RNPickerSelect
-          //    onValueChange={(value) => headerInputStates.setSelectedPlaylist(value)}
-          //    items={selectedPlaylistItems}
-          //    useNativeAndroidPickerStyle={false}
-          //    placeholder={{label: "Select a playlist", value: ""}}
-          //    style={{inputAndroid:
-          //      {
-          //      backgroundColor: 'transparent', color: 'white', fontSize: 20, fontWeight: "300",
-          //      }
-          //    }}
-          //  />
-          //</View>
         }
       </View>
     </View>

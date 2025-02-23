@@ -295,6 +295,7 @@ function ImporterHeader({
       <View style={{flex: 2}}>
         <Picker
           onValueChange={(value) => updateSelectedAttr(value)}
+          itemStyle={{color: "white"}}
         >
           {
             (selectedAttrItems).map(

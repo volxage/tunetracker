@@ -95,6 +95,7 @@ function AddPlaylistField({
             }
             accessibilityLabel='Select existing playlist'
             placeholder='Select an existing playlist'
+            itemStyle={{color: "white"}}
           >
             {
               availablePlaylists.map(
