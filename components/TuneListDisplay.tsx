@@ -1,6 +1,6 @@
 // Copyright 2024 Jonathan Hilliard
 
-import React, {isValidElement, useContext, useEffect, useState} from 'react';
+import React, {ReactNode, isValidElement, useContext, useEffect, useState} from 'react';
 import {
   FlatList,
   Switch,
@@ -59,6 +59,11 @@ import dateDisplay from '../textconverters/dateDisplay.tsx';
 import {useNavigation} from '@react-navigation/native';
 import {BgView} from '../Style.tsx';
 import {useTheme} from 'styled-components';
+import Header from './Header.tsx';
+import HeaderFocusContext, {header_focus_t} from '../contexts/HeaderFocusContext.tsx';
+import PlatformContainerSwitch from './PlatformContainerSwitch.tsx';
+import HeaderFocusWrapper from './HeaderFocusWrapper.tsx';
+import {Pressable} from 'react-native';
 const selectionAttrs = new Map<string, string>([
   ["title", "Title"],
   ["alternativeTitle", "Alternative Title"],
@@ -262,8 +267,8 @@ function TuneListHeader({
 }: {
   headerInputStates: HeaderInputStates
   setNewTune: Function,
-  selectedAttr: String,
-  selectedPlaylist: Playlist | playlist_enum,
+  selectedAttr: string,
+  selectedPlaylist: string | playlist_enum,
 }){
   const theme = useTheme();
   const dbStatus = useContext(OnlineDB.DbStateContext).status;
@@ -282,68 +287,88 @@ function TuneListHeader({
     [Status.Failed, "darkred"]
   ]);
   const navigation = useNavigation() as any;
+  const [focusedComponent, setFocusedComponent] = useState(null as ReactNode)
+  const [focusDescription, setFocusDescription] = useState("init");
 
   return(
-    <PanelView>
-      <View style={{flexDirection: 'row', borderBottomWidth:1}}>
-        <View style={{flex:1}}>
-          <TextInput
-            placeholder={"Search"}
-            placeholderTextColor={theme.text}
-            onChangeText={(text) => {headerInputStates.setSearch(text)}}
-          />
-        </View>
+    <HeaderFocusContext.Provider value={[focusedComponent, setFocusedComponent, focusDescription, setFocusDescription]}>
+      <PanelView>
+        <Header>
+          <View style={{flexDirection: 'row', borderBottomWidth:1}}>
+            <View style={{flex:1}}>
+              <TextInput
+                placeholder={"Search"}
+                placeholderTextColor={theme.text}
+                onChangeText={(text) => {headerInputStates.setSearch(text)}}
+              />
+            </View>
     {
       <View style={{flex:1}}>
-        <Picker
-          selectedValue={selectedPlaylist}
-          onValueChange={(value) => headerInputStates.setSelectedPlaylist(value)}
-          itemStyle={{color: "white"}}
+        <PlatformContainerSwitch AndroidContainer={View}
+          IosContainer={({children}) => {
+            return(
+              <HeaderFocusWrapper children={children} buttonText={selectedPlaylist !== playlist_enum.AllTunes ? selectedPlaylist : "No Playlist selected"} description="Select a playlist to look through"/>
+              );
+          }}
         >
-          {
-            allPlaylists.map(playlist => 
+          <Picker
+            selectedValue={selectedPlaylist}
+            onValueChange={(value) => headerInputStates.setSelectedPlaylist(value)}
+            itemStyle={{color: theme.text}}
+          >
+            {
+              allPlaylists.map(playlist => 
               <Picker.Item label={playlist.title} value={playlist.title} key={playlist.id.toString()}
                 style={{color: theme.text, backgroundColor: theme.panelBg, fontSize: 20, fontWeight: 200}}
               />
-            )
-          }
-          <Picker.Item label="No playlist" value={playlist_enum.AllTunes}
-            style={{color: theme.text, backgroundColor: theme.panelBg, fontSize: 20, fontWeight: 200}}
-          />
-        </Picker>
+              )
+            }
+            <Picker.Item label="No playlist" value={playlist_enum.AllTunes}
+              style={{color: theme.text, backgroundColor: theme.panelBg, fontSize: 20, fontWeight: 200}}
+            />
+          </Picker>
+        </PlatformContainerSwitch>
       </View>
     }
-    </View>
-    <View style={{flexDirection: 'row', alignItems: 'center', borderBottomWidth:1}}>
-      <View style={{flex: 5}}>
+  </View>
+  <View style={{flexDirection: 'row', alignItems: 'center', borderBottomWidth:1}}>
+    <View style={{flex: 5}}>
+      <PlatformContainerSwitch AndroidContainer={View}
+        IosContainer={({children}) => {
+          return(
+            <HeaderFocusWrapper children={children} buttonText={selectionAttrs.get(selectedAttr)} description='Select a tune property to sort by'/>
+            );
+        }}
+      >
         <Picker
           selectedValue={selectedAttr}
           onValueChange={(value) => headerInputStates.setSelectedAttr(value)}
           numberOfLines={2}
           itemStyle={{color: "white"}}
         >
-        {
-          selectedAttrItems.map(val => 
-          <Picker.Item label={val.label} value={val.value} key={val.value}
-            style={{color: theme.text, backgroundColor: theme.panelBg, fontSize: 20, fontWeight: 200}}
-          />
-          )
-        }
+          {
+            selectedAttrItems.map(val => 
+            <Picker.Item label={val.label} value={val.value} key={val.value}
+              style={{color: theme.text, backgroundColor: theme.panelBg, fontSize: 20, fontWeight: 200}}
+            />
+            )
+          }
         </Picker>
-      </View>
-      <Button
-        style={{
-          flex:1,
+      </PlatformContainerSwitch>
+    </View>
+    <Button
+      style={{
+        flex:1,
           borderColor: theme.melodyConf
-        }}
-        iconName='music'
-        onPress={() => {
-          headerInputStates.setSelectedAttr("melodyConfidence");
-        }}/>
+      }}
+      iconName='music'
+      onPress={() => {
+        headerInputStates.setSelectedAttr("melodyConfidence");
+      }}/>
       <Button
         style={{
           flex:1,
-          borderColor: theme.formConf
+            borderColor: theme.formConf
         }}
         onPress={() => {
           headerInputStates.setSelectedAttr("formConfidence");
@@ -353,7 +378,7 @@ function TuneListHeader({
       <Button
         style={{
           flex:1,
-          borderColor: theme.soloConf
+            borderColor: theme.soloConf
         }}
         onPress={() => {
           headerInputStates.setSelectedAttr("soloConfidence");
@@ -363,7 +388,7 @@ function TuneListHeader({
       <Button
         style={{
           flex:1,
-          borderColor: theme.lyricsConf
+            borderColor: theme.lyricsConf
         }}
         onPress={() => {
           headerInputStates.setSelectedAttr("lyricsConfidence");
@@ -409,24 +434,26 @@ function TuneListHeader({
           }}
           iconName='plus'
         />
-          <Button style={{
-            flex:1,
-              borderColor: statusColorMap.get(dbStatus)
-          }}
-          onPress={() => navigation.navigate("Importer")}
-          iconName='database-arrow-down'
-        />
-        <Button 
-          style={{
-            flex:1
-          }}
-          onPress={() => navigation.navigate("ExtrasMenu")}
-          iconName="dots-horizontal"
-        />
+        <Button style={{
+          flex:1,
+            borderColor: statusColorMap.get(dbStatus)
+        }}
+        onPress={() => navigation.navigate("Importer")}
+        iconName='database-arrow-down'
+      />
+      <Button 
+        style={{
+          flex:1
+        }}
+        onPress={() => navigation.navigate("ExtrasMenu")}
+        iconName="dots-horizontal"
+      />
     </View>
-    }
+      }
     </View>
-  </PanelView>
+  </Header>
+</PanelView>
+</HeaderFocusContext.Provider>
 );
 }
 export default function TuneListDisplay({
