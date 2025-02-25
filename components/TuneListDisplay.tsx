@@ -289,7 +289,6 @@ function TuneListHeader({
   const navigation = useNavigation() as any;
   const [focusedComponent, setFocusedComponent] = useState(null as ReactNode)
   const [focusDescription, setFocusDescription] = useState("init");
-
   return(
     <HeaderFocusContext.Provider value={[focusedComponent, setFocusedComponent, focusDescription, setFocusDescription]}>
       <PanelView>
@@ -313,11 +312,11 @@ function TuneListHeader({
         >
           <Picker
             selectedValue={selectedPlaylist}
-            onValueChange={(value) => headerInputStates.setSelectedPlaylist(value)}
+            onValueChange={(value) => {console.log("Updating playlist to: " + selectedPlaylist);selectedPlaylist !== "" && headerInputStates.setSelectedPlaylist(value);}}
             itemStyle={{color: theme.text}}
           >
             {
-              allPlaylists.map(playlist => 
+              allPlaylists.map((playlist) => 
               <Picker.Item label={playlist.title} value={playlist.title} key={playlist.id.toString()}
                 style={{color: theme.text, backgroundColor: theme.panelBg, fontSize: 20, fontWeight: 200}}
               />
@@ -342,7 +341,7 @@ function TuneListHeader({
       >
         <Picker
           selectedValue={selectedAttr}
-          onValueChange={(value) => headerInputStates.setSelectedAttr(value)}
+          onValueChange={(value) => {headerInputStates.setSelectedAttr(value)}}
           numberOfLines={2}
           itemStyle={{color: "white"}}
         >
@@ -427,7 +426,6 @@ function TuneListHeader({
           <Button style={{flex:1}} onPress={() => {
             const tn: tune_draft = {};
             headerInputStates.setSelectedTune(tn);
-            //TODO: Figure out why this needs to be false in order for TLD to have newTune be true!
             setNewTune(true);
 
             navigation.navigate("Editor");
@@ -478,8 +476,9 @@ export default function TuneListDisplay({
   const [selectedPlaylist, setSelectedPlaylist]: [BSON.ObjectId | playlist_enum.AllTunes, Function] = useState(playlist_enum.AllTunes);
   const [search, setSearch] = useState("");
   const [confidenceVisible, setConfidenceVisible] = useState(false);
-  const allPlaylists = useQuery(Playlist)
+  const allPlaylists = useQuery(Playlist);
   let selectedIds: BSON.ObjectId[] = []
+  console.log("Full rerender: selected playlist: " + selectedPlaylist);
 
   useEffect(() => {
   })
