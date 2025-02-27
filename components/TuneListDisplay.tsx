@@ -19,7 +19,7 @@ import {
   PanelView
 } from '../Style.tsx'
 import itemSort from '../itemSort.tsx'
-import { Picker } from '@react-native-picker/picker';
+import { Picker, PickerIOS } from '@react-native-picker/picker';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import OnlineDB from '../OnlineDB.tsx';
 import {Button} from '../simple_components/Button.tsx';
@@ -64,6 +64,7 @@ import HeaderFocusContext, {header_focus_t} from '../contexts/HeaderFocusContext
 import PlatformContainerSwitch from './PlatformContainerSwitch.tsx';
 import HeaderFocusWrapper from './HeaderFocusWrapper.tsx';
 import {Pressable} from 'react-native';
+import {Platform} from 'react-native';
 const selectionAttrs = new Map<string, string>([
   ["title", "Title"],
   ["alternativeTitle", "Alternative Title"],
@@ -270,6 +271,9 @@ function TuneListHeader({
   selectedAttr: string,
   selectedPlaylist: string | playlist_enum,
 }){
+  useEffect(() => {
+    console.log("NEW SELECTED PLAYLIST: " + selectedPlaylist);
+  }, [selectedPlaylist]);
   const theme = useTheme();
   const dbStatus = useContext(OnlineDB.DbStateContext).status;
   const selectedAttrItems = Array.from(selectionAttrs.entries()).map(
@@ -301,34 +305,44 @@ function TuneListHeader({
                 onChangeText={(text) => {headerInputStates.setSearch(text)}}
               />
             </View>
-    {
       <View style={{flex:1}}>
-        <PlatformContainerSwitch AndroidContainer={View}
-          IosContainer={({children}) => {
-            return(
-              <HeaderFocusWrapper children={children} buttonText={selectedPlaylist !== playlist_enum.AllTunes ? selectedPlaylist : "No Playlist selected"} description="Select a playlist to look through"/>
-              );
-          }}
+        {
+          Platform.OS === "android" ?
+        <Picker
+          selectedValue={selectedPlaylist}
+          onValueChange={(value) => {console.log("Updating playlist to: " + selectedPlaylist);selectedPlaylist !== "" && headerInputStates.setSelectedPlaylist(value);}}
+          itemStyle={{color: theme.text}}
         >
-          <Picker
-            selectedValue={selectedPlaylist}
-            onValueChange={(value) => {console.log("Updating playlist to: " + selectedPlaylist);selectedPlaylist !== "" && headerInputStates.setSelectedPlaylist(value);}}
-            itemStyle={{color: theme.text}}
-          >
-            {
-              allPlaylists.map((playlist) => 
-              <Picker.Item label={playlist.title} value={playlist.title} key={playlist.id.toString()}
-                style={{color: theme.text, backgroundColor: theme.panelBg, fontSize: 20, fontWeight: 200}}
-              />
-              )
-            }
-            <Picker.Item label="No playlist" value={playlist_enum.AllTunes}
+          {
+            allPlaylists.map((playlist) => 
+            <Picker.Item label={playlist.title} value={playlist.title} key={playlist.id.toString()}
               style={{color: theme.text, backgroundColor: theme.panelBg, fontSize: 20, fontWeight: 200}}
             />
-          </Picker>
-        </PlatformContainerSwitch>
+            )
+          }
+          <Picker.Item label="No playlist" value={playlist_enum.AllTunes}
+            style={{color: theme.text, backgroundColor: theme.panelBg, fontSize: 20, fontWeight: 200}}
+          />
+        </Picker>
+          :
+        <PickerIOS
+          selectedValue={selectedPlaylist}
+          onValueChange={(value) => {console.log("Updating playlist to: " + selectedPlaylist);selectedPlaylist !== "" && headerInputStates.setSelectedPlaylist(value);}}
+          itemStyle={{color: theme.text}}
+        >
+          {
+            allPlaylists.map((playlist) => 
+            <Picker.Item label={playlist.title} value={playlist.title} key={playlist.id.toString()}
+              style={{color: theme.text, backgroundColor: theme.panelBg, fontSize: 20, fontWeight: 200}}
+            />
+            )
+          }
+          <Picker.Item label="No playlist" value={playlist_enum.AllTunes}
+            style={{color: theme.text, backgroundColor: theme.panelBg, fontSize: 20, fontWeight: 200}}
+          />
+        </PickerIOS>
+        }
       </View>
-    }
   </View>
   <View style={{flexDirection: 'row', alignItems: 'center', borderBottomWidth:1}}>
     <View style={{flex: 5}}>

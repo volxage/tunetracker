@@ -10,7 +10,8 @@ export default function PlatformContainerSwitch({
   AndroidContainer: ElementType
   children: Element
 }){
-  switch(Platform.OS){
+  console.log("PlatformContainerSwitch rerender");
+  switch("ios"){
     case "ios": {
       return(
         <IosContainer>
