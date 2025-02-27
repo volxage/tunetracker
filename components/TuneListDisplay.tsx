@@ -286,14 +286,6 @@ function TuneListHeader({
     <PanelView>
       <View style={{flexDirection: 'row', borderBottomWidth:1}}>
         <View style={{flex:1}}>
-          <TextInput
-            placeholder={"Search"}
-            placeholderTextColor={theme.text}
-            onChangeText={(text) => {headerInputStates.setSearch(text)}}
-          />
-        </View>
-    {
-      <View style={{flex:1}}>
         <Picker
           selectedValue={selectedPlaylist}
           onValueChange={(value) => headerInputStates.setSelectedPlaylist(value)}
@@ -310,11 +302,9 @@ function TuneListHeader({
             style={{color: theme.text, backgroundColor: theme.panelBg, fontSize: 20, fontWeight: 200}}
           />
         </Picker>
-      </View>
-    }
-    </View>
-    <View style={{flexDirection: 'row', alignItems: 'center', borderBottomWidth:1}}>
-      <View style={{flex: 5}}>
+        </View>
+    {
+      <View style={{flex:1}}>
         <Picker
           selectedValue={selectedAttr}
           onValueChange={(value) => {headerInputStates.setSelectedAttr(value)}}
@@ -329,6 +319,16 @@ function TuneListHeader({
           )
         }
         </Picker>
+      </View>
+    }
+    </View>
+    <View style={{flexDirection: 'row', alignItems: 'center', borderBottomWidth:1}}>
+      <View style={{flex: 5}}>
+        <TextInput
+          placeholder={"Search"}
+          placeholderTextColor={theme.text}
+          onChangeText={(text) => {headerInputStates.setSearch(text)}}
+        />
       </View>
       <Button
         style={{
