@@ -17,20 +17,7 @@ export const ThemedButton = styled.Pressable`
   min-length: ${minButtonSize}px;
   justify-content: center;
 `
-export const DarkButton = styled.Pressable`
-  padding-vertical: 6px;
-  border-radius: 4px;
-  elevation: 3;
-  border-width: 2px;
-  border-color: cadetblue;
-  margin: 4px;
-  min-height: ${minButtonSize}px;
-  min-length: ${minButtonSize}px;
-  justify-content: center;
-`
 export const DeleteButton = styled.Pressable`
-  align-items: 'center';
-  justify-content: 'center';
   padding-vertical: 6px;
   border-radius: 4px;
   border-width: 2px;

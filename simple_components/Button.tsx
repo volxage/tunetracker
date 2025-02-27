@@ -1,5 +1,5 @@
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import {ButtonText, DarkButton, ThemedButton} from "../Style";
+import {ButtonText, ThemedButton} from "../Style";
 import {StyleProp, TextStyle, ViewStyle} from "react-native";
 
 export function Button({
@@ -35,19 +35,19 @@ export function Button({
   }
   if(iconName){
     return(
-      <DarkButton onPress={onPress} style={style} accessibilityLabel={accessibilityLabel}>
+      <ThemedButton onPress={onPress} style={style} accessibilityLabel={accessibilityLabel}>
         <ButtonText style={textStyle}>
           <Icon name={iconName} size={iconSize} color={iconColor}/>
         </ButtonText>
-      </DarkButton>
+      </ThemedButton>
     )
   }
   return(
-    <DarkButton onPress={onPress} style={style} accessibilityLabel={accessibilityLabel}>
+    <ThemedButton onPress={onPress} style={style} accessibilityLabel={accessibilityLabel}>
       <ButtonText style={textStyle}>
         {text}
       </ButtonText>
-    </DarkButton>
+    </ThemedButton>
   );
 }
 
