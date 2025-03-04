@@ -5,6 +5,7 @@ import http from "./http-to-server.ts"
 import {Platform} from "react-native";
 import {GoogleSignin, isErrorWithCode, isSuccessResponse, statusCodes, User} from '@react-native-google-signin/google-signin';
 import {AxiosError, AxiosResponse, isAxiosError} from "axios";
+import appleAuth from "@invertase/react-native-apple-authentication";
 let standards: standard[] = [];
 let composers: standard_composer[] = [];
 let status = Status.Waiting
@@ -23,11 +24,30 @@ async function firstTimeGoogleAuth(): Promise<string>{
       throw new Error("Signin error");
     }
   });
-  throw Error("User cancelled google auth")
 }
 async function getUserToken(): Promise<string>{
   if(Platform.OS === "ios"){
-    throw("iOS login not supported yet")
+    const appleAuthRequestResponse = await appleAuth.performRequest({
+      requestedOperation: appleAuth.Operation.LOGIN,
+      requestedScopes: [appleAuth.Scope.EMAIL] //Shouldn't need full name, look into this if there's problems.
+    })
+    appleAuthRequestResponse.authorizationCode
+    const credentialState = await appleAuth.getCredentialStateForUser(appleAuthRequestResponse.user);
+    //Check if user is authorized
+    if(credentialState == appleAuth.State.REVOKED){
+      //Throw error that auth didn't work
+      throw new Error("Auth revoked by user");
+    }
+    if(credentialState == appleAuth.State.NOT_FOUND){
+      //Throw error that auth couldn't find a user
+      throw new Error("Apple user not found (not TTServer error)");
+    }
+    if(!appleAuthRequestResponse.authorizationCode){
+      //Authorization code didn't work for some reason
+      throw new Error("Signin error");
+    }
+    //Assume authorized
+    return appleAuthRequestResponse.authorizationCode;
   }else{
     if(GoogleSignin.hasPreviousSignIn()){
       console.log("Has previous signin");
@@ -92,6 +112,7 @@ async function login(dispatch: Function, counter=0): Promise<string>{
   }
   return getUserToken().then(async user => {
     if(Platform.OS === "ios"){
+      const authCode = user as string;
       throw Error("iOS login not implemented yet");
     }else{
       console.log(user);
@@ -117,7 +138,11 @@ async function login(dispatch: Function, counter=0): Promise<string>{
           const data = err.response?.data as any;
           if((data["message"] as string).startsWith("Google token error: Token used too late, ")){
             console.log("Token used too late");
-            await googleSignOut()
+            if(Platform.OS === "android"){
+              await googleSignOut()
+            }else{
+              //TODO: Implement apple signout. The built-in one might not work!
+            }
             const user = await login(dispatch, counter + 1);
             return user;
           }

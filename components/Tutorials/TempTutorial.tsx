@@ -12,8 +12,8 @@ export default function TempTutorial({
 }){
   const navigation = useNavigation();
   return(
-    <ScrollView>
-      <SafeBgView>
+    <SafeBgView>
+      <ScrollView>
         <Text>TUTORIAL:</Text>
         <SubText>Note: We are working on an interactive tutorial for a more useful demonstration.</SubText>
         <Text>Tune List / Main Menu</Text>
@@ -45,7 +45,7 @@ export default function TempTutorial({
         <RowView>
           <DeleteButton onPress={() => {navigation.goBack();}} style={{flex:1}}><ButtonText>Exit Tutorial</ButtonText></DeleteButton>
         </RowView>
-      </SafeBgView>
-    </ScrollView>
+      </ScrollView>
+    </SafeBgView>
   )
 }
