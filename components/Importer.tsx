@@ -278,8 +278,9 @@ function ImporterHeader({
   const selectedAttrItems = Array.from(standardAttrs.entries())
     .map((x) => {return {label: x[1], value: x[0]}});
   const [createOnlineItemExpanded, setCreateOnlineItemExpanded] = useState(false);
-  const currentTune = useContext(TuneDraftContext);
-  const currentComposer = useContext(ComposerDraftContext);
+  //This is the craziest syntax I have ever seen
+  const {td: currentTune, setTd: setCurrentTune, updateTd: updateCurrentTune} = useContext(TuneDraftContext);
+  const {cd: currentComposer, setCd: setCurrentComposer, updateCd: updateCurrentComposer} = useContext(ComposerDraftContext);
   const [submissionResult, setSubmissionResult] = useState("");
   const [errorPresent, setErrorPresent] = useState(false);
   const navigation = useNavigation();
@@ -295,6 +296,7 @@ function ImporterHeader({
       <View style={{flex: 2}}>
         <Picker
           onValueChange={(value) => updateSelectedAttr(value)}
+          itemStyle={{color: "white"}}
         >
           {
             (selectedAttrItems).map(
@@ -376,6 +378,9 @@ function ImporterHeader({
                         ).then(res => {
                           setSubmissionResult(res.result);
                           setErrorPresent(res.isError);
+                          if(!res.isError){
+                            updateCurrentTune("dbDraftId", res.data.data.id);
+                          }
                         })
                       }else{
                         if(!currentComposer || !currentComposer.name){
@@ -458,8 +463,8 @@ export default function Importer({
   let suggestTuneSubmission = false;
   const fuse = importingComposers ?
     new Fuse<standard_composer>(standards as standard_composer[], composerFuseOptions) 
-    : new Fuse<standard>(standards as standard[], composerFuseOptions);
-  let searchResults: FuseResult<standard | composer>[] = []
+    : new Fuse<standard>(standards as standard[], tuneFuseOptions);
+  let searchResults: FuseResult<standard | standard_composer>[] = []
   const navigation = useNavigation();
   if(search === ""){
     itemSort(displayStandards, selectedAttr, listReversed);

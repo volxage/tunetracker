@@ -10,9 +10,12 @@ import {GoogleSignin, isErrorWithCode, isSuccessResponse, statusCodes} from '@re
 import {devSigningCert, webSigningCert} from './clientcerts';
 import OnlineDB from './OnlineDB';
 import SplashScreen from 'react-native-splash-screen';
+import {Platform} from "react-native";
 
 
-GoogleSignin.configure({
-  webClientId: webSigningCert,
-})
+if(Platform.OS === "android"){
+  GoogleSignin.configure({
+    webClientId: webSigningCert,
+  })
+}
 AppRegistry.registerComponent(appName, () => App);

@@ -282,22 +282,14 @@ function TuneListHeader({
     [Status.Failed, "darkred"]
   ]);
   const navigation = useNavigation() as any;
-
   return(
     <PanelView>
       <View style={{flexDirection: 'row', borderBottomWidth:1}}>
         <View style={{flex:1}}>
-          <TextInput
-            placeholder={"Search"}
-            placeholderTextColor={theme.text}
-            onChangeText={(text) => {headerInputStates.setSearch(text)}}
-          />
-        </View>
-    {
-      <View style={{flex:1}}>
         <Picker
           selectedValue={selectedPlaylist}
           onValueChange={(value) => headerInputStates.setSelectedPlaylist(value)}
+          itemStyle={{color: "white"}}
         >
           {
             allPlaylists.map(playlist => 
@@ -310,15 +302,14 @@ function TuneListHeader({
             style={{color: theme.text, backgroundColor: theme.panelBg, fontSize: 20, fontWeight: 200}}
           />
         </Picker>
-      </View>
-    }
-    </View>
-    <View style={{flexDirection: 'row', alignItems: 'center', borderBottomWidth:1}}>
-      <View style={{flex: 5}}>
+        </View>
+    {
+      <View style={{flex:1}}>
         <Picker
           selectedValue={selectedAttr}
-          onValueChange={(value) => headerInputStates.setSelectedAttr(value)}
+          onValueChange={(value) => {headerInputStates.setSelectedAttr(value)}}
           numberOfLines={2}
+          itemStyle={{color: "white"}}
         >
         {
           selectedAttrItems.map(val => 
@@ -328,6 +319,16 @@ function TuneListHeader({
           )
         }
         </Picker>
+      </View>
+    }
+    </View>
+    <View style={{flexDirection: 'row', alignItems: 'center', borderBottomWidth:1}}>
+      <View style={{flex: 5}}>
+        <TextInput
+          placeholder={"Search"}
+          placeholderTextColor={theme.text}
+          onChangeText={(text) => {headerInputStates.setSearch(text)}}
+        />
       </View>
       <Button
         style={{
@@ -400,7 +401,6 @@ function TuneListHeader({
           <Button style={{flex:1}} onPress={() => {
             const tn: tune_draft = {};
             headerInputStates.setSelectedTune(tn);
-            //TODO: Figure out why this needs to be false in order for TLD to have newTune be true!
             setNewTune(true);
 
             navigation.navigate("Editor");
@@ -449,8 +449,9 @@ export default function TuneListDisplay({
   const [selectedPlaylist, setSelectedPlaylist]: [BSON.ObjectId | playlist_enum.AllTunes, Function] = useState(playlist_enum.AllTunes);
   const [search, setSearch] = useState("");
   const [confidenceVisible, setConfidenceVisible] = useState(false);
-  const allPlaylists = useQuery(Playlist)
+  const allPlaylists = useQuery(Playlist);
   let selectedIds: BSON.ObjectId[] = []
+  console.log("Full rerender: selected playlist: " + selectedPlaylist);
 
   useEffect(() => {
   })

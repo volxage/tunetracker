@@ -9,6 +9,7 @@ import OnlineDB from "../OnlineDB";
 import {composer, submitted_composer_draft, submitted_tune_draft, tune_draft} from "../types";
 import InformationExpand from "./InformationExpand";
 import dateDisplay from "../textconverters/dateDisplay";
+import {useTheme} from "styled-components";
 
 function TuneDraftRender({
   tune,
@@ -18,6 +19,7 @@ function TuneDraftRender({
   separators: any,
 }){
   const navigation = useNavigation() as any;
+  const theme = useTheme();
   return(
     <TouchableHighlight
       key={tune.title}
@@ -30,8 +32,17 @@ function TuneDraftRender({
           <Text>{tune.title}</Text>
           <SubText>{(tune.Composers && tune.Composers.length > 0) ? tune.Composers.map(comp => comp.name).join(",") : "(No composers provided)"}</SubText>
         {
-          (tune.pending_review === null || tune.pending_review == true) && 
-          <SubText><Icon name="database-clock" size={20}/></SubText>
+          (tune.pending_review === null || tune.pending_review === true) ? 
+          <SubText><Icon name="database-clock" color={theme.pending} size={28}/></SubText>
+          :
+          <>
+            {
+              (tune.accepted === null || tune.accepted === false) ?
+              <SubText><Icon name="database-alert" size={28} color={theme.off}/></SubText>
+              :
+              <SubText><Icon name="database-check" color={theme.on} size={28}/></SubText>
+            }
+          </>
         }
         </SMarginView>
       }
@@ -45,6 +56,7 @@ function ComposerDraftRender({
   composer: submitted_composer_draft,
   separators: any,
 }){
+  const theme = useTheme();
   const navigation = useNavigation() as any;
   return(
     <TouchableHighlight
@@ -59,14 +71,14 @@ function ComposerDraftRender({
           <SubText>{composer.birth ? dateDisplay(composer.birth) : "No birthday provided!"}</SubText>
         {
           (composer.pending_review === null || composer.pending_review === true) ? 
-          <SubText><Icon name="database-clock" size={20}/></SubText>
+          <SubText><Icon name="database-clock" color={theme.pending} size={28}/></SubText>
           :
           <>
             {
               (composer.accepted === null || composer.accepted === false) ?
-              <SubText><Icon name="database-alert" size={20}/></SubText>
+              <SubText><Icon name="database-alert" size={28} color={theme.off}/></SubText>
               :
-              <SubText><Icon name="database-check" size={20}/></SubText>
+              <SubText><Icon name="database-check" color={theme.on} size={28}/></SubText>
             }
           </>
         }

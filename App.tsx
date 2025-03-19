@@ -56,12 +56,13 @@ import AsyncStorage from '@react-native-community/async-storage';
 const Stack = createNativeStackNavigator();
 
 function App(): React.JSX.Element {
-  const [state, dispatch] = useReducer(OnlineDB.reducer, {composers: [], standards: [], status: Status.Failed})
+  const [dbState, dbDispatch] = useReducer(OnlineDB.reducer, {composers: [], standards: [], status: Status.Failed})
   const [theme, setTheme] = useState(dark);
   useEffect(() => {
     SplashScreen.hide();
   }, [])
   useEffect(() => {
+    console.log("App open")
     try{
       AsyncStorage.getItem("theme").then(thm => {
         if(thm !== null){
@@ -74,13 +75,13 @@ function App(): React.JSX.Element {
       console.error("Error reading ");
       setTheme(dark);
     }
-    OnlineDB.updateDispatch(dispatch);
+    OnlineDB.updateDispatch(dbDispatch);
   }, []);
 
   return(
     <ThemeProvider theme={theme}>
-      <OnlineDB.DbDispatchContext.Provider value={dispatch}>
-        <OnlineDB.DbStateContext.Provider value={state}>
+      <OnlineDB.DbDispatchContext.Provider value={dbDispatch}>
+        <OnlineDB.DbStateContext.Provider value={dbState}>
           <BgView style={{flex: 1}}>
             <RealmProvider schema={[Tune, Composer, Playlist]} schemaVersion={4}>
               <NavigationContainer>

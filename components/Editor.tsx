@@ -181,7 +181,7 @@ export default function Editor({
 <Stack.Screen name={"ImportID"}>
   {props => 
   <SafeAreaView style={{flex: 1}}>
-    <TuneDraftContext.Provider value={state["currentDraft"]}>
+    <TuneDraftContext.Provider value={{td: state["currentDraft"], setTd: () => {},  updateTd: handleSetCurrentTune}}>
       <Importer
         importingComposers={false}
         importingId={true}
