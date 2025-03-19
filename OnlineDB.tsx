@@ -140,7 +140,8 @@ async function login(dispatch: Function, counter=0): Promise<string>{
         case 401:
         {
           const data = err.response?.data as any;
-          if((data["message"] as string).startsWith("Google token error: Token used too late, ")){
+          if((data["message"] as string).startsWith("Google token error: Token used too late, ") 
+            || (data["message"] as string).startsWith("Google token error: No pem found for envelope") ){
             console.log("Token used too late");
             if(Platform.OS === "android"){
               await googleSignOut()
