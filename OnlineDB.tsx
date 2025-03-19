@@ -110,7 +110,7 @@ async function login(dispatch: Function, counter=0): Promise<string>{
       switch(err.response?.status){
         case 404:
         {
-          throw Error("User not found in login function");
+          throw err;
         }
         case 401:
         {
