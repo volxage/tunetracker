@@ -134,7 +134,8 @@ async function login(dispatch: Function, counter=0): Promise<string>{
       switch(err.response?.status){
         case 404:
         {
-          throw Error("User not found in login function");
+          //Bubble up error to ensure tryLogin handles the registration properly
+          throw err;
         }
         case 401:
         {
