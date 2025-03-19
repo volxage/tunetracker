@@ -80,7 +80,7 @@ export default function PlaylistEditor(
       </View>
       <View style={{flexDirection: "row"}}>
         {
-          false &&
+          true &&
           <>
             {
               playlistUploaded ?
