@@ -34,11 +34,11 @@ async function getUserToken(): Promise<string>{
     appleAuthRequestResponse.authorizationCode
     const credentialState = await appleAuth.getCredentialStateForUser(appleAuthRequestResponse.user);
     //Check if user is authorized
-    if(credentialState == appleAuth.State.REVOKED){
+    if(credentialState === appleAuth.State.REVOKED){
       //Throw error that auth didn't work
       throw new Error("Auth revoked by user");
     }
-    if(credentialState == appleAuth.State.NOT_FOUND){
+    if(credentialState === appleAuth.State.NOT_FOUND){
       //Throw error that auth couldn't find a user
       throw new Error("Apple user not found (not TTServer error)");
     }
