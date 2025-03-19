@@ -463,7 +463,7 @@ export default function Importer({
   let suggestTuneSubmission = false;
   const fuse = importingComposers ?
     new Fuse<standard_composer>(standards as standard_composer[], composerFuseOptions) 
-    : new Fuse<standard>(standards as standard[], composerFuseOptions);
+    : new Fuse<standard>(standards as standard[], tuneFuseOptions);
   let searchResults: FuseResult<standard | standard_composer>[] = []
   const navigation = useNavigation();
   if(search === ""){
