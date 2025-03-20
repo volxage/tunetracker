@@ -14,7 +14,7 @@ function register(token: string, nickname: string, navigation: any, login: Funct
     return;
   }
   console.log("Registration attempt " + counter);
-  if(Platform.OS = "android"){
+  if(Platform.OS === "android"){
     //This only gets accepted if the token is valid, and the nickname should never be displayed anywhere unless it was approved.
     console.log("With google token:");
     console.log(token);
@@ -27,9 +27,28 @@ function register(token: string, nickname: string, navigation: any, login: Funct
       const data = err.response?.data as any;
       if((data["message"] as string).startsWith("Google token error: Token used too late, ")){
         OnlineDB.googleSignOut();
-        OnlineDB.getUser().then(user => {
-          const newToken = (user as User).idToken as string;
-          register(newToken, nickname, navigation, login, counter + 1)
+        OnlineDB.getUserToken().then(userToken => {
+          register(userToken, nickname, navigation, login, counter + 1)
+        });
+      }
+      console.log(err.response?.data);
+    });
+  }else{
+    //This only gets accepted if the token is valid, and the nickname should never be displayed anywhere unless it was approved.
+    console.log("With apple token:");
+    console.log(token);
+    httpToServer.post("/users/", {
+      nickname: nickname,
+      google_token: token
+    }).then(() => {
+      navigation.goBack();
+    }).catch((err: AxiosError) => {
+      const data = err.response?.data as any;
+      if((data["message"] as string).startsWith("Apple token error: Token used too late")){
+        //TODO: Get signout working on iOS
+        //OnlineDB.googleSignOut();
+        OnlineDB.getUserToken().then(userToken => {
+          register(userToken, nickname, navigation, login, counter + 1)
         });
       }
       console.log(err.response?.data);
@@ -38,20 +57,14 @@ function register(token: string, nickname: string, navigation: any, login: Funct
 }
 
 export default function Register({}: {}){
-  const googleUser = useContext(OnlineDB.DbStateContext).googleUser;
+  //TODO: use weird notation to set all these vars directly from the context
+  const dbStateContext = useContext(OnlineDB.DbStateContext);
+  const googleUser = dbStateContext.googleUser;
+  const appleUser = dbStateContext.appleUser;
+  const email = dbStateContext.email;
   const DbDispatchContext = useContext(OnlineDB.DbDispatchContext);
-  const [token, setToken] = useState("");
-  const [email, setEmail] = useState("(no email provided)");
   const [nicknameField, setNicknameField] = useState("");
   const navigation = useNavigation();
-  //const appleUser = useContext(OnlineDB.DbStateContext);
-  useEffect(() => {
-    if(typeof googleUser !== "undefined"){
-      setEmail(googleUser.user.email);
-      setToken(googleUser.idToken as string);
-      console.log("token set to: " + token);
-    }
-  }, [])
   async function login(){return OnlineDB.login(DbDispatchContext)}
 
   return(
@@ -60,7 +73,7 @@ export default function Register({}: {}){
       <SubText>We can't find the email {email} on TuneTracker yet. Pick an appropriate nickname if you'd like, and press submit to register your email to TuneTracker.</SubText>
       <Text>Nickname:</Text>
       <TextInput placeholder="Unnamed Tracker" placeholderTextColor="grey" style={{borderColor: "white", borderWidth: 1, margin: 8}}/>
-      <Button onPress={() => {register(token, nicknameField, navigation, login)}} text="Submit"/>
+      <Button onPress={() => {register(Platform.OS === "android" ? googleUser : appleUser, nicknameField, navigation, login)}} text="Submit"/>
     </SafeAreaView>
   )
 }
