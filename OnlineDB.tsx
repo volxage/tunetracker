@@ -12,6 +12,11 @@ let status = Status.Waiting
 let attemptNo = 0;
 const statusListeners = new Set<Function>();
 
+type appleUser = {
+  email: string,
+  userId: string
+}
+
 async function googleSignOut(): Promise<null>{
   return GoogleSignin.signOut();
 }
@@ -96,6 +101,14 @@ async function tryLogin(navigation: any, dispatch: Function, counter = 0){
       }
       case 404: {
         console.log("User token was processed and doesn't match any of TT's registered  users.");
+        const data = err.response?.data as any;
+        const userId = data["userId"]
+        dispatch({type: "setEmail", value: data["email"]});
+        if(Platform.OS === "android"){
+          dispatch({type: "setGoogleUser", value: userId});
+        }else{
+          dispatch({type: "setAppleUser", value: userId});
+        }
         navigation.navigate("Register");
       }
     }
@@ -313,7 +326,9 @@ type state_t = {
   composers: standard_composer[],
   standards: standard[],
   status: Status,
-  googleUser?: User
+  email?: string
+  googleUser?: string,
+  appleUser?: string
 }
 type action_t = {
   type: string,
@@ -322,19 +337,25 @@ type action_t = {
 export function reducer(state: state_t, action: action_t){
   switch(action.type){
     case "updateComposers": {
-      return {composers: action.value, standards: state.standards, status: state.status}
+      return {composers: action.value, standards: state.standards, status: state.status, googleUser: state.googleUser, appleUser: state.appleUser, email: state.email}
     }
     case "updateStandards": {
-      return {composers: state.composers, standards: action.value, status: state.status}
+      return {composers: state.composers, standards: action.value, status: state.status, googleUser: state.googleUser, appleUser: state.appleUser, email: state.email}
     }
     case "setStatus": {
-      return {composers: state.composers, standards: state.standards, status: action.value}
+      return {composers: state.composers, standards: state.standards, status: action.value, googleUser: state.googleUser, appleUser: state.appleUser, email: state.email}
     }
     case "setGoogleUser": {
-      return {composers: state.composers, standards: state.standards, status: action.value, googleUser: action.value}
+      return {composers: state.composers, standards: state.standards, status: state.status, googleUser: action.value, email: state.email}
+    }
+    case "setAppleUser": {
+      return {composers: state.composers, standards: state.standards, status: state.status, appleUser: action.value, email: state.email}
+    }
+    case "setEmail": {
+      return {composers: composers, standards: standards, status: status, googleUser: state.googleUser, appleUser: state.appleUser, email: action.value};
     }
     default: {
-      return {composers: composers, standards: standards, status: status};
+      return {composers: composers, standards: standards, status: status, googleUser: state.googleUser, appleUser: state.appleUser, email: state.email};
     }
   }
 }
