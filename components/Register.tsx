@@ -39,7 +39,7 @@ function register(token: string, nickname: string, navigation: any, login: Funct
     console.log(token);
     httpToServer.post("/users/", {
       nickname: nickname,
-      google_token: token
+      apple_token: token
     }).then(() => {
       navigation.goBack();
     }).catch((err: AxiosError) => {
