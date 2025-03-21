@@ -44,7 +44,7 @@ function register(token: string, nickname: string, navigation: any, login: Funct
       navigation.goBack();
     }).catch((err: AxiosError) => {
       const data = err.response?.data as any;
-      if((data["message"] as string).startsWith("Apple token error: Token used too late")){
+      if((data["message"] as string).includes("The code has expired or has been revoked.")){
         //TODO: Get signout working on iOS
         //OnlineDB.googleSignOut();
         OnlineDB.getUserToken().then(userToken => {
