@@ -1230,9 +1230,11 @@ PODS:
     - React-utils (= 0.74.2)
   - RealmJS (20.0.0):
     - React
+  - RNAppleAuthentication (2.4.0):
+    - React-Core
   - RNCAsyncStorage (1.12.1):
     - React-Core
-  - RNCPicker (2.8.1):
+  - RNCPicker (2.11.0):
     - React-Core
   - RNFS (2.20.0):
     - React-Core
@@ -1369,6 +1371,7 @@ DEPENDENCIES:
   - React-utils (from `../node_modules/react-native/ReactCommon/react/utils`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - RealmJS (from `../node_modules/realm`)
+  - "RNAppleAuthentication (from `../node_modules/@invertase/react-native-apple-authentication`)"
   - "RNCAsyncStorage (from `../node_modules/@react-native-community/async-storage`)"
   - "RNCPicker (from `../node_modules/@react-native-picker/picker`)"
   - RNFS (from `../node_modules/react-native-fs`)
@@ -1508,6 +1511,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   RealmJS:
     :path: "../node_modules/realm"
+  RNAppleAuthentication:
+    :path: "../node_modules/@invertase/react-native-apple-authentication"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-community/async-storage"
   RNCPicker:
@@ -1590,8 +1595,9 @@ SPEC CHECKSUMS:
   React-utils: 08bb648cea0f37a0aa5df0c4f9ef50e5484ee0eb
   ReactCommon: 4968ff446d467c4def1945125e59f82e3e986af3
   RealmJS: 7947e9d9edcfb4fde3dcf9911d320a2e08cdd540
+  RNAppleAuthentication: 8d313d93fe2238d6b7ff0a39c67ebcf298d96653
   RNCAsyncStorage: 87d0d3d6193e79bd435e955f8998d2040aa60d67
-  RNCPicker: f89d06ded677f77224839bccc1ca18611948e54c
+  RNCPicker: 124b4fb5859ba1a3fd53a91e16d1e7a0fc016e59
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8
   RNGoogleSignin: ba93c1137f8d5cebdd39b04f493fd212ddf5ecd6
   RNScreens: 6584fce529be4800e3d12c8069376df9e12bafaf
