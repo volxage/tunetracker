@@ -102,14 +102,16 @@ export default function ProfileMenu({}:{}){
   const [fetchError, setFetchError] = useState({} as AxiosError);
   const dbDispatch = useContext(OnlineDB.DbDispatchContext);
 
-  async function getUserInfo(first=true){
+  async function getUserInfo(first=false){
+    console.log("getUserInfo called")
     async function catchFunc(e: AxiosError){
       if(!first){
         console.error("Sumission failed twice. Giving up");
         console.log("Second error:");
         console.log(e);
         setFetchError(e);
-        return;
+	//Need to bubble up error in case the system tries to login a user all 3 times.
+        throw e;
       }
       else{
         console.log("First submission error:");
@@ -119,7 +121,7 @@ export default function ProfileMenu({}:{}){
         switch(e.response?.status){
           case 401: {
             await OnlineDB.tryLogin(navigation, dbDispatch).then(() => {
-              getUserInfo(false);
+              getUserInfo();
             });
             break;
           }
@@ -134,20 +136,25 @@ export default function ProfileMenu({}:{}){
         }
       }
     }
+    try{
     //TODO: Move to OnlineDB.ts
     await http.get("/users/info").then(res => {
-      setUser(res.data as User);
+	    setUser(res.data as User);
     }).catch(catchFunc)
     await http.get("users/tunedrafts").then(res => {
-      setTuneDrafts(res.data);
+	    setTuneDrafts(res.data);
     }).catch(catchFunc);
     await http.get("users/composerdrafts").then(res => {
-      setComposerDrafts(res.data);
+	    setComposerDrafts(res.data);
     }).catch(catchFunc);
+    }catch(err){
+	console.log("Giving up, returning from function")
+	return;
+    }
   };
 
   useEffect(() => {
-    getUserInfo();
+    getUserInfo(true);
   }, []);
   return(
     <SafeBgView>
