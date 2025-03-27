@@ -121,7 +121,7 @@ export default function ProfileMenu({}:{}){
         switch(e.response?.status){
           case 401: {
             await OnlineDB.tryLogin(navigation, dbDispatch).then(() => {
-              getUserInfo();
+              //getUserInfo();
             });
             break;
           }
@@ -137,19 +137,19 @@ export default function ProfileMenu({}:{}){
       }
     }
     try{
-    //TODO: Move to OnlineDB.ts
-    await http.get("/users/info").then(res => {
-	    setUser(res.data as User);
-    }).catch(catchFunc)
-    await http.get("users/tunedrafts").then(res => {
-	    setTuneDrafts(res.data);
-    }).catch(catchFunc);
-    await http.get("users/composerdrafts").then(res => {
-	    setComposerDrafts(res.data);
-    }).catch(catchFunc);
+      //TODO: Move to OnlineDB.ts
+      await http.get("/users/info").then(res => {
+        setUser(res.data as User);
+      }).catch(catchFunc)
+      await http.get("users/tunedrafts").then(res => {
+        setTuneDrafts(res.data);
+      }).catch(catchFunc);
+      await http.get("users/composerdrafts").then(res => {
+        setComposerDrafts(res.data);
+      }).catch(catchFunc);
     }catch(err){
-	console.log("Giving up, returning from function")
-	return;
+      console.log("Giving up, returning from function")
+      return;
     }
   };
 
