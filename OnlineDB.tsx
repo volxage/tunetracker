@@ -94,23 +94,27 @@ async function tryLogin(navigation: any, dispatch: Function, counter = 0){
   }).catch((err: AxiosError) => {
     console.log("Login error caught in tryLogin");
     console.log(err);
-    switch(err.status){
-      case 400: {
-        console.log("Login attempted to use empty user token");
-        throw(err);
-      }
-      case 404: {
-        console.log("User token was processed and doesn't match any of TT's registered  users.");
-        const data = err.response?.data as any;
-        const userId = data["userId"]
-        dispatch({type: "setEmail", value: data["email"]});
-        if(Platform.OS === "android"){
-          dispatch({type: "setGoogleUser", value: userId});
-        }else{
-          dispatch({type: "setAppleUser", value: userId});
+    if(err instanceof AxiosError){
+      switch(err.status){
+        case 400: {
+          console.log("Login attempted to use empty user token");
+          throw(err);
         }
-        navigation.navigate("Register");
+        case 404: {
+          console.log("User token was processed and doesn't match any of TT's registered  users.");
+          const data = err.response?.data as any;
+          const userId = data["userId"]
+          dispatch({type: "setEmail", value: data["email"]});
+          if(Platform.OS === "android"){
+            dispatch({type: "setGoogleUser", value: userId});
+          }else{
+            dispatch({type: "setAppleUser", value: userId});
+          }
+          navigation.navigate("Register");
+        }
       }
+    }else{
+      throw new Error("Unhandled login error (Probably user cancellation)")
     }
   })
 }
