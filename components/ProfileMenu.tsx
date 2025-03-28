@@ -102,8 +102,9 @@ export default function ProfileMenu({}:{}){
   const [fetchError, setFetchError] = useState({} as AxiosError);
   const dbDispatch = useContext(OnlineDB.DbDispatchContext);
 
-  async function getUserInfo(first=false){
+  async function getUserInfo(){
     console.log("getUserInfo called")
+    let first = true;
     async function catchFunc(e: AxiosError){
       if(!first){
         console.error("Sumission failed twice. Giving up");
@@ -117,11 +118,11 @@ export default function ProfileMenu({}:{}){
         console.log("First submission error:");
         console.log(e);
       }
+      first = false;
       if(isAxiosError(e)){
         switch(e.response?.status){
           case 401: {
             await OnlineDB.tryLogin(navigation, dbDispatch).then(() => {
-              //getUserInfo();
             });
             break;
           }
@@ -154,7 +155,7 @@ export default function ProfileMenu({}:{}){
   };
 
   useEffect(() => {
-    getUserInfo(true);
+    getUserInfo();
   }, []);
   return(
     <SafeBgView>
