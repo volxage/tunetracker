@@ -28,6 +28,7 @@ export default class Tune extends Realm.Object<Tune, 'title'> {
   dbDraftId?: number;
   playlists?: Realm.List<Playlist>;
   playedAt?: Date;
+  queued?: boolean;
 
 //static generate(tn: tune_draft){
 //  return {
@@ -73,7 +74,8 @@ export default class Tune extends Realm.Object<Tune, 'title'> {
       dbId: {type: "int", indexed: true, optional: true},
       dbDraftId: "int?",
       composers: 'Composer[]',
-      playlists: 'Playlist[]'
+      playlists: 'Playlist[]',
+      queued: {type: "bool", default: false}
     },
     primaryKey: 'id'
   }
