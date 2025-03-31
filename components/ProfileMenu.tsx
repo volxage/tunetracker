@@ -178,7 +178,14 @@ export default function ProfileMenu({}:{}){
               <SubText style={{color: "#888", fontSize: 18}}><Icon name={"database-clock"} size={24}/> - Your submission is pending review, so your changes aren't in the database yet.</SubText>
               <SubText style={{color: "#888", fontSize: 18}}><Icon name={"database-alert"} size={24}/> - Your submission was rejected, possibly because it contained incorrect or inappropriate content.</SubText>
               <SubText style={{color: "#888", fontSize: 18}}><Icon name={"database-check"} size={24}/> - Congratulations! Your submission was accepted, it should be available to other users now.</SubText>
+              <SubText style={{color: "#888", fontSize: 18}}>Press and hold below to begin the process of permanently deleting your account!</SubText>
             </SMarginView>
+            <DeleteButton
+              onLongPress={() => {
+              //navigate to account deletion screen
+              }}>
+                <ButtonText>DELETE ACCOUNT</ButtonText>
+            </DeleteButton>
           </View>
         );}}
       />
