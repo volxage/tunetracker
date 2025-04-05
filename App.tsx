@@ -51,6 +51,7 @@ import {ThemeProvider} from 'styled-components';
 import {light, dark} from './Themes.tsx';
 import {BgView, SafeBgView} from './Style.tsx';
 import AsyncStorage from '@react-native-community/async-storage';
+import AccountDeletion from './components/AccountDeletion.tsx';
 
 
 const Stack = createNativeStackNavigator();
@@ -219,6 +220,11 @@ function MainMenu({toggleTheme}: {toggleTheme: Function}): React.JSX.Element {
       <ExtrasMenu
         toggleTheme={toggleTheme}
       />
+      }
+    </Stack.Screen>
+    <Stack.Screen name="AccountDeletion">
+      {(props) => 
+      <AccountDeletion/>
       }
     </Stack.Screen>
     <Stack.Screen name="ProfileMenu" component={ProfileMenu}/>

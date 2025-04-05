@@ -182,7 +182,7 @@ export default function ProfileMenu({}:{}){
             </SMarginView>
             <DeleteButton
               onLongPress={() => {
-              //navigate to account deletion screen
+                navigation.navigate("AccountDeletion")
               }}>
                 <ButtonText>DELETE ACCOUNT</ButtonText>
             </DeleteButton>
