@@ -48,6 +48,10 @@ export default function AccountDeletion({}: {}){
         httpToServer.delete('/users/').then(response => {
           setAttemptResult("Successfully deleted account");
           navigation.goBack();
+          if(navigation.canGoBack()){
+            //Skip past account menu (you already deleted it, there's nothing to show)
+            navigation.goBack();
+          }
         }).catch(err => {
           setAttemptResult("Error on deleting account.");
           console.error(JSON.stringify(err));
