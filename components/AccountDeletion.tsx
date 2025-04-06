@@ -13,10 +13,13 @@ import {useTheme} from "styled-components";
 import {Button} from "../simple_components/Button";
 import { TextInput } from "../Style";
 import httpToServer from "../http-to-server";
+import ResponseBox from "./ResponseBox";
 
 export default function AccountDeletion({}: {}){
   const [verificationInput, setVerificationInput] = useState("");
   const navigation = useNavigation();
+  const [attemptResult, setAttemptResult] = useState("");
+  const [resultIsError, setResultIsError] = useState(false);
   return(
     <SafeBgView>
       <Text>DELETE ACCOUNT</Text>
@@ -32,9 +35,24 @@ export default function AccountDeletion({}: {}){
           <SubText>Text doesn't match, account deletion not ready</SubText>
         }
       </SMarginView>
+      <ResponseBox
+        result={attemptResult}
+        isError={resultIsError}
+      />
+    {
+      attemptResult !== "" ?
+      <Button style={{borderColor: "grey"}}/>
+      :
       <Button text="PERMANENTLY DELETE YOUR ACCOUNT" onPress={() => {
-        httpToServer.get('/users/deleteaccount');
+        setAttemptResult("Waiting for response...");
+        httpToServer.get('/users/deleteaccount').then(response => {
+          setAttemptResult("Successfully deleted account");
+          navigation.goBack();
+        }).catch(err => {
+          setAttemptResult("Error on deleting account!");
+        });
       }}/>
+    }
       <DeleteButton onPress={() => {navigation.goBack();}}><ButtonText>Cancel Account Deletion</ButtonText></DeleteButton>
     </SafeBgView>
   );
