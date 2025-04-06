@@ -124,6 +124,7 @@ export default function ProfileMenu({}:{}){
         switch(e.response?.status){
           case 401: {
             await OnlineDB.tryLogin(navigation, dbDispatch).then(() => {
+
             });
             break;
           }
@@ -149,6 +150,12 @@ export default function ProfileMenu({}:{}){
       await http.get("users/composerdrafts").then(res => {
         setComposerDrafts(res.data);
       }).catch(catchFunc);
+      if(user.email == "Loading email..."){
+        //This case happens when the user is logged in and the first request is cancelled.
+        await http.get("/users/info").then(res => {
+          setUser(res.data as User);
+        }).catch(catchFunc)
+      }
       setFetchDone(true);
     }catch(err){
       console.log("Giving up, returning from function")
