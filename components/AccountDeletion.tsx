@@ -45,11 +45,11 @@ export default function AccountDeletion({}: {}){
       :
       <Button text="PERMANENTLY DELETE YOUR ACCOUNT" onPress={() => {
         setAttemptResult("Waiting for response...");
-        httpToServer.delete('/users/deleteaccount').then(response => {
+        httpToServer.delete('/users/').then(response => {
           setAttemptResult("Successfully deleted account");
           navigation.goBack();
         }).catch(err => {
-          setAttemptResult("Error on deleting account: " + JSON.stringify(err));
+          setAttemptResult("Error on deleting account.");
           console.error(JSON.stringify(err));
         });
       }}/>
