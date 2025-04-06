@@ -96,7 +96,7 @@ type User = {
 }
 export default function ProfileMenu({}:{}){
   const navigation = useNavigation();
-  const [user, setUser] = useState({} as User);
+  const [user, setUser] = useState({nickname: "Loading nickname...", email: "Loading email..."} as User);
   const [tuneDrafts, setTuneDrafts] = useState([]);
   const [composerDrafts, setComposerDrafts] = useState([]);
   const [fetchError, setFetchError] = useState({} as AxiosError);
@@ -168,9 +168,9 @@ export default function ProfileMenu({}:{}){
         </View>
         <View style={{flex: 3}}>
           <Text>
-            {user.nickname ? user.nickname : "Loading nickname..."}
+            {user.nickname}
           </Text>
-          <SubText>{user.email ? user.email : "Loading email..."}</SubText>
+          <SubText>{user.email}</SubText>
         </View>
       </SMarginView>
       <InformationExpand
