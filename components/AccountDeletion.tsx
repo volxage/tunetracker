@@ -49,7 +49,7 @@ export default function AccountDeletion({}: {}){
           setAttemptResult("Successfully deleted account");
           navigation.goBack();
         }).catch(err => {
-          setAttemptResult("Error on deleting account!");
+          setAttemptResult("Error on deleting account: " + JSON.stringify(err));
         });
       }}/>
     }
