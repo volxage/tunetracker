@@ -96,11 +96,12 @@ type User = {
 }
 export default function ProfileMenu({}:{}){
   const navigation = useNavigation();
-  const [user, setUser] = useState({} as User);
+  const [user, setUser] = useState({nickname: "Loading nickname...", email: "Loading email..."} as User);
   const [tuneDrafts, setTuneDrafts] = useState([]);
   const [composerDrafts, setComposerDrafts] = useState([]);
   const [fetchError, setFetchError] = useState({} as AxiosError);
   const dbDispatch = useContext(OnlineDB.DbDispatchContext);
+  const [fetchDone, setFetchDone] = useState(false);
 
   async function getUserInfo(){
     console.log("getUserInfo called")
@@ -148,8 +149,17 @@ export default function ProfileMenu({}:{}){
       await http.get("users/composerdrafts").then(res => {
         setComposerDrafts(res.data);
       }).catch(catchFunc);
+
+      if(user.email == "Loading email..."){
+        //This case happens when the user is logged in and the first request is cancelled.
+        await http.get("/users/info").then(res => {
+          setUser(res.data as User);
+        }).catch(catchFunc)
+      }
+      setFetchDone(true);
     }catch(err){
       console.log("Giving up, returning from function")
+      setFetchDone(false);
       return;
     }
   };
@@ -165,9 +175,9 @@ export default function ProfileMenu({}:{}){
         </View>
         <View style={{flex: 3}}>
           <Text>
-            {user.nickname ? user.nickname : "Loading nickname..."}
+            {user.nickname}
           </Text>
-          <SubText>{user.email ? user.email : "Loading email..."}</SubText>
+          <SubText>{user.email}</SubText>
         </View>
       </SMarginView>
       <InformationExpand
@@ -178,6 +188,7 @@ export default function ProfileMenu({}:{}){
               <SubText style={{color: "#888", fontSize: 18}}><Icon name={"database-clock"} size={24}/> - Your submission is pending review, so your changes aren't in the database yet.</SubText>
               <SubText style={{color: "#888", fontSize: 18}}><Icon name={"database-alert"} size={24}/> - Your submission was rejected, possibly because it contained incorrect or inappropriate content.</SubText>
               <SubText style={{color: "#888", fontSize: 18}}><Icon name={"database-check"} size={24}/> - Congratulations! Your submission was accepted, it should be available to other users now.</SubText>
+              <SubText style={{color: "#888", fontSize: 18}}>Press and hold below to begin the process of permanently deleting your account!</SubText>
             </SMarginView>
           </View>
         );}}

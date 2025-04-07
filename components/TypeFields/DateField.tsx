@@ -70,6 +70,10 @@ export default function DateField({
           <ButtonText>Delete</ButtonText>
         </DeleteButton>
       </View>
+      {
+        attrKey == "playedAt" &&
+        <Button text="Set to Today" onPress={() => {handleSetCurrentItem(attrKey, new Date())}}/>
+      }
     </View>
   );
 }

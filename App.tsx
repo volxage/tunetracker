@@ -51,6 +51,8 @@ import {ThemeProvider} from 'styled-components';
 import {light, dark} from './Themes.tsx';
 import {BgView, SafeBgView} from './Style.tsx';
 import AsyncStorage from '@react-native-community/async-storage';
+import AccountDeletion from './components/AccountDeletion.tsx';
+import NewTuneSelector from './components/NewTuneSelector.tsx';
 
 
 const Stack = createNativeStackNavigator();
@@ -83,7 +85,7 @@ function App(): React.JSX.Element {
       <OnlineDB.DbDispatchContext.Provider value={dbDispatch}>
         <OnlineDB.DbStateContext.Provider value={dbState}>
           <BgView style={{flex: 1}}>
-            <RealmProvider schema={[Tune, Composer, Playlist]} schemaVersion={4}>
+            <RealmProvider schema={[Tune, Composer, Playlist]} schemaVersion={6}>
               <NavigationContainer>
                 <MainMenu 
                   toggleTheme={() => {
@@ -128,6 +130,7 @@ function MainMenu({toggleTheme}: {toggleTheme: Function}): React.JSX.Element {
     >
       <Stack.Group screenOptions={{presentation: "modal"}}>
         <Stack.Screen name="Register" component={Register}/>
+        <Stack.Screen name="NewTuneSelector" component={NewTuneSelector}/>
       </Stack.Group>
       <Stack.Screen name="Editor">
         {(props) => <Editor
@@ -219,6 +222,11 @@ function MainMenu({toggleTheme}: {toggleTheme: Function}): React.JSX.Element {
       <ExtrasMenu
         toggleTheme={toggleTheme}
       />
+      }
+    </Stack.Screen>
+    <Stack.Screen name="AccountDeletion">
+      {(props) => 
+      <AccountDeletion/>
       }
     </Stack.Screen>
     <Stack.Screen name="ProfileMenu" component={ProfileMenu}/>

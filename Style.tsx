@@ -23,8 +23,9 @@ export const DeleteButton = styled.Pressable`
   border-width: 2px;
   elevation: 3;
   font-size: 20px;
-  border-color: maroon;
+  border-color: ${({ theme }) => theme.delete};
   margin: 4px;
+  
   min-height: ${minButtonSize}px;
   min-length: ${minButtonSize}px;
   justifyContent: center;

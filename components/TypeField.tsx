@@ -88,6 +88,8 @@ function AddPlaylistField({
           <SubText style={{textAlign: "center", marginTop: 8}}>Select an existing playlist below, if there are any left. If not, press above to create a new playlist.</SubText>
         </SMarginView>
         <View style={{borderColor: theme.text, borderWidth: 1, margin: 28}}>
+          {
+            availablePlaylists.length > 0 ?
           <Picker
             onValueChange={
               // When the component rerenders, onValueChange is called with a value of "".
@@ -106,6 +108,9 @@ function AddPlaylistField({
                 )
             }
           </Picker>
+            :
+            <SubText style={{margin: 8}}>No playlists remaining to add to tune! Click "Switch to creating new Playlist" above to make a new playlist to use.</SubText>
+          }
         </View>
       </View>
     );
@@ -188,7 +193,7 @@ function TypeField({
   else if (attrKey === "playlists" as keyOfEitherDraft && attr){
     const ids = (attr as (Playlist | playlist)[]).map(pl => pl.id);
     return(
-      <View style={{padding: 8}}>
+      <SMarginView style={{padding: 8}}>
         <View style={{paddingBottom:20}}>
           <Title>PLAYLISTS</Title>
         </View>
@@ -216,6 +221,7 @@ function TypeField({
         <View style={{flexDirection:"row", alignSelf: "center"}}>
           <Button onPress={() => {setNewPlaylistOpen(!newPlaylistOpen)}}
             text={newPlaylistOpen ? "Switch to adding existing Playlists" : "Switch to creating new Playlist"}
+            style={{flex:1}}
           />
         </View>
         <AddPlaylistField
@@ -223,7 +229,7 @@ function TypeField({
           newPlaylist={newPlaylistOpen}
           handleSetCurrentItem={handleSetCurrentItem}
         />
-      </View>
+      </SMarginView>
     );
   }
   else if (attrKey === "tempi"){
