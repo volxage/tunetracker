@@ -85,7 +85,7 @@ function App(): React.JSX.Element {
       <OnlineDB.DbDispatchContext.Provider value={dbDispatch}>
         <OnlineDB.DbStateContext.Provider value={dbState}>
           <BgView style={{flex: 1}}>
-            <RealmProvider schema={[Tune, Composer, Playlist]} schemaVersion={5}>
+            <RealmProvider schema={[Tune, Composer, Playlist]} schemaVersion={6}>
               <NavigationContainer>
                 <MainMenu 
                   toggleTheme={() => {

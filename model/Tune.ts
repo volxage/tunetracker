@@ -20,6 +20,7 @@ export default class Tune extends Realm.Object<Tune, 'title'> {
   mainStyle?: string;
   styles?: string[];
   playthroughs?: number;
+  confidence?: number;
   formConfidence?: number;
   melodyConfidence?: number;
   soloConfidence?: number;
@@ -66,6 +67,7 @@ export default class Tune extends Realm.Object<Tune, 'title'> {
       mainStyle: "string?",
       styles: "string?[]",
       playthroughs: "int?",
+      confidence: "double?",
       formConfidence: "double?",
       melodyConfidence: "double?",
       soloConfidence: "double?",
