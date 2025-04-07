@@ -2,7 +2,7 @@
 
 import React, {isValidElement, useEffect, useState} from 'react';
 import {View} from 'react-native';
-import {ButtonText, DeleteButton, SafeBgView, Title} from '../Style';
+import {ButtonText, DeleteButton, SMarginView, SafeBgView, Title} from '../Style';
 import {useNavigation} from '@react-navigation/native';
 import {Button} from '../simple_components/Button';
 import {useTheme} from 'styled-components';
@@ -39,7 +39,7 @@ function ExtrasMenuUnwrapped({
 }: {
   toggleTheme: Function
 }){
-  const navigation = useNavigation() as any;
+  const navigation = useNavigation();
   const theme = useTheme();
   return (
     <SafeBgView style={{flex:1}}>
@@ -48,6 +48,11 @@ function ExtrasMenuUnwrapped({
           <Title>Extras Menu</Title>
         </View>
         <Button text="Profile" onPress={() => {navigation.navigate("ProfileMenu")}}/>
+        <View style={{marginHorizontal: 20, marginBottom: 8}}>
+          <DeleteButton onPress={() => {navigation.navigate("AccountDeletion")}}>
+            <ButtonText>Delete Account</ButtonText>
+          </DeleteButton>
+        </View>
         <Button text="Playlist Viewer" 
           onPress={() => {navigation.navigate("PlaylistViewer")}}
         />

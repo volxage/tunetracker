@@ -149,9 +149,11 @@ function ExtraInfo({
 }
 
 function TuneDetails({
-  tune
+  tune,
+  edit
 }: {
-  tune: Tune
+  tune: Tune,
+  edit: () => void
 }){
   return(
     <SMarginView>
@@ -175,10 +177,14 @@ function TuneDetails({
         <SubBoldText>Last played: </SubBoldText>
         <SubText>{dateDisplay(tune.playedAt)}</SubText>
       </RowView>
+      <View style={{flexDirection: "row"}}>
+        <Button text='Edit' style={{flex:1}} onPress={() => {
+          edit();
+        }}/>
+      </View>
     </SMarginView>
   )
 }
-
 function ItemRender({
   tune,
   setSelectedTune,
@@ -235,7 +241,7 @@ function ItemRender({
       {
         isExpanded && 
         //EXTRA INFO
-        <TuneDetails tune={tune}/>
+        <TuneDetails tune={tune} edit={() => {setSelectedTune(tune); navigation.navigate("Editor")}}/>
       }
     </BgView>
   }
@@ -397,22 +403,15 @@ function TuneListHeader({
       />
       {
         headerInputStates.allowNewTune &&
-        <View style={{flexDirection: "row", flex: 3}}>
+        <View style={{flexDirection: "row", flex: 2}}>
           <Button style={{flex:1}} onPress={() => {
             const tn: tune_draft = {};
             headerInputStates.setSelectedTune(tn);
             setNewTune(true);
 
-            navigation.navigate("Editor");
+            navigation.navigate("NewTuneSelector");
           }}
           iconName='plus'
-        />
-          <Button style={{
-            flex:1,
-              borderColor: statusColorMap.get(dbStatus)
-          }}
-          onPress={() => navigation.navigate("Importer")}
-          iconName='database-arrow-down'
         />
         <Button 
           style={{

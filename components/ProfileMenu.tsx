@@ -190,15 +190,6 @@ export default function ProfileMenu({}:{}){
               <SubText style={{color: "#888", fontSize: 18}}><Icon name={"database-check"} size={24}/> - Congratulations! Your submission was accepted, it should be available to other users now.</SubText>
               <SubText style={{color: "#888", fontSize: 18}}>Press and hold below to begin the process of permanently deleting your account!</SubText>
             </SMarginView>
-          {
-            fetchDone && 
-            <DeleteButton
-              onLongPress={() => {
-                navigation.navigate("AccountDeletion")
-              }}>
-                <ButtonText>DELETE ACCOUNT</ButtonText>
-            </DeleteButton>
-          }
           </View>
         );}}
       />

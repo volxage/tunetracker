@@ -52,6 +52,7 @@ import {light, dark} from './Themes.tsx';
 import {BgView, SafeBgView} from './Style.tsx';
 import AsyncStorage from '@react-native-community/async-storage';
 import AccountDeletion from './components/AccountDeletion.tsx';
+import NewTuneSelector from './components/NewTuneSelector.tsx';
 
 
 const Stack = createNativeStackNavigator();
@@ -129,6 +130,7 @@ function MainMenu({toggleTheme}: {toggleTheme: Function}): React.JSX.Element {
     >
       <Stack.Group screenOptions={{presentation: "modal"}}>
         <Stack.Screen name="Register" component={Register}/>
+        <Stack.Screen name="NewTuneSelector" component={NewTuneSelector}/>
       </Stack.Group>
       <Stack.Screen name="Editor">
         {(props) => <Editor

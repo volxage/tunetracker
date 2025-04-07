@@ -103,9 +103,11 @@ const statusTextMap = new Map([
   [Status.Complete, "Connection complete, but something is wrong."]
 ])
 function StandardComposerDetails({
-  std
+  std,
+  importFn
 }: {
-  std: standard_composer
+  std: standard_composer,
+  importFn: Function
 }){
   return(
     <SMarginView>
@@ -121,13 +123,16 @@ function StandardComposerDetails({
         <SubBoldText>Date of death: </SubBoldText>
         <SubText>{dateDisplay(std.death)}</SubText>
       </RowView>
+      <Button text='Import' onPress={() => {importFn(std)}}/>
     </SMarginView>
   )
 }
 function StandardDetails({
-  std
+  std,
+  importFn
 }: {
-  std: standard
+  std: standard,
+  importFn: Function
 }){
   return(
     <SMarginView>
@@ -147,6 +152,7 @@ function StandardDetails({
         <SubBoldText>Bio: </SubBoldText>
         <SubText>{std.bio}</SubText>
       </RowView>
+      <Button text='Import' onPress={() => {importFn(std)}}/>
     </SMarginView>
   )
 }
@@ -189,7 +195,7 @@ function StandardRender({
           <SubText>{subtext}</SubText>
           {
             detailsShown &&
-            <StandardComposerDetails std={comp}/>
+            <StandardComposerDetails std={comp} importFn={importFn}/>
           }
         </BgView>
       </TouchableHighlight>
@@ -222,7 +228,7 @@ function StandardRender({
           <SubText>{subtext}</SubText>
           {
             detailsShown &&
-            <StandardDetails std={stand}/>
+            <StandardDetails std={stand} importFn={importFn}/>
           }
         </BgView>
       </TouchableHighlight>
@@ -230,7 +236,7 @@ function StandardRender({
   }
 }
 function renderStandard(item: standard | composer, importFn: Function, separators: any, selectedAttr: keyof standard | composer, isComposer: boolean){
-  let text = "";
+  let text: string | undefined = "";
   let subtext = "";
   if(isComposer){
     const comp = item as composer;
