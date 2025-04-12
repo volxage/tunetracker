@@ -16,6 +16,7 @@ export type tune_draft = {
   "tempi"?: number[]
 //  "contrafacts"?: string[] // In the future, these could link to other tunes
   "playthroughs"?: number
+  "confidence"?: number
   "formConfidence"?: number
   "melodyConfidence"?: number
   "soloConfidence"?: number
@@ -115,6 +116,7 @@ export const editorAttrs: [keyof (tune_draft & tune_draft_extras), string][] = [
   ["playlists", "Playlists"],
   ["playthroughs", "Playthroughs"],
   ["hasLyrics", "Has lyrics?"],
+  ["confidence", "Confidence"],
   ["formConfidence", "Form Confidence"],
   ["melodyConfidence", "Melody Confidence"],
   ["soloConfidence", "Solo Confidence"],
