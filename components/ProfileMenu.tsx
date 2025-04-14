@@ -10,6 +10,7 @@ import {composer, submitted_composer_draft, submitted_tune_draft, tune_draft} fr
 import InformationExpand from "./InformationExpand";
 import dateDisplay from "../textconverters/dateDisplay";
 import {useTheme} from "styled-components";
+import {Button} from "../simple_components/Button";
 
 function TuneDraftRender({
   tune,
@@ -102,6 +103,7 @@ export default function ProfileMenu({}:{}){
   const [fetchError, setFetchError] = useState({} as AxiosError);
   const dbDispatch = useContext(OnlineDB.DbDispatchContext);
   const [fetchDone, setFetchDone] = useState(false);
+  const [viewingTunes, setViewingTunes] = useState(true);
 
   async function getUserInfo(){
     console.log("getUserInfo called")
@@ -193,7 +195,12 @@ export default function ProfileMenu({}:{}){
           </View>
         );}}
       />
-      <Title>SUBMITTED TUNES</Title>
+      <View style={{flexDirection: "row"}}>
+        <Title style={{flex:3, textAlignVertical: "center", textAlign: "center"}}>{viewingTunes ? "SUBMITTED TUNES" : "SUBMITTED COMPOSERS"}</Title>
+        <Button style={{flex:1}} iconName="swap-horizontal-bold" onPress={() => {setViewingTunes(!viewingTunes)}}/>
+      </View>
+    {
+      viewingTunes ? 
       <FlatList
         data={tuneDrafts}
         renderItem={({item, index, separators}) => (
@@ -203,12 +210,12 @@ export default function ProfileMenu({}:{}){
         />
         )}
         ListEmptyComponent={() => (
-          <SubText>We don't see any submissions</SubText>
+          <SMarginView>
+            <SubText>We don't see any submissions</SubText>
+          </SMarginView>
         )}
       />   
-      <SMarginView>
-        <Title>SUBMITTED COMPOSERS</Title>
-      </SMarginView>
+      :
       <FlatList
         data={composerDrafts}
         renderItem={({item, index, separators}) => (
@@ -223,6 +230,7 @@ export default function ProfileMenu({}:{}){
           </SMarginView>
         )}
       />   
+  }
           <DeleteButton onPress={navigation.goBack}><ButtonText>Go back</ButtonText></DeleteButton>
         </SafeBgView>
   );
