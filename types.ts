@@ -113,15 +113,16 @@ export const editorAttrs: [keyof (tune_draft & tune_draft_extras), string][] = [
   ["styles", "Styles"],
   ["tempi", "Tempi"],
   //["contrafacts", "Contrafacts"],
-  ["playlists", "Playlists"],
+//["playlists", "Playlists"],
   ["playthroughs", "Playthroughs"],
   ["hasLyrics", "Has lyrics?"],
-  ["confidence", "Confidence"],
-  ["formConfidence", "Form Confidence"],
-  ["melodyConfidence", "Melody Confidence"],
-  ["soloConfidence", "Solo Confidence"],
-  ["lyricsConfidence", "Lyrics Confidence"],
-  ["playedAt", "Last played"]
+//Below fields were removed because there's no reason to have these in two places.
+//["confidence", "Confidence"],
+//["formConfidence", "Form Confidence"],
+//["melodyConfidence", "Melody Confidence"],
+//["soloConfidence", "Solo Confidence"],
+//["lyricsConfidence", "Lyrics Confidence"],
+//["playedAt", "Last played"]
 ];
 export const composerEditorAttrs: [keyof Composer, string][] = [
   ["dbId", "Database Connection"],
@@ -138,14 +139,19 @@ export const compareTuneEditorAttrs: [keyof tune_draft, string][] = [
   ["composers", "Composers"],
 ];
 export const miniEditorAttrs = new Map<keyof (tune_draft & tune_draft_extras), string>([
-  ["title", "Title"],
-  ["melodyConfidence", "Melody Confidence"],
-  ["formConfidence", "Form Confidence"],
-  ["soloConfidence", "Solo Confidence"],
-  ["lyricsConfidence", "Lyrics Confidence"],
+//["melodyConfidence", "Melody Confidence"],
+//["formConfidence", "Form Confidence"],
+//["soloConfidence", "Solo Confidence"],
+//["lyricsConfidence", "Lyrics Confidence"],
   ["playlists", "Playlists"],
   ["playedAt", "Last played"]
 ])
+export const confidenceAttrs = new Map<keyof (tune_draft & tune_draft_extras), string>([
+  ["melodyConfidence", "Melody Confidence"],
+  ["formConfidence", "Form Confidence"],
+  ["soloConfidence", "Solo Confidence"],
+  ["lyricsConfidence", "Lyrics Confidence"]
+]);
 export const composerDefaults = new Map<keyof composer, any>([
   ["name", ""],
   //These need to be undefined so that new composers aren't labeled
@@ -170,6 +176,7 @@ export const tuneDefaults = new Map<keyof Tune, any>([
   //  ["contrafacts", [],],
   ["hasLyrics", false],
   ["playthroughs", 0],
+  ["confidence", 0],
   ["melodyConfidence", 0],
   ["formConfidence", 0],
   ["soloConfidence", 0],

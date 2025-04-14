@@ -97,7 +97,7 @@ function AddPlaylistField({
             }
             accessibilityLabel='Select existing playlist'
             placeholder='Select an existing playlist'
-            itemStyle={{color: "white"}}
+            itemStyle={{color: theme.text}}
           >
             {
               availablePlaylists.map(
@@ -185,7 +185,7 @@ function TypeField({
             handleSetCurrentItem(attrKey, Number(text))
           }}
           accessibilityLabel={"Enter main tempo"}
-          style={{textAlign: "center", fontWeight: "300"}}
+          style={{textAlign: "center", fontWeight: "300", borderColor: "grey", borderWidth: 1, marginHorizontal: 32}}
         />
       </BgView>
     );
@@ -201,8 +201,8 @@ function TypeField({
           data={attr as (playlist | Playlist)[]}
           renderItem={({item}) => (
             <View style={{flexDirection: 'row'}}>
-              <View style={{flex:4}}>
-                <SubText>{item.title}</SubText>
+              <View style={{flex:4, alignSelf: "center"}}>
+                <Text style={{textAlign: "center", fontWeight: 300}}>{item.title}</Text>
               </View>
               <View style={{flex:1}}>
                 <DeleteButton onPress={
@@ -242,12 +242,11 @@ function TypeField({
     }
     return(
       <View style={{padding: 8}}>
-        <View style={{flexDirection: 'row'}}>
-          <View style={{flex: 1}}></View>
-          <View style={{flex: 2}}>
+        <View style={{flexDirection: 'row', paddingLeft: 32}}>
+          <View style={{flex: 3, alignSelf: "center"}}>
             <Title>{attrName.toUpperCase()}</Title>
           </View>
-          <View style={{alignContent: 'flex-end', flex: 1}}>
+          <View style={{flex: 1}}>
             <Button
               onPress={() => handleSetCurrentItem(attrKey, (attr as number[]).concat([0]))}
               iconName="plus"
@@ -258,7 +257,7 @@ function TypeField({
           data={attr as number[]}
           renderItem={({item, index, separators}) => (
             <View style={{flexDirection: 'row'}}>
-              <View style={{flex: 3}}>
+              <View style={{flex: 3, alignSelf: "center"}}>
                 <TextInput defaultValue={String(attr as number)} placeholderTextColor={"grey"}
                   keyboardType="numeric"
                   accessibilityLabel='Enter a tempo'
@@ -271,7 +270,7 @@ function TypeField({
                     }
                     handleReplace(Number(text), index)
                   }}
-                  style={{textAlign: "center", fontWeight: "300"}}
+                  style={{textAlign: "center", fontWeight: "300", borderWidth: 1, borderColor: "grey", marginLeft: 32}}
                 />
               </View>
               <View style={{flex:1, alignContent: 'flex-end'}}>
@@ -341,13 +340,12 @@ function TypeField({
       //setarrAttr(newArrAttr); handeSetCurrentTune causes a rerender, indirectly updating arrAttr.
     }
     return(
-      <BgView style={{padding: 8}}>
+      <View style={{padding: 8}}>
         <View style={{flexDirection: 'row'}}>
-          <View style={{flex: 1}}></View>
-          <View style={{flex: 2}}>
+          <View style={{flex: 3, alignSelf: "center", marginLeft: 32}}>
             <Title>{attrName.toUpperCase()}</Title>
           </View>
-          <View style={{alignContent: 'flex-end', flex: 1}}>
+          <View style={{flex:1}}>
             <Button
               onPress={() => handleSetCurrentItem(attrKey, (attr as string[]).concat(["New item"]))}
               accessibilityLabel={"Create new entry for the " + attrName}
@@ -359,12 +357,13 @@ function TypeField({
           data={attr}
           renderItem={({item, index, separators}) => (
             <View style={{flexDirection: 'row'}}>
-              <View style={{flex: 3}}>
+              <View style={{flex: 3, alignSelf: "center", marginLeft: 32}}>
                 <TextInput
                   placeholder={"Type new value here"}
                   placeholderTextColor={"grey"}
                   defaultValue={item}
                   accessibilityLabel={"Enter entry " + index + " for this item's " + attrName}
+                  style={{borderColor: "grey", borderWidth: 1, textAlign: "center"}}
                   onChangeText={(text) => handleReplace(text, index)}/>
               </View>
               <View style={{flex:1, alignContent: 'flex-end'}}>
@@ -380,7 +379,7 @@ function TypeField({
             </View>
           )}
         />
-      </BgView>
+      </View>
     )
   }
 }

@@ -6,6 +6,9 @@ import {
   ButtonText,
   SubText,
   SafeBgView,
+  SMarginView,
+  SubBoldText,
+  Title,
 } from '../Style.tsx'
 import {
   SafeAreaView,
@@ -15,7 +18,7 @@ import {
 } from 'react-native';
 
 import TypeField from './TypeField.tsx';
-import {tune_draft, standard, tuneDefaults, tune_draft_extras, miniEditorAttrs, editorAttrs} from '../types.ts';
+import {tune_draft, standard, tuneDefaults, tune_draft_extras, miniEditorAttrs, editorAttrs, confidenceAttrs} from '../types.ts';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Importer from './Importer.tsx';
 import Compare from './Compare.tsx';
@@ -29,6 +32,9 @@ import TuneDraftContext from '../contexts/TuneDraftContext.ts';
 import tuneDraftReducer from '../DraftReducers/TuneDraftReducer.ts';
 import {useNavigation} from '@react-navigation/native';
 import { Button } from '../simple_components/Button.tsx';
+import Slider from '@react-native-community/slider';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import {useTheme} from 'styled-components';
 
 
 export default function Editor({
@@ -45,10 +51,18 @@ export default function Editor({
   const [advancedSelected, setAdvancedSelected] = useState(false);
   const Stack = createNativeStackNavigator();
   const navigation = useNavigation();
+  const theme = useTheme();
+  const [icon, setIcon] =  useState();
+  const [confidenceExpanded, setConfidenceExpanded] = useState(false);
 
   let basicEditorArr = Array.from(miniEditorAttrs.entries());
+  if(confidenceExpanded){
+    basicEditorArr = [...Array.from(confidenceAttrs.entries()), ...basicEditorArr];
+  }
 
   useEffect(() => {
+    Icon.getImageSource('circle', 26, 'white')
+      .then(setIcon);
     dispatch({type: "set_to_selected", selectedItem: selectedTune});
     if(selectedTune instanceof Tune){
     }
@@ -73,10 +87,51 @@ export default function Editor({
           <FlatList
             data={advancedSelected ? editorAttrs : basicEditorArr}
             ListHeaderComponent={
-              <Button
-                onPress={() => {setAdvancedSelected(!advancedSelected)}}
-                text={advancedSelected ? "Edit only confidence" : "Edit everything"}
-              />
+              <SMarginView>
+                <Button
+                  onPress={() => {setAdvancedSelected(!advancedSelected)}}
+                  text={advancedSelected ? "Set Confidence" : "Edit Tune"}
+                />
+                {
+                  !advancedSelected &&
+                  <View>
+                    <SMarginView style={{paddingVertical: 16, paddingBottom: 32}}>
+                      <Title>{state.currentDraft.title}</Title>
+                      {
+                        state.currentDraft.alternativeTitle &&
+                        <SubBoldText>Alternative Title: <SubText>{state.currentDraft.alternativeTitle}</SubText></SubBoldText>
+                      }
+                      {
+                        state.currentDraft.composers &&
+                        <SubBoldText>Composer(s): <SubText>{(state.currentDraft as tune_draft).composers?.map(cmp => cmp.name).join(", ")}</SubText></SubBoldText>
+                      }
+                    </SMarginView>
+                    <View style={{flexDirection: "row"}}>
+                      <Title style={{flex: 3, textAlign: "center", textAlignVertical: "center"}}>
+                        ALL CONFIDENCE
+                      </Title>
+                      <Button
+                        style={{flex: 1, borderColor: confidenceExpanded ? theme.delete : theme.defaultButton}} 
+                        iconName={confidenceExpanded ? "arrow-up-drop-circle-outline" : "arrow-down-drop-circle-outline"}
+                          onPress={() => {
+                        setConfidenceExpanded(!confidenceExpanded);
+                      }}/>
+                    </View>
+                    <Slider
+                      minimumValue={0}
+                      maximumValue={100}
+                      step={1}
+                      value={state.currentDraft.confidence}
+                      onSlidingComplete={(value) => {handleSetCurrentTune("confidence", value)}}
+                      style={{marginVertical: 20, marginHorizontal: 16, backgroundColor: "black"}}
+                      minimumTrackTintColor='cadetblue'
+                      maximumTrackTintColor='gray'
+                      thumbTintColor={theme.text || "gray"}
+                      thumbImage={icon}
+                    />
+                  </View>
+                }
+              </SMarginView>
             }
             renderItem={({item, index, separators}) => (
               <View>

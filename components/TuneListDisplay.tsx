@@ -70,6 +70,7 @@ const selectionAttrs = new Map<string, string>([
   ["mainStyle", "Main Style"],
   ["mainTempo", "Main Tempo"],
 //  ["contrafacts", "Contrafacts"],
+  ["confidence", "General Confidence"],
   ["melodyConfidence", "Melody Confidence"],
   ["formConfidence", "Form Confidence"],
   ["soloConfidence", "Solo Confidence"],

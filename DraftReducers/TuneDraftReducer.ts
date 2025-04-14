@@ -35,14 +35,43 @@ export default function tuneDraftReducer(state: any, action: any){
       }
 
       tuneCopy[action["attr"] as keyof tune_draft] = action["value"];
-      let newChangedAttrsList = state["newChangedAttrsList"];
+      let newChangedAttrsList = state["changedAttrsList"];
       if(!newChangedAttrsList){
         newChangedAttrsList = [];
       }
       if(!newChangedAttrsList.includes(action["attr"])){
-        newChangedAttrsList = newChangedAttrsList.concat(action["attr"]);
+        newChangedAttrsList.push(action["attr"]);
       }
-      return {currentDraft: tuneCopy, changedAttrsList: state["changedAttrsList"].concat(action["attr"])};
+      if((action["attr"] as string).endsWith("Confidence")){
+        const hasLyrics = tuneCopy.hasLyrics;
+
+        //Shorthands for each confidence, and handle undefined entries
+        const mc = tuneCopy.melodyConfidence ? tuneCopy.melodyConfidence : 0;
+        const fc = tuneCopy.formConfidence ? tuneCopy.formConfidence : 0;
+        const sc = tuneCopy.soloConfidence ? tuneCopy.soloConfidence : 0;
+        const lc = tuneCopy.lyricsConfidence ? tuneCopy.lyricsConfidence : 0;
+
+
+        //Average each confidence into main confidence
+        if(hasLyrics){
+          tuneCopy.confidence = (mc + fc + sc + lc) / 4;
+        }else{
+          tuneCopy.confidence = (mc + fc + sc) / 3;
+        }
+      }else if(action["attr"] === "confidence"){
+        //Set all confidences to master confidence level
+        const value = action["value"];
+        tuneCopy.melodyConfidence = value;
+        tuneCopy.formConfidence = value;
+        tuneCopy.soloConfidence = value;
+        tuneCopy.lyricsConfidence = value;
+        //Ensure each confidence is in the changedAttrsList
+        if(!newChangedAttrsList.includes("melodyConfidence")){ newChangedAttrsList.push("melodyConfidence") }
+        if(!newChangedAttrsList.includes("formConfidence")){ newChangedAttrsList.push("formConfidence") }
+        if(!newChangedAttrsList.includes("soloConfidence")){ newChangedAttrsList.push("soloConfidence") }
+        if(!newChangedAttrsList.includes("lyricsConfidence")){ newChangedAttrsList.push("lyricsConfidence") }
+      }
+      return {currentDraft: tuneCopy, changedAttrsList: newChangedAttrsList};
     }
     case 'set_to_selected':
     {
