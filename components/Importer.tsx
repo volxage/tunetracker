@@ -267,7 +267,8 @@ function ImporterHeader({
   importingComposers,
   suggestTuneSubmission,
   selectMode,
-  setSelectMode
+  setSelectMode,
+  importAll
 }: {
   listReversed: boolean | undefined,
   setListReversed: Function,
@@ -277,7 +278,8 @@ function ImporterHeader({
   importingComposers: boolean,
   suggestTuneSubmission: boolean,
   selectMode: boolean,
-  setSelectMode: Function
+  setSelectMode: Function,
+  importAll: Function
 }){
   const standardAttrs = importingComposers ? standardComposersAttrs : standardTuneAttrs;
   const dbDispatch = useContext(OnlineDB.DbDispatchContext);
@@ -437,7 +439,15 @@ function ImporterHeader({
       }
     </View>
   }
-  <Button text={selectMode ? "Importing many" : "Importing one"} onPress={() => {setSelectMode(!selectMode)}} style={{borderColor: !selectMode ? "darkgreen" : "darkred"}}/>
+  <View style={{flexDirection: "row"}}>
+    <Button text={selectMode ? "Importing many" : "Importing one"} onPress={() => {setSelectMode(!selectMode)}} style={{borderColor: !selectMode ? "darkgreen" : "darkred", flex:1}}/>
+    {
+      selectMode &&
+      <Button style={{flex:1}} text='Import selected' onPress={() => {
+        importAll();
+      }}/>
+    }
+  </View>
   <DeleteButton onPress={() => navigation.goBack()}>
     <ButtonText>Cancel import</ButtonText>
   </DeleteButton>
@@ -476,6 +486,17 @@ export default function Importer({
   const [selectMode, setSelectMode] = useState(false);
   const [selected, setSelected] = useState([] as number[]);
 
+  //For use in Header
+  function importAll(){
+    for(const id of selected){
+      const standard = displayStandards.find(stand => stand.id === id);
+      console.log("Importing standard:");
+      console.log(standard);
+      importFn(standard, true);
+    }
+    navigation.goBack();
+  }
+
   if(search === ""){
     itemSort(displayStandards, selectedAttr, listReversed);
   }else{
@@ -497,8 +518,6 @@ export default function Importer({
   if(selectMode){
     const tmpSelected = displayStandards.filter(val => selected.includes(val.id))
     const deselected = displayStandards.filter(val => !selected.includes(val.id))
-    console.log("Selected: ");
-    console.log(tmpSelected);
     displayStandards = [...tmpSelected, ...deselected]
   }
 
@@ -524,6 +543,7 @@ export default function Importer({
           setSearch={setSearch}
           selectMode={selectMode}
           setSelectMode={setSelectMode}
+          importAll={importAll}
         />
       }
       renderItem={({item, index, separators}) => {

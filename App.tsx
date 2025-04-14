@@ -145,7 +145,7 @@ function MainMenu({toggleTheme}: {toggleTheme: Function}): React.JSX.Element {
           <Importer
             importingComposers={false}
             importingId={false}
-            importFn={function(stand: standard, mini=false){
+            importFn={function(stand: standard, skipEditor = false){
               const tn: tune_draft = {};
               for(let attrPair of standardDefaults){
                 const standardAttr = stand[attrPair[0]];
@@ -183,19 +183,26 @@ function MainMenu({toggleTheme}: {toggleTheme: Function}): React.JSX.Element {
                           dbId: missingComp.id,
                         })
                         tn.composers?.push(createdComp)
-                        setSelectedTune(tn);
-                        setNewTune(true);
-                        props.navigation.goBack();
-                        props.navigation.navigate("Editor")
                       }
                     }
                   });
-                }else{
-                  setSelectedTune(tn);
-                  setNewTune(true);
-                  props.navigation.goBack();
-                  props.navigation.navigate("Editor")
                 }
+              }
+              if(skipEditor){
+                console.log("Skipping editor");
+                realm.write(() => {
+                  //ensure this works
+                  const modifiedTune = tn;
+                  modifiedTune.id = new BSON.ObjectId();
+                  modifiedTune.dbId = stand.id;
+                  realm.create(Tune, modifiedTune as Tune);
+                });
+              }else{
+                console.log("Not skipping editor");
+                setSelectedTune(tn);
+                setNewTune(true);
+                props.navigation.goBack();
+                props.navigation.navigate("Editor")
               }
             }}/>
           </SafeBgView>

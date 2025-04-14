@@ -107,7 +107,7 @@ function ConfidenceBar({
   }
   //TODO: Add confidence type to remove "as number"
   let confidence = tune[confidenceType] as number;
-  if(confidence === 0){
+  if(!confidence || confidence === 0){
     return;
   }
   return(
