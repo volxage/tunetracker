@@ -470,12 +470,6 @@ export default function TuneListDisplay({
     displaySongs = [];
   }
   const fuse = new Fuse<Tune>(displaySongs, fuseOptions);
-  if(selectMode){
-    const selected = displaySongs.filtered("id IN $0", selectedTunes.map(s => s.id));
-    const deselected = displaySongs.filtered("!(id IN $0)", selectedTunes.map(s => s.id))
-    displaySongs = [...selected, ...deselected]
-    selectedIds = selected.map(tn => tn.id);
-  }
   if(search === ""){
     displaySongs = itemSort(displaySongs, selectedAttr, listReversed);
   }else{
@@ -483,6 +477,12 @@ export default function TuneListDisplay({
       .map(function(value, index){
         return value.item;
       });
+  }
+  if(selectMode){
+    const selected = displaySongs.filtered("id IN $0", selectedTunes.map(s => s.id));
+    const deselected = displaySongs.filtered("!(id IN $0)", selectedTunes.map(s => s.id))
+    displaySongs = [...selected, ...deselected]
+    selectedIds = selected.map(tn => tn.id);
   }
 
   const headerInputStates = 

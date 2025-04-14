@@ -51,6 +51,7 @@ import {useNavigation} from '@react-navigation/native';
 import ResponseHandler from '../services/ResponseHandler.ts';
 import ResponseBox from './ResponseBox.tsx';
 import {useTheme} from 'styled-components';
+import {BSON} from 'realm';
 
 const tuneFuseOptions = { // For finetuning the search algorithm
 	// isCaseSensitive: false,
@@ -161,13 +162,21 @@ function StandardRender({
   importFn,
   separators,
   selectedAttr,
-  isComposer
+  isComposer,
+  selected,
+  setSelected,
+  selectMode,
+  setSelectMode
 }:{
   item: standard | standard_composer,
   importFn: Function,
   separators: any,
   selectedAttr: keyof (standard & standard_composer),
-  isComposer: boolean
+  isComposer: boolean,
+  selected: number[],
+  setSelected: Function,
+  selectMode: boolean,
+  setSelectMode: Function
 }){
   let text = "";
   let subtext = "";
@@ -186,7 +195,6 @@ function StandardRender({
         onPress={() => {
         }}
         onLongPress={() => {
-          importFn(item);
         }}
         onShowUnderlay={separators.highlight}
         onHideUnderlay={separators.unhighlight}>
@@ -203,6 +211,8 @@ function StandardRender({
   }else{
     const stand = item as standard;
     text = stand.title;
+    const isSelected = selectMode && selected.some(id => id === item.id);
+    const theme = useTheme();
     if(selectedAttr !== "title" as keyof standard){
       subtext = prettyPrint(stand[selectedAttr as keyof standard])
     }else{
@@ -216,50 +226,36 @@ function StandardRender({
       <TouchableHighlight
         key={stand.title}
         onPress={() => {
-          setDetailsShown(!detailsShown);
+          if(!selectMode){
+            setDetailsShown(!detailsShown);
+          }else{
+            if(selected.includes(stand.id)){
+              setSelected(selected.filter(val => val !== stand.id));
+            }else{
+              setSelected(selected.concat(stand.id))
+            }
+          }
         }}
         onLongPress={() => {
-          importFn(item);
+          if(selectMode){
+            setSelectMode(false);
+          }else{
+            importFn(item);
+          }
         }}
         onShowUnderlay={separators.highlight}
         onHideUnderlay={separators.unhighlight}>
-        <BgView style={{padding: 8}}>
+        <BgView style={{padding: 8, backgroundColor: isSelected ? theme.panelBg : theme.bg}}>
           <Text>{text}</Text>
           <SubText>{subtext}</SubText>
           {
-            detailsShown &&
+            !selectMode && detailsShown &&
             <StandardDetails std={stand} importFn={importFn}/>
           }
         </BgView>
       </TouchableHighlight>
     )
   }
-}
-function renderStandard(item: standard | composer, importFn: Function, separators: any, selectedAttr: keyof standard | composer, isComposer: boolean){
-  let text: string | undefined = "";
-  let subtext = "";
-  if(isComposer){
-    const comp = item as composer;
-    text = comp.name;
-    if(selectedAttr !== "name" as keyof composer){
-      subtext = prettyPrint(comp[selectedAttr as keyof composer])
-    }else{
-      subtext = dateDisplay(comp["birth"])
-    }
-  }else{
-    const stand = item as standard;
-    text = stand.title;
-    if(selectedAttr !== "title" as keyof standard){
-      subtext = prettyPrint(stand[selectedAttr as keyof standard])
-    }else{
-      if(stand["Composers"]){
-        subtext = prettyPrint(stand["Composers"].map(comp => comp.name).join(", "));
-      }else{
-        subtext = "(No composers listed)"
-      }
-    }
-  }
-  return {text: text, subtext: subtext};
 }
 
 function ImporterHeader({
@@ -269,7 +265,9 @@ function ImporterHeader({
   setSearch,
   importingId,
   importingComposers,
-  suggestTuneSubmission
+  suggestTuneSubmission,
+  selectMode,
+  setSelectMode
 }: {
   listReversed: boolean | undefined,
   setListReversed: Function,
@@ -277,7 +275,9 @@ function ImporterHeader({
   setSearch: Function,
   importingId: boolean,
   importingComposers: boolean,
-  suggestTuneSubmission: boolean
+  suggestTuneSubmission: boolean,
+  selectMode: boolean,
+  setSelectMode: Function
 }){
   const standardAttrs = importingComposers ? standardComposersAttrs : standardTuneAttrs;
   const dbDispatch = useContext(OnlineDB.DbDispatchContext);
@@ -437,6 +437,7 @@ function ImporterHeader({
       }
     </View>
   }
+  <Button text={selectMode ? "Importing many" : "Importing one"} onPress={() => {setSelectMode(!selectMode)}} style={{borderColor: !selectMode ? "darkgreen" : "darkred"}}/>
   <DeleteButton onPress={() => navigation.goBack()}>
     <ButtonText>Cancel import</ButtonText>
   </DeleteButton>
@@ -472,6 +473,9 @@ export default function Importer({
     : new Fuse<standard>(standards as standard[], tuneFuseOptions);
   let searchResults: FuseResult<standard | standard_composer>[] = []
   const navigation = useNavigation();
+  const [selectMode, setSelectMode] = useState(false);
+  const [selected, setSelected] = useState([] as number[]);
+
   if(search === ""){
     itemSort(displayStandards, selectedAttr, listReversed);
   }else{
@@ -490,6 +494,14 @@ export default function Importer({
       return !tuneQuery.some(T => T.dbId === standard.id);
     })
   }
+  if(selectMode){
+    const tmpSelected = displayStandards.filter(val => selected.includes(val.id))
+    const deselected = displayStandards.filter(val => !selected.includes(val.id))
+    console.log("Selected: ");
+    console.log(tmpSelected);
+    displayStandards = [...tmpSelected, ...deselected]
+  }
+
   suggestTuneSubmission = false;
   if(!searchResults || !searchResults[0]){
     suggestTuneSubmission = true;
@@ -509,11 +521,14 @@ export default function Importer({
           importingId={importingId}
           importingComposers={importingComposers}
           suggestTuneSubmission={suggestTuneSubmission}
-          setSearch={setSearch}/>
+          setSearch={setSearch}
+          selectMode={selectMode}
+          setSelectMode={setSelectMode}
+        />
       }
       renderItem={({item, index, separators}) => {
         return (
-          <StandardRender item={item} importFn={importFn} separators={separators} selectedAttr={selectedAttr as keyof (standard & standard_composer)} isComposer={importingComposers} />
+          <StandardRender item={item} importFn={importFn} separators={separators} selectedAttr={selectedAttr as keyof (standard & standard_composer)} isComposer={importingComposers} selectMode={selectMode} setSelectMode={setSelectMode} selected={selected} setSelected={setSelected}/>
         )
       }
     }
