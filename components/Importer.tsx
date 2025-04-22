@@ -425,9 +425,9 @@ function ImporterHeader({
             </View>
             :
             <View>
-              <SubText>You have very similar search results, or you haven't searched yet. We suggest searching for the Tune and connecting to it before submitting your copy; you can still suggest your changes after you connect to our version. Otherwise, tap and hold if you're sure you want to send your copy to our server for review.</SubText>
+              <SubText>You have very similar search results, or you haven't searched yet. We suggest searching for the Tune and connecting to it before submitting your copy; you can still suggest your changes after you connect to our version. Otherwise, tap below if you're sure you want to send your copy to our server for review.</SubText>
               <Button
-                onLongPress={() => {
+                onPress={() => {
                   OnlineDB.createTuneDraft(currentTune);
                   navigation.goBack();
                 }}
@@ -439,15 +439,18 @@ function ImporterHeader({
       }
     </View>
   }
-  <View style={{flexDirection: "row"}}>
-    <Button text={selectMode ? "Importing many" : "Importing one"} onPress={() => {setSelectMode(!selectMode)}} style={{borderColor: !selectMode ? "darkgreen" : "darkred", flex:1}}/>
     {
-      selectMode &&
-      <Button style={{flex:1}} text='Import selected' onPress={() => {
-        importAll();
-      }}/>
+      !importingId && 
+      <View style={{flexDirection: "row"}}>
+        <Button text={selectMode ? "Importing many" : "Importing one"} onPress={() => {setSelectMode(!selectMode)}} style={{borderColor: !selectMode ? "darkgreen" : "darkred", flex:1}}/>
+        {
+          selectMode &&
+          <Button style={{flex:1}} text='Import selected' onPress={() => {
+            importAll();
+          }}/>
+        }
+      </View>
     }
-  </View>
   <DeleteButton onPress={() => navigation.goBack()}>
     <ButtonText>Cancel import</ButtonText>
   </DeleteButton>
