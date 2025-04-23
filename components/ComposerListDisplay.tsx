@@ -154,14 +154,14 @@ function ComposerListHeader({
                           headerInputStates.setComposerToEdit({});
                           navigation.navigate("ComposerEditor")
                         }}
-                        text='Add *Brand New* composer'
+                        text='Add *brand new* composer'
                       />
                     </View>
                     :
                     <View>
-                      <SubText>You have very similar search results. Tap and hold the button below to add a brand new composer ONLY if you're sure that it's a different composer from the composers shown in the results.</SubText>
+                      <SubText>You have very similar search results, or your search is empty. Tap the button below to add a brand new composer ONLY if you're sure that it's a different composer from the composers shown in the results. (Try searching first!)</SubText>
                       <Button
-                        onLongPress={() => {
+                        onPress={() => {
                           headerInputStates.setNewComposer(true);
                           headerInputStates.setComposerToEdit({});
                           navigation.navigate("ComposerEditor")

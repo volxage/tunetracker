@@ -2,6 +2,7 @@
 import {BSON} from "realm"
 import Composer from "./model/Composer"
 import Tune from "./model/Tune"
+import {Platform} from "react-native"
 
 export type tune_draft = {
   "title"?: string
@@ -138,14 +139,17 @@ export const compareTuneEditorAttrs: [keyof tune_draft, string][] = [
   ["form", "Form"],
   ["composers", "Composers"],
 ];
-export const miniEditorAttrs = new Map<keyof (tune_draft & tune_draft_extras), string>([
+export const miniEditorAttrs = Platform.OS === "android" ? new Map<keyof (tune_draft & tune_draft_extras), string>([
 //["melodyConfidence", "Melody Confidence"],
 //["formConfidence", "Form Confidence"],
 //["soloConfidence", "Solo Confidence"],
 //["lyricsConfidence", "Lyrics Confidence"],
   ["playlists", "Playlists"],
   ["playedAt", "Last played"]
-])
+]) : new Map<keyof (tune_draft & tune_draft_extras), string>([
+  //Need to remove playlists for iOS because they break the editor (for now)
+  ["playedAt", "Last played"]
+]);
 export const confidenceAttrs = new Map<keyof (tune_draft & tune_draft_extras), string>([
   ["melodyConfidence", "Melody Confidence"],
   ["formConfidence", "Form Confidence"],

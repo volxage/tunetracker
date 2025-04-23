@@ -1,6 +1,6 @@
 import {FlatList, SafeAreaView, TouchableHighlight, View} from "react-native";
 import {Title, Text, SubText, DeleteButton, ButtonText, SafeBgView} from "../Style";
-import {useQuery} from "@realm/react";
+import {useQuery, useRealm, Realm} from "@realm/react";
 import Playlist from "../model/Playlist";
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
 import PlaylistEditor from "./PlaylistEditor";
@@ -9,6 +9,7 @@ import {editorAttrs} from "../types";
 import Tune from "../model/Tune";
 import Editor from "./Editor";
 import {useNavigation} from "@react-navigation/native";
+import {Button} from "../simple_components/Button";
 
 export default function PlaylistViewer(
   {
@@ -17,18 +18,37 @@ export default function PlaylistViewer(
   }){
   const allPlaylists = useQuery(Playlist);
   const Stack = createNativeStackNavigator();
-  let selectedPlaylist = allPlaylists.length > 0 ? allPlaylists[0] : undefined
   const [tuneToEdit, setTuneToEdit] = useState();
+  const [selectedPlaylist, setSelectedPlaylist] = useState(allPlaylists.length > 0 ? allPlaylists[0] : undefined)
   const navigation = useNavigation() as any;
+  const realm = useRealm();
   return(
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name={"PlaylistViewerUnwrapped"} >
         {props => <SafeBgView>
           <Title>Playlists</Title>
-          <DeleteButton
-            onPress={() => {navigation.goBack()}}>
-            <ButtonText>Go back</ButtonText>
-          </DeleteButton>
+          <View style={{flexDirection: "row"}}>
+            <Button text="Add Empty" style={{flex:1}}
+              onPress={() => {
+                realm.write(() => {
+                  //Create playlist, select it, and open it in editor
+                  const pl = realm.create("Playlist",
+                    {
+                      title: "NEW PLAYLIST",
+                      id: new Realm.BSON.ObjectId()
+                    }
+                  )
+                  setSelectedPlaylist(pl);
+                  navigation.navigate("PlaylistEditor");
+                });
+              }}
+            />
+            <DeleteButton
+              style={{flex: 1}}
+              onPress={() => {navigation.goBack()}}>
+              <ButtonText>Go back</ButtonText>
+            </DeleteButton>
+          </View>
           <FlatList 
             data={allPlaylists}
             ListEmptyComponent={
@@ -44,7 +64,7 @@ export default function PlaylistViewer(
                 // selectedPlaylist needs to be defined, otherwise we shouldn't load the menu.
                 console.assert(typeof selectedPlaylist !== "undefined",
                   "Selected playlist in PlaylistViewer is undefined");
-                selectedPlaylist = item;
+                setSelectedPlaylist(item);
                 navigation.navigate("PlaylistEditor");
               }}
             >
