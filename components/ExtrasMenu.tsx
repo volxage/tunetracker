@@ -53,10 +53,9 @@ function ExtrasMenuUnwrapped({
             <ButtonText>Delete Account</ButtonText>
           </DeleteButton>
         </View>
-        <Button text="Playlist Viewer" 
+        <Button text="Playlist Menu" 
           onPress={() => {navigation.navigate("PlaylistViewer")}}
         />
-        <Button style={{backgroundColor: theme.panelBg}} text='Import Playlist (Coming soon!)'/>
         <Button text='Tutorial'
           onPress={() => {navigation.navigate("TempTutorial")}}
         />
