@@ -58,6 +58,7 @@ export default function tuneDraftReducer(state: any, action: any){
         }else{
           tuneCopy.confidence = (mc + fc + sc) / 3;
         }
+        if(!newChangedAttrsList.includes("confidence")){ newChangedAttrsList.push("confidence") }
       }else if(action["attr"] === "confidence"){
         //Set all confidences to master confidence level
         const value = action["value"];
