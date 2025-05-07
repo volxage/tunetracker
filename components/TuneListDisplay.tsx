@@ -296,7 +296,7 @@ function TuneListHeader({
         <Picker
           selectedValue={selectedPlaylist}
           onValueChange={(value) => headerInputStates.setSelectedPlaylist(value)}
-          itemStyle={{color: "white"}}
+          itemStyle={{color: theme.text}}
         >
           {
             allPlaylists.map(playlist => 
@@ -316,7 +316,7 @@ function TuneListHeader({
           selectedValue={selectedAttr}
           onValueChange={(value) => {headerInputStates.setSelectedAttr(value)}}
           numberOfLines={2}
-          itemStyle={{color: "white"}}
+          itemStyle={{color: theme.text}}
         >
         {
           selectedAttrItems.map(val => 
