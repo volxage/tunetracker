@@ -1,5 +1,5 @@
 import {View} from "react-native";
-import {ButtonText, DeleteButton, SMarginView, SubText} from "../../Style";
+import {ButtonText, DeleteButton, SMarginView, SubBoldText, SubText} from "../../Style";
 import {useContext, useEffect, useState} from "react";
 import {submitted_tune_draft} from "../../types";
 import OnlineDB from "../../OnlineDB";
@@ -81,6 +81,13 @@ export default function DbDrafts({
               </View>
               :
               <View>
+                <SubBoldText>
+                  {
+                    draft.pending_review
+                    ? "Pending review!"
+                    : (draft.accepted ? "Accepted!" : "Rejected by moderator")
+                  }
+                </SubBoldText>
                 {
                   isComposer ?
                   <SubText>
@@ -88,13 +95,13 @@ export default function DbDrafts({
                   :
                   <SubText>
                     Uploaded Tune-draft details:{"\n\n"}
-                  Title: {draft.title + "\n"}
-                  Alternative Title: {draft.alternativeTitle || "(none)" + "\n"}
-                  Composers: {draft.Composers?.map(comp => comp.name).join(", ") + "\n"}
-                  Bio: {draft.bio || "(none)".concat("\n")}
-                  Form: {(draft.form || "(none)").concat("\n")}
-                  Year: {(String(draft.year) !== "null" ? String(draft.year) : "(none)").concat("\n")}
-                </SubText>
+                    Title: {draft.title + "\n"}
+                    Alternative Title: {draft.alternativeTitle || "(none)" + "\n"}
+                    Composers: {draft.Composers?.map(comp => comp.name).join(", ") + "\n"}
+                    Bio: {draft.bio || "(none)".concat("\n")}
+                    Form: {(draft.form || "(none)").concat("\n")}
+                    Year: {(String(draft.year) !== "null" ? String(draft.year) : "(none)").concat("\n")}
+                  </SubText>
                 }
             </View>
             }

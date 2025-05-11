@@ -228,7 +228,7 @@ function ItemRender({
     onHideUnderlay={separators.unhighlight}>
     {
       <BgView style={{backgroundColor: isSelected ? theme.panelBg : theme.bg, padding: 8}}>
-        <Text>{tune.title}</Text>
+        <Text>{tune.queued && <Icon name="exclamation-thick" size={24} style={{color: theme.pending}}/>}{tune.title}</Text>
         <SubText>{selectedAttr != "title"
           ? prettyPrint(tune[selectedAttr])
           : prettyPrint(tune["composers"])}</SubText>
