@@ -156,6 +156,7 @@ function TuneDetails({
   tune: Tune,
   edit: () => void
 }){
+  const realm = useRealm();
   return(
     <SMarginView>
       <RowView>
@@ -181,6 +182,11 @@ function TuneDetails({
       <View style={{flexDirection: "row"}}>
         <Button text='Edit' style={{flex:1}} onPress={() => {
           edit();
+        }}/>
+        <Button style={{flex: 1}} text={tune.queued ? "Unqueue" : "Queue"} onPress={() => {
+          realm.write(() => {
+          tune.queued = !tune.queued
+          });
         }}/>
       </View>
     </SMarginView>
@@ -228,7 +234,7 @@ function ItemRender({
     onHideUnderlay={separators.unhighlight}>
     {
       <BgView style={{backgroundColor: isSelected ? theme.panelBg : theme.bg, padding: 8}}>
-        <Text>{tune.queued && <Icon name="exclamation-thick" size={24} style={{color: theme.pending}}/>}{tune.title}</Text>
+        <Text>{tune.queued && <Icon name="bell-alert" size={20} style={{color: theme.pending}}/>}{tune.title}</Text>
         <SubText>{selectedAttr != "title"
           ? prettyPrint(tune[selectedAttr])
           : prettyPrint(tune["composers"])}</SubText>
