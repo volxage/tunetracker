@@ -75,6 +75,7 @@ const selectionAttrs = new Map<string, string>([
   ["formConfidence", "Form Confidence"],
   ["soloConfidence", "Solo Confidence"],
   ["lyricsConfidence", "Lyrics Confidence"],
+  ["queued", "Queued"],
   ["playthroughs", "Playthrough Count"],
   ["playedAt", "Last Played"],
 ]);
@@ -88,6 +89,7 @@ function prettyPrint(object: unknown): string{
     if(dateDisplay(object) === dateDisplay(new Date())) return dateDisplay(object) + " (TODAY)"
     return dateDisplay(object);
   }
+  if (typeof object == "boolean") return object ? "Yes" : "No";
   return "(Empty)";
 }
 
@@ -234,7 +236,7 @@ function ItemRender({
     onHideUnderlay={separators.unhighlight}>
     {
       <BgView style={{backgroundColor: isSelected ? theme.panelBg : theme.bg, padding: 8}}>
-        <Text>{tune.queued && <Icon name="bell-alert" size={20} style={{color: theme.pending}}/>}{tune.title}</Text>
+        <Text>{tune.queued && <SubText><Icon name="bell-alert" size={20} style={{color: theme.pending}}/> </SubText>}{tune.title}</Text>
         <SubText>{selectedAttr != "title"
           ? prettyPrint(tune[selectedAttr])
           : prettyPrint(tune["composers"])}</SubText>

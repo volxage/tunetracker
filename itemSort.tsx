@@ -4,8 +4,8 @@ import Composer from "./model/Composer";
 import Tune from "./model/Tune";
 import { composer, standard } from "./types";
 import Realm from "realm";
-type possible_items_type = Tune | standard | Composer | composer;
-function itemSort(songs: Array<possible_items_type> | Results<Tune> | List<Tune>, selected: keyof (Tune & standard & Composer | composer), reversed: boolean){
+type possible_items_type = Tune & standard & Composer & composer;
+function itemSort(songs: Array<possible_items_type> | Results<Tune> | List<Tune>, selected: keyof (Tune & standard & Composer & composer), reversed: boolean){
   let reverse_null_multiplier = 1;
   let reversed_multiplier = reversed ? -1 : 1;
   if ((selected as string).endsWith("confidence") || selected == "playthroughs"){
@@ -23,7 +23,6 @@ function itemSort(songs: Array<possible_items_type> | Results<Tune> | List<Tune>
       }
       return 0;
     }
-
 
     if (a == null) return 1 * reverse_null_multiplier;
     if (b == null) return -1 * reverse_null_multiplier;
@@ -57,7 +56,7 @@ function itemSort(songs: Array<possible_items_type> | Results<Tune> | List<Tune>
         }
         return 0;
       }
-      else { if (typeof a[0] == "number"){
+      else if (typeof a[0] == "number"){
         if ((a[0]) < (b[0] as number)){
           return -1 * reversed_multiplier;
         }
@@ -65,7 +64,6 @@ function itemSort(songs: Array<possible_items_type> | Results<Tune> | List<Tune>
           return 1 * reversed_multiplier;
         }
         return 0;
-      }
       }
     }
     else if ((a instanceof Results && b instanceof Results) || (a instanceof Realm.List && b instanceof Realm.List)){
@@ -87,6 +85,7 @@ function itemSort(songs: Array<possible_items_type> | Results<Tune> | List<Tune>
     if(selected === "composers"){
       return songs.map(s => s as Tune).sort(itemCompare)
     }else{
+      if(selected === "queued") reversed = !reversed;
       return songs.sorted(selected, reversed);
     }
   }else{
