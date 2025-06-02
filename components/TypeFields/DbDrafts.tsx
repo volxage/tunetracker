@@ -7,6 +7,8 @@ import ResponseHandler from "../../services/ResponseHandler";
 import {useNavigation} from "@react-navigation/native";
 import ResponseBox from "../ResponseBox";
 import {Button} from "../../simple_components/Button";
+import axios from "axios";
+import {HandleSetItem} from "../Editor";
 
 async function tuneDraftFetch(id: number, navigation: any, onlineDbDispatch: any){
   async function attempt(first: boolean){
@@ -40,12 +42,17 @@ export default function DbDrafts({
   const [fetchResult, setFetchResult] = useState("");
   const [fetchError, setFetchError] = useState(false);
   const onlineDbDispatch = useContext(OnlineDB.DbDispatchContext);
+  const itemHandler = useContext(HandleSetItem);
   useEffect(() => {
     if(typeof attr !== "undefined" && attr !== 0){
       tuneDraftFetch(attr, navigation, onlineDbDispatch).then(res => {
         if(!res.isError){
           setFetchError(false);
           setDraft(res.data);
+          if(res.data.accepted){
+            //Find draft's online version and connect immediately (don't wait for confirmation)
+            itemHandler("dbId", res.data.TuneId, true);
+          }
         }else{
           setFetchResult(res.result);
           setFetchError(true);
