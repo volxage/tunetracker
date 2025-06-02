@@ -158,7 +158,7 @@ export default function ComposerEditor({
 <Stack.Screen name={"ComposerImportId"}>
   {props => 
   <SafeAreaView style={{flex: 1}}>
-    <ComposerDraftContext.Provider value={state["currentDraft"]}>
+  <ComposerDraftContext.Provider value={{cd: state["currentDraft"], setCd: () => {}, updateCd: handleSetCurrentComposer}}>
       <Importer
         importingComposers={true}
         importingId={true}
