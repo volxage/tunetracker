@@ -11,7 +11,7 @@ export type tune_draft = {
   "form"?: string
   "notableRecordings"?: string[]
   "mainKey"?: string
-  "keyCenters"?: string[]
+  "keyCenters"?: number[]
   "styles"?: string[]
   "mainTempo"?: number
   "tempi"?: number[]

@@ -14,7 +14,7 @@ export default class Tune extends Realm.Object<Tune, 'title'> {
   hasLyrics?: boolean;
   mainKey?: string;
   // Note that "keys" is reserved in Realm.Object
-  keyCenters?: string[]; 
+  keyCenters?: number[]; 
   mainTempo?: number;
   tempi?: number[];
   mainStyle?: string;
@@ -61,7 +61,7 @@ export default class Tune extends Realm.Object<Tune, 'title'> {
       year: "int?",
       hasLyrics: "bool?",
       mainKey: "string?",
-      keyCenters: "string?[]",
+      keyCenters: "int?[]",
       mainTempo: "int?",
       tempi: "int?[]",
       mainStyle: "string?",
