@@ -9,7 +9,7 @@ const fontScale = PixelRatio.getFontScale();
 export const ThemedButton = styled.Pressable`
   padding-vertical: 6px;
   border-radius: 4px;
-  elevation: 3;
+  elevation: 0;
   border-width: 2px;
   border-color: ${({ theme }) => theme.defaultButton};
   margin: 4px;
@@ -21,7 +21,7 @@ export const DeleteButton = styled.Pressable`
   padding-vertical: 6px;
   border-radius: 4px;
   border-width: 2px;
-  elevation: 3;
+  elevation: 0;
   font-size: 20px;
   border-color: ${({ theme }) => theme.delete};
   margin: 4px;
@@ -50,6 +50,11 @@ export const SubBoldText = styled.Text`
   font-size: ${fontScale * 20}px;
   color: ${({ theme }) => theme.text};
   font-weight: 350;
+`;
+export const SubDimText = styled.Text`
+  font-size: ${fontScale * 20}px;
+  color: ${({ theme }) => theme.detailText};
+  font-weight: 200;
 `;
 export const ButtonText = styled.Text`
   font-size: ${20 * fontScale}px;
