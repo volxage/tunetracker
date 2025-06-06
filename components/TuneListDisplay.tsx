@@ -459,7 +459,7 @@ export default function TuneListDisplay({
   const [confidenceVisible, setConfidenceVisible] = useState(false);
   const allPlaylists = useQuery(Playlist);
   let selectedIds: BSON.ObjectId[] = []
-  console.log("Full rerender: selected playlist: " + selectedPlaylist);
+  //console.log("Full rerender: selected playlist: " + selectedPlaylist);
 
   useEffect(() => {
   })

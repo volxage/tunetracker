@@ -28,6 +28,7 @@ export type tune_draft = {
   "dbDraftId"?: number
   "bio"?: string
   "year"?: number
+  "queued"?: boolean
   playedAt?: Date
   //  "playedAt"?: string[]
 }
@@ -178,6 +179,7 @@ export const tuneDefaults = new Map<keyof Tune, any>([
   ["keyCenters", []],
   ["styles", []],
   ["tempi", []],
+  ["queued", false],
   //  ["contrafacts", [],],
   ["hasLyrics", false],
   ["playthroughs", 0],

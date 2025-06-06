@@ -9,6 +9,7 @@ import {
   SMarginView,
   SubBoldText,
   Title,
+  SubDimText,
 } from '../Style.tsx'
 import {
   SafeAreaView,
@@ -94,10 +95,24 @@ export default function Editor({
               data={advancedSelected ? editorAttrs : basicEditorArr}
               ListHeaderComponent={
                 <SMarginView>
-                  <Button
-                    onPress={() => {setAdvancedSelected(!advancedSelected)}}
-                    text={advancedSelected ? "Set Confidence" : "Edit Tune"}
-                  />
+                  <View style={{flexDirection: "row"}}>
+                    <Button
+                      style={{flex:1}}
+                      onPress={() => {setAdvancedSelected(!advancedSelected)}}
+                      text={advancedSelected ? "Set Confidence" : "Edit Tune"}
+                    />
+                      <Button
+                        style={{flex:1}}
+                        onPress={() => {
+                          if(state.currentDraft.queued){
+                            handleSetCurrentTune("queued", false, true)
+                          }else{
+                            handleSetCurrentTune("queued", true, true)
+                          }
+                        }}
+                        text={state.currentDraft.queued ? "Unqueue" : "Queue"}
+                    />
+                </View>
                   {
                     !advancedSelected &&
                       <View>
@@ -105,13 +120,22 @@ export default function Editor({
                         <Title>{state.currentDraft.title}</Title>
                     {
                       state.currentDraft.alternativeTitle &&
-                      <SubBoldText>Alternative Title: <SubText>{state.currentDraft.alternativeTitle}</SubText></SubBoldText>
+                      <SubDimText style={{textAlign: "center"}}>AKA: <SubText>{state.currentDraft.alternativeTitle}</SubText></SubDimText>
                     }
                     {
                       state.currentDraft.composers &&
-                        <SubBoldText>Composer(s): <SubText>{(state.currentDraft as tune_draft).composers?.map(cmp => cmp.name).join(", ")}</SubText></SubBoldText>
-
+                        <SubDimText style={{textAlign: "center"}}>By <SubText>{(state.currentDraft as tune_draft).composers?.map(cmp => cmp.name).join(", ")}</SubText></SubDimText>
                     }
+                    <View style={{flexDirection: "row"}}>
+                      <View style={{flex:1}}>
+                        <SubDimText style={{textAlign: "center"}}>Form</SubDimText>
+                        <SubText style={{textAlign: "center"}}>{state.currentDraft.form}</SubText>
+                      </View>
+                      <View style={{flex:1}}>
+                        <SubDimText style={{textAlign: "center"}}>Main Key</SubDimText>
+                        <SubText style={{textAlign: "center"}}>{state.currentDraft.mainKey}</SubText>
+                      </View>
+                    </View>
                         </SMarginView>
                         <View style={{flexDirection: "row"}}>
                         <Title style={{flex: 3, textAlign: "center", textAlignVertical: "center"}}>
@@ -161,9 +185,9 @@ export default function Editor({
                 )}
                 ListFooterComponent={
                   <View>
-                    <SubText style={{fontSize: 16, color:'grey', alignSelf: 'center'}}>
-                  Press and hold if you're sure
-                  </SubText>
+                    <SubDimText style={{textAlign: "center"}}>
+                      Press and hold if you're sure
+                    </SubDimText>
                   {
                     !newTune && 
                       <DeleteButton
@@ -186,6 +210,7 @@ export default function Editor({
                     !newTune &&
                       <Button
                         onPress={() => {
+                          console.log("Saving old tune");
                           realm.write(() => {
                             for(let attr of state["changedAttrsList"]){
                               selectedTune[attr as keyof (tune_draft | Tune)] = (state["currentDraft"][attr as keyof tune_draft])
@@ -201,6 +226,7 @@ export default function Editor({
                     newTune &&
                       <Button
                         onPress={() => {
+                          console.log("Saving new tune!!!");
                           const ctCopy = state["currentDraft"]
                           ctCopy.id = new BSON.ObjectId()
                           realm.write(() => {

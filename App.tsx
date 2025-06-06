@@ -57,7 +57,7 @@ import NewTuneSelector from './components/NewTuneSelector.tsx';
 
 const Stack = createNativeStackNavigator();
 
-const migration = (oldRealm, newRealm) => {
+function migration(oldRealm, newRealm){
   const keyMap = new Map([
     ["c", 0],
     ["c#", 1],
