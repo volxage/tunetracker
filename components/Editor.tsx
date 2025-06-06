@@ -111,6 +111,7 @@ export default function Editor({
                       state.currentDraft.composers &&
                         <SubBoldText>Composer(s): <SubText>{(state.currentDraft as tune_draft).composers?.map(cmp => cmp.name).join(", ")}</SubText></SubBoldText>
 
+                    }
                         </SMarginView>
                         <View style={{flexDirection: "row"}}>
                         <Title style={{flex: 3, textAlign: "center", textAlignVertical: "center"}}>

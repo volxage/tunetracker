@@ -57,6 +57,48 @@ import NewTuneSelector from './components/NewTuneSelector.tsx';
 
 const Stack = createNativeStackNavigator();
 
+const migration = (oldRealm, newRealm) => {
+  const keyMap = new Map([
+    ["c", 0],
+    ["c#", 1],
+    ["db", 1],
+    ["d", 2],
+    ["d#", 3],
+    ["eb", 3],
+    ["e", 4],
+    ["f", 5],
+    ["f#", 6],
+    ["gb", 6],
+    ["g", 7],
+    ["g#", 8],
+    ["ab", 8],
+    ["a", 9],
+    ["a#", 10],
+    ["bb", 10],
+    ["b", 11],
+  ])
+  if(oldRealm.schemaVersion <= 6){
+    //Migrate keyCenters to per-key confidence
+    const oldObjects = oldRealm.objects(Tune);
+    const newObjects = newRealm.objects(Tune);
+    for (let i = 0; i < oldObjects.length; i++) {
+      const oldObj = oldObjects[i];
+      const newObj = newObjects[i];
+      if(typeof oldObj.keyCenters !== "undefined"){
+        //Old key centers were an array of strings.
+        const oldKeys = oldObj.keyCenters as unknown as string[];
+        //Just ignore a key if it doesn't exist in the map
+        const newKeyMap = oldKeys.filter(key => keyMap.has(key.toLowerCase()))
+          .map(key => keyMap.get(key.toLowerCase()) as number);
+        const newKeys = [0,0,0,0,0,0,0,0,0,0,0,0];
+        //Set the confidence of each key as proficient (3)
+        newKeyMap.forEach(keyIndex => {newKeys[keyIndex] = 3})
+
+        newObj.keyCenters = newKeys
+      }
+    }
+  }
+}
 function App(): React.JSX.Element {
   const [dbState, dbDispatch] = useReducer(OnlineDB.reducer, {composers: [], standards: [], status: Status.Failed})
   const [theme, setTheme] = useState(dark);
@@ -85,48 +127,7 @@ function App(): React.JSX.Element {
       <OnlineDB.DbDispatchContext.Provider value={dbDispatch}>
         <OnlineDB.DbStateContext.Provider value={dbState}>
           <BgView style={{flex: 1}}>
-          <RealmProvider schema={[Tune, Composer, Playlist]} schemaVersion={7} onMigration={(oldRealm, newRealm) => {
-            const keyMap = new Map([
-              ["c", 0],
-              ["c#", 1],
-              ["db", 1],
-              ["d", 2],
-              ["d#", 3],
-              ["eb", 3],
-              ["e", 4],
-              ["f", 5],
-              ["f#", 6],
-              ["gb", 6],
-              ["g", 7],
-              ["g#", 8],
-              ["ab", 8],
-              ["a", 9],
-              ["a#", 10],
-              ["bb", 10],
-              ["b", 11],
-            ])
-            if(oldRealm.schemaVersion <= 6){
-              //Migrate keyCenters to per-key confidence
-              const oldObjects = oldRealm.objects(Tune);
-              const newObjects = newRealm.objects(Tune);
-              for (let i = 0; i < oldObjects.length; i++) {
-                const oldObj = oldObjects[i];
-                const newObj = newObjects[i];
-                if(typeof oldObj.keyCenters !== "undefined"){
-                  //Old key centers were an array of strings.
-                  const oldKeys = oldObj.keyCenters as unknown as string[];
-                  //Just ignore a key if it doesn't exist in the map
-                  const newKeyMap = oldKeys.filter(key => keyMap.has(key.toLowerCase()))
-                    .map(key => keyMap.get(key.toLowerCase()) as number);
-                  const newKeys = [0,0,0,0,0,0,0,0,0,0,0,0];
-                  //Set the confidence of each key as proficient (3)
-                  newKeyMap.forEach(keyIndex => {newKeys[keyIndex] = 3})
-
-                  newObj.keyCenters = newKeys
-                }
-              }
-            }
-          }}>
+          <RealmProvider schema={[Tune, Composer, Playlist]} schemaVersion={7} onMigration={migration}>
               <NavigationContainer>
                 <MainMenu 
                   toggleTheme={() => {
