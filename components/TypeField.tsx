@@ -293,51 +293,65 @@ function TypeField({
     if(!arr || arr.length !== 12){
       arr = [0,0,0,0,0,0,0,0,0,0,0,0];
     }
-    const arr1 = arr.slice(0,6);
-    const arr2 = arr.slice(6,12);
+    const arr1 = arr.slice(0,4);
+    const arr2 = arr.slice(4,8);
+    const arr3 = arr.slice(8,12);
     const colorConfMap = new Map([
       [0, theme.detailText],
       [1, theme.off],
       [2, theme.pending],
-      [3, theme.formConf],
+      [3, theme.soloConf],
       [4, theme.on],
     ]);
     const items1 = arr1.map((conf, i) => {return(
-      <Button text={prettyKeyMap.get(i)} style={{borderColor: colorConfMap.get(conf)}} onPress={() => {
+      <Button key={i} text={prettyKeyMap.get(i)} style={{borderColor: colorConfMap.get(conf), flex: 1}} onPress={() => {
         setKeyEditing(i);
       }}/>
     )});
     const items2 = arr2.map((conf, i) => {return(
-      <View>
-        <Button text={prettyKeyMap.get(i + 6)} style={{borderColor: colorConfMap.get(conf)}} onPress={() => {
-          //+ 6 to offset the array slice from earlier
-          setKeyEditing(i + 6);
-        }}/>
-      </View>
+      <Button key={i + 4} text={prettyKeyMap.get(i + 4)} style={{borderColor: colorConfMap.get(conf), flex: 1}} onPress={() => {
+        //+ 6 to offset the array slice from earlier
+        setKeyEditing(i + 4);
+      }}/>
+    )})
+    const items3 = arr3.map((conf, i) => {return(
+      <Button key={i + 8} text={prettyKeyMap.get(i + 8)} style={{borderColor: colorConfMap.get(conf), flex: 1}} onPress={() => {
+        //+ 6 to offset the array slice from earlier
+        setKeyEditing(i + 8);
+      }}/>
     )})
     if(keyEditing < 0 || keyEditing > 11){
       return(
-        <View>
+        <View style={{marginHorizontal: 32}}>
+          <Title>KEYS</Title>
           <View style={{flexDirection: "row"}}>
             {items1}
           </View>
           <View style={{flexDirection: "row"}}>
             {items2}
           </View>
-        </View>
+          <View style={{flexDirection: "row"}}>
+            {items3}
+          </View>
+      </View>
       )
     }else{
-      <View style={{flexDirection: "row"}}>
-        {
-          Array.from(colorConfMap.entries()).map(([i, color]) => 
-            <Button text={prettyKeyMap.get(keyEditing)} style={{borderColor: colorConfMap.get(color)}} onPress={() => {
-              //Replace array with new array where currently editing key is replaced by the selected confidence
-              handleSetCurrentItem("keyCenters", arr.map((val, arrIndex) => arrIndex === i ? i : val));
-              setKeyEditing(-1);
-            }}/>
-          )
-        }
-      </View>
+      return(
+        <View>
+          <Title>KEYS</Title>
+          <View style={{flexDirection: "row"}}>
+          {
+            Array.from(colorConfMap.entries()).map(([i, color]) => 
+              <Button key={i} text={prettyKeyMap.get(keyEditing)} style={{borderColor: color, flex:1}} onPress={() => {
+                //Replace array with new array where currently editing key is replaced by the selected confidence
+                handleSetCurrentItem(attrKey, arr.map((val, arrIndex) => arrIndex === keyEditing ? i : val));
+                setKeyEditing(-1);
+              }}/>
+            )
+          }
+          </View>
+        </View>
+    )
     }
   }
   else if (typeof attr === "string"){

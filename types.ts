@@ -110,7 +110,6 @@ export const editorAttrs: [keyof (tune_draft & tune_draft_extras), string][] = [
   //  ["notable_recordings", "Notable Recordings"],
   ["mainKey", "Main Key"],
   ["mainTempo", "Main Tempo"],
-  ["keyCenters", "Keys"],
   ["styles", "Styles"],
   ["tempi", "Tempi"],
   //["contrafacts", "Contrafacts"],
@@ -144,10 +143,12 @@ export const miniEditorAttrs = Platform.OS === "android" ? new Map<keyof (tune_d
 //["formConfidence", "Form Confidence"],
 //["soloConfidence", "Solo Confidence"],
 //["lyricsConfidence", "Lyrics Confidence"],
+  ["keyCenters", "Keys"],
   ["playlists", "Playlists"],
   ["playedAt", "Last played"]
 ]) : new Map<keyof (tune_draft & tune_draft_extras), string>([
   //Need to remove playlists for iOS because they break the editor (for now)
+  ["keyCenters", "Keys"],
   ["playedAt", "Last played"]
 ]);
 export const confidenceAttrs = new Map<keyof (tune_draft & tune_draft_extras), string>([
