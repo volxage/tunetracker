@@ -367,9 +367,9 @@ function TypeField({
     const previousKeyIndex = invalidPreviousKey ? 0 : keyMap.get(key.toLowerCase());
 
     //This is my first recursive jsx map function! I hope this doesn't have bad performance implications! :o
-    const keyButtons = keys.map((row) => {
+    const keyButtons = keys.map((row, rowIndex) => {
       return(
-        <View style={{flexDirection: "row"}}>
+        <View key={rowIndex} style={{flexDirection: "row"}}>
           {
             row.map((keyIndex) => 
               <Button key={keyIndex} text={prettyKeyMap.get(keyIndex)} style={{flex:1, borderColor: keyIndex === previousKeyIndex ? theme.on : theme.detailText}} onPress={() => {
