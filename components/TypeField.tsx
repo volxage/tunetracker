@@ -7,7 +7,8 @@ import {
   Text,
   SubText,
   BgView,
-  SMarginView
+  SMarginView,
+  SubDimText
 } from '../Style.tsx'
 import { Button } from '../simple_components/Button.tsx';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
@@ -18,7 +19,7 @@ import {
   Switch,
   View,
 } from 'react-native';
-import { composer, playlist, prettyKeyMap, tune_draft, tune_draft_extras } from '../types.ts';
+import { composer, keyMap, playlist, prettyKeyMap, tune_draft, tune_draft_extras } from '../types.ts';
 import DbConnection from './TypeFields/DbConnection.tsx';
 import ComposerField from './TypeFields/ComposerField.tsx';
 import Composer from '../model/Composer.ts';
@@ -55,7 +56,7 @@ function AddPlaylistField({
         <View style={{flex: 3}}>
           <TextInput
             placeholder='Enter New Playlist Name'
-            placeholderTextColor={"grey"}
+            placeholderTextColor={theme.detailText}
             onChangeText={setNewPlaylistTitle}
             accessibilityLabel='Enter new playlist name'
           />
@@ -173,7 +174,7 @@ function TypeField({
     return(
       <BgView style={{padding: 8}}>
         <Title style={{textAlign: "center"}}>{attrName.toUpperCase()}</Title>
-        <TextInput defaultValue={String(attr as number)} placeholderTextColor={"grey"}
+        <TextInput defaultValue={String(attr as number)} placeholderTextColor={theme.detailText}
           keyboardType="numeric"
           value={String(attr)}
           onChangeText={(text) => {
@@ -185,7 +186,7 @@ function TypeField({
             handleSetCurrentItem(attrKey, Number(text))
           }}
           accessibilityLabel={"Enter main tempo"}
-          style={{textAlign: "center", fontWeight: "300", borderColor: "grey", borderWidth: 1, marginHorizontal: 32}}
+          style={{textAlign: "center", fontWeight: "300", borderColor: theme.detailText, borderWidth: 1, marginHorizontal: 32}}
         />
       </BgView>
     );
@@ -258,7 +259,7 @@ function TypeField({
           renderItem={({item, index, separators}) => (
             <View style={{flexDirection: 'row'}}>
               <View style={{flex: 3, alignSelf: "center"}}>
-                <TextInput defaultValue={String(attr as number)} placeholderTextColor={"grey"}
+                <TextInput defaultValue={String(attr as number)} placeholderTextColor={theme.detailText}
                   keyboardType="numeric"
                   accessibilityLabel='Enter a tempo'
                   value={String((attr as number[])[index])}
@@ -270,7 +271,7 @@ function TypeField({
                     }
                     handleReplace(Number(text), index)
                   }}
-                  style={{textAlign: "center", fontWeight: "300", borderWidth: 1, borderColor: "grey", marginLeft: 32}}
+                  style={{textAlign: "center", fontWeight: "300", borderWidth: 1, borderColor: theme.detailText, marginLeft: 32}}
                 />
               </View>
               <View style={{flex:1, alignContent: 'flex-end'}}>
@@ -354,13 +355,58 @@ function TypeField({
     )
     }
   }
+  else if (attrKey === "mainKey"){
+    const keys = [
+      [0,1,2,3],
+      [4,5,6,7],
+      [8,9,10,11],
+    ]
+    const attrStr = attr as string;
+    const [key, quality] = attrStr.split(" ");
+    let invalidPreviousKey = !keyMap.has(key.toLowerCase());
+    const previousKeyIndex = invalidPreviousKey ? 0 : keyMap.get(key.toLowerCase());
+
+    //This is my first recursive jsx map function! I hope this doesn't have bad performance implications! :o
+    const keyButtons = keys.map((row) => {
+      return(
+        <View style={{flexDirection: "row"}}>
+          {
+            row.map((keyIndex) => 
+              <Button key={keyIndex} text={prettyKeyMap.get(keyIndex)} style={{flex:1, borderColor: keyIndex === previousKeyIndex ? theme.on : theme.detailText}} onPress={() => {
+                handleSetCurrentItem(attrKey, (prettyKeyMap.get(keyIndex) as string).concat(" ", quality));
+              }}/>
+            )
+          }
+        </View>
+      );
+    });
+    return(
+      <View style={{padding: 8, marginHorizontal:32}}>
+        <Title>MAIN KEY</Title>
+      { invalidPreviousKey && 
+        <SMarginView>
+          <SubText>We found your last key, but your key "{key}" doesn't seem to be a note. Please select which key you meant below, and this message will go away.</SubText>
+        </SMarginView>
+      }
+        {keyButtons}
+        <View style={{flexDirection: "row"}}>
+          <Button style={{flex:1, borderColor: quality==="Major" ? theme.on : theme.detailText}} text="Major" onPress={() => {
+            handleSetCurrentItem(attrKey, key.concat(" ", "Major"));
+          }}/>
+          <Button style={{flex:1, borderColor: quality==="Minor" ? theme.on : theme.detailText}} text="Minor" onPress={() => {
+            handleSetCurrentItem(attrKey, key.concat(" ", "Minor"));
+          }}/>
+        </View>
+      </View>
+    )
+  }
   else if (typeof attr === "string"){
     return(
       <View style={{padding: 8}}>
         <Title style={{textAlign: "center"}}>{attrName.toUpperCase()}</Title>
-        <TextInput defaultValue={attr} placeholderTextColor={"grey"}
+        <TextInput defaultValue={attr} placeholderTextColor={theme.detailText}
           onChangeText={(text) => handleSetCurrentItem(attrKey, text)}
-          style={{textAlign: "center", fontWeight: "300", borderColor: "grey", borderWidth: 1, marginHorizontal: 32}}
+          style={{textAlign: "center", fontWeight: "300", borderColor: theme.detailText, borderWidth: 1, marginHorizontal: 32}}
           accessibilityLabel={"Enter " + attrName}
         />
       </View>
@@ -428,10 +474,10 @@ function TypeField({
               <View style={{flex: 3, alignSelf: "center", marginLeft: 32}}>
                 <TextInput
                   placeholder={"Type new value here"}
-                  placeholderTextColor={"grey"}
+                  placeholderTextColor={theme.detailText}
                   defaultValue={item}
                   accessibilityLabel={"Enter entry " + index + " for this item's " + attrName}
-                  style={{borderColor: "grey", borderWidth: 1, textAlign: "center"}}
+                  style={{borderColor: theme.detailText, borderWidth: 1, textAlign: "center"}}
                   onChangeText={(text) => handleReplace(text, index)}/>
               </View>
               <View style={{flex:1, alignContent: 'flex-end'}}>

@@ -61,7 +61,7 @@ export default function DbDrafts({
     }
   }, [attr])
   if(typeof attr === "undefined" || attr === 0){
-    console.log("Draft undefined or 0");
+    //console.log("Draft undefined or 0");
     return(<></>);
   }
   return(
