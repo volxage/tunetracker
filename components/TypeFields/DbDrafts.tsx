@@ -28,15 +28,14 @@ async function tuneDraftFetch(id: number, navigation: any, onlineDbDispatch: any
 }
 export default function DbDrafts({
   attr,
-  navigation,
   isComposer,
   handleSetCurrentItem
 }:{
   attr: undefined | number,
-  navigation: any,
   isComposer: boolean,
   handleSetCurrentItem: Function
 }){
+  const navigation = useNavigation();
   const [isExpanded, setIsExpanded] = useState(false);
   const [draft, setDraft] = useState({} as submitted_tune_draft);
   const [fetchResult, setFetchResult] = useState("");

@@ -28,7 +28,6 @@ import {useQuery, useRealm} from '@realm/react';
 import {BSON, List} from 'realm';
 import { Picker } from '@react-native-picker/picker';
 import DateField from './TypeFields/DateField.tsx';
-import {useNavigation} from '@react-navigation/native';
 import DbDrafts from './TypeFields/DbDrafts.tsx';
 import {useTheme} from 'styled-components';
 
@@ -138,7 +137,6 @@ function TypeField({
   const [icon, setIcon] = useState();
   const [bool, setBool] = useState(attr as boolean)
   const [newPlaylistOpen, setNewPlaylistOpen] = useState(false)
-  const navigation = useNavigation();
   useEffect(() => {
     Icon.getImageSource('circle', 26, 'white')
       .then(setIcon);
@@ -146,18 +144,18 @@ function TypeField({
   type keyOfEitherDraft = keyof (tune_draft | composer)
   if (attrKey === "dbId" as keyOfEitherDraft){
     return(
-      <DbConnection attr={attr} navigation={navigation} isComposer={isComposer} handleSetCurrentItem={handleSetCurrentItem}/>
+      <DbConnection attr={attr} isComposer={isComposer} handleSetCurrentItem={handleSetCurrentItem}/>
     );
   }
   else if (attrKey === "dbDraftId" as keyOfEitherDraft){
     return(
-      <DbDrafts attr={attr} navigation={navigation} isComposer={isComposer} handleSetCurrentItem={handleSetCurrentItem}/>
+      <DbDrafts attr={attr} isComposer={isComposer} handleSetCurrentItem={handleSetCurrentItem}/>
     )
 
   }
   else if (attrKey === "composers" as keyOfEitherDraft){
     return(
-      <ComposerField attr={attr as (Composer | composer)[]} navigation={navigation} />
+      <ComposerField attr={attr as (Composer | composer)[]} />
     );
   }
   else if (attr instanceof Date || attrKey === "birth" || attrKey === "death" || attrKey === "playedAt"){
@@ -167,7 +165,6 @@ function TypeField({
         attrKey={attrKey}
         attrName={attrName}
         handleSetCurrentItem={handleSetCurrentItem}
-        navigation={navigation}/>
     );
   }
   else if (attrKey === "mainTempo" || attrKey === "playthroughs"){

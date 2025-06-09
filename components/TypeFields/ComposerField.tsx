@@ -19,16 +19,16 @@ import Composer from '../../model/Composer.js';
 import {composer} from '../../types.ts';
 import dateDisplay from '../../textconverters/dateDisplay.tsx';
 import { Button } from '../../simple_components/Button.tsx';
+import {useNavigation} from '@react-navigation/native';
 
 
 export default function ComposerField({
   attr,
-  navigation
 }:{
   attr: Array<composer | Composer>,
-  navigation: any
 }){
   const [composerExpanded, setComposerExpanded] = useState(false);
+  const navigation = useNavigation();
   return(
     <View style={{padding: 8}}>
       <Title style={{textAlign: "center"}}>COMPOSERS</Title>

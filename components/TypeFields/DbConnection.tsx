@@ -15,18 +15,18 @@ import OnlineDB from '../../OnlineDB.tsx';
 import dateDisplay from '../../textconverters/dateDisplay.tsx';
 import {Button} from '../../simple_components/Button.tsx';
 import {useTheme} from 'styled-components';
+import {useNavigation} from '@react-navigation/native';
 
 export default function DbConnection({
   attr,
-  navigation,
   isComposer,
   handleSetCurrentItem
 }:{
   attr: unknown,
-  navigation: any,
   isComposer: boolean,
   handleSetCurrentItem: Function
 }){
+  const navigation = useNavigation();
   const [connectTuneExpanded, setConnectTuneExpanded] = useState(false);
   const status = useContext(OnlineDB.DbStateContext).status;
   const theme = useTheme();

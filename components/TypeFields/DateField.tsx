@@ -4,22 +4,22 @@ import DatePicker from "react-native-date-picker";
 import { ButtonText, DeleteButton, SubText, Title} from "../../Style";
 import dateDisplay from "../../textconverters/dateDisplay";
 import { Button } from "../../simple_components/Button";
+import {useNavigation} from "@react-navigation/native";
 
 export default function DateField({
   attr,
   attrKey,
-  navigation,
   handleSetCurrentItem,
   attrName
 }:{
   attr: Date | undefined,
   attrKey: string,
-  navigation: any,
   handleSetCurrentItem: Function,
   attrName: string
 }){
   const [dateCopy, setDateCopy]: [Date | undefined, Function] = useState(undefined);
   const [dateOpen, setDateOpen] = useState(false);
+  const navigation = useNavigation();
   useEffect(() => {
     if(typeof attr !== "undefined"){
       setDateCopy(new Date(attr.valueOf()))
