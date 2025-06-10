@@ -20,15 +20,15 @@ import {
   View,
 } from 'react-native';
 import { composer, keyMap, playlist, prettyKeyMap, tune_draft, tune_draft_extras } from '../types.ts';
-import DbConnection from './TypeFields/DbConnection.tsx';
-import ComposerField from './TypeFields/ComposerField.tsx';
+import DbConnection from './typefields/DbConnection.tsx';
+import ComposerField from './typefields/ComposerField.tsx';
 import Composer from '../model/Composer.ts';
 import Playlist from '../model/Playlist.ts';
 import {useQuery, useRealm} from '@realm/react';
 import {BSON, List} from 'realm';
 import { Picker } from '@react-native-picker/picker';
-import DateField from './TypeFields/DateField.tsx';
-import DbDrafts from './TypeFields/DbDrafts.tsx';
+import DateField from './typefields/DateField.tsx';
+import DbDrafts from './typefields/DbDrafts.tsx';
 import {useTheme} from 'styled-components';
 
 function AddPlaylistField({
