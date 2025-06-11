@@ -65,7 +65,7 @@ export default function DbConnection({
                   if(isComposer){
                     navigation.navigate("ComposerImportId")
                   }else {
-                    navigation.navigate("ImportID")}
+                    navigation.navigate("SimilarItemPrompt")}
                   }
                 }
                 text='Connect to database'

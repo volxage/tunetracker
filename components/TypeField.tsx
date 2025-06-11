@@ -165,6 +165,7 @@ function TypeField({
         attrKey={attrKey}
         attrName={attrName}
         handleSetCurrentItem={handleSetCurrentItem}
+      />
     );
   }
   else if (attrKey === "mainTempo" || attrKey === "playthroughs"){

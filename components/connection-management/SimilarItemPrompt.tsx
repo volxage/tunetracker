@@ -1,4 +1,4 @@
-import {useContext, useEffect} from "react";
+import {useContext, useEffect, useState} from "react";
 import OnlineDB from "../../OnlineDB";
 import TuneDraftContext from "../../contexts/TuneDraftContext";
 import ComposerDraftContext from "../../contexts/ComposerDraftContext";
@@ -10,6 +10,7 @@ import {composer, standard, standard_composer} from "../../types";
 import {jsx} from "react/jsx-runtime";
 import {FlatList, View} from "react-native";
 import dateDisplay from "../../textconverters/dateDisplay";
+import {Pressable} from "react-native";
 
 const tuneFuseOptions = { // For finetuning the search algorithm
 	// isCaseSensitive: false,
@@ -48,7 +49,35 @@ const composerFuseOptions = { // For finetuning the search algorithm
 	]
 };
 
-function SimilarItemPrompt({
+function StandardRender({stand}: {stand: standard}){
+  const [expanded, setExpanded] = useState(false);
+  return(
+    <Pressable style={{padding: 8}} onPress={() => {setExpanded(!expanded)}}>
+      <Text>{stand.title}</Text>
+      <SubText>{stand.Composers?.map(c => c.name).join(", ")}</SubText>
+      {
+        expanded &&
+          <Button text="This is the one!" onPress={() => {}}/>
+      }
+    </Pressable>
+  )
+}
+
+function ComposerRender({comp}:{comp: standard_composer}){
+  const [expanded, setExpanded] = useState(false);
+  return(
+    <View style={{padding:8}}>
+      <Text>{comp.name}</Text>
+      <SubText>{dateDisplay(comp.birth)} - {dateDisplay(comp.death)}</SubText>
+      {
+        expanded &&
+          <Button text="This is the one!" onPress={() => {}}/>
+      }
+    </View>
+  )
+}
+
+export default function SimilarItemPrompt({
 }:{
 }){
   const navigation = useNavigation();
@@ -60,16 +89,15 @@ function SimilarItemPrompt({
   //If the composerDraftContext isn't empty.
   const isComposer = Object.keys(CDContext).length > 0;
   const activeDraft = isComposer ? CDContext.cd : TDContext.td;
+  if(!activeDraft){
+    //Simple error message. Hopefully never reached.
+    return(
+      <SafeBgView><Text>Error: Couldn't retrieve active draft.</Text><DeleteButton onPress={()=>{navigation.goBack()}}/></SafeBgView>
+    );
+  }
 
-  let fuse = new Fuse([]) as unknown as (Fuse<standard> | Fuse<standard_composer>);
+  let fuse = isComposer ? new Fuse<standard_composer>(composers, composerFuseOptions) : new Fuse<standard>(standards, tuneFuseOptions);
   let results;
-  useEffect(() => {
-    if(isComposer){
-      fuse = new Fuse(composers, composerFuseOptions);
-    }else{
-      fuse = new Fuse(standards, tuneFuseOptions);
-    }
-  }, [isComposer])
 
   if(activeDraft.dbId){
     return(
@@ -88,24 +116,17 @@ function SimilarItemPrompt({
   }
   results = results.slice(0,3);
   return(
+    <SafeBgView>
+      <Text style={{textAlign: "center"}}>Are any of these your {isComposer ? "composer?" : "tune?"}</Text>
     <FlatList data={results} renderItem={({item}) => {
       if(isComposer){
         //Not sure why the typing system complains about item.item always being a standard.
         const comp = item.item as unknown as standard_composer;
-        return(
-          <View style={{padding:8}}>
-            <Text>{comp.name}</Text>
-            <SubText>{dateDisplay(comp.birth)} - {dateDisplay(comp.death)}</SubText>
-          </View>
-        )
+        return( <ComposerRender comp={comp} /> );
       }else{
-        return(
-          <View style={{padding: 8}}>
-            <Text>{item.item.title}</Text>
-            <SubText>{item.item.Composers?.map(c => c.name).join(", ")}</SubText>
-          </View>
-        )
+        return( <StandardRender stand={item.item} /> );
       }
     }}/>
+    </SafeBgView>
   )
 }

@@ -36,6 +36,7 @@ import { Button } from '../simple_components/Button.tsx';
 import Slider from '@react-native-community/slider';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import {useTheme} from 'styled-components';
+import SimilarItemPrompt from './connection-management/SimilarItemPrompt.tsx';
 
 
 //Wish there was a better way of doing this
@@ -87,9 +88,11 @@ export default function Editor({
 
 
   return (
+    <TuneDraftContext.Provider value={{td: state["currentDraft"], setTd: () => {},  updateTd: handleSetCurrentTune}}>
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name={"EditorUnwrapped"} >
-        {props => <SafeBgView>
+        {props => 
+        <SafeBgView>
           <HandleSetItem.Provider value={handleSetCurrentTune}>
             <FlatList
               data={advancedSelected ? editorAttrs : basicEditorArr}
@@ -265,44 +268,44 @@ export default function Editor({
                 }
                 />
                 </HandleSetItem.Provider>
-</SafeBgView>}
-</Stack.Screen>
-<Stack.Screen name={"ImportID"}>
-  {props => 
-  <SafeAreaView style={{flex: 1}}>
-    <TuneDraftContext.Provider value={{td: state["currentDraft"], setTd: () => {},  updateTd: handleSetCurrentTune}}>
-      <Importer
-        importingComposers={false}
-        importingId={true}
-        importFn={function(stand: standard, mini: boolean){
-          handleSetCurrentTune("dbId", stand.id)
-          props.navigation.goBack();
-        }}/>
-      </TuneDraftContext.Provider>
-    </SafeAreaView>
-  }
-</Stack.Screen>
-<Stack.Screen name="Compare">
-  {props =>
-    //Logically, this screen will never appear if there is no standard, so we can guarantee that getStandardById will return a standard.
-    <Compare
-      currentItem={state["currentDraft"]}
-      onlineVersion={(state["currentDraft"].dbId ? OnlineDB.getStandardById(state["currentDraft"].dbId) : null) as standard}
-      handleSetCurrentItem={handleSetCurrentTune}
-      isComposer={false}
-    />
-  }
-</Stack.Screen>
-<Stack.Screen name='ComposerSelector'>
-  {props =>
-  <SafeAreaView style={{flex: 1}}>
-    <ComposerListDisplay
-      originalTuneComposers={state["currentDraft"]["composers"] ? state["currentDraft"]["composers"] : []}
-      handleSetCurrentTune={handleSetCurrentTune}
-    />
-  </SafeAreaView>
-  }
-</Stack.Screen>
-</Stack.Navigator>
+          </SafeBgView>}
+    </Stack.Screen>
+      <Stack.Screen name={"ImportID"}>
+        {props => 
+        <SafeAreaView style={{flex: 1}}>
+        <Importer
+          importingComposers={false}
+          importingId={true}
+          importFn={function(stand: standard, mini: boolean){
+            handleSetCurrentTune("dbId", stand.id)
+            props.navigation.goBack();
+          }}/>
+          </SafeAreaView>
+        }
+      </Stack.Screen>
+      <Stack.Screen name="Compare">
+        {props =>
+          //Logically, this screen will never appear if there is no standard, so we can guarantee that getStandardById will return a standard.
+          <Compare
+            currentItem={state["currentDraft"]}
+            onlineVersion={(state["currentDraft"].dbId ? OnlineDB.getStandardById(state["currentDraft"].dbId) : null) as standard}
+            handleSetCurrentItem={handleSetCurrentTune}
+            isComposer={false}
+          />
+        }
+      </Stack.Screen>
+      <Stack.Screen name='ComposerSelector'>
+        {props =>
+        <SafeAreaView style={{flex: 1}}>
+        <ComposerListDisplay
+          originalTuneComposers={state["currentDraft"]["composers"] ? state["currentDraft"]["composers"] : []}
+          handleSetCurrentTune={handleSetCurrentTune}
+        />
+          </SafeAreaView>
+        }
+      </Stack.Screen>
+      <Stack.Screen name='SimilarItemPrompt' component={SimilarItemPrompt}/>
+    </Stack.Navigator>
+</TuneDraftContext.Provider>
   );
 }
