@@ -1,8 +1,10 @@
+//Copyright 2025 Jonathan Hilliard
+
 import {useContext, useEffect, useState} from "react";
 import OnlineDB from "../../OnlineDB";
 import TuneDraftContext from "../../contexts/TuneDraftContext";
 import ComposerDraftContext from "../../contexts/ComposerDraftContext";
-import {ButtonText, DeleteButton, SafeBgView, SubText, Text} from "../../Style";
+import {ButtonText, DeleteButton, RowView, SafeBgView, SMarginView, SubBoldText, SubText, Text} from "../../Style";
 import {Button} from "../../simple_components/Button";
 import {useNavigation} from "@react-navigation/native";
 import Fuse from "fuse.js";
@@ -51,15 +53,43 @@ const composerFuseOptions = { // For finetuning the search algorithm
 
 function StandardRender({stand}: {stand: standard}){
   const [expanded, setExpanded] = useState(false);
+  const TDContext = useContext(TuneDraftContext);
+  const navigation = useNavigation();
   return(
+    <SMarginView>
     <Pressable style={{padding: 8}} onPress={() => {setExpanded(!expanded)}}>
-      <Text>{stand.title}</Text>
-      <SubText>{stand.Composers?.map(c => c.name).join(", ")}</SubText>
-      {
-        expanded &&
-          <Button text="This is the one!" onPress={() => {}}/>
-      }
+    <Text>{stand.title}</Text>
+    <SubText>{stand.Composers?.map(c => c.name).join(", ")}</SubText>
+    {
+      expanded &&
+        <SMarginView>
+          <RowView>
+            <SubBoldText>Alternative title: </SubBoldText>
+            <SubText>{stand.alternative_title}</SubText>
+          </RowView>
+          <RowView>
+            <SubBoldText>Year:</SubBoldText>
+            <SubText>{stand.year}</SubText>
+          </RowView>
+          <RowView>
+            <SubBoldText>Form: </SubBoldText>
+            <SubText>{stand.form}</SubText>
+          </RowView>
+          <RowView>
+            <SubBoldText>Bio: </SubBoldText>
+            <SubText>{stand.bio}</SubText>
+          </RowView>
+          <Button text="This is the one!" onPress={() => {
+            TDContext.updateTd("dbId", stand.id, true);
+            if(navigation.canGoBack()){
+              navigation.goBack();
+              navigation.navigate("ConfirmConnectionPrompt");
+            }
+          }}/>
+        </SMarginView>
+    }
     </Pressable>
+    </SMarginView>
   )
 }
 
@@ -89,6 +119,7 @@ export default function SimilarItemPrompt({
   //If the composerDraftContext isn't empty.
   const isComposer = Object.keys(CDContext).length > 0;
   const activeDraft = isComposer ? CDContext.cd : TDContext.td;
+  const typeStr = isComposer ? "composer" : "tune";
   if(!activeDraft){
     //Simple error message. Hopefully never reached.
     return(
@@ -99,11 +130,11 @@ export default function SimilarItemPrompt({
   let fuse = isComposer ? new Fuse<standard_composer>(composers, composerFuseOptions) : new Fuse<standard>(standards, tuneFuseOptions);
   let results;
 
-  if(activeDraft.dbId){
+  if(activeDraft.dbId && activeDraft.dbId !== 0){
     return(
       <SafeBgView>
         <Text>Oops!</Text>
-        <SubText>This {isComposer ? "composer" : "tune" } seems to be connected. You shouldn't be on this menu, please email code@jhilla.org if you are able to consistently reach this message even after pressing "Back."</SubText>
+        <SubText>This {typeStr} seems to be connected. You shouldn't be on this menu, please email code@jhilla.org if you are able to consistently reach this message even after pressing "Back."</SubText>
         <DeleteButton onPress={()=>{navigation.goBack();}}><ButtonText>Back</ButtonText></DeleteButton>
       </SafeBgView>
     );
@@ -117,7 +148,7 @@ export default function SimilarItemPrompt({
   results = results.slice(0,3);
   return(
     <SafeBgView>
-      <Text style={{textAlign: "center"}}>Are any of these your {isComposer ? "composer?" : "tune?"}</Text>
+      <Text style={{textAlign: "center"}}>Are any of these your {typeStr}?</Text>
     <FlatList data={results} renderItem={({item}) => {
       if(isComposer){
         //Not sure why the typing system complains about item.item always being a standard.
@@ -126,7 +157,16 @@ export default function SimilarItemPrompt({
       }else{
         return( <StandardRender stand={item.item} /> );
       }
-    }}/>
+    }}
+      ListFooterComponent={() => {
+        return(
+          <View>
+            <DeleteButton><ButtonText>None are right</ButtonText></DeleteButton>
+            <DeleteButton onPress={() => {navigation.goBack()}}><ButtonText>Cancel {typeStr} connection</ButtonText></DeleteButton>
+          </View>
+        )
+      }}
+    />
     </SafeBgView>
   )
 }

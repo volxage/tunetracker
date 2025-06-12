@@ -151,7 +151,7 @@ function Preview({
           Press and hold to disconnect this Composer from the online version above
         </SubText>
         <DeleteButton onLongPress={() => {
-            handleSetCurrentItem("dbId", undefined);
+            handleSetCurrentItem("dbId", undefined, true);
         }}><ButtonText>Detach</ButtonText></DeleteButton>
         <Button onPress={() => {navigation.navigate("ComposerCompare")}}
           text='Compare and Change'
