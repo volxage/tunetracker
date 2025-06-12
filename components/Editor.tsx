@@ -37,6 +37,7 @@ import Slider from '@react-native-community/slider';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import {useTheme} from 'styled-components';
 import SimilarItemPrompt from './connection-management/SimilarItemPrompt.tsx';
+import ConfirmConectionPrompt from './connection-management/ConfirmConnectionPrompt.tsx';
 
 
 //Wish there was a better way of doing this
@@ -305,6 +306,7 @@ export default function Editor({
         }
       </Stack.Screen>
       <Stack.Screen name='SimilarItemPrompt' component={SimilarItemPrompt}/>
+      <Stack.Screen name='ConfirmConnectionPrompt' component={ConfirmConectionPrompt}/>
     </Stack.Navigator>
 </TuneDraftContext.Provider>
   );
