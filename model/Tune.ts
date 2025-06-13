@@ -8,6 +8,7 @@ export default class Tune extends Realm.Object<Tune, 'title'> {
   id!: Realm.BSON.ObjectId;
   title!: string;
   alternativeTitle?: string;
+  bio?: string;
   composers?: Realm.List<Composer>;
   form?: string;
   year?: number;
@@ -57,6 +58,7 @@ export default class Tune extends Realm.Object<Tune, 'title'> {
       id: {type: 'objectId', default: new Realm.BSON.ObjectId()},
       title: {type: 'string', indexed: true},
       alternativeTitle: "string?",
+      bio: "string?",
       form: "string?",
       year: "int?",
       hasLyrics: "bool?",
