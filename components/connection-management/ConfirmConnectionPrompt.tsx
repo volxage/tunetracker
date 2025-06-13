@@ -6,6 +6,7 @@ import {useContext} from "react";
 import TuneDraftContext from "../../contexts/TuneDraftContext";
 import ComposerDraftContext from "../../contexts/ComposerDraftContext";
 import OnlineDB from "../../OnlineDB";
+import dateDisplay from "../../textconverters/dateDisplay";
 
 //TODO: Only display what is different! Like a function-less Compare and change
 export default function ConfirmConectionPrompt({
@@ -16,13 +17,72 @@ export default function ConfirmConectionPrompt({
   const CDContext = useContext(ComposerDraftContext);
   const isComposer = Object.keys(CDContext).length > 0;
   if(isComposer){
-
+    if(!CDContext.cd.dbId){
+      return(
+        <BgView>
+          <Text>Oops!</Text>
+          <SubText>This composer doesn't seem to be connected. You shouldn't be on this menu, please email code@jhilla.org if you are able to consistently reach this message even after pressing "Back."</SubText>
+          <DeleteButton onPress={()=>{navigation.goBack();}}><ButtonText>Back</ButtonText></DeleteButton>
+        </BgView>
+      )
+    }
+    const comp = OnlineDB.getComposerById(CDContext.cd.dbId as number);
+    if(!comp){
+      return(
+        <BgView>
+          <Text>Oops!</Text>
+          <SubText>We can't reach the composer you just selected. You shouldn't be on this menu, please email code@jhilla.org if you are able to consistently reach this message even after pressing "Back."</SubText>
+          <DeleteButton onPress={()=>{navigation.goBack();}}><ButtonText>Back</ButtonText></DeleteButton>
+        </BgView>
+      )
+    }
+    return(
+      <SafeBgView>
+        <SMarginView>
+          <Text>How do you want to connect?</Text>
+        </SMarginView>
+        <Title>{comp.name}</Title>
+        <RowView>
+          <SubBoldText>Birth-Death:</SubBoldText>
+          <SubText>{dateDisplay(comp.birth)}-{dateDisplay(comp.death)}</SubText>
+        </RowView>
+        <RowView>
+          <SubBoldText>Bio: </SubBoldText>
+          <SubText>{comp.bio}</SubText>
+        </RowView>
+        <RowView>
+          <DeleteButton style={{flex:1}} onPress={() => {
+            CDContext.updateCd("dbId", 0, true);
+            navigation.goBack();
+          }}>
+            <ButtonText>Cancel connection</ButtonText>
+          </DeleteButton>
+          <DeleteButton style={{flex:1}} onPress={() => {
+            CDContext.updateCd("dbId", 0, true);
+            navigation.goBack();
+            navigation.navigate("SimilarItemPrompt");
+          }}>
+            <ButtonText>Wrong composer</ButtonText>
+          </DeleteButton>
+        </RowView>
+        <Button text="Connect, ignore changes above" onPress={() => {
+          navigation.goBack();
+        }}
+        />
+        <Button text="Fix issues above" onPress={() => {
+          //Send to improved Compare and Change}/>
+          //
+        }}
+        />
+        <Button text="Accept all changes" onPress={() => {}}/>
+      </SafeBgView>
+    );
   }else{
     if(!TDContext.td.dbId){
       return(
         <BgView>
           <Text>Oops!</Text>
-          <SubText>This tune seems to be connected. You shouldn't be on this menu, please email code@jhilla.org if you are able to consistently reach this message even after pressing "Back."</SubText>
+          <SubText>This tune doesn't seem to be connected. You shouldn't be on this menu, please email code@jhilla.org if you are able to consistently reach this message even after pressing "Back."</SubText>
           <DeleteButton onPress={()=>{navigation.goBack();}}><ButtonText>Back</ButtonText></DeleteButton>
         </BgView>
       )
