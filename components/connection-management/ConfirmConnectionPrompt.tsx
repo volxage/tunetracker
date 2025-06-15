@@ -7,6 +7,10 @@ import TuneDraftContext from "../../contexts/TuneDraftContext";
 import ComposerDraftContext from "../../contexts/ComposerDraftContext";
 import OnlineDB from "../../OnlineDB";
 import dateDisplay from "../../textconverters/dateDisplay";
+import {standard, standardDefaults} from "../../types";
+import {translateAttrFromStandardTune} from "../../DraftReducers/utils/translate";
+import {useQuery, useRealm} from "@realm/react";
+import Composer from "../../model/Composer";
 
 //TODO: Only display what is different! Like a function-less Compare and change
 export default function ConfirmConectionPrompt({
@@ -16,6 +20,8 @@ export default function ConfirmConectionPrompt({
   const TDContext = useContext(TuneDraftContext);
   const CDContext = useContext(ComposerDraftContext);
   const isComposer = Object.keys(CDContext).length > 0;
+  const compQuery = useQuery(Composer);
+  const realm = useRealm();
   if(isComposer){
     if(!CDContext.cd.dbId){
       return(
@@ -122,6 +128,8 @@ export default function ConfirmConectionPrompt({
         <RowView>
           <DeleteButton style={{flex:1}} onPress={() => {
             TDContext.updateTd("dbId", 0, true);
+
+
             navigation.goBack();
           }}>
             <ButtonText>Cancel connection</ButtonText>
@@ -140,11 +148,25 @@ export default function ConfirmConectionPrompt({
         />
         <Button text="Fix issues above" onPress={() => {
           //Send to improved Compare and Change}/>
-          //
+          navigation.navigate("Compare");
         }}
         />
-        <Button text="Accept all changes" onPress={() => {}}/>
+          <Button text="Accept all changes"
+            onPress={() => {
+              //Accept all entries that don't include id or composer_placeholder.
+              const excludeList = ["id", "composer_placeholder"];
+              const modifiedStdDefaults = new Map(Array.from(standardDefaults.entries()).filter((ent) => !excludeList.includes(ent[0])));
+              for(const a in stand){
+                const attr = a as keyof standard;
+                if(modifiedStdDefaults.has(attr)){
+                  const newEntry = translateAttrFromStandardTune(attr, stand[attr], compQuery, realm)[0];
+                  TDContext.updateTd(newEntry[0], newEntry[1]);
+                }
+              }
+              navigation.goBack();
+            }}
+          />
       </SafeBgView>
     )
-  }
+  }^
 }
