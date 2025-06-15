@@ -168,5 +168,5 @@ export default function ConfirmConectionPrompt({
           />
       </SafeBgView>
     )
-  }^
+  }
 }

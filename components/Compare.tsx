@@ -1,4 +1,4 @@
-//Copyright 2024 Jonathan Hilliard
+//Copyright 2025 Jonathan Hilliard
 import React, {useContext, useEffect, useReducer, useState} from 'react';
 import {
   DeleteButton,
@@ -8,6 +8,7 @@ import {
   Text,
   SMarginView,
   BgView,
+  SafeBgView,
 } from '../Style.tsx'
 import { Realm, useQuery, useRealm } from '@realm/react'
 
@@ -362,7 +363,8 @@ export default function Compare({
   const comparedDbChangesDebugString = debugDisplayOnline(comparedDbChanges, isComposer);
   const attrs = (isComposer ? composerEditorAttrs : compareTuneEditorAttrs)
     .filter(item => (!exclude_set.has(item[0]) && !item[0].endsWith("Confidence")))
-    //.filter so that attrs not present in both versions are ignored.
+  const presentAttrs = attrs.filter(item => (item[0] in onlineVersion));
+    //.filter so that attrs not present in online version is ignored
   const onlineDbState = useContext(OnlineDB.DbStateContext);
   const onlineDbDispatch = useContext(OnlineDB.DbDispatchContext);
   const realm = useRealm();
@@ -422,70 +424,52 @@ export default function Compare({
   }
 
   return(
-    <BgView>
-      <FlatList
-        data={attrs}
-        ListHeaderComponent={(props) => (
-          <InformationExpand Content={() =>
-            <View>
-              <SubText>Here, you can assess the differences between the online version of the tune (on the left in each category) and your local version (on the right of each category) and choose which one you think to be more accurate. If you think neither are accurate, return to the Editor (via Cancel changes) to fix your version and then come back to upload your changes! Categories where both your local tune and the online tune are empty won't show up here.</SubText>
-              <SubText>When you're finished, you can save what you changed on the right side to your phone, and you can upload (or update a previous upload) for what's on the left side to tunetracker.jhilla.org for others to use!</SubText>
-            </View>
-            }/>
-          )}
-          renderItem={({item, index, separators}) => (
-            <CompareField item={item}
-              index={index}
-              currentItem={currentItem}
-              onlineVersion={onlineVersion}
-              localDispatch={localDispatch}
-              dbDispatch={dbDispatch}
-            />
-          )}
-          ListFooterComponent={(props) => (
-            <>
-              {
-                debugMode &&
-                <View>
-                  <Text>Tune changes:</Text>
-                  <SubText>{comparedLocalChangesDebugString}</SubText>
-                  <Text>Online changes:</Text>
-                  <SubText>{comparedDbChangesDebugString}</SubText>
-                </View>
-              }
-              <ResponseBox
-                result={uploadResult}
-                isError={uploadErrorPresent}
-              />
-              <Button style={{backgroundColor: (uploadResult === "") ? "cadetblue" : "grey"}}
-                onPress={() => {
-                  //TODO: Add type for tunetracker server responses/errors
-                  //Abstract error handling to a service?
-                  if(uploadResult === ""){
-                    submit();
-                  }
-                }}
-                text='Upload/Update left side'
-              />
-              <View style={{flexDirection: "row"}}>
-                <Button style={{flex: 1}}
-                  onPress={() => {
-                    navigation.goBack();
-                    for(let attr of localState.changedAttrsList){
-                      handleSetCurrentItem(attr, comparedLocalChanges[attr as keyof (Tune | tune_draft)]);
-                    }
-                  }}
-                  text='Save right side'
-                />
-                <DeleteButton style={{flex: 1}}
-                  onPress={() => {navigation.goBack()}}
-                >
-                  <ButtonText>Cancel changes</ButtonText>
-                </DeleteButton>
-              </View>
-            </>
-        )}
+    <SafeBgView>
+      <InformationExpand Content={() =>
+      <View>
+        <SubText>Here, you can assess the differences between the online version of the tune (on the left in each category) and your local version (on the right of each category) and choose which one you think to be more accurate. If you think neither are accurate, return to the Editor (via Cancel changes) to fix your version and then come back to upload your changes! Categories where both your local tune and the online tune are empty won't show up here.</SubText>
+        <SubText>When you're finished, you can save what you changed on the right side to your phone, and you can upload (or update a previous upload) for what's on the left side to tunetracker.jhilla.org for others to use!</SubText>
+      </View>
+        }/>
+      {
+        debugMode &&
+          <View>
+            <Text>Tune changes:</Text>
+            <SubText>{comparedLocalChangesDebugString}</SubText>
+            <Text>Online changes:</Text>
+            <SubText>{comparedDbChangesDebugString}</SubText>
+          </View>
+      }
+      <ResponseBox
+        result={uploadResult}
+        isError={uploadErrorPresent}
       />
-    </BgView>
+      <Button style={{backgroundColor: (uploadResult === "") ? "cadetblue" : "grey"}}
+  onPress={() => {
+    //TODO: Add type for tunetracker server responses/errors
+    //Abstract error handling to a service?
+    if(uploadResult === ""){
+      submit();
+    }
+  }}
+  text='Upload/Update left side'
+    />
+      <View style={{flexDirection: "row"}}>
+      <Button style={{flex: 1}}
+  onPress={() => {
+    navigation.goBack();
+    for(let attr of localState.changedAttrsList){
+      handleSetCurrentItem(attr, comparedLocalChanges[attr as keyof (Tune | tune_draft)]);
+    }
+  }}
+  text='Save right side'
+    />
+      <DeleteButton style={{flex: 1}}
+  onPress={() => {navigation.goBack()}}
+>
+  <ButtonText>Cancel changes</ButtonText>
+    </DeleteButton>
+    </View>
+    </SafeBgView>
   );
 }
