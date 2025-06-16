@@ -34,6 +34,7 @@ export default function ComposerField({
       <Title style={{textAlign: "center"}}>COMPOSERS</Title>
       <FlatList
         data={attr}
+        scrollEnabled={false}
         renderItem={({item, index, separators}) => (
           <View style={{padding: 8}}>
             <Text style={{textAlign: "center", fontWeight: "300"}}>{item.name}</Text>

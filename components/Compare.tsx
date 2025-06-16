@@ -10,6 +10,7 @@ import {
   BgView,
   SafeBgView,
   SubDimText,
+  RowView,
 } from '../Style.tsx'
 import { Realm, useQuery, useRealm } from '@realm/react'
 
@@ -17,6 +18,7 @@ import { composer, composerEditorAttrs, editorAttrs, standard, standard_composer
 
 import {
   FlatList,
+  ScrollView,
   View,
 } from 'react-native';
 
@@ -41,6 +43,7 @@ import ResponseHandler from '../services/ResponseHandler.ts';
 import InformationExpand from './InformationExpand.tsx';
 import {Button} from '../simple_components/Button.tsx';
 import TypeField from './TypeField.tsx';
+import {useTheme} from 'styled-components';
 const debugMode = false;
 
 //Anything that ends with "confidence" is also excluded
@@ -97,6 +100,9 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
   let standardAttrPresent = false;
   const translatedKey = translateKeyFromLocal(item[0] as local_key);
   const [choice, setChoice] = useState(1); // 0 - DB   1 - Neither   2 - Local
+  useEffect(() => {
+    setChoice(1);
+  }, [item[0]])
   if(!onlineVersion){
     console.error("No online version to compare against!")
     return(<></>);
@@ -355,12 +361,13 @@ export default function Compare({
   const comparedDbChangesDebugString = debugDisplayOnline(comparedDbChanges, isComposer);
   const attrs = (isComposer ? composerEditorAttrs : compareTuneEditorAttrs)
     .filter(item => (!exclude_set.has(item[0]) && !item[0].endsWith("Confidence")))
-  const presentAttrs = attrs.filter(item => (item[0] in onlineVersion));
+  const presentAttrs = attrs;
     //.filter so that attrs not present in online version is ignored
   const onlineDbState = useContext(OnlineDB.DbStateContext);
-  const [currentAttr, setCurrentAttr] = useState(["title", "Title", ""] as [keyof tune_draft & composer, string, any])
+  const [attrI, setAttrI] = useState(0);
   const onlineDbDispatch = useContext(OnlineDB.DbDispatchContext);
   const realm = useRealm();
+  const theme = useTheme();
 
   function submit(first=true){
     if(!uploadSuccessful && !errorReceived){
@@ -418,12 +425,35 @@ export default function Compare({
 
   return(
     <SafeBgView>
+      <ScrollView>
       <InformationExpand Content={() =>
       <View>
         <SubText>Here, you can assess the differences between the online version of the tune (on the left in each category) and your local version (on the right of each category) and choose which one you think to be more accurate. If neither are accurate, pick the closest one and then edit from there to correct it. Categories where both your local tune and the online tune are empty won't show up here.</SubText>
-        <SubText>When you're finished, you can save what you changed on the right side to your phone, and you can upload (or update a previous upload) for what's on the left side to tunetracker.jhilla.org for others to use!</SubText>
       </View>
         }/>
+      <SMarginView>
+        <SubDimText style={presentAttrs[attrI][0] === "title" && {textDecorationLine: "underline"}}>Title: <SubText>{localState.currentDraft.title}</SubText></SubDimText>
+        <SubDimText style={presentAttrs[attrI][0] === "alternativeTitle" && {textDecorationLine: "underline"}}>Alternative Title: <SubText>{localState.currentDraft.alternativeTitle}</SubText></SubDimText>
+        <SubDimText style={presentAttrs[attrI][0] === "bio" && {textDecorationLine: "underline"}}>Bio: <SubText>{localState.currentDraft.bio}</SubText></SubDimText>
+        <SubDimText style={presentAttrs[attrI][0] === "form" && {textDecorationLine: "underline"}}>Form: <SubText>{localState.currentDraft.form}</SubText></SubDimText>
+        <SubDimText style={presentAttrs[attrI][0] === "composers" && {textDecorationLine: "underline"}}>Composers: <SubText>{(localState.currentDraft.composers as composer[])?.map(comp => comp.name).join(",")}</SubText></SubDimText>
+      </SMarginView>
+      <RowView>
+        <Button
+          style={{flex:1}}
+          iconName='arrow-up'
+          onPress={() => {
+            //Mod (%) doesn't really do what it should in JS for negatives, this is an efficient fix
+            setAttrI( (((attrI - 1) % presentAttrs.length) + presentAttrs.length) % presentAttrs.length );
+          }}
+        />
+          <Button style={{flex:1}}
+          iconName='arrow-down'
+          onPress={() => {
+            setAttrI((attrI + 1) % presentAttrs.length);
+          }}
+    />
+      </RowView>
       {
         debugMode &&
           <View>
@@ -437,18 +467,8 @@ export default function Compare({
         result={uploadResult}
         isError={uploadErrorPresent}
       />
-      <CompareField item={["title", "Title"]} index={1} onlineVersion={onlineVersion} currentItem={currentItem} localDispatch={localDispatch} dbDispatch={dbDispatch}/>
-      <TypeField attr={localState.currentDraft[currentAttr[0]]} attrKey={currentAttr[0]} attrName={currentAttr[1]} handleSetCurrentItem={handleSetCurrentItem} isComposer={isComposer}/>
-      <Button style={{backgroundColor: (uploadResult === "") ? "cadetblue" : "grey"}}
-  onPress={() => {
-    //TODO: Add type for tunetracker server responses/errors
-    //Abstract error handling to a service?
-    if(uploadResult === ""){
-      submit();
-    }
-  }}
-  text='Upload/Update left side'
-    />
+      <TypeField attr={localState.currentDraft[presentAttrs[attrI][0]]} attrKey={presentAttrs[attrI][0]} attrName={presentAttrs[attrI][1]} handleSetCurrentItem={handleSetCurrentItem} isComposer={isComposer}/>
+      <CompareField item={presentAttrs[attrI]} index={1} onlineVersion={onlineVersion} currentItem={currentItem} localDispatch={localDispatch} dbDispatch={dbDispatch}/>
       <View style={{flexDirection: "row"}}>
       <Button style={{flex: 1}}
   onPress={() => {
@@ -457,7 +477,7 @@ export default function Compare({
       handleSetCurrentItem(attr, comparedLocalChanges[attr as keyof (Tune | tune_draft)]);
     }
   }}
-  text='Save right side'
+  text='Done'
     />
       <DeleteButton style={{flex: 1}}
   onPress={() => {navigation.goBack()}}
@@ -465,6 +485,7 @@ export default function Compare({
   <ButtonText>Cancel changes</ButtonText>
     </DeleteButton>
     </View>
+    </ScrollView>
     </SafeBgView>
   );
 }
