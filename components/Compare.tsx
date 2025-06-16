@@ -9,6 +9,7 @@ import {
   SMarginView,
   BgView,
   SafeBgView,
+  SubDimText,
 } from '../Style.tsx'
 import { Realm, useQuery, useRealm } from '@realm/react'
 
@@ -39,6 +40,7 @@ import ResponseBox from './ResponseBox.tsx';
 import ResponseHandler from '../services/ResponseHandler.ts';
 import InformationExpand from './InformationExpand.tsx';
 import {Button} from '../simple_components/Button.tsx';
+import TypeField from './TypeField.tsx';
 const debugMode = false;
 
 //Anything that ends with "confidence" is also excluded
@@ -137,6 +139,7 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
             (standardAttrPresent) ?
             <SMarginView style={{flex: 1}}>
               <View>
+                <SubDimText>Online Version</SubDimText>
                 <SubText
                   style={{
                     textDecorationLine: choice === 2 ? "line-through" : "none",
@@ -147,17 +150,20 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
                 </SubText>
               {
                 choice === 2 &&
+                  <View>
                 <SubText
                   style={{
                     color: "#CFC"
                   }}>
                     {local_display} <Icon size={20} name='arrow-left'/>
                   </SubText>
+                </View>
               }
             </View>
           </SMarginView>
           :
           <SMarginView style={{flex: 1}}>
+                <SubDimText>Online Version</SubDimText>
                 <SubText
                   style={{
                     textDecorationLine: choice === 2 ? "line-through" : "none",
@@ -168,12 +174,15 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
                 </SubText>
               {
                 choice === 2 &&
-                <SubText
-                  style={{
-                    color: "#CFC"
-                  }}>
-                    {local_display} <Icon size={20} name='arrow-left'/>
-                  </SubText>
+                  <View>
+                    <SubDimText>Online Version</SubDimText>
+                    <SubText
+                      style={{
+                        color: "#CFC"
+                      }}>
+                {local_display} <Icon size={20} name='arrow-left'/>
+                </SubText>
+                </View>
               }
           </SMarginView>
         }
@@ -181,6 +190,7 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
         (tuneAttrPresent) ?
         <SMarginView style={{flex: 1}}>
           <View>
+            <SubDimText>Your Version</SubDimText>
             <SubText
               style={{
                 textDecorationLine: choice === 0 ? "line-through" : "none",
@@ -201,6 +211,7 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
         </SMarginView>
         :
         <SMarginView style={{flex: 1}}>
+        <SubDimText>Your Version</SubDimText>
           <SubText
             style={{
               textDecorationLine: choice === 0 ? "line-through" : "none",
@@ -231,12 +242,6 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
               }}
               onPress={() => {
                 setChoice(0);
-                dbDispatch({
-                  type: 'update_attr',
-                  //attr: item[0],
-                  attr: translatedKey,
-                  value: onlineVersion[translatedKey]
-                });
                 localDispatch({
                   //"Update from other" translates the attr from the online standard
                   type: 'update_from_other',
@@ -245,7 +250,6 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
                   composerQuery: compQuery,
                   realm: realm
                 });
-                // (From Editor.tsx) dispatch({type: 'update_attr', attr: attr_key, value: value});
               }}
               iconName='database'
             />
@@ -266,12 +270,6 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
             }}
             onPress={() => {
               setChoice(1);
-              dbDispatch({
-                type: 'update_attr',
-                //attr: item[0],
-                attr: translatedKey,
-                value: online_item
-              });
               localDispatch({
                 type: 'update_attr',
                 attr: item[0],
@@ -288,12 +286,6 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
             }}
             onPress={() => {
               setChoice(2);
-              dbDispatch({
-                //"Update from other" translates the attr to the online standard
-                type: 'update_from_other',
-                attr: item[0],
-                value: local_item
-              });
               localDispatch({
                 type: 'update_attr',
                 attr: item[0],
@@ -366,6 +358,7 @@ export default function Compare({
   const presentAttrs = attrs.filter(item => (item[0] in onlineVersion));
     //.filter so that attrs not present in online version is ignored
   const onlineDbState = useContext(OnlineDB.DbStateContext);
+  const [currentAttr, setCurrentAttr] = useState(["title", "Title", ""] as [keyof tune_draft & composer, string, any])
   const onlineDbDispatch = useContext(OnlineDB.DbDispatchContext);
   const realm = useRealm();
 
@@ -427,7 +420,7 @@ export default function Compare({
     <SafeBgView>
       <InformationExpand Content={() =>
       <View>
-        <SubText>Here, you can assess the differences between the online version of the tune (on the left in each category) and your local version (on the right of each category) and choose which one you think to be more accurate. If you think neither are accurate, return to the Editor (via Cancel changes) to fix your version and then come back to upload your changes! Categories where both your local tune and the online tune are empty won't show up here.</SubText>
+        <SubText>Here, you can assess the differences between the online version of the tune (on the left in each category) and your local version (on the right of each category) and choose which one you think to be more accurate. If neither are accurate, pick the closest one and then edit from there to correct it. Categories where both your local tune and the online tune are empty won't show up here.</SubText>
         <SubText>When you're finished, you can save what you changed on the right side to your phone, and you can upload (or update a previous upload) for what's on the left side to tunetracker.jhilla.org for others to use!</SubText>
       </View>
         }/>
@@ -444,6 +437,8 @@ export default function Compare({
         result={uploadResult}
         isError={uploadErrorPresent}
       />
+      <CompareField item={["title", "Title"]} index={1} onlineVersion={onlineVersion} currentItem={currentItem} localDispatch={localDispatch} dbDispatch={dbDispatch}/>
+      <TypeField attr={localState.currentDraft[currentAttr[0]]} attrKey={currentAttr[0]} attrName={currentAttr[1]} handleSetCurrentItem={handleSetCurrentItem} isComposer={isComposer}/>
       <Button style={{backgroundColor: (uploadResult === "") ? "cadetblue" : "grey"}}
   onPress={() => {
     //TODO: Add type for tunetracker server responses/errors
