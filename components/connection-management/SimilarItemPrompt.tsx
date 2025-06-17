@@ -161,7 +161,9 @@ export default function SimilarItemPrompt({
       ListFooterComponent={() => {
         return(
           <View>
-            <DeleteButton><ButtonText>None are right</ButtonText></DeleteButton>
+              <DeleteButton onPress={() => {navigation.goBack();navigation.navigate("UploadRequest");}}>
+                <ButtonText>None are right</ButtonText>
+              </DeleteButton>
             <DeleteButton onPress={() => {navigation.goBack()}}><ButtonText>Cancel {typeStr} connection</ButtonText></DeleteButton>
           </View>
         )
