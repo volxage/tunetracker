@@ -67,7 +67,9 @@ function AttrBasicRender({attr, attr_key, pretty_attr_key}:{attr: any, attr_key:
         <View style={{borderColor: "#222", borderWidth: 1}}>
           <Title style={{alignSelf: "center"}}>Composers</Title>
           <SubText style={{alignSelf: "center"}}>{(attr as Composer[]).map(cmp => cmp.name).join(", ")}</SubText>
-          <SubText style={{alignSelf: "center", color: "#777", margin: 16}}>Your version and the server's version are the same for this item's {pretty_attr_key}</SubText>
+          <SubText style={{alignSelf: "center", color: "#777", margin: 16}}>
+            Your version and the server's version are the same for this item's {pretty_attr_key}
+          </SubText>
         </View>
       );
     }
@@ -76,7 +78,9 @@ function AttrBasicRender({attr, attr_key, pretty_attr_key}:{attr: any, attr_key:
         <View style={{borderColor: "#222", borderWidth: 1}}>
           <Title style={{alignSelf: "center"}}>{pretty_attr_key}</Title>
           <SubText style={{alignSelf: "center"}}>{displayLocalAttr(attr_key, attr)}</SubText>
-          <SubText style={{alignSelf: "center", color: "#777", margin: 16}}>Your version and the server's version are the same for this item's {pretty_attr_key}</SubText>
+          <SubText style={{alignSelf: "center", color: "#777", margin: 16}}>
+            Your version and the server's version are the same for this item's {pretty_attr_key}
+          </SubText>
         </View>
       )
     }
@@ -119,7 +123,11 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
   }
   if(comparedAttrEqual(item[0] as keyof tune_draft, currentItem[item[0] as keyof local_type], onlineVersion)){
     return(
-      <AttrBasicRender attr={currentItem[item[0] as keyof local_type]} attr_key={item[0] as local_key} pretty_attr_key={item[1]}/>
+      <AttrBasicRender
+        attr={currentItem[item[0] as keyof local_type]}
+        attr_key={item[0] as local_key}
+        pretty_attr_key={item[1]}
+      />
     );
   }
   let local_item = currentItem[item[0] as keyof local_type];
@@ -135,40 +143,37 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
         </View>
       );
     }
-  }
-  return(
+  } return(
     <View style={{borderWidth: 1, borderColor: "#222222", marginVertical: 12}}>
       <Title style={{alignSelf: "center"}}>{item[1]}</Title>
       <View>
         <View style={{flexDirection: "row"}}>
-          {
-            (standardAttrPresent) ?
+          {(standardAttrPresent) ?
             <SMarginView style={{flex: 1}}>
               <View>
                 <SubDimText>Online Version</SubDimText>
                 <SubText
                   style={{
                     textDecorationLine: choice === 2 ? "line-through" : "none",
-                      color: choice === 2 ? "#777" : "white"
+                    color: choice === 2 ? "#777" : "white"
                   }}
                 >
                   {online_display}
                 </SubText>
-              {
-                choice === 2 &&
-                  <View>
-                <SubText
-                  style={{
-                    color: "#CFC"
-                  }}>
-                    {local_display} <Icon size={20} name='arrow-left'/>
-                  </SubText>
-                </View>
-              }
-            </View>
-          </SMarginView>
-          :
-          <SMarginView style={{flex: 1}}>
+                {
+                  choice === 2 &&
+                    <View>
+                      <SubText
+                        style={{
+                          color: "#CFC"
+                        }}>
+                        {local_display} <Icon size={20} name='arrow-left'/>
+                      </SubText>
+                    </View>
+                }
+              </View>
+            </SMarginView>
+          : <SMarginView style={{flex: 1}}>
                 <SubDimText>Online Version</SubDimText>
                 <SubText
                   style={{
@@ -426,66 +431,78 @@ export default function Compare({
   return(
     <SafeBgView>
       <ScrollView>
-      <InformationExpand Content={() =>
-      <View>
-        <SubText>Here, you can assess the differences between the online version of the tune (on the left in each category) and your local version (on the right of each category) and choose which one you think to be more accurate. If neither are accurate, pick the closest one and then edit from there to correct it. Categories where both your local tune and the online tune are empty won't show up here.</SubText>
-      </View>
-        }/>
-      <SMarginView>
-        <SubDimText style={presentAttrs[attrI][0] === "title" && {textDecorationLine: "underline"}}>Title: <SubText>{localState.currentDraft.title}</SubText></SubDimText>
-        <SubDimText style={presentAttrs[attrI][0] === "alternativeTitle" && {textDecorationLine: "underline"}}>Alternative Title: <SubText>{localState.currentDraft.alternativeTitle}</SubText></SubDimText>
-        <SubDimText style={presentAttrs[attrI][0] === "bio" && {textDecorationLine: "underline"}}>Bio: <SubText>{localState.currentDraft.bio}</SubText></SubDimText>
-        <SubDimText style={presentAttrs[attrI][0] === "form" && {textDecorationLine: "underline"}}>Form: <SubText>{localState.currentDraft.form}</SubText></SubDimText>
-        <SubDimText style={presentAttrs[attrI][0] === "composers" && {textDecorationLine: "underline"}}>Composers: <SubText>{(localState.currentDraft.composers as composer[])?.map(comp => comp.name).join(",")}</SubText></SubDimText>
-      </SMarginView>
-      <RowView>
-        <Button
-          style={{flex:1}}
-          iconName='arrow-up'
-          onPress={() => {
-            //Mod (%) doesn't really do what it should in JS for negatives, this is an efficient fix
-            setAttrI( (((attrI - 1) % presentAttrs.length) + presentAttrs.length) % presentAttrs.length );
-          }}
+        <InformationExpand
+          Content={() =>
+            <View>
+              <SubText>Here, you can assess the differences between the online version of the tune (on the left in each category) and your local version (on the right of each category) and choose which one you think to be more accurate. If neither are accurate, pick the closest one and then edit from there to correct it. Categories where both your local tune and the online tune are empty won't show up here.</SubText>
+            </View>
+          }
         />
+        <SMarginView>
+          <SubDimText style={presentAttrs[attrI][0] === "title" && {textDecorationLine: "underline"}}>
+            Title: <SubText>{localState.currentDraft.title}</SubText>
+          </SubDimText>
+          <SubDimText style={presentAttrs[attrI][0] === "alternativeTitle" && {textDecorationLine: "underline"}}>
+            Alternative Title: <SubText>{localState.currentDraft.alternativeTitle}</SubText>
+          </SubDimText>
+          <SubDimText style={presentAttrs[attrI][0] === "bio" && {textDecorationLine: "underline"}}>
+            Bio: <SubText>{localState.currentDraft.bio}</SubText>
+          </SubDimText>
+          <SubDimText style={presentAttrs[attrI][0] === "form" && {textDecorationLine: "underline"}}>
+            Form: <SubText>{localState.currentDraft.form}</SubText>
+          </SubDimText>
+          <SubDimText style={presentAttrs[attrI][0] === "composers" && {textDecorationLine: "underline"}}>
+            Composers: <SubText>{(localState.currentDraft.composers as composer[])?.map(comp => comp.name).join(",")}</SubText>
+          </SubDimText>
+        </SMarginView>
+        <RowView>
+          <Button
+            style={{flex:1}}
+            iconName='arrow-up'
+            onPress={() => {
+              //Mod (%) doesn't really do what it should in JS for negatives, this is an efficient fix
+              setAttrI( (((attrI - 1) % presentAttrs.length) + presentAttrs.length) % presentAttrs.length );
+            }}
+          />
           <Button style={{flex:1}}
-          iconName='arrow-down'
-          onPress={() => {
-            setAttrI((attrI + 1) % presentAttrs.length);
-          }}
-    />
-      </RowView>
-      {
-        debugMode &&
-          <View>
-            <Text>Tune changes:</Text>
-            <SubText>{comparedLocalChangesDebugString}</SubText>
-            <Text>Online changes:</Text>
-            <SubText>{comparedDbChangesDebugString}</SubText>
-          </View>
-      }
-      <ResponseBox
-        result={uploadResult}
-        isError={uploadErrorPresent}
-      />
-      <TypeField attr={localState.currentDraft[presentAttrs[attrI][0]]} attrKey={presentAttrs[attrI][0]} attrName={presentAttrs[attrI][1]} handleSetCurrentItem={handleSetCurrentItem} isComposer={isComposer}/>
-      <CompareField item={presentAttrs[attrI]} index={1} onlineVersion={onlineVersion} currentItem={currentItem} localDispatch={localDispatch} dbDispatch={dbDispatch}/>
-      <View style={{flexDirection: "row"}}>
-      <Button style={{flex: 1}}
-  onPress={() => {
-    navigation.goBack();
-    for(let attr of localState.changedAttrsList){
-      handleSetCurrentItem(attr, comparedLocalChanges[attr as keyof (Tune | tune_draft)]);
-    }
-  }}
-  text='Done'
-    />
-      <DeleteButton style={{flex: 1}}
-  onPress={() => {navigation.goBack()}}
->
-  <ButtonText>Cancel changes</ButtonText>
-    </DeleteButton>
-    </View>
-    </ScrollView>
+            iconName='arrow-down'
+            onPress={() => {
+              setAttrI((attrI + 1) % presentAttrs.length);
+            }}
+          />
+        </RowView>
+        {
+          debugMode &&
+            <View>
+              <Text>Tune changes:</Text>
+              <SubText>{comparedLocalChangesDebugString}</SubText>
+              <Text>Online changes:</Text>
+              <SubText>{comparedDbChangesDebugString}</SubText>
+            </View>
+        }
+        <ResponseBox
+          result={uploadResult}
+          isError={uploadErrorPresent}
+        />
+        <TypeField attr={localState.currentDraft[presentAttrs[attrI][0]]} attrKey={presentAttrs[attrI][0]} attrName={presentAttrs[attrI][1]} handleSetCurrentItem={handleSetCurrentItem} isComposer={isComposer}/>
+        <CompareField item={presentAttrs[attrI]} index={1} onlineVersion={onlineVersion} currentItem={currentItem} localDispatch={localDispatch} dbDispatch={dbDispatch}/>
+        <View style={{flexDirection: "row"}}>
+          <Button style={{flex: 1}}
+            onPress={() => {
+              navigation.goBack();
+              for(let attr of localState.changedAttrsList){
+                handleSetCurrentItem(attr, comparedLocalChanges[attr as keyof (Tune | tune_draft)]);
+              }
+            }}
+            text='Done'
+          />
+          <DeleteButton style={{flex: 1}}
+            onPress={() => {navigation.goBack()}}
+          >
+            <ButtonText>Cancel changes</ButtonText>
+          </DeleteButton>
+        </View>
+      </ScrollView>
     </SafeBgView>
   );
 }
