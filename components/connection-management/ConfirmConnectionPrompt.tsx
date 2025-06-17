@@ -147,7 +147,7 @@ export default function ConfirmConectionPrompt({
         }}
         />
         <Button text="Fix issues above" onPress={() => {
-          //Send to improved Compare and Change}/>
+          navigation.goBack();
           navigation.navigate("Compare");
         }}
         />

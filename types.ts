@@ -115,7 +115,7 @@ export const editorAttrs: [keyof (tune_draft & tune_draft_extras), string][] = [
   ["tempi", "Tempi"],
   //["contrafacts", "Contrafacts"],
 //["playlists", "Playlists"],
-  ["playthroughs", "Playthroughs"],
+  ["bio", "Bio"],
   ["hasLyrics", "Has lyrics?"],
 //Below fields were removed because there's no reason to have these in two places.
 //["confidence", "Confidence"],
@@ -173,6 +173,7 @@ export const tuneDefaults = new Map<keyof Tune, any>([
   ["composers", []],
   ["playlists", []],
   ["form", ""],
+  ["bio", ""],
   //  ["notableRecordings", []],
   ["mainKey", ""],
   ["mainTempo", 0],

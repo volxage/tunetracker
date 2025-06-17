@@ -358,6 +358,7 @@ export default function Compare({
   //  const [comparedLocalChanges, setComparedTuneChanges] = useState(currentItem);
   const [uploadResult, setUploadResult] = useState("");
   const [uploadError, setUploadError] = useState({} as AxiosError);
+  const [finalMode, setFinalMode] = useState(false);
   const uploadSuccessful = false;
   const [uploadErrorPresent, setUploadErrorPresent] = useState(false);
   const errorReceived = uploadError && "message" in uploadError;
@@ -452,56 +453,103 @@ export default function Compare({
             Form: <SubText>{localState.currentDraft.form}</SubText>
           </SubDimText>
           <SubDimText style={presentAttrs[attrI][0] === "composers" && {textDecorationLine: "underline"}}>
-            Composers: <SubText>{(localState.currentDraft.composers as composer[])?.map(comp => comp.name).join(",")}</SubText>
+            Composers: <SubText>{(localState.currentDraft.composers as composer[])?.map(comp => comp.name).join(", ")}</SubText>
           </SubDimText>
         </SMarginView>
-        <RowView>
-          <Button
-            style={{flex:1}}
-            iconName='arrow-up'
-            onPress={() => {
-              //Mod (%) doesn't really do what it should in JS for negatives, this is an efficient fix
-              setAttrI( (((attrI - 1) % presentAttrs.length) + presentAttrs.length) % presentAttrs.length );
-            }}
-          />
-          <Button style={{flex:1}}
-            iconName='arrow-down'
-            onPress={() => {
-              setAttrI((attrI + 1) % presentAttrs.length);
-            }}
-          />
-        </RowView>
         {
-          debugMode &&
+          finalMode ?
             <View>
-              <Text>Tune changes:</Text>
-              <SubText>{comparedLocalChangesDebugString}</SubText>
-              <Text>Online changes:</Text>
-              <SubText>{comparedDbChangesDebugString}</SubText>
-            </View>
-        }
-        <ResponseBox
-          result={uploadResult}
-          isError={uploadErrorPresent}
-        />
-        <TypeField attr={localState.currentDraft[presentAttrs[attrI][0]]} attrKey={presentAttrs[attrI][0]} attrName={presentAttrs[attrI][1]} handleSetCurrentItem={handleSetCurrentItem} isComposer={isComposer}/>
-        <CompareField item={presentAttrs[attrI]} index={1} onlineVersion={onlineVersion} currentItem={currentItem} localDispatch={localDispatch} dbDispatch={dbDispatch}/>
-        <View style={{flexDirection: "row"}}>
-          <Button style={{flex: 1}}
-            onPress={() => {
-              navigation.goBack();
-              for(let attr of localState.changedAttrsList){
-                handleSetCurrentItem(attr, comparedLocalChanges[attr as keyof (Tune | tune_draft)]);
+              {
+                (uploadResult || JSON.stringify(uploadError) !== "{}") ? 
+                  <View>
+                    <ResponseBox
+                      result={uploadResult}
+                      isError={uploadErrorPresent}
+                    />
+                    <SMarginView>
+                      <SubText>Thank you for contributing to TuneTracker!</SubText>
+                    </SMarginView>
+                    <Button text="Continue" onPress={() => {navigation.goBack()}}/>
+                  </View>
+                  :
+                  <View>
+                    <SMarginView>
+                      <SubText>
+                        Would you like to submit your changes (above) to the server so others can use them?
+                      </SubText>
+                    </SMarginView>
+                    <Button style={{flex: 1}}
+                      onPress={() => {
+                        if(uploadResult === ""){
+                          submit();
+                        }
+                        for(let attr of localState.changedAttrsList){
+                          handleSetCurrentItem(attr, comparedLocalChanges[attr as keyof (Tune | tune_draft)]);
+                        }
+                      }}
+                      text='Submit to server'
+                    />
+                    <Button style={{flex: 1}}
+                      onPress={() => {
+                        navigation.goBack();
+                        for(let attr of localState.changedAttrsList){
+                          handleSetCurrentItem(attr, comparedLocalChanges[attr as keyof (Tune | tune_draft)]);
+                        }
+                      }}
+                      text='Save only for me'
+                    />
+                    <DeleteButton style={{flex: 1}}
+                      onPress={() => {setFinalMode(false)}}
+                    >
+                      <ButtonText>Oops, I'm not done</ButtonText>
+                    </DeleteButton>
+                  </View>
               }
-            }}
-            text='Done'
-          />
-          <DeleteButton style={{flex: 1}}
-            onPress={() => {navigation.goBack()}}
-          >
-            <ButtonText>Cancel changes</ButtonText>
-          </DeleteButton>
-        </View>
+            </View>
+            :
+            <View>
+              <RowView>
+                <Button
+                  style={{flex:1}}
+                  iconName='arrow-up'
+                  onPress={() => {
+                    //Mod (%) doesn't really do what it should in JS for negatives, this is an efficient fix
+                    setAttrI( (((attrI - 1) % presentAttrs.length) + presentAttrs.length) % presentAttrs.length );
+                  }}
+                />
+                <Button style={{flex:1}}
+                  iconName='arrow-down'
+                  onPress={() => {
+                    setAttrI((attrI + 1) % presentAttrs.length);
+                  }}
+                />
+              </RowView>
+              {
+                debugMode &&
+                  <View>
+                    <Text>Tune changes:</Text>
+                    <SubText>{comparedLocalChangesDebugString}</SubText>
+                    <Text>Online changes:</Text>
+                    <SubText>{comparedDbChangesDebugString}</SubText>
+                  </View>
+              }
+              <TypeField attr={localState.currentDraft[presentAttrs[attrI][0]]} attrKey={presentAttrs[attrI][0]} attrName={presentAttrs[attrI][1]} handleSetCurrentItem={handleSetCurrentItem} isComposer={isComposer}/>
+              <CompareField item={presentAttrs[attrI]} index={1} onlineVersion={onlineVersion} currentItem={currentItem} localDispatch={localDispatch} dbDispatch={dbDispatch}/>
+              <RowView>
+                <Button style={{flex: 1}}
+                  onPress={() => {
+                    setFinalMode(true);
+                  }}
+                  text='Done'
+                />
+                <DeleteButton style={{flex: 1}}
+                  onPress={() => {navigation.goBack()}}
+                >
+                  <ButtonText>Cancel changes</ButtonText>
+                </DeleteButton>
+              </RowView>
+            </View>
+      }
       </ScrollView>
     </SafeBgView>
   );
