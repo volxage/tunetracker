@@ -104,7 +104,7 @@ export default function DbDrafts({
                     Title: {draft.title + "\n"}
                     Alternative Title: {draft.alternativeTitle || "(none)" + "\n"}
                     Composers: {draft.Composers?.map(comp => comp.name).join(", ") + "\n"}
-                    Bio: {draft.bio || "(none)".concat("\n")}
+                    Bio: {(draft.bio || "(none)").concat("\n")}
                     Form: {(draft.form || "(none)").concat("\n")}
                     Year: {(String(draft.year) !== "null" ? String(draft.year) : "(none)").concat("\n")}
                   </SubText>
