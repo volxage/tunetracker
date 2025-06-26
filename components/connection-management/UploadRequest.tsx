@@ -11,7 +11,14 @@ import standardTuneDraftReducer from "../../DraftReducers/StandardTuneDraftReduc
 import ResponseHandler from '../services/ResponseHandler.ts';
 import {AxiosError} from "axios";
 import OnlineDB from "../../OnlineDB";
-import {standard_composer, standard_draft} from "../../types";
+import {compareTuneEditorAttrs, composer, composerEditorAttrs, standard_composer, standard_draft, tune_draft} from "../../types";
+
+const exclude_set = new Set([
+  "dbId",
+  "playlists",
+  "playthroughs",
+  //"composers"
+]);
 
 export default function UploadRequest({}: {}){
   //TODO: Translate tune to standard, fix submit button, hide cancel button if success
@@ -30,7 +37,30 @@ export default function UploadRequest({}: {}){
   );
   const convertedStd = dbState.currentDraft;
   const onlineDbDispatch = useContext(OnlineDB.DbDispatchContext);
+  const attrs = (isComposer ? composerEditorAttrs : compareTuneEditorAttrs)
+    .filter(item => (!exclude_set.has(item[0]) && !item[0].endsWith("Confidence")))
   useEffect(() => {
+    if(isComposer){
+      const draft = CDContext.cd;
+      for(const attr of attrs){
+        dbDispatch({
+          //"Update from other" translates the attr to the online standard
+          type: 'update_from_other',
+          attr: attr[0],
+          value: draft[attr[0] as keyof composer]
+        });
+      }
+    }else{
+      const draft = TDContext.td;
+      for(const attr of attrs){
+        dbDispatch({
+          //"Update from other" translates the attr to the online standard
+          type: 'update_from_other',
+          attr: attr[0],
+          value: draft[attr[0] as keyof tune_draft]
+        });
+      }
+    }
   })
   function submit(first=true){
     if(!uploadSuccessful && !errorReceived){
