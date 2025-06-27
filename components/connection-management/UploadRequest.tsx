@@ -1,5 +1,5 @@
 import {View} from "react-native";
-import {ButtonText, DeleteButton, SafeBgView, SMarginView, SubText, Text, Title} from "../../Style";
+import {ButtonText, DeleteButton, SafeBgView, SMarginView, SubBoldText, SubText, Text, Title} from "../../Style";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import {Button} from "../../simple_components/Button";
 import {useNavigation} from "@react-navigation/native";
@@ -8,7 +8,7 @@ import TuneDraftContext from "../../contexts/TuneDraftContext";
 import ComposerDraftContext from "../../contexts/ComposerDraftContext";
 import standardComposerDraftReducer from "../../DraftReducers/StandardComposerDraftReducer";
 import standardTuneDraftReducer from "../../DraftReducers/StandardTuneDraftReducer";
-import ResponseHandler from '../services/ResponseHandler.ts';
+import ResponseHandler from '../../services/ResponseHandler.ts';
 import {AxiosError} from "axios";
 import OnlineDB from "../../OnlineDB";
 import {compareTuneEditorAttrs, composer, composerEditorAttrs, standard_composer, standard_draft, tune_draft} from "../../types";
@@ -61,7 +61,7 @@ export default function UploadRequest({}: {}){
         });
       }
     }
-  })
+  }, [])
   function submit(first=true){
     if(!uploadSuccessful && !errorReceived){
       if(!isComposer){
