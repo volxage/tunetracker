@@ -1,7 +1,9 @@
 import {useContext} from "react";
-import {SMarginView, SubBoldText} from "../Style";
+import {SMarginView, SubBoldText, SubDimText, SubText} from "../Style";
 import TuneDraftContext from "../contexts/TuneDraftContext";
 import ComposerDraftContext from "../contexts/ComposerDraftContext";
+import {standard_draft} from "../types";
+import OnlineDB from "../OnlineDB";
 
 export default function DraftSummary({}:{}){
   const TDContext = useContext(TuneDraftContext);
@@ -10,18 +12,63 @@ export default function DraftSummary({}:{}){
   if(isComposer){
     return(
       <SMarginView>
-        <SubBoldText></SubBoldText>
       </SMarginView>
     );
   }else{
+    const td = TDContext.td;
     return(
       <SMarginView>
-        <SubBoldText></SubBoldText>
+        <SubDimText>
+          Title: <SubText>{td.title}</SubText>
+        </SubDimText>
+        <SubDimText>
+          Alternative Title: <SubText>{td.alternativeTitle}</SubText>
+        </SubDimText>
+        <SubDimText>
+          Bio: <SubText>{td.bio}</SubText>
+        </SubDimText>
+        <SubDimText>
+          Form: <SubText>{td.form}</SubText>
+        </SubDimText>
+        <SubDimText>
+          Composers: <SubText>{(td.composers as composer[])?.map(comp => comp.name).join(", ")}</SubText>
+        </SubDimText>
       </SMarginView>
     );
   }
 }
 
 export function DbDraftSummary({dbDraft}:{dbDraft: any}){
+  const TDContext = useContext(TuneDraftContext);
+  const CDContext = useContext(ComposerDraftContext);
+  const isComposer = Object.keys(CDContext).length > 0;
+  const allComposers = useContext(OnlineDB.DbStateContext).composers;
 
+  if(isComposer){
+    return(
+      <SMarginView>
+      </SMarginView>
+    );
+  }else{
+    const sd = dbDraft as standard_draft;
+    return(
+      <SMarginView>
+        <SubDimText>
+          Title: <SubText>{sd.title}</SubText>
+        </SubDimText>
+        <SubDimText>
+          Alternative Title: <SubText>{sd.alternative_title}</SubText>
+        </SubDimText>
+        <SubDimText>
+          Bio: <SubText>{sd.bio}</SubText>
+        </SubDimText>
+        <SubDimText>
+          Form: <SubText>{sd.form}</SubText>
+        </SubDimText>
+        <SubDimText>
+          Composers: <SubText>{(sd.Composers as number[])?.map(id => allComposers.find(comp => comp.id === id)?.name).join(", ")}</SubText>
+        </SubDimText>
+      </SMarginView>
+    );
+  }
 }
