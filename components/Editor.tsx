@@ -1,6 +1,6 @@
 // Copyright 2024 Jonathan Hilliard
 
-import React, {createContext, isValidElement, useContext, useEffect, useReducer, useState} from 'react';
+import React, {createContext, useContext, useEffect, useReducer, useState} from 'react';
 import {
   DeleteButton,
   ButtonText,
@@ -19,7 +19,7 @@ import {
 } from 'react-native';
 
 import TypeField from './TypeField.tsx';
-import {tune_draft, standard, tuneDefaults, tune_draft_extras, miniEditorAttrs, editorAttrs, confidenceAttrs} from '../types.ts';
+import {tune_draft, standard, miniEditorAttrs, editorAttrs, confidenceAttrs} from '../types.ts';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Importer from './Importer.tsx';
 import Compare from './Compare.tsx';
