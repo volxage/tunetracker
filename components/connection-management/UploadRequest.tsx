@@ -12,6 +12,7 @@ import ResponseHandler from '../../services/ResponseHandler.ts';
 import {AxiosError} from "axios";
 import OnlineDB from "../../OnlineDB";
 import {compareTuneEditorAttrs, composer, composerEditorAttrs, standard_composer, standard_draft, tune_draft} from "../../types";
+import DraftSummary, {DbDraftSummary} from "../../simple_components/DraftSummary.tsx";
 
 const exclude_set = new Set([
   "dbId",
@@ -119,8 +120,9 @@ export default function UploadRequest({}: {}){
       <Text style={{textAlign: "center"}}>Upload your tune?</Text>
       <SMarginView>
         <SubText>Uploading your work means that other TuneTracker users can import it easily without having to type it again like you did! You will receive credit.</SubText>
-        <SubText>It also means that future users won't encounter problems when comparing which songs a group of people know all know.</SubText>
+        <SubText>It also means that future users won't encounter problems when determining songs that a group of people all know.</SubText>
       </SMarginView>
+      <DbDraftSummary dbDraft={dbState.currentDraft}/>
       <Button text="Upload tune"/>
       <DeleteButton onPress={() => {navigation.goBack();}}>
         <ButtonText>Cancel</ButtonText>
