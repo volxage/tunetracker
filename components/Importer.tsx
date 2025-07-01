@@ -365,7 +365,7 @@ function ImporterHeader({
                         const copyToSend = {
                           title: currentTune.title,
                           alternative_title: currentTune.alternativeTitle,
-                          id: currentTune.id,
+                          //id: currentTune.id,
                           form: currentTune.form,
                           bio: currentTune.bio,
                           composers: !currentTune.composers ? undefined : currentTune.composers.map(comp => {
@@ -375,7 +375,7 @@ function ImporterHeader({
                             }
                             return comp.id;
                           })
-                        } as tune_draft;
+                                  };
                         ResponseHandler(
                           OnlineDB.createTuneDraft(copyToSend),
                           (res) => {return `Successfully submitted your draft of ${res.data.title}`},
@@ -428,6 +428,7 @@ function ImporterHeader({
               <SubText>You have very similar search results, or you haven't searched yet. We suggest searching for the Tune and connecting to it before submitting your copy; you can still suggest your changes after you connect to our version. Otherwise, tap below if you're sure you want to send your copy to our server for review.</SubText>
               <Button
                 onPress={() => {
+                  //TODO: remove, it's obsolete
                   OnlineDB.createTuneDraft(currentTune);
                   navigation.goBack();
                 }}

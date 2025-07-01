@@ -293,7 +293,7 @@ async function fetchTunes(counter=0): Promise<standard[]>{
   );
 }
 
-async function createTuneDraft(tuneDraft: tune_draft){
+async function createTuneDraft(tuneDraft: standard_draft){
   return http.post("/tunes", tuneDraft).catch(r => {throw r});
 }
 async function createComposerDraft(composerDraft: composer){

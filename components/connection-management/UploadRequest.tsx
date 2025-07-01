@@ -13,6 +13,7 @@ import {AxiosError} from "axios";
 import OnlineDB from "../../OnlineDB";
 import {compareTuneEditorAttrs, composer, composerEditorAttrs, standard_composer, standard_draft, tune_draft} from "../../types";
 import DraftSummary, {DbDraftSummary} from "../../simple_components/DraftSummary.tsx";
+import ResponseBox from "../ResponseBox.tsx";
 
 const exclude_set = new Set([
   "dbId",
@@ -77,7 +78,7 @@ export default function UploadRequest({}: {}){
           composers: toUpload.Composers
         }
         ResponseHandler(
-          OnlineDB.sendUpdateDraft(copyToSend), 
+          OnlineDB.createTuneDraft(copyToSend), 
           (response => {
             return `Successfully uploaded your version of ${response.data.title}`;
           }),
@@ -99,7 +100,7 @@ export default function UploadRequest({}: {}){
           id: toUpload.id
         }
         ResponseHandler(
-          OnlineDB.sendComposerUpdateDraft(copyToSend),
+          OnlineDB.createComposerDraft(copyToSend),
           (response => {
             return `Successfully uploaded your vesion of ${response.data.name}`;
           }),
@@ -123,10 +124,25 @@ export default function UploadRequest({}: {}){
         <SubText>It also means that future users won't encounter problems when determining songs that a group of people all know.</SubText>
       </SMarginView>
       <DbDraftSummary dbDraft={dbState.currentDraft}/>
-      <Button text="Upload tune"/>
-      <DeleteButton onPress={() => {navigation.goBack();}}>
-        <ButtonText>Cancel</ButtonText>
-      </DeleteButton>
+      <ResponseBox
+        result={uploadResult}
+        isError={uploadErrorPresent}
+      />
+      {
+        uploadResult === "" ?
+          <View>
+            <Button text="Upload tune" onPress={() => {
+              submit();
+            }}/>
+            <DeleteButton onPress={navigation.goBack}>
+              <ButtonText>Cancel</ButtonText>
+            </DeleteButton>
+          </View>
+          :
+          <View>
+            <Button text="Done" onPress={navigation.goBack}/>
+          </View>
+      }
     </SafeBgView>
   );
 }
