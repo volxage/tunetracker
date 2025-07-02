@@ -1,6 +1,6 @@
 import {createContext} from "react"
 import {tune_draft} from "../types";
-type tune_draft_context_t = {
+export type tune_draft_context_t = {
   td: tune_draft,
   setTd: (td: tune_draft) => void,
   //There's a technical difference between optional parameters and initialized ones,
