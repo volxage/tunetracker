@@ -68,7 +68,7 @@ export default function DraftNotif({
 
   const [notifications, setNotifications] = useState([] as notification_t[])
   useEffect(() => {
-    setNotifications(ParseNotifications(draftContext, isComposer, navigation));
+    setNotifications(ParseNotifications(draftContext, navigation));
   }, [])
   return(
     <View>

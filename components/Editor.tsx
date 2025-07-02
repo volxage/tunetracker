@@ -19,7 +19,7 @@ import {
 } from 'react-native';
 
 import TypeField from './TypeField.tsx';
-import {tune_draft, standard, miniEditorAttrs, editorAttrs, confidenceAttrs} from '../types.ts';
+import {tune_draft, standard, miniEditorAttrs, editorAttrs, confidenceAttrs, tune_draft_extras} from '../types.ts';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Importer from './Importer.tsx';
 import Compare from './Compare.tsx';
@@ -77,7 +77,7 @@ export default function Editor({
     }
   }, []);
 
-  function handleSetCurrentTune(attr_key: keyof tune_draft, value: any, immediate = false){
+  function handleSetCurrentTune(attr_key: keyof (tune_draft & tune_draft_extras), value: any, immediate = false){
     if(immediate){
       if(selectedTune instanceof Tune){
         realm.write(() => {
@@ -91,185 +91,182 @@ export default function Editor({
 
   return (
     <TuneDraftContext.Provider value={{td: state["currentDraft"], setTd: () => {},  updateTd: handleSetCurrentTune}}>
-    <Stack.Navigator screenOptions={{headerShown: false}}>
+      <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name={"EditorUnwrapped"} >
-        {props => 
-        <SafeBgView>
+          {props => 
+          <SafeBgView>
           <HandleSetItem.Provider value={handleSetCurrentTune}>
             <FlatList
               data={advancedSelected ? editorAttrs : basicEditorArr}
               ListHeaderComponent={
                 <SMarginView>
                   <View style={{flexDirection: "row"}}>
-                    <Button
-                      style={{flex:1}}
-                      onPress={() => {setAdvancedSelected(!advancedSelected)}}
-                      text={advancedSelected ? "Set Confidence" : "Edit Tune"}
-                    />
-                      <Button
-                        style={{flex:1}}
-                        onPress={() => {
-                          if(state.currentDraft.queued){
-                            handleSetCurrentTune("queued", false, true)
-                          }else{
-                            handleSetCurrentTune("queued", true, true)
-                          }
-                        }}
-                        text={state.currentDraft.queued ? "Unqueue" : "Queue"}
-                    />
-                </View>
-                  {
-                    !advancedSelected &&
-                      <View>
-                        <SMarginView style={{paddingVertical: 16, paddingBottom: 32}}>
-                        <Title>{state.currentDraft.title}</Title>
-                    {
-                      state.currentDraft.alternativeTitle &&
-                      <SubDimText style={{textAlign: "center"}}>AKA: <SubText>{state.currentDraft.alternativeTitle}</SubText></SubDimText>
-                    }
-                    {
-                      state.currentDraft.composers &&
-                        <SubDimText style={{textAlign: "center"}}>By <SubText>{(state.currentDraft as tune_draft).composers?.map(cmp => cmp.name).join(", ")}</SubText></SubDimText>
-                    }
-                    <View style={{flexDirection: "row"}}>
-                      <View style={{flex:1}}>
-                        <SubDimText style={{textAlign: "center"}}>Form</SubDimText>
-                        <SubText style={{textAlign: "center"}}>{state.currentDraft.form}</SubText>
-                      </View>
-                      <View style={{flex:1}}>
-                        <SubDimText style={{textAlign: "center"}}>Main Key</SubDimText>
-                        <SubText style={{textAlign: "center"}}>{state.currentDraft.mainKey}</SubText>
-                      </View>
-                    </View>
-                        </SMarginView>
-                        <View style={{flexDirection: "row"}}>
-                        <Title style={{flex: 3, textAlign: "center", textAlignVertical: "center"}}>
-                        ALL CONFIDENCE
-                        </Title>
-                          <Button
-                            style={{flex: 1, borderColor: confidenceExpanded ? theme.delete : theme.defaultButton}} 
-                      iconName={confidenceExpanded ? "arrow-up-drop-circle-outline" : "arrow-down-drop-circle-outline"}
-                      onPress={() => {
-                        setConfidenceExpanded(!confidenceExpanded);
-                      }}/>
-                        </View>
-                        <Slider
-                          minimumValue={0}
-                          maximumValue={100}
-                          step={1}
-                          value={state.currentDraft.confidence}
-                          onSlidingComplete={(value) => {handleSetCurrentTune("confidence", value)}}
-                          style={{marginVertical: 20, marginHorizontal: 16, backgroundColor: "black"}}
-                      minimumTrackTintColor='cadetblue'
-                      maximumTrackTintColor='gray'
-                      thumbTintColor={theme.text || "gray"}
-                      thumbImage={icon}
-                        />
-                        </View>
-                    }
-                    </SMarginView>
+                  <Button
+                    style={{flex:1}}
+                onPress={() => {setAdvancedSelected(!advancedSelected)}}
+                text={advancedSelected ? "Set Confidence" : "Edit Tune"}
+                />
+                  <Button
+                    style={{flex:1}}
+                onPress={() => {
+                  if(state.currentDraft.queued){
+                    handleSetCurrentTune("queued", false, true)
+                  }else{
+                    handleSetCurrentTune("queued", true, true)
                   }
-                renderItem={({item, index, separators}) => (
-                  <View>
-                    { (item[0] !== "lyricsConfidence" || state["currentDraft"]["hasLyrics"]) &&
-                    <TouchableHighlight
-                      key={item[0]}
-                      onShowUnderlay={separators.highlight}
-                      onHideUnderlay={separators.unhighlight}
-                    >
-                      <TypeField
-                        attr={state["currentDraft"][item[0]]}
-                        attrKey={item[0]}
-                        attrName={item[1]}
-                        handleSetCurrentItem={handleSetCurrentTune}
-                        isComposer={false}
-                      />
-                    </TouchableHighlight>
-                    }
-                  </View>
-                )}
-                ListFooterComponent={
-                  <View>
-                    <SubDimText style={{textAlign: "center"}}>
-                      Press and hold if you're sure
-                    </SubDimText>
+                }}
+                text={state.currentDraft.queued ? "Unqueue" : "Queue"}
+                />
+                </View>
+                {
+                  !advancedSelected &&
+                    <View>
+                      <SMarginView style={{paddingVertical: 16, paddingBottom: 32}}>
+                      <Title>{state.currentDraft.title}</Title>
                   {
-                    !newTune && 
-                      <DeleteButton
-                        onLongPress={() => {
-                          realm.write(() => {
-                            realm.delete(selectedTune);
-                          })
-                          navigation.goBack();
-                        }}>
-                        <ButtonText>DELETE TUNE (CAN'T UNDO!)</ButtonText>
-                      </DeleteButton>
+                    state.currentDraft.alternativeTitle &&
+                      <SubDimText style={{textAlign: "center"}}>AKA: <SubText>{state.currentDraft.alternativeTitle}</SubText></SubDimText>
+                  }
+                  {
+                    state.currentDraft.composers &&
+                      <SubDimText style={{textAlign: "center"}}>By <SubText>{(state.currentDraft as tune_draft).composers?.map(cmp => cmp.name).join(", ")}</SubText></SubDimText>
                   }
                   <View style={{flexDirection: "row"}}>
-                    <View style={{flex: 1}}>
-
-                  {
-                  }
-                  {
-                    // newTune ? save new tune : update existing tune
-                    !newTune &&
-                      <Button
-                        onPress={() => {
-                          console.log("Saving old tune");
-                          realm.write(() => {
-                            for(let attr of state["changedAttrsList"]){
-                              selectedTune[attr as keyof (tune_draft | Tune)] = (state["currentDraft"][attr as keyof tune_draft])
-                            }
-                          });
-                          navigation.goBack();
-                          //});
-                        }}
-                        text='Save'
-                      />
-                  }
-                  {
-                    newTune &&
-                      <Button
-                        onPress={() => {
-                          console.log("Saving new tune!!!");
-                          const ctCopy = state["currentDraft"]
-                          ctCopy.id = new BSON.ObjectId()
-                          realm.write(() => {
-                            realm.create("Tune",
-                              state["currentDraft"]
-                            )
-                          });
-                          navigation.goBack();
-                          setNewTune(false);
-                        }}
-                        text='Save'
-                      />
-                  }
-
+                    <View style={{flex:1}}>
+                    <SubDimText style={{textAlign: "center"}}>Form</SubDimText>
+                    <SubText style={{textAlign: "center"}}>{state.currentDraft.form}</SubText>
                   </View>
-                  {
-                    newTune ?
-                      <View style={{flex: 1}}>
-                      <DeleteButton
-                        onPress={() => {navigation.goBack(); setNewTune(false);}}
-                      >
-                        <ButtonText>Cancel creation</ButtonText>
-                      </DeleteButton>
-                    </View>
-                    :
-                    <View style={{flex: 1}}>
-                    <DeleteButton
-                      onPress={() => {navigation.goBack(); setNewTune(false);}}
-                    >
-                      <ButtonText>Cancel Edit</ButtonText>
-                    </DeleteButton>
-                    </View>
-                  }
+                  <View style={{flex:1}}>
+                  <SubDimText style={{textAlign: "center"}}>Main Key</SubDimText>
+                  <SubText style={{textAlign: "center"}}>{state.currentDraft.mainKey}</SubText>
                   </View>
+                  </View>
+                  </SMarginView>
+                  <View style={{flexDirection: "row"}}>
+                  <Title style={{flex: 3, textAlign: "center", textAlignVertical: "center"}}>
+                  ALL CONFIDENCE
+                  </Title>
+                    <Button
+                      style={{flex: 1, borderColor: confidenceExpanded ? theme.delete : theme.defaultButton}} 
+                  iconName={confidenceExpanded ? "arrow-up-drop-circle-outline" : "arrow-down-drop-circle-outline"}
+                  onPress={() => {
+                    setConfidenceExpanded(!confidenceExpanded);
+                  }}/>
+                  </View>
+                  <Slider
+                    minimumValue={0}
+                    maximumValue={100}
+                    step={1}
+                    value={state.currentDraft.confidence}
+                    onSlidingComplete={(value) => {handleSetCurrentTune("confidence", value)}}
+                    style={{marginVertical: 20, marginHorizontal: 16, backgroundColor: "black"}}
+                  minimumTrackTintColor='cadetblue'
+                  maximumTrackTintColor='gray'
+                  thumbTintColor={theme.text || "gray"}
+                  thumbImage={icon}
+                  />
                   </View>
                 }
+                </SMarginView>
+              }
+          renderItem={({item, index, separators}) => (
+            <View>
+              { (item[0] !== "lyricsConfidence" || state["currentDraft"]["hasLyrics"]) &&
+              <TouchableHighlight
+                key={item[0]}
+                onShowUnderlay={separators.highlight}
+                onHideUnderlay={separators.unhighlight}
+              >
+                <TypeField
+                  attr={state["currentDraft"][item[0]]}
+                  attrKey={item[0]}
+                  attrName={item[1]}
+                  handleSetCurrentItem={handleSetCurrentTune}
+                  isComposer={false}
                 />
-                </HandleSetItem.Provider>
+              </TouchableHighlight>
+              }
+            </View>
+          )}
+          ListFooterComponent={
+            <View>
+              <SubDimText style={{textAlign: "center"}}>
+            Press and hold if you're sure
+            </SubDimText>
+            {
+              !newTune && 
+                <DeleteButton
+                  onLongPress={() => {
+                    realm.write(() => {
+                      realm.delete(selectedTune);
+                    })
+                    navigation.goBack();
+                  }}>
+                  <ButtonText>DELETE TUNE (CAN'T UNDO!)</ButtonText>
+                </DeleteButton>
+            }
+            <View style={{flexDirection: "row"}}>
+              <View style={{flex: 1}}>
+            {
+              // newTune ? save new tune : update existing tune
+              !newTune &&
+                <Button
+                  onPress={() => {
+                    console.log("Saving old tune");
+                    realm.write(() => {
+                      for(let attr of state["changedAttrsList"]){
+                        selectedTune[attr as keyof (tune_draft | Tune)] = (state["currentDraft"][attr as keyof tune_draft])
+                      }
+                    });
+                    navigation.goBack();
+                    //});
+                  }}
+                  text='Save'
+                />
+            }
+            {
+              newTune &&
+                <Button
+                  onPress={() => {
+                    console.log("Saving new tune!!!");
+                    const ctCopy = state["currentDraft"]
+                    ctCopy.id = new BSON.ObjectId()
+                    realm.write(() => {
+                      realm.create("Tune",
+                        state["currentDraft"]
+                      )
+                    });
+                    navigation.goBack();
+                    setNewTune(false);
+                  }}
+                  text='Save'
+                />
+            }
+
+            </View>
+            {
+              newTune ?
+                <View style={{flex: 1}}>
+                <DeleteButton
+                  onPress={() => {navigation.goBack(); setNewTune(false);}}
+                >
+                  <ButtonText>Cancel creation</ButtonText>
+                </DeleteButton>
+              </View>
+              :
+              <View style={{flex: 1}}>
+              <DeleteButton
+                onPress={() => {navigation.goBack(); setNewTune(false);}}
+              >
+                <ButtonText>Cancel Edit</ButtonText>
+              </DeleteButton>
+              </View>
+            }
+            </View>
+            </View>
+          }
+          />
+          </HandleSetItem.Provider>
           </SafeBgView>}
     </Stack.Screen>
       <Stack.Screen name={"ImportID"}>
@@ -284,7 +281,7 @@ export default function Editor({
           }}/>
           </SafeAreaView>
         }
-      </Stack.Screen>
+    </Stack.Screen>
       <Stack.Screen name="Compare">
         {props =>
           //Logically, this screen will never appear if there is no standard, so we can guarantee that getStandardById will return a standard.
@@ -296,20 +293,20 @@ export default function Editor({
           />
         }
       </Stack.Screen>
-      <Stack.Screen name='ComposerSelector'>
-        {props =>
-        <SafeAreaView style={{flex: 1}}>
-        <ComposerListDisplay
-          originalTuneComposers={state["currentDraft"]["composers"] ? state["currentDraft"]["composers"] : []}
-          handleSetCurrentTune={handleSetCurrentTune}
-        />
-          </SafeAreaView>
-        }
-      </Stack.Screen>
+        <Stack.Screen name='ComposerSelector'>
+          {props =>
+          <SafeAreaView style={{flex: 1}}>
+          <ComposerListDisplay
+            originalTuneComposers={state["currentDraft"]["composers"] ? state["currentDraft"]["composers"] : []}
+            handleSetCurrentTune={handleSetCurrentTune}
+          />
+            </SafeAreaView>
+          }
+    </Stack.Screen>
       <Stack.Screen name='SimilarItemPrompt' component={SimilarItemPrompt}/>
       <Stack.Screen name='UploadRequest' component={UploadRequest}/>
       <Stack.Screen name='ConfirmConnectionPrompt' component={ConfirmConectionPrompt}/>
     </Stack.Navigator>
-</TuneDraftContext.Provider>
-  );
+    </TuneDraftContext.Provider>
+);
 }
