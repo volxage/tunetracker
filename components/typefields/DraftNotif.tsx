@@ -1,3 +1,5 @@
+// Copyright 2025 Jonathan Hilliard
+
 import {FlatList, TouchableHighlight, View} from "react-native";
 import {SMarginView, SubText, Text} from "../../Style";
 import {useContext, useEffect, useState} from "react";
