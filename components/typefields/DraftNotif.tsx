@@ -63,7 +63,7 @@ export default function DraftNotif({
   const td = useContext(TuneDraftContext);
   const cd = useContext(ComposerDraftContext);
   //Test if the tunedraft context is an empty object
-  const isComposer = Object.keys(td).length !== 0;
+  const isComposer = Object.keys(td).length === 0;
   const draftContext = isComposer ? cd : td;
   const navigation = useNavigation();
 
@@ -75,16 +75,22 @@ export default function DraftNotif({
     <View>
       <FlatList
         data={notifications}
-        renderItem={entry => 
-          <TouchableHighlight>
-            <Text>{entry.item.name}</Text>
-            <SubText>{entry.item.description}</SubText>
-            <FlatList data={entry.item.choices} renderItem={({item: choice}) => 
-            <View>
-              <Button text={choice.text} onPress={() => {choice.action()}}/>
-            </View>
-            }/>
-          </TouchableHighlight>
+        ListEmptyComponent={() => <View><SubText>No notifications!</SubText></View>}
+        renderItem={entry => {
+          return(
+            <TouchableHighlight key={entry.index} onPress={() => {}}>
+              <View>
+                <Text>{entry.item.name}</Text>
+                <SubText>{entry.item.description}</SubText>
+                <FlatList data={entry.item.choices} renderItem={({item: choice}) => 
+                  <View>
+                    <Button text={choice.text} onPress={() => {choice.action()}}/>
+                  </View>
+                }/>
+              </View>
+            </TouchableHighlight>
+          )
+        }
         }
       />
     </View>
