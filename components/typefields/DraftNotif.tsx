@@ -6,6 +6,7 @@ import ComposerDraftContext, {composer_draft_context_t} from "../../contexts/Com
 import {tune_draft, composer} from "../../types";
 import {useNavigation} from "@react-navigation/native";
 import {Button} from "../../simple_components/Button";
+import {NewTuneContext} from "../Editor";
 
 type notification_t = {
   name: string
@@ -62,15 +63,20 @@ export default function DraftNotif({
 }){
   const td = useContext(TuneDraftContext);
   const cd = useContext(ComposerDraftContext);
+  const isNewTune = useContext(NewTuneContext).valueOf();
   //Test if the tunedraft context is an empty object
   const isComposer = Object.keys(td).length === 0;
   const draftContext = isComposer ? cd : td;
+  const draft = isComposer ? cd.cd : td.td;
   const navigation = useNavigation();
 
   const [notifications, setNotifications] = useState([] as notification_t[])
   useEffect(() => {
     setNotifications(ParseNotifications(draftContext, navigation));
-  }, [])
+  }, [draft.dbId])
+  if(isNewTune){
+    return(<></>);
+  }
   return(
     <View>
       <FlatList
