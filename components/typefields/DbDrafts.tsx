@@ -8,7 +8,8 @@ import {useNavigation} from "@react-navigation/native";
 import ResponseBox from "../ResponseBox";
 import {Button} from "../../simple_components/Button";
 import axios from "axios";
-import {HandleSetItem} from "../Editor";
+import TuneDraftContext from "../../contexts/TuneDraftContext";
+import ComposerDraftContext from "../../contexts/ComposerDraftContext";
 
 async function tuneDraftFetch(id: number, navigation: any, onlineDbDispatch: any){
   async function attempt(first: boolean){
@@ -28,20 +29,24 @@ async function tuneDraftFetch(id: number, navigation: any, onlineDbDispatch: any
 }
 export default function DbDrafts({
   attr,
-  isComposer,
   handleSetCurrentItem
 }:{
   attr: undefined | number,
-  isComposer: boolean,
   handleSetCurrentItem: Function
 }){
   const navigation = useNavigation();
   const [isExpanded, setIsExpanded] = useState(false);
-  const [draft, setDraft] = useState({} as submitted_tune_draft);
   const [fetchResult, setFetchResult] = useState("");
   const [fetchError, setFetchError] = useState(false);
+
+  const td = useContext(TuneDraftContext);
+  const cd = useContext(ComposerDraftContext);
+  const isComposer = Object.keys(td).length === 0;
+  const itemHandler = isComposer ? cd.updateCd : td.updateTd;
+
+  const [draft, setDraft] = useState({} as submitted_tune_draft);
   const onlineDbDispatch = useContext(OnlineDB.DbDispatchContext);
-  const itemHandler = useContext(HandleSetItem);
+
   useEffect(() => {
     if(typeof attr !== "undefined" && attr !== 0){
       tuneDraftFetch(attr, navigation, onlineDbDispatch).then(res => {

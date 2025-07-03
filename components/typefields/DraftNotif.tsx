@@ -65,7 +65,7 @@ export default function DraftNotif({
 }){
   const td = useContext(TuneDraftContext);
   const cd = useContext(ComposerDraftContext);
-  const isNewTune = useContext(NewTuneContext).valueOf();
+  const isNewTune = useContext(NewTuneContext);
   //Test if the tunedraft context is an empty object
   const isComposer = Object.keys(td).length === 0;
   const draftContext = isComposer ? cd : td;

@@ -41,13 +41,11 @@ function TypeField({
   attrKey,
   attrName,
   handleSetCurrentItem,
-  isComposer
 }: {
   attr: unknown,
   attrKey: keyof (tune_draft & composer & tune_draft_extras),
   attrName: string,
   handleSetCurrentItem: Function,
-  isComposer: boolean
 }){
   const theme = useTheme();
   const [icon, setIcon] = useState();
@@ -65,7 +63,7 @@ function TypeField({
   }
   else if (attrKey === "dbDraftId" as keyOfEitherDraft){
     return(
-      <DbDrafts attr={attr} isComposer={isComposer} handleSetCurrentItem={handleSetCurrentItem}/>
+      <DbDrafts attr={attr} handleSetCurrentItem={handleSetCurrentItem}/>
     )
 
   }
