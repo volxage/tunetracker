@@ -238,7 +238,7 @@ function TypeField({
       [4,5,6,7],
       [8,9,10,11],
     ]
-    const attrStr = attr as string;
+    const attrStr = attr ? attr as string : "";
     const [key, quality] = attrStr.split(" ");
     let invalidPreviousKey = !keyMap.has(key.toLowerCase());
     const previousKeyIndex = invalidPreviousKey ? 0 : keyMap.get(key.toLowerCase());
