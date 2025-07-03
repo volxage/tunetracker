@@ -260,7 +260,7 @@ function TypeField({
     return(
       <View style={{padding: 8, marginHorizontal:32}}>
         <Title>MAIN KEY</Title>
-      { invalidPreviousKey && 
+      { invalidPreviousKey && attr !== "" &&
         <SMarginView>
           <SubText>We found your last key, but your key "{key}" doesn't seem to be a note. Please select which key you meant below, and this message will go away.</SubText>
         </SMarginView>

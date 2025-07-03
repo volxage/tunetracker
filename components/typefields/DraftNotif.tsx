@@ -1,5 +1,5 @@
 import {FlatList, TouchableHighlight, View} from "react-native";
-import {SubText, Text} from "../../Style";
+import {SMarginView, SubText, Text} from "../../Style";
 import {useContext, useEffect, useState} from "react";
 import TuneDraftContext, {tune_draft_context_t} from "../../contexts/TuneDraftContext";
 import ComposerDraftContext, {composer_draft_context_t} from "../../contexts/ComposerDraftContext";
@@ -79,15 +79,15 @@ export default function DraftNotif({
         renderItem={entry => {
           return(
             <TouchableHighlight key={entry.index} onPress={() => {}}>
-              <View>
-                <Text>{entry.item.name}</Text>
+              <SMarginView>
+                <Text style={{textAlign: "center"}}>{entry.item.name}</Text>
                 <SubText>{entry.item.description}</SubText>
                 <FlatList data={entry.item.choices} renderItem={({item: choice}) => 
                   <View>
                     <Button text={choice.text} onPress={() => {choice.action()}}/>
                   </View>
                 }/>
-              </View>
+              </SMarginView>
             </TouchableHighlight>
           )
         }
