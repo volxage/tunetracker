@@ -31,6 +31,7 @@ import DateField from './typefields/DateField.tsx';
 import DbDrafts from './typefields/DbDrafts.tsx';
 import {useTheme} from 'styled-components';
 import PlaylistField from './typefields/PlaylistField.tsx';
+import DraftNotif from './typefields/DraftNotif.tsx';
 
 
 
@@ -57,8 +58,9 @@ function TypeField({
   }, []);
   type keyOfEitherDraft = keyof (tune_draft | composer)
   if (attrKey === "dbId" as keyOfEitherDraft){
+    //<DbConnection attr={attr} isComposer={isComposer} handleSetCurrentItem={handleSetCurrentItem}/>
     return(
-      <DbConnection attr={attr} isComposer={isComposer} handleSetCurrentItem={handleSetCurrentItem}/>
+      <DraftNotif/>
     );
   }
   else if (attrKey === "dbDraftId" as keyOfEitherDraft){
