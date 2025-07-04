@@ -2,7 +2,7 @@ import {View} from "react-native";
 import {Text, BgView, ButtonText, DeleteButton, RowView, SubBoldText, SubText, SafeBgView, Title, SMarginView, SubDimText} from "../../Style";
 import {Button} from "../../simple_components/Button";
 import {useNavigation} from "@react-navigation/native";
-import {useContext} from "react";
+import {useContext, useEffect, useState} from "react";
 import TuneDraftContext from "../../contexts/TuneDraftContext";
 import ComposerDraftContext from "../../contexts/ComposerDraftContext";
 import OnlineDB from "../../OnlineDB";
@@ -11,6 +11,7 @@ import {standard, standardDefaults} from "../../types";
 import {translateAttrFromStandardTune} from "../../DraftReducers/utils/translate";
 import {useQuery, useRealm} from "@realm/react";
 import Composer from "../../model/Composer";
+import Tune from "../../model/Tune";
 
 //TODO: Only display what is different! Like a function-less Compare and change
 export default function ConfirmConectionPrompt({
@@ -20,8 +21,34 @@ export default function ConfirmConectionPrompt({
   const TDContext = useContext(TuneDraftContext);
   const CDContext = useContext(ComposerDraftContext);
   const isComposer = Object.keys(CDContext).length > 0;
+  const tuneQuery = useQuery(Tune);
   const compQuery = useQuery(Composer);
   const realm = useRealm();
+
+  const [duplicateItemFound, setDuplicateItemFound] = useState(false);
+  useEffect(() => {
+    if(isComposer){
+      const filtered = compQuery.filtered("dbId IN $0", CDContext.cd.dbId);
+      setDuplicateItemFound(filtered.length > 0);
+    }else{
+      const filtered = tuneQuery.filtered("dbId IN $0", TDContext.td.dbId);
+      setDuplicateItemFound(filtered.length > 0);
+    }
+  }, [])
+
+  if(duplicateItemFound){
+    //TODO:
+    //Return special menu with options to handle duplicate
+    //I.E. "Delete this one, take me to the other one."
+    // Are you sure? this is permanent -> Tune deleted. Want to view the other one?
+    //Or: "The other one is connected to the wrong item, let me fix it"
+    // Above would take you to the SimilarItemPrompt for the other item. This would mean that SimilarItemPrompt should show the currently editing draft to make things clearer!
+    return(
+      <View>
+        <SubText>MENU IN PROGRESS</SubText>
+      </View>
+    );
+  }
   if(isComposer){
     if(!CDContext.cd.dbId){
       return(
