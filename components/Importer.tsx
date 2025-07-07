@@ -193,8 +193,16 @@ function StandardRender({
       <TouchableHighlight
         key={comp.name}
         onPress={() => {
+          if(!selectMode){
+            setDetailsShown(!detailsShown);
+          }
         }}
         onLongPress={() => {
+          if(selectMode){
+            setSelectMode(false);
+          }else{
+            importFn(item);
+          }
         }}
         onShowUnderlay={separators.highlight}
         onHideUnderlay={separators.unhighlight}>
