@@ -14,6 +14,7 @@ import OnlineDB from "../../OnlineDB";
 import {compareTuneEditorAttrs, composer, composerEditorAttrs, standard_composer, standard_draft, tune_draft} from "../../types";
 import DraftSummary, {DbDraftSummary} from "../../simple_components/DraftSummary.tsx";
 import ResponseBox from "../ResponseBox.tsx";
+import {NewTuneContext} from "../Editor.tsx";
 
 const exclude_set = new Set([
   "dbId",
@@ -41,6 +42,7 @@ export default function UploadRequest({}: {}){
   const onlineDbDispatch = useContext(OnlineDB.DbDispatchContext);
   const attrs = (isComposer ? composerEditorAttrs : compareTuneEditorAttrs)
     .filter(item => (!exclude_set.has(item[0]) && !item[0].endsWith("Confidence")))
+  const isNewTune = useContext(NewTuneContext);
   useEffect(() => {
     if(isComposer){
       const draft = CDContext.cd;
@@ -80,7 +82,7 @@ export default function UploadRequest({}: {}){
         ResponseHandler(
           OnlineDB.createTuneDraft(copyToSend), 
           (response => {
-            return `Successfully uploaded your version of ${response.data.title}`;
+            return `Successfully ${isNewTune ? "uploaded" : "updated"} your version of ${response.data.title}`;
           }),
           submit,
           first,
@@ -102,7 +104,7 @@ export default function UploadRequest({}: {}){
         ResponseHandler(
           OnlineDB.createComposerDraft(copyToSend),
           (response => {
-            return `Successfully uploaded your vesion of ${response.data.name}`;
+            return `Successfully ${isNewTune ? "uploaded" : "updated"} your vesion of ${response.data.name}`;
           }),
           submit,
           first,
@@ -120,9 +122,13 @@ export default function UploadRequest({}: {}){
       <Title><Icon name="upload" size={28}/></Title>
       <Text style={{textAlign: "center"}}>Upload your tune?</Text>
       <SMarginView>
-        <SubText>Uploading your work means that other TuneTracker users can import it easily without having to type it again like you did! You will receive credit.</SubText>
-        <SubText>It also means that future users won't encounter problems when determining songs that a group of people all know.</SubText>
-      </SMarginView>
+        {
+          isNewTune ?
+            <View><SubText>Updating your work means that after review, other users can import your revisions and TuneTracker's information can be more accurate!</SubText><SubText>It also means that future users won't encounter problems when determining songs that a group of people all know.</SubText>
+</View>:
+            <SubText>Uploading your work means that other TuneTracker users can import it easily without having to type it again like you did! You will receive credit.</SubText>
+        }
+              </SMarginView>
       <DbDraftSummary dbDraft={dbState.currentDraft}/>
       <ResponseBox
         result={uploadResult}
@@ -131,7 +137,7 @@ export default function UploadRequest({}: {}){
       {
         uploadResult === "" ?
           <View>
-            <Button text="Upload tune" onPress={() => {
+            <Button text={isNewTune ? "Upload tune" : "Update submission"} onPress={() => {
               submit();
             }}/>
             <DeleteButton onPress={navigation.goBack}>
