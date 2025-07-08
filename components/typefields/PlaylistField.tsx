@@ -1,5 +1,5 @@
-import {FlatList, TextInput, View} from "react-native";
-import {SMarginView, Title, Text, DeleteButton, ButtonText, SubText} from "../../Style";
+import {FlatList, View} from "react-native";
+import {SMarginView, Title, Text, DeleteButton, ButtonText, SubText, TextInput} from "../../Style";
 import Playlist from "../../model/Playlist";
 import {playlist} from "../../types";
 import { Button } from "../../simple_components/Button";
@@ -38,6 +38,7 @@ function AddPlaylistField({
             placeholderTextColor={theme.detailText}
             onChangeText={setNewPlaylistTitle}
             accessibilityLabel='Enter new playlist name'
+            style={{"color": theme.text}}
           />
         </View>
         <View style={{alignContent: 'flex-end', flex: 1}}>
@@ -136,7 +137,7 @@ export default function PlaylistField({
       <Button onPress={() => {setNewPlaylistOpen(!newPlaylistOpen)}}
         text={newPlaylistOpen ? "Switch to adding existing Playlists" : "Switch to creating new Playlist"}
         style={{flex:1}}
-    />
+      />
     </View>
     <AddPlaylistField
       tunePlaylists={attr as (Playlist | playlist)[]}
