@@ -12,6 +12,7 @@ import {translateAttrFromStandardTune} from "../../DraftReducers/utils/translate
 import {useQuery, useRealm} from "@realm/react";
 import Composer from "../../model/Composer";
 import Tune from "../../model/Tune";
+import DraftSummary, {DbDraftSummary} from "../../simple_components/DraftSummary";
 
 //TODO: Only display what is different! Like a function-less Compare and change
 export default function ConfirmConectionPrompt({
@@ -43,9 +44,30 @@ export default function ConfirmConectionPrompt({
     // Are you sure? this is permanent -> Tune deleted. Want to view the other one?
     //Or: "The other one is connected to the wrong item, let me fix it"
     // Above would take you to the SimilarItemPrompt for the other item. This would mean that SimilarItemPrompt should show the currently editing draft to make things clearer!
+    
+    const stand = isComposer ? OnlineDB.getComposerById(CDContext.cd.dbId as number) : OnlineDB.getStandardById(TDContext.td.dbId as number)
     return(
       <View>
-        <SubText>MENU IN PROGRESS</SubText>
+      <Title></Title>
+        <Title>THIS MENU IS STILL IN PROGRESS</Title>
+        <Title>Duplicate Item Found</Title>
+        <SubText>This {isComposer ? "composer" : "tune"} is already connected on your device! What do you want to do?</SubText>
+        <SMarginView>
+          <RowView>
+            <View>
+              <SubBoldText>Version you're connecting to:</SubBoldText>
+              <DbDraftSummary dbDraft={stand}/>
+            </View>
+            <View>
+              <SubBoldText>Currently Editing:</SubBoldText>
+              <DraftSummary/>
+            </View>
+            <View>
+              <SubBoldText>Other version found on device</SubBoldText>
+              <DraftSummary/>
+            </View>
+          </RowView>
+        </SMarginView>
       </View>
     );
   }
