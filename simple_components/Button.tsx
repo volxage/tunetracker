@@ -26,7 +26,7 @@ export function Button({
   if(!iconSize) iconSize = 30;
   if(text){
     return(
-      <ThemedButton onPress={onPress} style={style} accessibilityLabel={accessibilityLabel}>
+      <ThemedButton onPress={onPress} onLongPress={onLongPress} style={style} accessibilityLabel={accessibilityLabel}>
         <ButtonText style={textStyle}>
           {text}
         </ButtonText>
@@ -35,15 +35,15 @@ export function Button({
   }
   if(iconName){
     return(
-      <ThemedButton onPress={onPress} style={style} accessibilityLabel={accessibilityLabel}>
+      <ThemedButton onPress={onPress} onLongPress={onLongPress} style={style} accessibilityLabel={accessibilityLabel}>
         <ButtonText style={textStyle}>
-          <Icon name={iconName} size={iconSize} color={iconColor}/>
+          <Icon name={iconName} onLongPress={onLongPress} size={iconSize} color={iconColor}/>
         </ButtonText>
       </ThemedButton>
     )
   }
   return(
-    <ThemedButton onPress={onPress} style={style} accessibilityLabel={accessibilityLabel}>
+    <ThemedButton onPress={onPress} onLongPress={onLongPress} style={style} accessibilityLabel={accessibilityLabel}>
       <ButtonText style={textStyle}>
         {text}
       </ButtonText>
