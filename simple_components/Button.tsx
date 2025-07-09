@@ -1,6 +1,6 @@
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import {ButtonText, ThemedButton} from "../Style";
-import {StyleProp, TextStyle, ViewStyle} from "react-native";
+import {ButtonText, RowView, ThemedButton} from "../Style";
+import {StyleProp, TextStyle, View, ViewStyle} from "react-native";
 
 export function Button({
   text,
@@ -24,6 +24,18 @@ export function Button({
   accessibilityLabel?: string
 }){
   if(!iconSize) iconSize = 30;
+  if(text && iconName){
+    return(
+      <ThemedButton onPress={onPress} onLongPress={onLongPress} style={style} accessibilityLabel={accessibilityLabel}>
+        <ButtonText style={textStyle}>
+          <RowView>
+            <Icon name={iconName}/>
+            {text}
+          </RowView>
+        </ButtonText>
+      </ThemedButton>
+    );
+  }
   if(text){
     return(
       <ThemedButton onPress={onPress} onLongPress={onLongPress} style={style} accessibilityLabel={accessibilityLabel}>
