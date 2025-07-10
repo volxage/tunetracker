@@ -1,5 +1,5 @@
 import {View} from "react-native";
-import {ButtonText, DeleteButton, SafeBgView, SMarginView, SubBoldText, SubText, Text, Title} from "../../Style";
+import {ButtonText, DeleteButton, RowView, SafeBgView, SMarginView, SubBoldText, SubDimText, SubText, Text, Title} from "../../Style";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import {Button} from "../../simple_components/Button";
 import {useNavigation} from "@react-navigation/native";
@@ -129,7 +129,7 @@ export default function UploadRequest({}: {}){
             <SubText>Uploading your work means that other TuneTracker users can import it easily without having to type it again like you did! You will receive credit.</SubText>
         }
               </SMarginView>
-      <DbDraftSummary dbDraft={dbState.currentDraft}/>
+      <UploadSummary/>
       <ResponseBox
         result={uploadResult}
         isError={uploadErrorPresent}
@@ -151,4 +151,28 @@ export default function UploadRequest({}: {}){
       }
     </SafeBgView>
   );
+}
+function UploadSummary({dbState}:{dbState: {currentDraft: any}}){
+  const isNewTune = useContext(NewTuneContext);
+  //TODO: Fetch previous draft!
+  if(isNewTune){
+    return(
+      <View>
+        <DbDraftSummary dbDraft={dbState.currentDraft}/>
+      </View>
+    );
+  }else{
+    return(
+      <RowView>
+        <View>
+          <SubDimText>Previously uploaded:</SubDimText>
+          <SubText>NEED TO FETCH PREVIOUS DRAFT</SubText>
+        </View>
+        <View>
+          <SubDimText>New version to submit:</SubDimText>
+          <DbDraftSummary dbDraft={dbState.currentDraft}/>
+        </View>
+      </RowView>
+    );
+  }
 }
