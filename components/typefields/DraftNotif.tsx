@@ -9,6 +9,7 @@ import {tune_draft, composer} from "../../types";
 import {useNavigation} from "@react-navigation/native";
 import {Button} from "../../simple_components/Button";
 import {NewTuneContext} from "../Editor";
+import {useTheme} from "styled-components";
 
 type notification_t = {
   name: string
@@ -58,27 +59,14 @@ function ParseNotifications(draftContext: tune_draft_context_t | composer_draft_
   return notifications;
 }
 
-export default function DraftNotif({
-
+function NotifItems({
+  notifications,
+  setNotifications
 }:{
-
+  notifications: notification_t[],
+  setNotifications: Function
 }){
-  const td = useContext(TuneDraftContext);
-  const cd = useContext(ComposerDraftContext);
-  const isNewTune = useContext(NewTuneContext);
-  //Test if the tunedraft context is an empty object
-  const isComposer = Object.keys(td).length === 0;
-  const draftContext = isComposer ? cd : td;
-  const draft = isComposer ? cd.cd : td.td;
-  const navigation = useNavigation();
 
-  const [notifications, setNotifications] = useState([] as notification_t[])
-  useEffect(() => {
-    setNotifications(ParseNotifications(draftContext, navigation));
-  }, [draft.dbId])
-  if(isNewTune){
-    return(<></>);
-  }
   return(
     <View>
       <FlatList
@@ -101,6 +89,42 @@ export default function DraftNotif({
         }
         }
       />
+    </View>
+  );
+}
+export default function DraftNotif({
+}: {
+}){
+  const [notifications, setNotifications] = useState([] as notification_t[])
+  const td = useContext(TuneDraftContext);
+  const cd = useContext(ComposerDraftContext);
+  const isNewTune = useContext(NewTuneContext);
+  //Test if the tunedraft context is an empty object
+  const isComposer = Object.keys(td).length === 0;
+  const draftContext = isComposer ? cd : td;
+  const draft = isComposer ? cd.cd : td.td;
+  const navigation = useNavigation();
+  const [expanded, setExpanded] = useState(false);
+  const theme = useTheme();
+  
+  if(isNewTune){
+    return(<></>);
+  }
+  useEffect(() => {
+    setNotifications(ParseNotifications(draftContext, navigation));
+  }, [draft.dbId])
+  return(
+    <View>
+      <Button
+        onPress={() => {setExpanded(!expanded)}}
+        style={{backgroundColor: theme.panleBg}}
+        iconName={notifications.length > 0 ? "cloud-alert" : "cloud-check"}
+        text={notifications.length.toString()}
+      />
+      {
+        expanded &&
+          <NotifItems notifications={notifications} setNotifications={setNotifications}/>
+      }
     </View>
   );
 }
