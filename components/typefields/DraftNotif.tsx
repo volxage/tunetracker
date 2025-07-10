@@ -1,7 +1,7 @@
 // Copyright 2025 Jonathan Hilliard
 
 import {FlatList, TouchableHighlight, View} from "react-native";
-import {SMarginView, SubText, Text} from "../../Style";
+import {SMarginView, SubBoldText, SubDimText, SubText, Text} from "../../Style";
 import {useContext, useEffect, useState} from "react";
 import TuneDraftContext, {tune_draft_context_t} from "../../contexts/TuneDraftContext";
 import ComposerDraftContext, {composer_draft_context_t} from "../../contexts/ComposerDraftContext";
@@ -71,7 +71,7 @@ function NotifItems({
     <View>
       <FlatList
         data={notifications}
-        ListEmptyComponent={() => <View><SubText>No notifications!</SubText></View>}
+        ListEmptyComponent={() => <View><SubText style={{textAlign: "center"}}>No alerts! Your draft is in good health.</SubText></View>}
         renderItem={entry => {
           return(
             <TouchableHighlight key={entry.index} onPress={() => {}}>
@@ -106,6 +106,7 @@ export default function DraftNotif({
   const navigation = useNavigation();
   const [expanded, setExpanded] = useState(false);
   const theme = useTheme();
+  const notificationsPresent = notifications.length > 0;
   
   if(isNewTune){
     return(<></>);
@@ -114,17 +115,21 @@ export default function DraftNotif({
     setNotifications(ParseNotifications(draftContext, navigation));
   }, [draft.dbId])
   return(
-    <View>
+    <SMarginView>
       <Button
         onPress={() => {setExpanded(!expanded)}}
-        style={{backgroundColor: theme.panleBg}}
-        iconName={notifications.length > 0 ? "cloud-alert" : "cloud-check"}
-        text={notifications.length.toString()}
+        iconName={notificationsPresent ? "cloud-alert" : "cloud-check"}
+        iconColor={notificationsPresent ? theme.pending : theme.on}
+        text={notificationsPresent ? notifications.length.toString() : ""}
+        textStyle={{color: theme.detailText}}
       />
       {
         expanded &&
-          <NotifItems notifications={notifications} setNotifications={setNotifications}/>
+          <View style={{borderColor: theme.panelBg, borderWidth: 8}}>
+            <SubBoldText style={{textAlign: "center"}}>Draft Alerts</SubBoldText>
+            <NotifItems notifications={notifications} setNotifications={setNotifications}/>
+          </View>
       }
-    </View>
+    </SMarginView>
   );
 }
