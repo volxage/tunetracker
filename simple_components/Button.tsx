@@ -27,12 +27,10 @@ export function Button({
   if(text && iconName){
     return(
       <ThemedButton onPress={onPress} onLongPress={onLongPress} style={style} accessibilityLabel={accessibilityLabel}>
-        <ButtonText style={textStyle}>
-          <RowView>
-            <Icon name={iconName}/>
-            {text}
+          <RowView style={{alignSelf: "center"}}>
+            <ButtonText><Icon name={iconName} size={iconSize} color={iconColor}/></ButtonText>
+            <ButtonText style={[textStyle, {marginLeft: 8}]}>{text}</ButtonText>
           </RowView>
-        </ButtonText>
       </ThemedButton>
     );
   }
