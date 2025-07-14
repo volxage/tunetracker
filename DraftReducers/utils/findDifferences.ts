@@ -1,3 +1,7 @@
+import {composer_draft_context_t} from "../../contexts/ComposerDraftContext";
+import {tune_draft_context_t} from "../../contexts/TuneDraftContext";
+import {standard, standard_composer} from "../../types";
+
 type draft_context_t = tune_draft_context_t | composer_draft_context_t;
 export function findDifferences(draftContext: draft_context_t, std: standard | standard_composer){
   if("cd" in draftContext){
