@@ -121,7 +121,7 @@ function CompareField({item, index, onlineVersion, currentItem, localDispatch, d
   if(!standardAttrPresent && !tuneAttrPresent){
     return(<></>)
   }
-  if(comparedAttrEqual(item[0] as keyof tune_draft, currentItem[item[0] as keyof local_type], onlineVersion)){
+  if(comparedAttrEqual(item[0], currentItem[item[0] as keyof local_type], onlineVersion)){
     return(
       <AttrBasicRender
         attr={currentItem[item[0] as keyof local_type]}
