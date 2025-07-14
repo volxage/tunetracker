@@ -214,6 +214,7 @@ export const standardComposerDefaults = new Map<string, any>([
   ["id", 0]
 ])
 
+//TODO: Allow user to select preferences for keys like Cb
 export const prettyKeyMap = new Map([
   [0, "C"],
   [1, "C#"],
