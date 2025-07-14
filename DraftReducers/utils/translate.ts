@@ -77,7 +77,7 @@ export function translateAttrFromStandardTune(attrKey: keyof standard, attr: any
       return ["alternativeTitle", attr];
     }
     case 'Composers': {
-      //NOTE! THIS ASSUMES THE STANDARD'S COMPOSERS ARE LOCALLY STORED ALREADY!
+      //NOTE! THIS ASSUMES THE STANDARD'S COMPOSERS ARE LOCALLY STORED ALREADY! (I.E. are stored either directly in Realm or are stored as standard_composers from the DB)
       //TODO: Handle "edge" case referenced above
       if(!composerQuery){
         console.error("Composer query not passed, cannot translate from standard");
