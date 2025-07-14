@@ -24,7 +24,6 @@ const exclude_set = new Set([
 ]);
 
 export default function UploadRequest({}: {}){
-  //TODO: Translate tune to standard, fix submit button, hide cancel button if success
   const navigation = useNavigation();
   const [uploadResult, setUploadResult] = useState("");
   const [uploadError, setUploadError] = useState({} as AxiosError);

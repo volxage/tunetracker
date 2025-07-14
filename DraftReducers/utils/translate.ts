@@ -33,7 +33,7 @@ export function translateAttrFromTune(attrKey: keyof tune_draft, attr: any): [ke
       return [["alternative_title", attr]];
     }
     case 'composers': {
-      //NOTE! THIS ASSUMES THE TUNEDRAFT'S COMPOSERS ARE TIED TO THE DATABASE ALREADY!
+      //NOTE! THIS ASSUMES THE TUNEDRAFT'S COMPOSERS ARE TIED TO THE DATABASE ALREADY! (I.E. are stored either directly in Realm or are stored as standard_composers from the DB)
       //TODO: Handle "edge" case referenced above
       if(typeof attr === "undefined"){
         return [["Composers", []]]

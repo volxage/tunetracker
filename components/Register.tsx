@@ -57,11 +57,7 @@ function register(token: string, nickname: string, navigation: any, login: Funct
 }
 
 export default function Register({}: {}){
-  //TODO: use weird notation to set all these vars directly from the context
-  const dbStateContext = useContext(OnlineDB.DbStateContext);
-  const googleUser = dbStateContext.googleUser;
-  const appleUser = dbStateContext.appleUser;
-  const email = dbStateContext.email;
+  const {googleUser: googleUser, appleUser: appleUser, email: email} = useContext(OnlineDB.DbStateContext);
   const DbDispatchContext = useContext(OnlineDB.DbDispatchContext);
   const [nicknameField, setNicknameField] = useState("");
   const navigation = useNavigation();

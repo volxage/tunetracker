@@ -119,8 +119,6 @@ async function tryLogin(navigation: any, dispatch: Function, counter = 0){
   })
 }
 
-//TODO:
-//What are we returning? Anything? Or just making sure there's no rejections?
 async function login(dispatch: Function, counter=0): Promise<string>{
   console.log("Login function begin");
   if(counter > 5){

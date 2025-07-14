@@ -8,7 +8,6 @@ function nonEmptyArray(array: unknown){
   return true;
 }
 
-//TODO: Generalize for tunes vs composers
 export function comparedAttrEqual(tuneDraftAttrKey: keyof (tune_draft | composer), tuneDraftAttr: any, standard: standard){
   //The following only takes the first attribute and compares it.
   // => [standardKey, attr][]
