@@ -166,7 +166,7 @@ function UploadSummary({dbState}:{dbState: {currentDraft: any}}){
       <RowView>
         <View>
           <SubDimText>Previously uploaded:</SubDimText>
-          <SubText>NEED TO FETCH PREVIOUS DRAFT</SubText>
+          <SubText>Sorry! This menu isn't ready yet.</SubText>
         </View>
         <View>
           <SubDimText>New version to submit:</SubDimText>
