@@ -1,4 +1,4 @@
-import {standard, standard_composer, tune_draft} from "../../types";
+import {composer, standard, standard_composer, tune_draft} from "../../types";
 import {translateAttrFromTune} from "./translate";
 
 
@@ -9,7 +9,7 @@ function nonEmptyArray(array: unknown){
 }
 
 //TODO: Generalize for tunes vs composers
-export function comparedAttrEqual(tuneDraftAttrKey: keyof tune_draft, tuneDraftAttr: any, standard: standard){
+export function comparedAttrEqual(tuneDraftAttrKey: keyof (tune_draft | composer), tuneDraftAttr: any, standard: standard){
   //The following only takes the first attribute and compares it.
   // => [standardKey, attr][]
   const translatedAttrs = translateAttrFromTune(tuneDraftAttrKey, tuneDraftAttr);
