@@ -11,6 +11,10 @@ import axios from "axios";
 import TuneDraftContext from "../../contexts/TuneDraftContext";
 import ComposerDraftContext from "../../contexts/ComposerDraftContext";
 
+//TODO: Generalize for composers
+
+
+
 async function tuneDraftFetch(id: number, navigation: any, onlineDbDispatch: any){
   async function attempt(first: boolean){
     return ResponseHandler(

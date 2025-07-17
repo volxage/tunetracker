@@ -318,6 +318,13 @@ async function getTuneDraft(tuneDraftId: number){
     throw("Draft id is invalid");
   }
 }
+async function getComposerDraft(composerDraftId: number){
+  if(composerDraftId){
+    return http.get(`/composers/drafts/${composerDraftId}`);
+  }else{
+    throw("Draft id is invalid");
+  }
+}
 
 async function sendPlaylist(playlist: playlist){
 
@@ -393,6 +400,7 @@ export default {
     return composers.find((comp: standard_composer) => comp.id === id);
   },
   getTuneDraft,
+  getComposerDraft,
   getAttemptNo(){return attemptNo},
   updateDispatch,
   googleSignOut

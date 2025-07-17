@@ -151,9 +151,45 @@ export default function UploadRequest({}: {}){
     </SafeBgView>
   );
 }
-function UploadSummary({dbState}:{dbState: {currentDraft: any}}){
+
+async function tuneDraftFetch(id: number, navigation: any, onlineDbDispatch: any){
+  async function attempt(first: boolean){
+    return ResponseHandler(
+      OnlineDB.getTuneDraft(id),
+      ()=>"",
+      attempt,
+      first, 
+      navigation, 
+      onlineDbDispatch,
+      new Map<number, string>([
+        [404, "Your tune draft was rejected and deleted, or simply lost by the server. Typically drafts are only deleted (rather than just rejected) if they contain offensive/inappropriate material. Please refrain from including those things in your drafts!"]
+      ])
+    )
+  }
+  return attempt(true);
+}
+async function composerDraftFetch(id: number, navigation: any, onlineDbDispatch: any){
+  async function attempt(first: boolean){
+    return ResponseHandler(
+      OnlineDB.getComposerDraft(id),
+      ()=>"",
+      attempt,
+      first, 
+      navigation, 
+      onlineDbDispatch,
+      new Map<number, string>([
+        [404, "Your composer draft was rejected and deleted, or simply lost by the server. Typically drafts are only deleted (rather than just rejected) if they contain offensive/inappropriate material. Please refrain from including those things in your drafts!"]
+      ])
+    )
+  }
+  return attempt(true);
+}
+
+function UploadSummary({dbState}:{dbState: {currentDraft: tune_draft | composer}}){
   const isNewTune = useContext(NewTuneContext);
-  //TODO: Fetch previous draft!
+  const navigation = useNavigation();
+  const dbDispatch = useContext(OnlineDB.DbDispatchContext);
+  let PreviousUploadComponent = () => {return <View><SubText>This is your first upload!</SubText></View>};
   if(isNewTune){
     return(
       <View>
@@ -161,11 +197,26 @@ function UploadSummary({dbState}:{dbState: {currentDraft: any}}){
       </View>
     );
   }else{
+    if(dbState.currentDraft.dbDraftId){
+      if("title" in dbState.currentDraft){
+        tuneDraftFetch(dbState.currentDraft.dbDraftId, navigation, dbDispatch).then(({result: result, isError: isError, data: data}) => {
+          if(!isError){
+            PreviousUploadComponent = () => {
+              return(
+                <DbDraftSummary dbDraft={data}/>
+              )
+            }
+          }
+        });
+      }else{
+
+      }
+    }
     return(
       <RowView>
         <View>
           <SubDimText>Previously uploaded:</SubDimText>
-          <SubText>Sorry! This menu isn't ready yet.</SubText>
+          <PreviousUploadComponent/>
         </View>
         <View>
           <SubDimText>New version to submit:</SubDimText>
