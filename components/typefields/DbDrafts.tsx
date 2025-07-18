@@ -32,6 +32,22 @@ async function tuneDraftFetch(id: number, navigation: any, onlineDbDispatch: any
   }
   return attempt(true);
 }
+async function composerDraftFetch(id: number, navigation: any, onlineDbDispatch: any){
+  async function attempt(first: boolean){
+    return ResponseHandler(
+      OnlineDB.getComposerDraft(id),
+      ()=>"",
+      attempt,
+      first, 
+      navigation, 
+      onlineDbDispatch,
+      new Map<number, string>([
+        [404, "Your composer draft was rejected and deleted, or simply lost by the server. Typically drafts are only deleted (rather than just rejected) if they contain offensive/inappropriate material. Please refrain from including those things in your drafts!"]
+      ])
+    )
+  }
+  return attempt(true);
+}
 export default function DbDrafts({
   attr,
   handleSetCurrentItem
@@ -46,7 +62,7 @@ export default function DbDrafts({
 
   const td = useContext(TuneDraftContext);
   const cd = useContext(ComposerDraftContext);
-  const isComposer = Object.keys(td).length === 0;
+  const isComposer = Object.keys(cd).length > 0;
   const itemHandler = isComposer ? cd.updateCd : td.updateTd;
 
   const [draft, setDraft] = useState({} as submitted_tune_draft);
@@ -54,19 +70,35 @@ export default function DbDrafts({
 
   useEffect(() => {
     if(typeof attr !== "undefined" && attr !== 0){
-      tuneDraftFetch(attr, navigation, onlineDbDispatch).then(res => {
-        if(!res.isError){
-          setFetchError(false);
-          setDraft(res.data);
-          if(res.data.accepted){
-            //Find draft's online version and connect immediately (don't wait for confirmation)
-            itemHandler("dbId", res.data.TuneId, true);
+      if(isComposer){
+        composerDraftFetch(attr, navigation, onlineDbDispatch).then(res => {
+          if(!res.isError){
+            setFetchError(false);
+            setDraft(res.data);
+            if(res.data.accepted){
+              //Find draft's online version and connect immediately (don't wait for confirmation)
+              itemHandler("dbId", res.data.ComposerId, true);
+            }
+          }else{
+            setFetchResult(res.result);
+            setFetchError(true);
           }
-        }else{
-          setFetchResult(res.result);
-          setFetchError(true);
-        }
-      });
+        })
+      }else{
+        tuneDraftFetch(attr, navigation, onlineDbDispatch).then(res => {
+          if(!res.isError){
+            setFetchError(false);
+            setDraft(res.data);
+            if(res.data.accepted){
+              //Find draft's online version and connect immediately (don't wait for confirmation)
+              itemHandler("dbId", res.data.TuneId, true);
+            }
+          }else{
+            setFetchResult(res.result);
+            setFetchError(true);
+          }
+        });
+      }
     }
   }, [attr])
   if(typeof attr === "undefined" || attr === 0){
