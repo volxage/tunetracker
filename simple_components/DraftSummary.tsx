@@ -2,16 +2,29 @@ import {useContext} from "react";
 import {SMarginView, SubBoldText, SubDimText, SubText} from "../Style";
 import TuneDraftContext from "../contexts/TuneDraftContext";
 import ComposerDraftContext from "../contexts/ComposerDraftContext";
-import {standard, standard_composer, standard_draft} from "../types";
+import {standard, standard_composer, standard_composer_draft, standard_draft} from "../types";
 import OnlineDB from "../OnlineDB";
+import Tune from "../model/Tune";
+import Composer from "../model/Composer";
+import dateDisplay from "../textconverters/dateDisplay";
 
 export default function DraftSummary({}:{}){
   const TDContext = useContext(TuneDraftContext);
   const CDContext = useContext(ComposerDraftContext);
   const isComposer = Object.keys(CDContext).length > 0;
   if(isComposer){
+    const cd = CDContext.cd;
     return(
       <SMarginView>
+        <SubDimText>
+          Name: <SubText>{cd.name}</SubText>
+        </SubDimText>
+        <SubDimText>
+          Birth-Death: <SubText>{dateDisplay(cd.birth)} - {dateDisplay(cd.death)}</SubText>
+        </SubDimText>
+        <SubDimText>
+          Bio: <SubText>{cd.bio}</SubText>
+        </SubDimText>
       </SMarginView>
     );
   }else{
@@ -37,6 +50,9 @@ export default function DraftSummary({}:{}){
     );
   }
 }
+export function ItemSummary({item}:{item: Tune | Composer}){
+
+}
 
 export function ToUploadDbDraftSummary({dbDraft}:{dbDraft: any}){
   const TDContext = useContext(TuneDraftContext);
@@ -45,8 +61,18 @@ export function ToUploadDbDraftSummary({dbDraft}:{dbDraft: any}){
   const allComposers = useContext(OnlineDB.DbStateContext).composers;
 
   if(isComposer){
+    const cd = dbDraft as standard_composer_draft;
     return(
       <SMarginView>
+        <SubDimText>
+          Name: <SubText>{cd.name}</SubText>
+        </SubDimText>
+        <SubDimText>
+          Birth-Death: <SubText>{dateDisplay(cd.birth)} - {dateDisplay(cd.death)}</SubText>
+        </SubDimText>
+        <SubDimText>
+          Bio: <SubText>{cd.bio}</SubText>
+        </SubDimText>
       </SMarginView>
     );
   }else{
@@ -80,8 +106,18 @@ export function ExistingDbDraftSummary({dbDraft}:{dbDraft: any}){
   const allComposers = useContext(OnlineDB.DbStateContext).composers;
 
   if(isComposer){
+    const cd = dbDraft as standard_composer;
     return(
       <SMarginView>
+        <SubDimText>
+          Name: <SubText>{cd.name}</SubText>
+        </SubDimText>
+        <SubDimText>
+          Birth-Death: <SubText>{dateDisplay(cd.birth)} - {dateDisplay(cd.death)}</SubText>
+        </SubDimText>
+        <SubDimText>
+          Bio: <SubText>{cd.bio}</SubText>
+        </SubDimText>
       </SMarginView>
     );
   }else{
