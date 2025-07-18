@@ -53,7 +53,7 @@ export default function Editor({
     setNewTune: Function
   }): React.JSX.Element {
   const realm = useRealm();
-  const [state, dispatch] = useReducer(tuneDraftReducer, {currentDraft: {}, changedAttrsList: []});
+  const [state, dispatch] = useReducer(tuneDraftReducer, {currentDraft: {}, changedAttrsList: [], id: undefined});
   const [advancedSelected, setAdvancedSelected] = useState(newTune);
   const Stack = createNativeStackNavigator();
   const navigation = useNavigation();
@@ -87,7 +87,7 @@ export default function Editor({
 
 
   return (
-    <TuneDraftContext.Provider value={{td: state["currentDraft"], setTd: () => {},  updateTd: handleSetCurrentTune}}>
+    <TuneDraftContext.Provider value={{td: state["currentDraft"], setTd: () => {},  updateTd: handleSetCurrentTune, id: state.id}}>
       <NewTuneContext.Provider value={newTune}>
         <Stack.Navigator screenOptions={{headerShown: false}}>
           <Stack.Screen name={"EditorUnwrapped"} >
