@@ -2,7 +2,7 @@ import {useContext} from "react";
 import {SMarginView, SubBoldText, SubDimText, SubText} from "../Style";
 import TuneDraftContext from "../contexts/TuneDraftContext";
 import ComposerDraftContext from "../contexts/ComposerDraftContext";
-import {standard_draft} from "../types";
+import {standard, standard_composer, standard_draft} from "../types";
 import OnlineDB from "../OnlineDB";
 
 export default function DraftSummary({}:{}){
@@ -38,7 +38,7 @@ export default function DraftSummary({}:{}){
   }
 }
 
-export function DbDraftSummary({dbDraft}:{dbDraft: any}){
+export function ToUploadDbDraftSummary({dbDraft}:{dbDraft: any}){
   const TDContext = useContext(TuneDraftContext);
   const CDContext = useContext(ComposerDraftContext);
   const isComposer = Object.keys(CDContext).length > 0;
@@ -67,6 +67,41 @@ export function DbDraftSummary({dbDraft}:{dbDraft: any}){
         </SubDimText>
         <SubDimText>
           Composers: <SubText>{(sd.Composers as number[])?.map(id => allComposers.find(comp => comp.id === id)?.name).join(", ")}</SubText>
+        </SubDimText>
+      </SMarginView>
+    );
+  }
+}
+
+export function ExistingDbDraftSummary({dbDraft}:{dbDraft: any}){
+  const TDContext = useContext(TuneDraftContext);
+  const CDContext = useContext(ComposerDraftContext);
+  const isComposer = Object.keys(CDContext).length > 0;
+  const allComposers = useContext(OnlineDB.DbStateContext).composers;
+
+  if(isComposer){
+    return(
+      <SMarginView>
+      </SMarginView>
+    );
+  }else{
+    const sd = dbDraft as standard;
+    return(
+      <SMarginView>
+        <SubDimText>
+          Title: <SubText>{sd.title}</SubText>
+        </SubDimText>
+        <SubDimText>
+          Alternative Title: <SubText>{sd.alternative_title}</SubText>
+        </SubDimText>
+        <SubDimText>
+          Bio: <SubText>{sd.bio}</SubText>
+        </SubDimText>
+        <SubDimText>
+          Form: <SubText>{sd.form}</SubText>
+        </SubDimText>
+        <SubDimText>
+          Composers: <SubText>{(sd.Composers as standard_composer[])?.map(comp => comp.name).join(", ")}</SubText>
         </SubDimText>
       </SMarginView>
     );

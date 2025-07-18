@@ -12,7 +12,7 @@ import ResponseHandler from '../../services/ResponseHandler.ts';
 import {AxiosError} from "axios";
 import OnlineDB from "../../OnlineDB";
 import {compareTuneEditorAttrs, composer, composerEditorAttrs, standard_composer, standard_composer_draft, standard_draft, tune_draft} from "../../types";
-import DraftSummary, {DbDraftSummary} from "../../simple_components/DraftSummary.tsx";
+import DraftSummary, {ExistingDbDraftSummary, ToUploadDbDraftSummary} from "../../simple_components/DraftSummary.tsx";
 import ResponseBox from "../ResponseBox.tsx";
 import {NewTuneContext} from "../Editor.tsx";
 
@@ -203,6 +203,7 @@ function UploadSummary({dbState, isComposer}:{dbState: {currentDraft: standard_d
   const CDContext = useContext(ComposerDraftContext);
   const dbDraftId = (isComposer ? CDContext.cd : TDContext.td).dbDraftId;
   const [prevData, setPrevData] = useState({});
+  console.log(prevData);
   useEffect(() => {
     if(!isNewTune){
       if(dbDraftId){
@@ -221,7 +222,7 @@ function UploadSummary({dbState, isComposer}:{dbState: {currentDraft: standard_d
   if(isNewTune){
     return(
       <View>
-        <DbDraftSummary dbDraft={dbState.currentDraft}/>
+        <ToUploadDbDraftSummary dbDraft={dbState.currentDraft}/>
       </View>
     );
   }
@@ -229,11 +230,11 @@ function UploadSummary({dbState, isComposer}:{dbState: {currentDraft: standard_d
     <RowView>
       <View style={{flexWrap: "wrap", flex: 1}}>
         <SubDimText style={{textAlign: "center"}}>Previously uploaded:</SubDimText>
-        {("title" in prevData || "name" in prevData) ? <DbDraftSummary dbDraft={prevData}/> : <SubText>This is your first upload!</SubText>}
+        {("title" in prevData || "name" in prevData) ? <ExistingDbDraftSummary dbDraft={prevData}/> : <SubText>This is your first upload!</SubText>}
       </View>
       <View style={{flexWrap: "wrap", flex:1}}>
         <SubDimText style={{textAlign: "center"}}>New version to upload:</SubDimText>
-        <DbDraftSummary dbDraft={dbState.currentDraft}/>
+        <ToUploadDbDraftSummary dbDraft={dbState.currentDraft}/>
       </View>
     </RowView>
   );
