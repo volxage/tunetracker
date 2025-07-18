@@ -12,7 +12,9 @@ import {translateAttrFromStandardTune} from "../../DraftReducers/utils/translate
 import {useQuery, useRealm} from "@realm/react";
 import Composer from "../../model/Composer";
 import Tune from "../../model/Tune";
-import DraftSummary, {DbDraftSummary} from "../../simple_components/DraftSummary";
+import DraftSummary, {ExistingDbDraftSummary, ItemSummary} from "../../simple_components/DraftSummary";
+import {SafeAreaView} from "react-native";
+import {ScrollView} from "react-native";
 
 //TODO: Only display what is different! Like a function-less Compare and change
 export default function ConfirmConectionPrompt({
@@ -26,18 +28,29 @@ export default function ConfirmConectionPrompt({
   const compQuery = useQuery(Composer);
   const realm = useRealm();
 
-  const [duplicateItemFound, setDuplicateItemFound] = useState(false);
+  const [duplicateItemFound, setDuplicateItemFound] = useState([false, {}]);
   useEffect(() => {
     if(isComposer){
-      const filtered = compQuery.filtered("dbId IN $0", CDContext.cd.dbId);
-      setDuplicateItemFound(filtered.length > 0);
+      //Check for duplicates, not including currently editing item
+      let filtered = compQuery.filtered("dbId == $0 AND NOT id != $1", CDContext.cd.dbId, CDContext.id);
+      if(filtered.length > 0){
+        setDuplicateItemFound([true, filtered[0]]);
+      }else{
+        setDuplicateItemFound([false, {}]);
+      }
     }else{
-      const filtered = tuneQuery.filtered("dbId IN $0", TDContext.td.dbId);
-      setDuplicateItemFound(filtered.length > 0);
+      //Check for duplicates, not including currently editing item
+      console.log(`SDFJSKLJL ID ${TDContext.td.id}`);
+      let filtered = tuneQuery.filtered("dbId == $0 AND id != $1", TDContext.td.dbId, TDContext.id);
+      if(filtered.length > 0){
+        setDuplicateItemFound([true, filtered[0]]);
+      }else{
+        setDuplicateItemFound([false, {}]);
+      }
     }
   }, [])
 
-  if(duplicateItemFound){
+  if(duplicateItemFound[0]){
     //TODO:
     //Return special menu with options to handle duplicate
     //I.E. "Delete this one, take me to the other one."
@@ -47,28 +60,57 @@ export default function ConfirmConectionPrompt({
     
     const stand = isComposer ? OnlineDB.getComposerById(CDContext.cd.dbId as number) : OnlineDB.getStandardById(TDContext.td.dbId as number)
     return(
-      <View>
-      <Title></Title>
-        <Title>THIS MENU IS STILL IN PROGRESS</Title>
-        <Title>Duplicate Item Found</Title>
-        <SubText>This {isComposer ? "composer" : "tune"} is already connected on your device! What do you want to do?</SubText>
-        <SMarginView>
-          <RowView>
+      <SafeBgView>
+        <ScrollView>
+          <Title></Title>
+          <Title>Duplicate Item Found</Title>
+          <SubText>This {isComposer ? "composer" : "tune"} is already connected on your device! Both versions connect to the same online item, probably accidentally. This may confuse you and others in the future. What do you want to do?</SubText>
+          <SMarginView>
             <View>
-              <SubBoldText>Version you're connecting to:</SubBoldText>
-              <DbDraftSummary dbDraft={stand}/>
+              <SubBoldText>Online version you're connecting to:</SubBoldText>
+              <ExistingDbDraftSummary dbDraft={stand}/>
             </View>
             <View>
-              <SubBoldText>Currently Editing:</SubBoldText>
+              <SubBoldText>Currently editing and connecting:</SubBoldText>
               <DraftSummary/>
+              <Button text="This one doesn't match, undo connection I just made" onPress={() => {
+                TDContext.updateTd("dbId", 0, true);
+                navigation.goBack();
+              }}/>
+              <DeleteButton onPress={() => {
+                //Exit out of editor
+                navigation.goBack();
+                navigation.goBack();
+                const currentTune = tuneQuery.filtered("id == $0", TDContext.id);
+                realm.write(() => {
+                  realm.delete(currentTune);
+                  console.log("deleted new tune");
+                })
+              }}>
+                <ButtonText>DELETE this one and keep the other version</ButtonText>
+              </DeleteButton>
             </View>
             <View>
-              <SubBoldText>Other version found on device</SubBoldText>
-              <DraftSummary/>
+              <SubBoldText>Duplicate found on device</SubBoldText>
+              <ItemSummary item={duplicateItemFound[1]}/>
+              <Button text="Duplicate doesn't match online version, disconnect duplicate" onPress={() => {
+                realm.write(() => {
+                  duplicateItemFound[1].dbId = 0;
+                  setDuplicateItemFound([false, {}]);
+                })
+              }}/>
+              <DeleteButton onPress={() => {
+                realm.write(() => {
+                  realm.delete(duplicateItemFound[1]);
+                  setDuplicateItemFound([false, {}]);
+                })
+              }}>
+              <ButtonText>DELETE duplicate found on device, keep new version</ButtonText>
+              </DeleteButton>
             </View>
-          </RowView>
-        </SMarginView>
-      </View>
+          </SMarginView>
+        </ScrollView>
+      </SafeBgView>
     );
   }
   if(isComposer){
@@ -127,6 +169,8 @@ export default function ConfirmConectionPrompt({
         <Button text="Fix issues above" onPress={() => {
           //Send to improved Compare and Change}/>
           //
+          navigation.goBack();
+          navigation.navigate("Compare");
         }}
         />
         <Button text="Accept all changes" onPress={() => {}}/>
