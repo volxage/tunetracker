@@ -5,7 +5,11 @@ import Composer from '../model/Composer.ts';
 import {Results, Realm, BSON} from 'realm';
 import {translateAttrFromStandardTune} from './utils/translate.ts';
 
-export default function tuneDraftReducer(state: any, action: any){
+type state_t = {
+  currentDraft: tune_draft,
+  changedAttrsList: (keyof tune_draft)[]
+}
+export default function tuneDraftReducer(state: state_t, action: any){
   switch(action.type){
     case 'update_from_other':
     {
