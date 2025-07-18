@@ -90,6 +90,9 @@ export default function UploadRequest({}: {}){
         ).then(res => {
           setUploadResult(res.result);
           setUploadErrorPresent(res.isError);
+          if(!uploadErrorPresent){
+            CDContext.updateCd("dbDraftId", res.data.data.id, true);
+          }
         })
       }else{
         const toUpload = convertedStd as standard_composer;
@@ -112,6 +115,9 @@ export default function UploadRequest({}: {}){
         ).then(res => {
           setUploadResult(res.result);
           setUploadErrorPresent(res.isError);
+          if(!uploadErrorPresent){
+            TDContext.updateTd("dbDraftId", res.data.data.id, true);
+          }
         })
       }
     }
@@ -128,7 +134,7 @@ export default function UploadRequest({}: {}){
             <SubText>Uploading your work means that other TuneTracker users can import it easily without having to type it again like you did! You will receive credit.</SubText>
         }
               </SMarginView>
-      <UploadSummary/>
+      <UploadSummary dbState={dbState}/>
       <ResponseBox
         result={uploadResult}
         isError={uploadErrorPresent}
@@ -189,7 +195,7 @@ function UploadSummary({dbState}:{dbState: {currentDraft: tune_draft | composer}
   const isNewTune = useContext(NewTuneContext);
   const navigation = useNavigation();
   const dbDispatch = useContext(OnlineDB.DbDispatchContext);
-  let PreviousUploadComponent = () => {return <View><SubText>This is your first upload!</SubText></View>};
+  let PreviousUploadComponent = () => {return <View><SubText style={{}}>This is your first upload!</SubText></View>};
   if(isNewTune){
     return(
       <View>
@@ -214,12 +220,12 @@ function UploadSummary({dbState}:{dbState: {currentDraft: tune_draft | composer}
     }
     return(
       <RowView>
-        <View>
-          <SubDimText>Previously uploaded:</SubDimText>
+        <View style={{flexWrap: "wrap", flex: 1}}>
+          <SubDimText style={{textAlign: "center"}}>Previously uploaded:</SubDimText>
           <PreviousUploadComponent/>
         </View>
-        <View>
-          <SubDimText>New version to submit:</SubDimText>
+        <View style={{flexWrap: "wrap", flex:1}}>
+          <SubDimText style={{textAlign: "center"}}>New version to upload:</SubDimText>
           <DbDraftSummary dbDraft={dbState.currentDraft}/>
         </View>
       </RowView>
