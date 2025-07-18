@@ -10,6 +10,7 @@ import {Button} from "../../simple_components/Button";
 import axios from "axios";
 import TuneDraftContext from "../../contexts/TuneDraftContext";
 import ComposerDraftContext from "../../contexts/ComposerDraftContext";
+import {ExistingDbDraftSummary} from "../../simple_components/DraftSummary";
 
 //TODO: Generalize for composers
 
@@ -108,15 +109,12 @@ export default function DbDrafts({
                   <SubText>
                   </SubText>
                   :
+                        <View>
                   <SubText>
-                    Uploaded Tune-draft details:{"\n\n"}
-                    Title: {draft.title + "\n"}
-                    Alternative Title: {draft.alternativeTitle || "(none)" + "\n"}
-                    Composers: {draft.Composers?.map(comp => comp.name).join(", ") + "\n"}
-                    Bio: {(draft.bio || "(none)").concat("\n")}
-                    Form: {(draft.form || "(none)").concat("\n")}
-                    Year: {(String(draft.year) !== "null" ? String(draft.year) : "(none)").concat("\n")}
+                    Uploaded Tune-draft details:
                   </SubText>
+                          <ExistingDbDraftSummary dbDraft={draft}/>
+                        </View>
                 }
             </View>
             }
