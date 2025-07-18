@@ -91,7 +91,7 @@ export default function UploadRequest({}: {}){
           setUploadResult(res.result);
           setUploadErrorPresent(res.isError);
           if(!uploadErrorPresent){
-            CDContext.updateCd("dbDraftId", res.data.data.id, true);
+            TDContext.updateTd("dbDraftId", res.data.data.id, true);
           }
         })
       }else{
@@ -116,7 +116,7 @@ export default function UploadRequest({}: {}){
           setUploadResult(res.result);
           setUploadErrorPresent(res.isError);
           if(!uploadErrorPresent){
-            TDContext.updateTd("dbDraftId", res.data.data.id, true);
+            CDContext.updateCd("dbDraftId", res.data.data.id, true);
           }
         })
       }
