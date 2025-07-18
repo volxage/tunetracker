@@ -138,15 +138,19 @@ export default function DbDrafts({
                 </SubBoldText>
                 {
                   isComposer ?
-                  <SubText>
-                  </SubText>
-                  :
                         <View>
+                          <SubText>
+                            Uploaded Composer-draft details:
+                          </SubText>
+                            <ExistingDbDraftSummary dbDraft={draft}/>
+                        </View>
+                  :
+                <View>
                   <SubText>
                     Uploaded Tune-draft details:
                   </SubText>
-                          <ExistingDbDraftSummary dbDraft={draft}/>
-                        </View>
+                  <ExistingDbDraftSummary dbDraft={draft}/>
+                </View>
                 }
             </View>
             }
