@@ -49,6 +49,7 @@ export type composer = {
   "bio"?: string
   "birth"?: Date | undefined
   "death"?: Date | undefined
+  "id"?: BSON.ObjectId
   "dbId"?: number
   "dbDraftId"?: number
 }
@@ -127,10 +128,11 @@ export const editorAttrs: [keyof (tune_draft & tune_draft_extras), string][] = [
 ];
 export const composerEditorAttrs: [keyof Composer, string][] = [
   ["dbId", "Database Connection"],
+  ["dbDraftId", "Submitted Drafts"],
   ["name", "Name"],
   ["birth", "Birthday"],
   ["death", "Day of Death"],
-  ["bio", "Biography"]
+  ["bio", "Biography"],
 ];
 export const compareTuneEditorAttrs: [keyof tune_draft, string][] = [
   ["title", "Title"],
@@ -165,7 +167,8 @@ export const composerDefaults = new Map<keyof composer, any>([
   ["birth", undefined],
   ["death", undefined],
   ["bio", ""],
-  ["dbId", 0]
+  ["dbId", 0],
+  ["dbDraftId", 0]
 ])
 export const tuneDefaults = new Map<keyof Tune, any>([
   ["title", "New song"],
