@@ -68,7 +68,7 @@ export default function ComposerEditor({
     onlineVersion.death = onlineVersion.death ? new Date(onlineVersion.death) : undefined;
   }
   return (
-    <ComposerDraftContext.Provider value={{cd: state["currentDraft"], setCd: () => {},  updateCd: handleSetCurrentComposer}}>
+    <ComposerDraftContext.Provider value={{cd: state["currentDraft"], setCd: () => {},  updateCd: handleSetCurrentComposer, id: selectedComposer?.id}}>
       <Stack.Navigator screenOptions={{headerShown: false}}>
         <Stack.Screen name={"EditorUnwrapped"} >
           {props => <SafeBgView>
