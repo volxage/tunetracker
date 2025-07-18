@@ -95,15 +95,25 @@ function StandardRender({stand}: {stand: standard}){
 
 function ComposerRender({comp}:{comp: standard_composer}){
   const [expanded, setExpanded] = useState(false);
+  const CDContext = useContext(ComposerDraftContext);
+  const navigation = useNavigation();
   return(
-    <View style={{padding:8}}>
-      <Text>{comp.name}</Text>
-      <SubText>{dateDisplay(comp.birth)} - {dateDisplay(comp.death)}</SubText>
-      {
-        expanded &&
-          <Button text="This is the one!" onPress={() => {}}/>
-      }
-    </View>
+    <SMarginView>
+      <Pressable style={{padding:8}} onPress={() => {setExpanded(!expanded)}}>
+        <Text>{comp.name}</Text>
+        <SubText>{dateDisplay(comp.birth)} - {dateDisplay(comp.death)}</SubText>
+        {
+          expanded &&
+            <Button text="This is the one!" onPress={() => {
+            CDContext.updateCd("dbId", comp.id, true);
+            if(navigation.canGoBack()){
+              navigation.goBack();
+              navigation.navigate("ConfirmConnectionPrompt");
+            }
+            }}/>
+        }
+      </Pressable>
+    </SMarginView>
   )
 }
 
