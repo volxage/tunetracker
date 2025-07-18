@@ -51,7 +51,41 @@ export default function DraftSummary({}:{}){
   }
 }
 export function ItemSummary({item}:{item: Tune | Composer}){
-
+  if("title" in item){
+    const td = item;
+    return(
+      <SMarginView>
+        <SubDimText>
+          Title: <SubText>{td.title}</SubText>
+        </SubDimText>
+        <SubDimText>
+          Alternative Title: <SubText>{td.alternativeTitle}</SubText>
+        </SubDimText>
+        <SubDimText>
+          Bio: <SubText>{td.bio}</SubText>
+        </SubDimText>
+        <SubDimText>
+          Form: <SubText>{td.form}</SubText>
+        </SubDimText>
+        <SubDimText>
+          Composers: <SubText>{td.composers?.map(comp => comp.name).join(", ")}</SubText>
+        </SubDimText>
+      </SMarginView>
+    );
+  }else{
+    const cd = item;
+      <SMarginView>
+        <SubDimText>
+          Name: <SubText>{cd.name}</SubText>
+        </SubDimText>
+        <SubDimText>
+          Birth-Death: <SubText>{dateDisplay(cd.birth)} - {dateDisplay(cd.death)}</SubText>
+        </SubDimText>
+        <SubDimText>
+          Bio: <SubText>{cd.bio}</SubText>
+        </SubDimText>
+      </SMarginView>
+  }
 }
 
 export function ToUploadDbDraftSummary({dbDraft}:{dbDraft: any}){
