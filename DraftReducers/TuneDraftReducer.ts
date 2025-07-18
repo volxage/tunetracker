@@ -7,7 +7,8 @@ import {translateAttrFromStandardTune} from './utils/translate.ts';
 
 type state_t = {
   currentDraft: tune_draft,
-  changedAttrsList: (keyof tune_draft)[]
+  changedAttrsList: (keyof tune_draft)[],
+  id?: BSON.ObjectId
 }
 export default function tuneDraftReducer(state: state_t, action: any){
   switch(action.type){
@@ -29,7 +30,7 @@ export default function tuneDraftReducer(state: state_t, action: any){
       }
 
       // Mark attr as changed for it to be saved
-      return {currentDraft: copy, changedAttrsList: newChangedAttrsList};
+      return {currentDraft: copy, changedAttrsList: newChangedAttrsList, id: state.id};
     }
     case 'update_attr':
     {
@@ -76,7 +77,7 @@ export default function tuneDraftReducer(state: state_t, action: any){
         if(!newChangedAttrsList.includes("soloConfidence")){ newChangedAttrsList.push("soloConfidence") }
         if(!newChangedAttrsList.includes("lyricsConfidence")){ newChangedAttrsList.push("lyricsConfidence") }
       }
-      return {currentDraft: tuneCopy, changedAttrsList: newChangedAttrsList};
+      return {currentDraft: tuneCopy, changedAttrsList: newChangedAttrsList, id: state.id};
     }
     case 'set_to_selected':
     {
@@ -104,11 +105,13 @@ export default function tuneDraftReducer(state: state_t, action: any){
         }
         //tune.dbId = action["selectedItem"]["id"]
       }
-      return {currentDraft: tune, changedAttrsList: []};
+      console.log("SETTING TO SELECTED");
+      console.log(`New id: ${action["selectedItem"].id}`);
+      return {currentDraft: tune, changedAttrsList: [], id: action["selectedItem"].id};
     }
     default: {
       console.error(`${action.type} not implemented for TuneDraftReducer!`)
-      return {currentDraft: state["currentDraft"], changedAttrsList: state["changedAttrsList"]};
+      return {currentDraft: state["currentDraft"], changedAttrsList: state["changedAttrsList"], id: state.id};
     }
   }
 }
