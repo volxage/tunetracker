@@ -11,7 +11,7 @@ import standardTuneDraftReducer from "../../DraftReducers/StandardTuneDraftReduc
 import ResponseHandler from '../../services/ResponseHandler.ts';
 import {AxiosError} from "axios";
 import OnlineDB from "../../OnlineDB";
-import {compareTuneEditorAttrs, composer, composerEditorAttrs, standard_composer, standard_draft, tune_draft} from "../../types";
+import {compareTuneEditorAttrs, composer, composerEditorAttrs, standard_composer, standard_composer_draft, standard_draft, tune_draft} from "../../types";
 import DraftSummary, {DbDraftSummary} from "../../simple_components/DraftSummary.tsx";
 import ResponseBox from "../ResponseBox.tsx";
 import {NewTuneContext} from "../Editor.tsx";
@@ -34,6 +34,7 @@ export default function UploadRequest({}: {}){
   const CDContext = useContext(ComposerDraftContext);
   //If the composerDraftContext isn't empty.
   const isComposer = Object.keys(CDContext).length > 0;
+  const activeDraft = (isComposer ? CDContext.cd : TDContext.td);
   const [dbState, dbDispatch] = useReducer(
     (isComposer ? standardComposerDraftReducer : standardTuneDraftReducer), {currentDraft: {}}
   );
@@ -73,10 +74,13 @@ export default function UploadRequest({}: {}){
           title: toUpload.title,
           alternative_title: toUpload.alternative_title,
           composer_placeholder: toUpload.composer_placeholder,
-          id: toUpload.id,
           form: toUpload.form,
           bio: toUpload.bio,
           composers: toUpload.Composers
+        }
+        if(activeDraft.dbDraftId){
+          copyToSend["id"] = activeDraft.dbDraftId;
+          console.log(copyToSend);
         }
         ResponseHandler(
           OnlineDB.createTuneDraft(copyToSend), 
@@ -134,7 +138,7 @@ export default function UploadRequest({}: {}){
             <SubText>Uploading your work means that other TuneTracker users can import it easily without having to type it again like you did! You will receive credit.</SubText>
         }
               </SMarginView>
-      <UploadSummary dbState={dbState}/>
+      <UploadSummary dbState={dbState} isComposer={isComposer}/>
       <ResponseBox
         result={uploadResult}
         isError={uploadErrorPresent}
@@ -191,44 +195,46 @@ async function composerDraftFetch(id: number, navigation: any, onlineDbDispatch:
   return attempt(true);
 }
 
-function UploadSummary({dbState}:{dbState: {currentDraft: tune_draft | composer}}){
+function UploadSummary({dbState, isComposer}:{dbState: {currentDraft: standard_draft | standard_composer_draft}, isComposer: boolean}){
   const isNewTune = useContext(NewTuneContext);
   const navigation = useNavigation();
   const dbDispatch = useContext(OnlineDB.DbDispatchContext);
-  let PreviousUploadComponent = () => {return <View><SubText style={{}}>This is your first upload!</SubText></View>};
+  const TDContext = useContext(TuneDraftContext);
+  const CDContext = useContext(ComposerDraftContext);
+  const dbDraftId = (isComposer ? CDContext.cd : TDContext.td).dbDraftId;
+  const [prevData, setPrevData] = useState({});
+  useEffect(() => {
+    if(!isNewTune){
+      if(dbDraftId){
+        if("title" in dbState.currentDraft){
+          tuneDraftFetch(dbDraftId, navigation, dbDispatch).then(({result: result, isError: isError, data: data}) => {
+            if(!isError){
+              setPrevData(data);
+            }
+          });
+        }else{
+
+        }
+      }
+    }
+  }, [dbDraftId, dbState.currentDraft]);
   if(isNewTune){
     return(
       <View>
         <DbDraftSummary dbDraft={dbState.currentDraft}/>
       </View>
     );
-  }else{
-    if(dbState.currentDraft.dbDraftId){
-      if("title" in dbState.currentDraft){
-        tuneDraftFetch(dbState.currentDraft.dbDraftId, navigation, dbDispatch).then(({result: result, isError: isError, data: data}) => {
-          if(!isError){
-            PreviousUploadComponent = () => {
-              return(
-                <DbDraftSummary dbDraft={data}/>
-              )
-            }
-          }
-        });
-      }else{
-
-      }
-    }
-    return(
-      <RowView>
-        <View style={{flexWrap: "wrap", flex: 1}}>
-          <SubDimText style={{textAlign: "center"}}>Previously uploaded:</SubDimText>
-          <PreviousUploadComponent/>
-        </View>
-        <View style={{flexWrap: "wrap", flex:1}}>
-          <SubDimText style={{textAlign: "center"}}>New version to upload:</SubDimText>
-          <DbDraftSummary dbDraft={dbState.currentDraft}/>
-        </View>
-      </RowView>
-    );
   }
+  return(
+    <RowView>
+      <View style={{flexWrap: "wrap", flex: 1}}>
+        <SubDimText style={{textAlign: "center"}}>Previously uploaded:</SubDimText>
+        {("title" in prevData || "name" in prevData) ? <DbDraftSummary dbDraft={prevData}/> : <SubText>This is your first upload!</SubText>}
+      </View>
+      <View style={{flexWrap: "wrap", flex:1}}>
+        <SubDimText style={{textAlign: "center"}}>New version to upload:</SubDimText>
+        <DbDraftSummary dbDraft={dbState.currentDraft}/>
+      </View>
+    </RowView>
+  );
 }
