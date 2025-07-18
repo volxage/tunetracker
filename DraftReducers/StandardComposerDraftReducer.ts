@@ -3,7 +3,11 @@
 import { standard_composer_draft, composerDefaults, standardComposerDefaults } from "../types"
 import Composer from "../model/Composer";
 import {translateAttrFromComposer} from "./utils/translate";
-export default function standardComposerDraftReducer(state: any, action: any){
+type state_t = {
+  currentDraft: standard_composer_draft,
+  changedAttrsList: Array<string>
+}
+export default function standardComposerDraftReducer(state: state_t, action: any){
   switch(action.type){
     case 'update_attr':
     {
