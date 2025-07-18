@@ -3,7 +3,7 @@ import {ButtonText, DeleteButton, RowView, SafeBgView, SMarginView, SubBoldText,
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import {Button} from "../../simple_components/Button";
 import {useNavigation} from "@react-navigation/native";
-import {useContext, useEffect, useReducer, useState} from "react";
+import {act, useContext, useEffect, useReducer, useState} from "react";
 import TuneDraftContext from "../../contexts/TuneDraftContext";
 import ComposerDraftContext from "../../contexts/ComposerDraftContext";
 import standardComposerDraftReducer from "../../DraftReducers/StandardComposerDraftReducer";
@@ -34,15 +34,17 @@ export default function UploadRequest({}: {}){
   const CDContext = useContext(ComposerDraftContext);
   //If the composerDraftContext isn't empty.
   const isComposer = Object.keys(CDContext).length > 0;
+  console.log(`UploadRequest: isComposer: ${isComposer}`);
   const activeDraft = (isComposer ? CDContext.cd : TDContext.td);
   const [dbState, dbDispatch] = useReducer(
-    (isComposer ? standardComposerDraftReducer : standardTuneDraftReducer), {currentDraft: {}}
+    (isComposer ? standardComposerDraftReducer : standardTuneDraftReducer), {currentDraft: {}, changedAttrsList: []}
   );
   const convertedStd = dbState.currentDraft;
   const onlineDbDispatch = useContext(OnlineDB.DbDispatchContext);
   const attrs = (isComposer ? composerEditorAttrs : compareTuneEditorAttrs)
     .filter(item => (!exclude_set.has(item[0]) && !item[0].endsWith("Confidence")))
   const isNewTune = useContext(NewTuneContext);
+  const firstUpload = !("dbDraftId" in activeDraft && activeDraft.dbDraftId !== 0);
   useEffect(() => {
     if(isComposer){
       const draft = CDContext.cd;
@@ -80,12 +82,11 @@ export default function UploadRequest({}: {}){
         }
         if(activeDraft.dbDraftId){
           copyToSend["id"] = activeDraft.dbDraftId;
-          console.log(copyToSend);
         }
         ResponseHandler(
           OnlineDB.createTuneDraft(copyToSend), 
           (response => {
-            return `Successfully ${isNewTune ? "uploaded" : "updated"} your version of ${response.data.title}`;
+            return `Successfully ${firstUpload ? "uploaded" : "updated"} your version of ${response.data.title}`;
           }),
           submit,
           first,
@@ -110,7 +111,7 @@ export default function UploadRequest({}: {}){
         ResponseHandler(
           OnlineDB.createComposerDraft(copyToSend),
           (response => {
-            return `Successfully ${isNewTune ? "uploaded" : "updated"} your vesion of ${response.data.name}`;
+            return `Successfully ${firstUpload ? "uploaded" : "updated"} your vesion of ${response.data.name}`;
           }),
           submit,
           first,
@@ -128,17 +129,27 @@ export default function UploadRequest({}: {}){
   }
   return(
     <SafeBgView>
-      <Title><Icon name="upload" size={28}/></Title>
-      <Text style={{textAlign: "center"}}>Upload your tune?</Text>
-      <SMarginView>
-        {
-          isNewTune ?
-            <View><SubText>Updating your work means that after review, other users can import your revisions and TuneTracker's information can be more accurate!</SubText><SubText>It also means that future users won't encounter problems when determining songs that a group of people all know.</SubText>
-</View>:
-            <SubText>Uploading your work means that other TuneTracker users can import it easily without having to type it again like you did! You will receive credit.</SubText>
-        }
-              </SMarginView>
-      <UploadSummary dbState={dbState} isComposer={isComposer}/>
+      {
+        uploadResult === "" ?
+        <View>
+          <Title><Icon name="upload" size={28}/></Title>
+          <Text style={{textAlign: "center"}}>Upload your {isComposer ? "composer" : "tune"}?</Text>
+          <SMarginView>
+            {
+              !firstUpload ?
+                <View><SubText>Updating your work means that after review, other users can import your revisions and TuneTracker's information can be more accurate!</SubText><SubText>It also means that future users won't encounter problems when determining songs that a group of people all know.</SubText>
+                </View>:
+                <SubText>Uploading your work means that other TuneTracker users can import it easily without having to type it again like you did! You will receive credit.</SubText>
+            }
+          </SMarginView>
+          <UploadSummary dbState={dbState} isComposer={isComposer}/>
+        </View>
+          :
+          <SMarginView>
+            <Title>Thanks for your submission!</Title>
+            <SubText style={{textAlign: "center"}}>Your effort is greatly appreciated.</SubText>
+          </SMarginView>
+      }
       <ResponseBox
         result={uploadResult}
         isError={uploadErrorPresent}
@@ -146,7 +157,7 @@ export default function UploadRequest({}: {}){
       {
         uploadResult === "" ?
           <View>
-            <Button text={isNewTune ? "Upload tune" : "Update submission"} onPress={() => {
+            <Button text={firstUpload ? "Upload tune" : "Update submission"} onPress={() => {
               submit();
             }}/>
             <DeleteButton onPress={navigation.goBack}>
@@ -196,30 +207,26 @@ async function composerDraftFetch(id: number, navigation: any, onlineDbDispatch:
 }
 
 function UploadSummary({dbState, isComposer}:{dbState: {currentDraft: standard_draft | standard_composer_draft}, isComposer: boolean}){
-  const isNewTune = useContext(NewTuneContext);
   const navigation = useNavigation();
   const dbDispatch = useContext(OnlineDB.DbDispatchContext);
   const TDContext = useContext(TuneDraftContext);
   const CDContext = useContext(ComposerDraftContext);
   const dbDraftId = (isComposer ? CDContext.cd : TDContext.td).dbDraftId;
   const [prevData, setPrevData] = useState({});
-  console.log(prevData);
   useEffect(() => {
-    if(!isNewTune){
-      if(dbDraftId){
-        if("title" in dbState.currentDraft){
-          tuneDraftFetch(dbDraftId, navigation, dbDispatch).then(({result: result, isError: isError, data: data}) => {
-            if(!isError){
-              setPrevData(data);
-            }
-          });
-        }else{
+    if(dbDraftId && dbDraftId !== 0){
+      if("title" in dbState.currentDraft){
+        tuneDraftFetch(dbDraftId, navigation, dbDispatch).then(({result: result, isError: isError, data: data}) => {
+          if(!isError){
+            setPrevData(data);
+          }
+        });
+      }else{
 
-        }
       }
     }
   }, [dbDraftId, dbState.currentDraft]);
-  if(isNewTune){
+  if(!dbDraftId || dbDraftId === 0){
     return(
       <View>
         <ToUploadDbDraftSummary dbDraft={dbState.currentDraft}/>
