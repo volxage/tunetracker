@@ -59,7 +59,14 @@ export default function ComposerEditor({
     dispatch({type: "set_to_selected", selectedItem: selectedComposer});
   }, []);
 
-  function handleSetCurrentComposer(attr_key: keyof composer, value: any){
+  function handleSetCurrentComposer(attr_key: keyof composer, value: any, immediate = false){
+    if(immediate){
+      if(selectedComposer instanceof Composer){
+        realm.write(() => {
+          selectedComposer[attr_key] = value
+        })
+      }
+    }
     dispatch({type: 'update_attr', attr: attr_key, value: value});
   }
   const onlineVersion = (state["currentDraft"].dbId ? OnlineDB.getComposerById(state["currentDraft"].dbId) : null) as composer
