@@ -50,7 +50,7 @@ export default function ComposerEditor({
   //Intentional copy to allow cancelling of edits
   //  const [currentDraft, setCurrentTune] = useState()
   //console.log(prettyAttrs);
-  const [state, dispatch] = useReducer(composerDraftReducer, {currentDraft: {}, changedAttrsList: []});
+  const [state, dispatch] = useReducer(composerDraftReducer, {currentDraft: {}, changedAttrsList: [], id: undefined});
   const Stack = createNativeStackNavigator();
   const realm = useRealm();
   const navigation = useNavigation();
@@ -77,7 +77,7 @@ export default function ComposerEditor({
   }
   return (
     <NewComposerContext.Provider value={newComposer}>
-      <ComposerDraftContext.Provider value={{cd: state["currentDraft"], setCd: () => {},  updateCd: handleSetCurrentComposer, id: selectedComposer?.id}}>
+      <ComposerDraftContext.Provider value={{cd: state["currentDraft"], setCd: () => {},  updateCd: handleSetCurrentComposer, id: state.id}}>
         <Stack.Navigator screenOptions={{headerShown: false}}>
           <Stack.Screen name={"EditorUnwrapped"} >
             {props => <SafeBgView>
@@ -109,9 +109,13 @@ export default function ComposerEditor({
                       !newComposer && 
                         <DeleteButton
                           onLongPress={() => {
-                            realm.write(() => 
-                              realm.delete(selectedComposer)
-                            )
+                            try{
+                              realm.write(() => 
+                                realm.delete(selectedComposer)
+                              )
+                            }catch(err){
+                              console.log(err);
+                            }
                             navigation.goBack();
                           }}>
                           <ButtonText>DELETE COMPOSER (CAN'T UNDO!)</ButtonText>

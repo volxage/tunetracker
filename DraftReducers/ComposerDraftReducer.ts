@@ -3,9 +3,11 @@
 import { composer, composerDefaults } from "../types"
 import Composer from "../model/Composer";
 import {translateAttrFromStandardComposer} from "./utils/translate";
+import {BSON} from "realm";
 type state_t= {
   "currentDraft": composer,
   "changedAttrsList": (keyof composer)[]
+  "id"?: BSON.ObjectId
 }
 type action_t= {
   "value"?: any,
@@ -19,7 +21,7 @@ export default function composerDraftReducer(state: state_t, action: action_t){
     {
       if(!action["attr"]){
         console.error("update_attr called with missing attr");
-        return {currentDraft: state["currentDraft"], changedAttrsList: state["changedAttrsList"]}
+        return {currentDraft: state["currentDraft"], changedAttrsList: state["changedAttrsList"], id: state.id}
       }
 
       const cd: composer = {}
@@ -34,7 +36,7 @@ export default function composerDraftReducer(state: state_t, action: action_t){
       if(!newChangedAttrsList.includes(action["attr"])){
         newChangedAttrsList = newChangedAttrsList.concat(action["attr"]);
       }
-      return {currentDraft: cd, changedAttrsList: newChangedAttrsList};
+      return {currentDraft: cd, changedAttrsList: newChangedAttrsList, id: state.id};
     }
     case 'update_from_other':
     {
@@ -57,7 +59,7 @@ export default function composerDraftReducer(state: state_t, action: action_t){
         }
       }
 
-      return {currentDraft: copy, changedAttrsList: newChangedAttrsList};
+      return {currentDraft: copy, changedAttrsList: newChangedAttrsList, id: state.id};
     }
     case 'set_to_selected':
     {
@@ -86,11 +88,11 @@ export default function composerDraftReducer(state: state_t, action: action_t){
           }
         }
       }
-      return {currentDraft: cd, changedAttrsList:[]};
+      return {currentDraft: cd, changedAttrsList:[], id: action["selectedItem"]?.id};
     }
     default:{
       console.error(`${action.type} not implemented for ComposerDraftReducer!`)
-      return {currentDraft: state["currentDraft"], changedAttrsList: state["changedAttrsList"]}
+      return {currentDraft: state["currentDraft"], changedAttrsList: state["changedAttrsList"], id: state.id}
     }
   }
 }

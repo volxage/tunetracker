@@ -32,7 +32,8 @@ export default function ConfirmConectionPrompt({
   useEffect(() => {
     if(isComposer){
       //Check for duplicates, not including currently editing item
-      let filtered = compQuery.filtered("dbId == $0 AND NOT id != $1", CDContext.cd.dbId, CDContext.id);
+      let filtered = compQuery.filtered("dbId == $0 AND id != $1", CDContext.cd.dbId, CDContext.id);
+      console.log(CDContext.id);
       if(filtered.length > 0){
         setDuplicateItemFound([true, filtered[0]]);
       }else{
@@ -40,7 +41,6 @@ export default function ConfirmConectionPrompt({
       }
     }else{
       //Check for duplicates, not including currently editing item
-      console.log(`SDFJSKLJL ID ${TDContext.td.id}`);
       let filtered = tuneQuery.filtered("dbId == $0 AND id != $1", TDContext.td.dbId, TDContext.id);
       if(filtered.length > 0){
         setDuplicateItemFound([true, filtered[0]]);
@@ -136,17 +136,12 @@ export default function ConfirmConectionPrompt({
     return(
       <SafeBgView>
         <SMarginView>
-          <Text>How do you want to connect?</Text>
+          <Title>How do you want to connect?</Title>
         </SMarginView>
-        <Title>{comp.name}</Title>
-        <RowView>
-          <SubBoldText>Birth-Death:</SubBoldText>
-          <SubText>{dateDisplay(comp.birth)}-{dateDisplay(comp.death)}</SubText>
-        </RowView>
-        <RowView>
-          <SubBoldText>Bio: </SubBoldText>
-          <SubText>{comp.bio}</SubText>
-        </RowView>
+        <SubBoldText style={{textAlign: "center"}}>Online version you're connecting to</SubBoldText>
+        <ExistingDbDraftSummary dbDraft={comp}/>
+        <SubBoldText style={{textAlign: "center"}}>Your version</SubBoldText>
+        <DraftSummary/>
         <RowView>
           <DeleteButton style={{flex:1}} onPress={() => {
             CDContext.updateCd("dbId", 0, true);
@@ -162,18 +157,18 @@ export default function ConfirmConectionPrompt({
             <ButtonText>Wrong composer</ButtonText>
           </DeleteButton>
         </RowView>
-        <Button text="Connect, ignore changes above" onPress={() => {
+        <Button text="Connect, but keep my version the same" onPress={() => {
           navigation.goBack();
         }}
         />
-        <Button text="Fix issues above" onPress={() => {
+        <Button text="Connect, but fix issues in online version" onPress={() => {
           //Send to improved Compare and Change}/>
           //
           navigation.goBack();
-          navigation.navigate("Compare");
+          navigation.navigate("ComposerCompare");
         }}
         />
-        <Button text="Accept all changes" onPress={() => {}}/>
+        <Button text="Copy online version to my device" onPress={() => {}}/>
       </SafeBgView>
     );
   }else{
