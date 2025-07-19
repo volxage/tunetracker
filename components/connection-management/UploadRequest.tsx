@@ -222,7 +222,11 @@ function UploadSummary({dbState, isComposer}:{dbState: {currentDraft: standard_d
           }
         });
       }else{
-
+        composerDraftFetch(dbDraftId, navigation, dbDispatch).then(({result: result, isError: isError, data: data}) => {
+          if(!isError){
+            setPrevData(data);
+          }
+        });
       }
     }
   }, [dbDraftId, dbState.currentDraft]);
