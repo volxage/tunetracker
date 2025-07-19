@@ -439,23 +439,41 @@ export default function Compare({
             </View>
           }
         />
-        <SMarginView>
-          <SubDimText style={presentAttrs[attrI][0] === "title" && {textDecorationLine: "underline"}}>
-            Title: <SubText>{localState.currentDraft.title}</SubText>
-          </SubDimText>
-          <SubDimText style={presentAttrs[attrI][0] === "alternativeTitle" && {textDecorationLine: "underline"}}>
-            Alternative Title: <SubText>{localState.currentDraft.alternativeTitle}</SubText>
-          </SubDimText>
-          <SubDimText style={presentAttrs[attrI][0] === "bio" && {textDecorationLine: "underline"}}>
-            Bio: <SubText>{localState.currentDraft.bio}</SubText>
-          </SubDimText>
-          <SubDimText style={presentAttrs[attrI][0] === "form" && {textDecorationLine: "underline"}}>
-            Form: <SubText>{localState.currentDraft.form}</SubText>
-          </SubDimText>
-          <SubDimText style={presentAttrs[attrI][0] === "composers" && {textDecorationLine: "underline"}}>
-            Composers: <SubText>{(localState.currentDraft.composers as composer[])?.map(comp => comp.name).join(", ")}</SubText>
-          </SubDimText>
-        </SMarginView>
+        {
+          isComposer ? 
+          <SMarginView>
+              <SubDimText style={presentAttrs[attrI][0] === "title" && {textDecorationLine: "underline"}}>
+                Name: <SubText>{localState.currentDraft.name}</SubText>
+              </SubDimText>
+              <SubDimText style={presentAttrs[attrI][0] === "alternativeTitle" && {textDecorationLine: "underline"}}>
+                Birthday: <SubText>{dateDisplay(localState.currentDraft.birth)}</SubText>
+              </SubDimText>
+              <SubDimText style={presentAttrs[attrI][0] === "alternativeTitle" && {textDecorationLine: "underline"}}>
+                Day of death: <SubText>{dateDisplay(localState.currentDraft.death)}</SubText>
+              </SubDimText>
+              <SubDimText style={presentAttrs[attrI][0] === "bio" && {textDecorationLine: "underline"}}>
+                Bio: <SubText>{localState.currentDraft.bio}</SubText>
+              </SubDimText>
+          </SMarginView>
+            :
+            <SMarginView>
+              <SubDimText style={presentAttrs[attrI][0] === "title" && {textDecorationLine: "underline"}}>
+                Title: <SubText>{localState.currentDraft.title}</SubText>
+              </SubDimText>
+              <SubDimText style={presentAttrs[attrI][0] === "alternativeTitle" && {textDecorationLine: "underline"}}>
+                Alternative Title: <SubText>{localState.currentDraft.alternativeTitle}</SubText>
+              </SubDimText>
+              <SubDimText style={presentAttrs[attrI][0] === "bio" && {textDecorationLine: "underline"}}>
+                Bio: <SubText>{localState.currentDraft.bio}</SubText>
+              </SubDimText>
+              <SubDimText style={presentAttrs[attrI][0] === "form" && {textDecorationLine: "underline"}}>
+                Form: <SubText>{localState.currentDraft.form}</SubText>
+              </SubDimText>
+              <SubDimText style={presentAttrs[attrI][0] === "composers" && {textDecorationLine: "underline"}}>
+                Composers: <SubText>{(localState.currentDraft.composers as composer[])?.map(comp => comp.name).join(", ")}</SubText>
+              </SubDimText>
+            </SMarginView>
+        }
         {
           finalMode ?
             <View>
