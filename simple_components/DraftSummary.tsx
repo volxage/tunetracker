@@ -75,6 +75,7 @@ export function ItemSummary({item}:{item: Tune | Composer}){
     );
   }else{
     const cd = item;
+    return(
       <SMarginView>
         <SubDimText>
           Name: <SubText>{cd.name}</SubText>
@@ -86,6 +87,7 @@ export function ItemSummary({item}:{item: Tune | Composer}){
           Bio: <SubText>{cd.bio}</SubText>
         </SubDimText>
       </SMarginView>
+    )
   }
 }
 
