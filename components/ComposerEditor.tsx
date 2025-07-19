@@ -54,6 +54,7 @@ export default function ComposerEditor({
   const Stack = createNativeStackNavigator();
   const realm = useRealm();
   const navigation = useNavigation();
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(true);
 
   useEffect(() => {
     console.log("Composereditor effect");
@@ -121,56 +122,61 @@ export default function ComposerEditor({
                           <ButtonText>DELETE COMPOSER (CAN'T UNDO!)</ButtonText>
                         </DeleteButton>
                     }
-                    <View style={{flexDirection: "row"}}>
-                      <View style={{flex: 1}}>
+                    {
+                      !hasUnsavedChanges ?
+                        <View>
+                          <Button text="Done" onPress={() => {navigation.goBack()}}/>
+                        </View>
+                        :
+                        <View style={{flexDirection: "row"}}>
+                          <View style={{flex: 1}}>
+                            {
+                              !newComposer &&
+                                <Button
+                                  onPress={() => {
+                                    realm.write(() => {
+                                      let attr: keyof composer;
+                                      for(attr in state["currentDraft"]){
+                                        selectedComposer[attr] = state["currentDraft"][attr]; //as (string & Date | undefined); Why does the model want this type?
+                                      }
+                                    });
+                                    setNewComposer(false);
+                                    setHasUnsavedChanges(false);
+                                  }}
+                                  text='Save'
+                                />
+                            }
+                            {
+                              newComposer &&
+                                <Button
+                                  onPress={() => {
+                                    //database.write(async () => {database.get('composers').create(comp => {
+                                    //  (comp as Composer).replace(state["currentDraft"])
+                                    //}).then(resultingModel => {
+                                    //  console.log(resultingModel);
+                                    //})});
+                                    //WHY DOES THIS WORK?
+                                    const ctCopy = state["currentDraft"]
+                                    ctCopy.id = new BSON.ObjectId()
+                                    realm.write(() => {
+                                      realm.create("Composer", state["currentDraft"]);
+                                    });
+                                    setNewComposer(false);
+                                    setHasUnsavedChanges(false);
+                                  }}
+                                  text='Save'
+                                />
+                            }
 
-                        {
-                        }
-                        {
-                          !newComposer &&
-                            <Button
-                              onPress={() => {
-                                realm.write(() => {
-                                  let attr: keyof composer;
-                                  for(attr in state["currentDraft"]){
-                                    selectedComposer[attr] = state["currentDraft"][attr]; //as (string & Date | undefined); Why does the model want this type?
-                                  }
-                                });
-                                navigation.goBack()
-                              }}
-                              text='Save'
-                            />
-                        }
-                        {
-                          newComposer &&
-                            <Button
-                              onPress={() => {
-                                //database.write(async () => {database.get('composers').create(comp => {
-                                //  (comp as Composer).replace(state["currentDraft"])
-                                //}).then(resultingModel => {
-                                //  console.log(resultingModel);
-                                //})});
-                                //WHY DOES THIS WORK?
-                                const ctCopy = state["currentDraft"]
-                                ctCopy.id = new BSON.ObjectId()
-                                realm.write(() => {
-                                  realm.create("Composer", state["currentDraft"]);
-                                });
-                                navigation.goBack();
-                                setNewComposer(false);
-                              }}
-                              text='Save'
-                            />
-                        }
 
-
-                      </View>
-                      <View style={{flex: 1}}>
-                        <DeleteButton
-                          onPress={() => {navigation.goBack(); setNewComposer(false);}}
-                        ><ButtonText>Cancel Edit</ButtonText></DeleteButton>
-                      </View>
-                    </View>
+                          </View>
+                          <View style={{flex: 1}}>
+                            <DeleteButton
+                              onPress={() => {navigation.goBack(); setNewComposer(false);}}
+                            ><ButtonText>Cancel Edit</ButtonText></DeleteButton>
+                          </View>
+                        </View>
+                    }
                   </View>
                 }
               />
