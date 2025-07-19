@@ -110,13 +110,16 @@ export default function DraftNotif({
   const [expanded, setExpanded] = useState(false);
   const theme = useTheme();
   const notificationsPresent = notifications.length > 0;
+  const newItem = (!isComposer && isNewTune) || (isComposer && isNewComposer);
   
-  if( (!isComposer && isNewTune) || (isComposer && isNewComposer) ){
+  useEffect(() => {
+    if(!newItem){
+      setNotifications(ParseNotifications(draftContext, navigation));
+    }
+  }, [draft.dbId, newItem])
+  if(newItem){
     return(<></>);
   }
-  useEffect(() => {
-    setNotifications(ParseNotifications(draftContext, navigation));
-  }, [draft.dbId])
   return(
     <SMarginView>
       <Button

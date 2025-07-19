@@ -60,6 +60,7 @@ export default function Editor({
   const theme = useTheme();
   const [icon, setIcon] =  useState();
   const [confidenceExpanded, setConfidenceExpanded] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(true);
 
   let basicEditorArr = Array.from(miniEditorAttrs.entries());
   if(confidenceExpanded){
@@ -81,6 +82,9 @@ export default function Editor({
           selectedTune[attr_key] = value
         })
       }
+    }else{
+      //Immediate changes don't need to be saved
+      setHasUnsavedChanges(true);
     }
     dispatch({type: 'update_attr', attr: attr_key, value: value});
   }
@@ -186,79 +190,89 @@ export default function Editor({
                   )}
                   ListFooterComponent={
                     <View>
-                      <SubDimText style={{textAlign: "center"}}>
-                        Press and hold if you're sure
-                      </SubDimText>
                       {
                         !newTune && 
-                          <DeleteButton
-                            onLongPress={() => {
-                              realm.write(() => {
-                                realm.delete(selectedTune);
-                              })
-                              navigation.goBack();
-                            }}>
-                            <ButtonText>DELETE TUNE (CAN'T UNDO!)</ButtonText>
-                          </DeleteButton>
+                          <View>
+                            <SubDimText style={{textAlign: "center"}}>
+                              Press and hold if you're sure
+                            </SubDimText>
+                            <DeleteButton
+                              onLongPress={() => {
+                                realm.write(() => {
+                                  realm.delete(selectedTune);
+                                })
+                                navigation.goBack();
+                              }}>
+                              <ButtonText>DELETE TUNE (CAN'T UNDO!)</ButtonText>
+                            </DeleteButton>
+                          </View>
                       }
-                      <View style={{flexDirection: "row"}}>
-                        <View style={{flex: 1}}>
-                          {
-                            // newTune ? save new tune : update existing tune
-                            !newTune &&
-                              <Button
-                                onPress={() => {
-                                  console.log("Saving old tune");
-                                  realm.write(() => {
-                                    for(let attr of state["changedAttrsList"]){
-                                      selectedTune[attr as keyof (tune_draft | Tune)] = (state["currentDraft"][attr as keyof tune_draft])
-                                    }
-                                  });
-                                  navigation.goBack();
-                                  //});
-                                }}
-                                text='Save'
-                              />
-                          }
-                          {
-                            newTune &&
-                              <Button
-                                onPress={() => {
-                                  console.log("Saving new tune!!!");
-                                  const ctCopy = state["currentDraft"]
-                                  ctCopy.id = new BSON.ObjectId()
-                                  realm.write(() => {
-                                    realm.create("Tune",
-                                      state["currentDraft"]
-                                    )
-                                  });
-                                  navigation.goBack();
-                                  setNewTune(false);
-                                }}
-                                text='Save'
-                              />
-                          }
-
-                        </View>
-                        {
-                          newTune ?
-                            <View style={{flex: 1}}>
-                              <DeleteButton
-                                onPress={() => {navigation.goBack(); setNewTune(false);}}
-                              >
-                                <ButtonText>Cancel creation</ButtonText>
-                              </DeleteButton>
+                      {
+                        !hasUnsavedChanges ? 
+                          <View>
+                            <Button text="Done" onPress={() => {navigation.goBack()}}/>
+                          </View>
+                          :
+                          <View>
+                            <View style={{flexDirection: "row"}}>
+                              <View style={{flex: 1}}>
+                                {
+                                  // newTune ? save new tune : update existing tune
+                                  !newTune &&
+                                    <Button
+                                      onPress={() => {
+                                        console.log("Saving old tune");
+                                        realm.write(() => {
+                                          for(let attr of state["changedAttrsList"]){
+                                            selectedTune[attr as keyof (tune_draft | Tune)] = (state["currentDraft"][attr as keyof tune_draft])
+                                          }
+                                        });
+                                        setNewTune(false);
+                                        setHasUnsavedChanges(false);
+                                      }}
+                                      text='Save'
+                                    />
+                                }
+                                {
+                                  newTune &&
+                                    <Button
+                                      onPress={() => {
+                                        console.log("Saving new tune!!!");
+                                        const ctCopy = state["currentDraft"]
+                                        ctCopy.id = new BSON.ObjectId()
+                                        realm.write(() => {
+                                          realm.create("Tune",
+                                            state["currentDraft"]
+                                          )
+                                        });
+                                        setHasUnsavedChanges(false);
+                                        setNewTune(false);
+                                      }}
+                                      text='Save'
+                                    />
+                                }
+                              </View>
+                              {
+                                newTune ?
+                                  <View style={{flex: 1}}>
+                                    <DeleteButton
+                                      onPress={() => {navigation.goBack(); setNewTune(false);}}
+                                    >
+                                      <ButtonText>Cancel creation</ButtonText>
+                                    </DeleteButton>
+                                  </View>
+                                  :
+                                  <View style={{flex: 1}}>
+                                    <DeleteButton
+                                      onPress={() => {navigation.goBack(); setNewTune(false);}}
+                                    >
+                                      <ButtonText>Cancel Edit</ButtonText>
+                                    </DeleteButton>
+                                  </View>
+                              }
                             </View>
-                            :
-                            <View style={{flex: 1}}>
-                              <DeleteButton
-                                onPress={() => {navigation.goBack(); setNewTune(false);}}
-                              >
-                                <ButtonText>Cancel Edit</ButtonText>
-                              </DeleteButton>
-                            </View>
-                        }
-                      </View>
+                          </View>
+                      }
                     </View>
                   }
                 />
