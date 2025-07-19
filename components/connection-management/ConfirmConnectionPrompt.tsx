@@ -33,7 +33,6 @@ export default function ConfirmConectionPrompt({
     if(isComposer){
       //Check for duplicates, not including currently editing item
       let filtered = compQuery.filtered("dbId == $0 AND id != $1", CDContext.cd.dbId, CDContext.id);
-      console.log(CDContext.id);
       if(filtered.length > 0){
         setDuplicateItemFound([true, filtered[0]]);
       }else{
@@ -51,13 +50,6 @@ export default function ConfirmConectionPrompt({
   }, [])
 
   if(duplicateItemFound[0]){
-    //TODO:
-    //Return special menu with options to handle duplicate
-    //I.E. "Delete this one, take me to the other one."
-    // Are you sure? this is permanent -> Tune deleted. Want to view the other one?
-    //Or: "The other one is connected to the wrong item, let me fix it"
-    // Above would take you to the SimilarItemPrompt for the other item. This would mean that SimilarItemPrompt should show the currently editing draft to make things clearer!
-    
     const stand = isComposer ? OnlineDB.getComposerById(CDContext.cd.dbId as number) : OnlineDB.getStandardById(TDContext.td.dbId as number)
     return(
       <SafeBgView>
@@ -84,7 +76,6 @@ export default function ConfirmConectionPrompt({
                 const currentTune = tuneQuery.filtered("id == $0", TDContext.id);
                 realm.write(() => {
                   realm.delete(currentTune);
-                  console.log("deleted new tune");
                 })
               }}>
                 <ButtonText>DELETE this one and keep the other version</ButtonText>
