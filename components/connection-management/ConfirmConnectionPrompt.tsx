@@ -16,7 +16,8 @@ import DraftSummary, {ExistingDbDraftSummary, ItemSummary} from "../../simple_co
 import {SafeAreaView} from "react-native";
 import {ScrollView} from "react-native";
 
-//TODO: Only display what is different! Like a function-less Compare and change
+//TODO: Highlight what is different!
+//TODO: Fix composer deletion without breaking the ComposerListDisplay
 export default function ConfirmConectionPrompt({
 }: {
 }){
@@ -69,17 +70,20 @@ export default function ConfirmConectionPrompt({
                 TDContext.updateTd("dbId", 0, true);
                 navigation.goBack();
               }}/>
-              <DeleteButton onPress={() => {
-                //Exit out of editor
-                navigation.goBack();
-                navigation.goBack();
-                const currentTune = tuneQuery.filtered("id == $0", TDContext.id);
-                realm.write(() => {
-                  realm.delete(currentTune);
-                })
-              }}>
-                <ButtonText>DELETE this one and keep the other version</ButtonText>
-              </DeleteButton>
+              {
+                !isComposer &&
+                <DeleteButton onPress={() => {
+                  //Exit out of editor
+                  navigation.goBack();
+                  navigation.goBack();
+                  const currentTune = tuneQuery.filtered("id == $0", TDContext.id);
+                  realm.write(() => {
+                    realm.delete(currentTune);
+                  })
+                }}>
+                  <ButtonText>DELETE this one and keep the other version</ButtonText>
+                </DeleteButton>
+              }
             </View>
             <View>
               <SubBoldText>Duplicate found on device</SubBoldText>
@@ -90,14 +94,17 @@ export default function ConfirmConectionPrompt({
                   setDuplicateItemFound([false, {}]);
                 })
               }}/>
-              <DeleteButton onPress={() => {
-                realm.write(() => {
-                  realm.delete(duplicateItemFound[1]);
-                  setDuplicateItemFound([false, {}]);
-                })
-              }}>
-              <ButtonText>DELETE duplicate found on device, keep new version</ButtonText>
-              </DeleteButton>
+              {
+                !isComposer &&
+                <DeleteButton onPress={() => {
+                  realm.write(() => {
+                    realm.delete(duplicateItemFound[1]);
+                    setDuplicateItemFound([false, {}]);
+                  })
+                }}>
+                  <ButtonText>DELETE duplicate found on device, keep new version</ButtonText>
+                </DeleteButton>
+              }
             </View>
           </SMarginView>
         </ScrollView>
