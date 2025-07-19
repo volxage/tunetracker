@@ -10,6 +10,7 @@ import {useNavigation} from "@react-navigation/native";
 import {Button} from "../../simple_components/Button";
 import {NewTuneContext} from "../Editor";
 import {useTheme} from "styled-components";
+import {NewComposerContext} from "../ComposerEditor";
 
 type notification_t = {
   name: string
@@ -100,6 +101,7 @@ export default function DraftNotif({
   const td = useContext(TuneDraftContext);
   const cd = useContext(ComposerDraftContext);
   const isNewTune = useContext(NewTuneContext);
+  const isNewComposer = useContext(NewComposerContext);
   //Test if the tunedraft context is an empty object
   const isComposer = Object.keys(cd).length > 0;
   const draftContext = isComposer ? cd : td;
@@ -109,7 +111,7 @@ export default function DraftNotif({
   const theme = useTheme();
   const notificationsPresent = notifications.length > 0;
   
-  if(isNewTune){
+  if( (!isComposer && isNewTune) || (isComposer && isNewComposer) ){
     return(<></>);
   }
   useEffect(() => {

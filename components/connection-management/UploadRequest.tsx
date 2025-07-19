@@ -14,7 +14,6 @@ import OnlineDB from "../../OnlineDB";
 import {compareTuneEditorAttrs, composer, composerEditorAttrs, standard_composer, standard_composer_draft, standard_draft, tune_draft} from "../../types";
 import DraftSummary, {ExistingDbDraftSummary, ToUploadDbDraftSummary} from "../../simple_components/DraftSummary.tsx";
 import ResponseBox from "../ResponseBox.tsx";
-import {NewTuneContext} from "../Editor.tsx";
 
 const exclude_set = new Set([
   "dbId",
@@ -43,7 +42,6 @@ export default function UploadRequest({}: {}){
   const onlineDbDispatch = useContext(OnlineDB.DbDispatchContext);
   const attrs = (isComposer ? composerEditorAttrs : compareTuneEditorAttrs)
     .filter(item => (!exclude_set.has(item[0]) && !item[0].endsWith("Confidence")))
-  const isNewTune = useContext(NewTuneContext);
   const firstUpload = !("dbDraftId" in activeDraft && activeDraft.dbDraftId !== 0);
   useEffect(() => {
     if(isComposer){
