@@ -105,8 +105,6 @@ export default function tuneDraftReducer(state: state_t, action: any){
         }
         //tune.dbId = action["selectedItem"]["id"]
       }
-      console.log("SETTING TO SELECTED");
-      console.log(`New id: ${action["selectedItem"].id}`);
       return {currentDraft: tune, changedAttrsList: [], id: action["selectedItem"].id};
     }
     default: {
