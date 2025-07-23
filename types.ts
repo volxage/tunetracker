@@ -26,6 +26,8 @@ export type tune_draft = {
   "id"?: BSON.ObjectId
   "dbId"?: number
   "dbDraftId"?: number
+  "lastSeenDraftState"?: string
+  "lastRecordedStandardChange"?: Date
   "bio"?: string
   "year"?: number
   "queued"?: boolean
@@ -52,6 +54,8 @@ export type composer = {
   "id"?: BSON.ObjectId
   "dbId"?: number
   "dbDraftId"?: number
+  "lastSeenDraftState"?: string
+  "lastRecordedStandardChange"?: Date
 }
 export type standard_composer = {
   "name": string
