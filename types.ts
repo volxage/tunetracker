@@ -62,6 +62,7 @@ export type standard_composer = {
   "bio"?: string
   "birth"?: Date | undefined
   "death"?: Date | undefined
+  "updatedAt": Date
   "id": number
 }
 export type standard_composer_draft = {
@@ -75,6 +76,7 @@ export type standard = {
   "title": string
   "alternative_title"?: string
   "Composers"?: Array<standard_composer>
+  "updatedAt": Date
   "composer_placeholder"?: string
   "form"?: string
   "bio"?: string
