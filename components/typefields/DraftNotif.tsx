@@ -11,6 +11,7 @@ import {Button} from "../../simple_components/Button";
 import {NewTuneContext} from "../Editor";
 import {useTheme} from "styled-components";
 import {NewComposerContext} from "../ComposerEditor";
+import OnlineDB from "../../OnlineDB";
 
 type notification_t = {
   name: string
@@ -39,6 +40,8 @@ function ParseNotifications(draftContext: draft_context_t, navigation: any){
           }
         ]
       });
+    }else{
+      //Composer has a non-zero dbId
     }
   }else{
     const td = draftContext.td;
@@ -56,6 +59,36 @@ function ParseNotifications(draftContext: draft_context_t, navigation: any){
         ]
       });
     }else{
+      //Tune has a non-zero dbId
+      const standard = OnlineDB.getStandardById(td.dbId);
+      if(!standard || typeof standard === "undefined"){
+        notifications.push({
+          name: "Can't reach online version",
+          description: "We can't reach to the online version you connected to. (It was probably deleted, or there's a problem connecting with the server). If you believe the version you previously connected to is now replaced, you should reconnect to the new version!",
+          choices: [
+            {
+              text: "Replace connection",
+              action: () => {
+                navigation.navigate("SimilarItemPrompt");
+              }
+            }
+          ]
+        });
+      }
+      else if(!td.lastRecordedStandardChange || td.lastRecordedStandardChange < standard.updatedAt){
+        notifications.push({
+          name: "New changes detected",
+          description: "It seems there has been some modifications to the online version since the last time you checked. You should check them out!",
+          choices: [
+            {
+              text: "Check out new changes",
+              action: () => {
+                navigation.navigate("Compare");
+              }
+            }
+          ]
+        });
+      }
     }
   }
   return notifications;
