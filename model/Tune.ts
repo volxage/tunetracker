@@ -28,6 +28,8 @@ export default class Tune extends Realm.Object<Tune, 'title'> {
   lyricsConfidence?: number;
   dbId?: number;
   dbDraftId?: number;
+  lastSeenDraftState?: string;
+  lastRecordedStandardChange?: Date;
   playlists?: Realm.List<Playlist>;
   playedAt?: Date;
   queued?: boolean;
@@ -77,6 +79,8 @@ export default class Tune extends Realm.Object<Tune, 'title'> {
       playedAt: "date?",
       dbId: {type: "int", indexed: true, optional: true},
       dbDraftId: "int?",
+      lastSeenDraftState: "string?",
+      lastRecordedStandardChange: "date?",
       composers: 'Composer[]',
       playlists: 'Playlist[]',
       queued: {type: "bool", default: false}
