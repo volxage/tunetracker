@@ -11,6 +11,7 @@ import {
   SafeBgView,
   SubDimText,
   RowView,
+  SubBoldText,
 } from '../Style.tsx'
 import { Realm, useQuery, useRealm } from '@realm/react'
 
@@ -67,9 +68,11 @@ function AttrBasicRender({attr, attr_key, pretty_attr_key}:{attr: any, attr_key:
         <View style={{borderColor: "#222", borderWidth: 1}}>
           <Title style={{alignSelf: "center"}}>Composers</Title>
           <SubText style={{alignSelf: "center"}}>{(attr as Composer[]).map(cmp => cmp.name).join(", ")}</SubText>
-          <SubText style={{alignSelf: "center", color: "#777", margin: 16}}>
-            Your version and the server's version are the same for this item's {pretty_attr_key}
-          </SubText>
+          <SMarginView>
+            <SubBoldText style={{alignSelf: "center", textAlign: "center"}}>
+              Your version and the server's version are the same for this item's {pretty_attr_key}
+            </SubBoldText>
+          </SMarginView>
         </View>
       );
     }
@@ -78,9 +81,11 @@ function AttrBasicRender({attr, attr_key, pretty_attr_key}:{attr: any, attr_key:
         <View style={{borderColor: "#222", borderWidth: 1}}>
           <Title style={{alignSelf: "center"}}>{pretty_attr_key}</Title>
           <SubText style={{alignSelf: "center"}}>{displayLocalAttr(attr_key, attr)}</SubText>
-          <SubText style={{alignSelf: "center", color: "#777", margin: 16}}>
-            Your version and the server's version are the same for this item's {pretty_attr_key}
-          </SubText>
+          <SMarginView>
+            <SubBoldText style={{alignSelf: "center", textAlign: "center"}}>
+              Your version and the server's version are the same for this item's {pretty_attr_key}
+            </SubBoldText>
+          </SMarginView>
         </View>
       )
     }
