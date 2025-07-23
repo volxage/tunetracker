@@ -197,6 +197,7 @@ function MainMenu({toggleTheme}: {toggleTheme: Function}): React.JSX.Element {
                 }
               }
               tn.dbId = stand['id'];
+              tn.lastRecordedStandardChange = new Date();
               if(stand["Composers"]){
                 const compDbIds = stand["Composers"].map(comp => comp.id)
                 const localComps = allLocalComposers.filter(comp => comp.dbId && compDbIds.includes(comp.dbId));

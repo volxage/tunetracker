@@ -12,6 +12,8 @@ import {NewTuneContext} from "../Editor";
 import {useTheme} from "styled-components";
 import {NewComposerContext} from "../ComposerEditor";
 import OnlineDB from "../../OnlineDB";
+import {AxiosError} from "axios";
+import ResponseHandler from "../../services/ResponseHandler";
 
 type notification_t = {
   name: string
@@ -23,6 +25,38 @@ type notification_t = {
   }[]
 }
 type draft_context_t = tune_draft_context_t | composer_draft_context_t;
+async function tuneDraftFetch(id: number, navigation: any, onlineDbDispatch: any){
+  async function attempt(first: boolean){
+    return ResponseHandler(
+      OnlineDB.getTuneDraft(id),
+      ()=>"",
+      attempt,
+      first, 
+      navigation, 
+      onlineDbDispatch,
+      new Map<number, string>([
+        [404, "Your draft was rejected and deleted, or simply lost by the server. Typically drafts are only deleted (rather than just rejected) if they contain offensive/inappropriate material. Please refrain from including those things in your drafts!"]
+      ])
+    )
+  }
+  return attempt(true);
+}
+async function composerDraftFetch(id: number, navigation: any, onlineDbDispatch: any){
+  async function attempt(first: boolean){
+    return ResponseHandler(
+      OnlineDB.getComposerDraft(id),
+      ()=>"",
+      attempt,
+      first, 
+      navigation, 
+      onlineDbDispatch,
+      new Map<number, string>([
+        [404, "Your composer draft was rejected and deleted, or simply lost by the server. Typically drafts are only deleted (rather than just rejected) if they contain offensive/inappropriate material. Please refrain from including those things in your drafts!"]
+      ])
+    )
+  }
+  return attempt(true);
+}
 function ParseNotifications(draftContext: draft_context_t, navigation: any){
   const notifications = [] as notification_t[];
   if("cd" in draftContext){
@@ -44,11 +78,56 @@ function ParseNotifications(draftContext: draft_context_t, navigation: any){
       //Composer has a non-zero dbId
     }
   }else{
+    //draftContext is for a Tune.
     const td = draftContext.td;
+    if(td.dbDraftId){
+      const names = new Map<string, string>([
+        ["PENDING", "Your draft is pending review."],
+        ["REJECTED", "Your draft was rejected."],
+        ["DELETED", "Your draft was deleted, or can't be found."],
+        ["ACCEPTED", "Your draft was accepted!"]
+      ])
+      const descriptions = new Map<string, string>([
+        ["PENDING", "Your draft is pending review from TuneTracker moderators before other users can use it."],
+        ["REJECTED", "Your draft was rejected by moderators, it was either very innacurate or inappropriate."],
+        ["DELETED", "Your draft seems to have been deleted. It probably contained inappropriate material, or the server is having problems."],
+        ["ACCEPTED", "Congratulations! Your draft was accepted by moderators and can now be used by other users."]
+      ])
+      let res = "";
+      OnlineDB.getTuneDraft(td.dbDraftId).then(({data: data}) => {
+        if(data.pending_review === true){res = "PENDING";}
+        if(!data.pending_review && data.accepted === false){res = "REJECTED"}
+        if(!data.pending_review && data.accepted === true){
+          res = "ACCEPTED"
+          draftContext.updateTd("dbId", data.TuneId, true);
+        }
+      }).catch(err => {
+        if(err instanceof AxiosError){
+          if(err.status === 404){
+            res = "DELETED";
+          }
+        }
+      }).finally(() => {
+        if(res !== "" && td.lastSeenDraftState !== res){
+          notifications.push({
+            name: names.get(res) as string,
+            description: descriptions.get(res) as string,
+            choices: [
+              {
+                text: "Hide this message",
+                action: () => {
+                  draftContext.updateTd("lastSeenDraftState", res, true);
+                }
+              }
+            ]
+          });
+        }
+      })
+    }
     if(!td.dbId || td.dbId === 0){
       notifications.push({
-        name: "Not attached to database",
-        description: "Your tune draft isn't connected to TuneTracker's database. Connecting your tunes will make it easier for you to determine which songs you have in common with your friends, along with other benefits.",
+        name: td.lastSeenDraftState === "PENDING" ? "Not connected: Draft pending" : "Not attached to database",
+        description: td.lastSeenDraftState === "PENDING" ? "You have uploaded your tune, but you won't be connected to the database until it has been accepted. We recommend periodically checking in to make sure it hasn't been added by someone else." : "Your tune draft isn't connected to TuneTracker's database. Connecting your tunes will make it easier for you to determine which songs you have in common with your friends, along with other benefits.",
         choices: [
           {
             text: "Resolve",
@@ -74,20 +153,22 @@ function ParseNotifications(draftContext: draft_context_t, navigation: any){
             }
           ]
         });
-      }
-      else if(!td.lastRecordedStandardChange || td.lastRecordedStandardChange < standard.updatedAt){
-        notifications.push({
-          name: "New changes detected",
-          description: "It seems there has been some modifications to the online version since the last time you checked. You should check them out!",
-          choices: [
-            {
-              text: "Check out new changes",
-              action: () => {
-                navigation.navigate("Compare");
+      }else{
+        //Standard is valid
+        if(!td.lastRecordedStandardChange || td.lastRecordedStandardChange < standard.updatedAt){
+          notifications.push({
+            name: "New changes detected",
+            description: "It seems there has been some modifications to the online version since the last time you checked. You should take a look!",
+            choices: [
+              {
+                text: "Check out new changes",
+                action: () => {
+                  navigation.navigate("Compare");
+                }
               }
-            }
-          ]
-        });
+            ]
+          });
+        }
       }
     }
   }
@@ -149,7 +230,7 @@ export default function DraftNotif({
     if(!newItem){
       setNotifications(ParseNotifications(draftContext, navigation));
     }
-  }, [draft.dbId, newItem])
+  }, [draft.dbId, newItem, draft.lastRecordedStandardChange, draft.lastSeenDraftState])
   if(newItem){
     return(<></>);
   }

@@ -510,7 +510,7 @@ export default function Compare({
                           handleSetCurrentItem(attr, comparedLocalChanges[attr as keyof (Tune | tune_draft)]);
                         }
                       }}
-                      text='Submit to server'
+                      text='Submit to server and save'
                     />
                     <Button style={{flex: 1}}
                       onPress={() => {
@@ -518,6 +518,8 @@ export default function Compare({
                         for(let attr of localState.changedAttrsList){
                           handleSetCurrentItem(attr, comparedLocalChanges[attr as keyof (Tune | tune_draft)]);
                         }
+                        handleSetCurrentItem("lastSeenDraftState", "PENDING", true);
+                        handleSetCurrentItem("lastRecordedStandardChange", new Date(), true);
                       }}
                       text='Save only for me'
                     />

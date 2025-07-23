@@ -110,7 +110,7 @@ export enum Status{
 
 export const editorAttrs: [keyof (tune_draft & tune_draft_extras), string][] = [
   ["dbId", "Database Connection"],
-  ["dbDraftId", "Submitted Draft"],
+  //["dbDraftId", "Submitted Draft"],
   ["title", "Title"],
   ["alternativeTitle", "Alternative Title"],
   ["composers", "Composers"],
@@ -199,6 +199,8 @@ export const tuneDefaults = new Map<keyof Tune, any>([
   ["soloConfidence", 0],
   ["lyricsConfidence", 0],
   ["playedAt", undefined],
+  ["lastSeenDraftState", undefined],
+  ["lastRecordedStandardChange", undefined],
   ["dbId", 0],
   ["dbDraftId", 0]
 ]);
