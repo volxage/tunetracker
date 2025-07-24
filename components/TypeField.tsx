@@ -274,6 +274,18 @@ function TypeField({
         </View>
       </View>
     )
+  }else if (attrKey === "bio"){
+    return(
+      <View style={{padding: 8}}>
+        <Title style={{textAlign: "center"}}>{attrName.toUpperCase()}</Title>
+        <TextInput defaultValue={attr} placeholderTextColor={theme.detailText}
+          onChangeText={(text) => handleSetCurrentItem(attrKey, text)}
+          style={{textAlign: "left", fontWeight: "300", borderColor: theme.detailText, borderWidth: 1, marginHorizontal: 32}}
+          accessibilityLabel={"Enter " + attrName}
+          multiline={true}
+        />
+      </View>
+    );
   }
   else if (typeof attr === "string"){
     return(
