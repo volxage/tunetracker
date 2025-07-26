@@ -33,10 +33,10 @@ import {
 } from 'react-native';
 
 
-import {standard, tune_draft, Status, standardDefaults} from './types.ts';
+import {standard, tune_draft, Status, standardDefaults, standard_composer} from './types.ts';
 import OnlineDB from './OnlineDB.tsx';
 import ExtrasMenu from './components/ExtrasMenu.tsx';
-import {RealmProvider, useQuery, useRealm} from '@realm/react';
+import {RealmProvider, useQuery, useRealm, Realm} from '@realm/react';
 import Tune from './model/Tune.ts';
 import Composer from './model/Composer.ts';
 import Playlist from './model/Playlist.ts';
@@ -57,7 +57,7 @@ import NewTuneSelector from './components/NewTuneSelector.tsx';
 
 const Stack = createNativeStackNavigator();
 
-function migration(oldRealm, newRealm){
+function migration(oldRealm: Realm, newRealm: Realm){
   const keyMap = new Map([
     ["c", 0],
     ["c#", 1],
@@ -100,8 +100,32 @@ function migration(oldRealm, newRealm){
   }
 }
 function App(): React.JSX.Element {
-  const [dbState, dbDispatch] = useReducer(OnlineDB.reducer, {composers: [], standards: [], status: Status.Failed})
+  const [dbState, dbDispatch] = useReducer(OnlineDB.reducer, {composers: [] as standard_composer[], standards: [] as standard[], status: Status.Failed, googleUser: undefined, appleUser: undefined, email: undefined});
   const [theme, setTheme] = useState(dark);
+  const [selectedTune, setSelectedTune]: [Tune | unknown, Function] = useState();
+  const [selectedTunes, setSelectedTunes]: [Tune[], Function] = useState([]);
+  const [newTune, setNewTune] = useState(false);
+  const realm = useRealm();
+  const composerQuery = useQuery(Composer);
+
+  const allLocalComposers = useQuery(Composer);
+  function toggleTheme(){
+    if(theme === dark){
+      try {
+        AsyncStorage.setItem('theme', JSON.stringify(light));
+      } catch (e) {
+        console.error("Error saving theme");
+      }
+      setTheme(light);
+    }else{
+      try {
+        AsyncStorage.setItem('theme', JSON.stringify(dark));
+      } catch (e) {
+        console.error("Error saving theme");
+      }
+      setTheme(dark);
+    }
+  }
   useEffect(() => {
     SplashScreen.hide();
   }, [])
@@ -121,7 +145,6 @@ function App(): React.JSX.Element {
     }
     OnlineDB.updateDispatch(dbDispatch);
   }, []);
-
   return(
     <ThemeProvider theme={theme}>
       <OnlineDB.DbDispatchContext.Provider value={dbDispatch}>
@@ -129,25 +152,140 @@ function App(): React.JSX.Element {
           <BgView style={{flex: 1}}>
           <RealmProvider schema={[Tune, Composer, Playlist]} schemaVersion={10} onMigration={migration}>
               <NavigationContainer>
-                <MainMenu 
-                  toggleTheme={() => {
-                    if(theme === dark){
-                      try {
-                        AsyncStorage.setItem('theme', JSON.stringify(light));
-                      } catch (e) {
-                        console.error("Error saving theme");
-                      }
-                      setTheme(light);
-                    }else{
-                      try {
-                        AsyncStorage.setItem('theme', JSON.stringify(dark));
-                      } catch (e) {
-                        console.error("Error saving theme");
-                      }
-                      setTheme(dark);
+                <Stack.Navigator
+                  screenOptions={{headerShown: false}}
+                  initialRouteName='TuneListDisplay'
+                >
+                  <Stack.Group screenOptions={{presentation: "modal"}}>
+                    <Stack.Screen name="Register" component={Register}/>
+                    <Stack.Screen name="NewTuneSelector" component={NewTuneSelector}/>
+                  </Stack.Group>
+                  <Stack.Screen name="Editor">
+                    {(props) => <Editor
+                      selectedTune={selectedTune as Tune}
+                      newTune={newTune}
+                      setNewTune={setNewTune}
+                    />}
+                  </Stack.Screen>
+                  <Stack.Screen name="Importer">
+                    {(props) =>
+                      <SafeBgView>
+                        <Importer
+                          importingComposers={false}
+                          importingId={false}
+                          importFn={function(stand: standard, skipEditor = false){
+                            const tn: tune_draft = {};
+                            for(let attrPair of standardDefaults){
+                              const standardAttr = stand[attrPair[0]];
+                              const tuneAttrPair = translateAttrFromStandardTune(attrPair[0], standardAttr, composerQuery, realm)
+                              if(attrPair[0] !== "id" && typeof standardAttr !== "undefined"){
+                                tn[tuneAttrPair[0][0]] = tuneAttrPair[0][1];
+                              }
+                            }
+                            tn.dbId = stand['id'];
+                            tn.lastRecordedStandardChange = new Date();
+                            if(stand["Composers"]){
+                              const compDbIds = stand["Composers"].map(comp => comp.id)
+                              const localComps = allLocalComposers.filter(comp => comp.dbId && compDbIds.includes(comp.dbId));
+                              tn.composers = localComps;
+                              if(tn.composers.length !== stand["Composers"].length){
+                                //TODO: Optimize
+                                // Composer(s) are missing from localDB.
+                                // Finds all dbIds where there are no corresponding local entries
+                                const missingComposersIds = compDbIds.filter(id => 
+                                  !localComps.some(dbComposer => dbComposer.dbId === id)
+                                );
+                                // Maps missing IDs to onineDB composers
+                                const missingComposers = missingComposersIds.map(missingCompId => 
+                                  stand["Composers"]?.find(onlineComp => onlineComp.id === missingCompId)
+                                );
+                                realm.write(() => {
+                                  for(const missingComp of missingComposers){
+                                    if(!missingComp){
+                                      //TODO: Handle error from composer not being found in OnlineDB
+                                    }else{
+                                      const createdComp = realm.create(Composer, {
+                                        id: new BSON.ObjectId(),
+                                        name: missingComp.name ? missingComp.name : "New Song",
+                                        birth: missingComp?.birth,
+                                        death: missingComp?.death,
+                                        dbId: missingComp.id,
+                                      })
+                                      tn.composers?.push(createdComp)
+                                    }
+                                  }
+                                });
+                              }
+                            }
+                            if(skipEditor){
+                              console.log("Skipping editor");
+                              realm.write(() => {
+                                //ensure this works
+                                const modifiedTune = tn;
+                                modifiedTune.id = new BSON.ObjectId();
+                                modifiedTune.dbId = stand.id;
+                                realm.create(Tune, modifiedTune as Tune);
+                              });
+                            }else{
+                              console.log("Not skipping editor");
+                              setSelectedTune(tn);
+                              setNewTune(true);
+                              props.navigation.goBack();
+                              props.navigation.navigate("Editor")
+                            }
+                          }}/>
+                      </SafeBgView>
                     }
-                  }}
-                />
+                  </Stack.Screen>
+                  <Stack.Screen name="TuneListDisplay">
+                    {(props) =>
+                      <SafeBgView>
+                        <View>
+                          <TuneListDisplay
+                            setSelectedTune={setSelectedTune}
+                            setNewTune={setNewTune}
+                            allowNewTune={true}
+                            selectMode={false}
+                            selectedTunes={selectedTunes}
+                            setSelectedTunes={setSelectedTunes}
+                          />
+                        </View>
+                      </SafeBgView>
+                    }
+                  </Stack.Screen>
+                  <Stack.Screen name="ExtrasMenu">
+                    {(props) => 
+                      <ExtrasMenu
+                        toggleTheme={toggleTheme}
+                      />
+                    }
+                  </Stack.Screen>
+                  <Stack.Screen name="AccountDeletion">
+                    {(props) => 
+                      <AccountDeletion/>
+                    }
+                  </Stack.Screen>
+                  <Stack.Screen name="ProfileMenu" component={ProfileMenu}/>
+                  <Stack.Screen name="PlaylistViewer">
+                    {(props) =>
+                      <SafeBgView>
+                        <View style={{flex:1}}>
+                          <PlaylistViewer/>
+                        </View>
+                      </SafeBgView>
+                    }
+                  </Stack.Screen>
+                  <Stack.Screen name="PlaylistImporter">
+                    {(props) =>
+                      <SafeBgView>
+                        <View style={{flex:1}}>
+                          <PlaylistImporter
+                          />
+                        </View>
+                      </SafeBgView>
+                    }
+                  </Stack.Screen>
+                </Stack.Navigator>
               </NavigationContainer>
             </RealmProvider>
           </BgView>
@@ -157,149 +295,4 @@ function App(): React.JSX.Element {
   );
 }
 
-function MainMenu({toggleTheme}: {toggleTheme: Function}): React.JSX.Element {
-  const [selectedTune, setSelectedTune]: [Tune | unknown, Function] = useState();
-  const [selectedTunes, setSelectedTunes]: [Tune[], Function] = useState([]);
-  const [newTune, setNewTune] = useState(false);
-  const realm = useRealm();
-  const composerQuery = useQuery(Composer);
-
-  const allLocalComposers = useQuery(Composer);
-  return(
-    <Stack.Navigator
-      screenOptions={{headerShown: false}}
-      initialRouteName='TuneListDisplay'
-    >
-      <Stack.Group screenOptions={{presentation: "modal"}}>
-        <Stack.Screen name="Register" component={Register}/>
-        <Stack.Screen name="NewTuneSelector" component={NewTuneSelector}/>
-      </Stack.Group>
-      <Stack.Screen name="Editor">
-        {(props) => <Editor
-          selectedTune={selectedTune as Tune}
-          newTune={newTune}
-          setNewTune={setNewTune}
-        />}
-      </Stack.Screen>
-      <Stack.Screen name="Importer">
-        {(props) =>
-        <SafeBgView>
-          <Importer
-            importingComposers={false}
-            importingId={false}
-            importFn={function(stand: standard, skipEditor = false){
-              const tn: tune_draft = {};
-              for(let attrPair of standardDefaults){
-                const standardAttr = stand[attrPair[0]];
-                const tuneAttrPair = translateAttrFromStandardTune(attrPair[0], standardAttr, composerQuery, realm)
-                if(attrPair[0] !== "id" && typeof standardAttr !== "undefined"){
-                  tn[tuneAttrPair[0][0]] = tuneAttrPair[0][1];
-                }
-              }
-              tn.dbId = stand['id'];
-              tn.lastRecordedStandardChange = new Date();
-              if(stand["Composers"]){
-                const compDbIds = stand["Composers"].map(comp => comp.id)
-                const localComps = allLocalComposers.filter(comp => comp.dbId && compDbIds.includes(comp.dbId));
-                tn.composers = localComps;
-                if(tn.composers.length !== stand["Composers"].length){
-                  //TODO: Optimize
-                  // Composer(s) are missing from localDB.
-                  // Finds all dbIds where there are no corresponding local entries
-                  const missingComposersIds = compDbIds.filter(id => 
-                    !localComps.some(dbComposer => dbComposer.dbId === id)
-                  );
-                  // Maps missing IDs to onineDB composers
-                  const missingComposers = missingComposersIds.map(missingCompId => 
-                    stand["Composers"]?.find(onlineComp => onlineComp.id === missingCompId)
-                  );
-                  realm.write(() => {
-                    for(const missingComp of missingComposers){
-                      if(!missingComp){
-                        //TODO: Handle error from composer not being found in OnlineDB
-                      }else{
-                        const createdComp = realm.create(Composer, {
-                          id: new BSON.ObjectId(),
-                          name: missingComp.name ? missingComp.name : "New Song",
-                          birth: missingComp?.birth,
-                          death: missingComp?.death,
-                          dbId: missingComp.id,
-                        })
-                        tn.composers?.push(createdComp)
-                      }
-                    }
-                  });
-                }
-              }
-              if(skipEditor){
-                console.log("Skipping editor");
-                realm.write(() => {
-                  //ensure this works
-                  const modifiedTune = tn;
-                  modifiedTune.id = new BSON.ObjectId();
-                  modifiedTune.dbId = stand.id;
-                  realm.create(Tune, modifiedTune as Tune);
-                });
-              }else{
-                console.log("Not skipping editor");
-                setSelectedTune(tn);
-                setNewTune(true);
-                props.navigation.goBack();
-                props.navigation.navigate("Editor")
-              }
-            }}/>
-          </SafeBgView>
-        }
-      </Stack.Screen>
-      <Stack.Screen name="TuneListDisplay">
-        {(props) =>
-        <SafeBgView>
-          <View>
-            <TuneListDisplay
-              setSelectedTune={setSelectedTune}
-              setNewTune={setNewTune}
-              allowNewTune={true}
-              selectMode={false}
-              selectedTunes={selectedTunes}
-              setSelectedTunes={setSelectedTunes}
-            />
-          </View>
-        </SafeBgView>
-      }
-    </Stack.Screen>
-    <Stack.Screen name="ExtrasMenu">
-      {(props) => 
-      <ExtrasMenu
-        toggleTheme={toggleTheme}
-      />
-      }
-    </Stack.Screen>
-    <Stack.Screen name="AccountDeletion">
-      {(props) => 
-      <AccountDeletion/>
-      }
-    </Stack.Screen>
-    <Stack.Screen name="ProfileMenu" component={ProfileMenu}/>
-    <Stack.Screen name="PlaylistViewer">
-        {(props) =>
-        <SafeBgView>
-          <View style={{flex:1}}>
-            <PlaylistViewer/>
-          </View>
-        </SafeBgView>
-        }
-    </Stack.Screen>
-    <Stack.Screen name="PlaylistImporter">
-        {(props) =>
-        <SafeBgView>
-          <View style={{flex:1}}>
-            <PlaylistImporter
-            />
-          </View>
-        </SafeBgView>
-        }
-    </Stack.Screen>
-  </Stack.Navigator>
-);
-}
 export default App;
