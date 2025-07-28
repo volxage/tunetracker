@@ -16,7 +16,8 @@ import {
   RowView,
   SubBoldText,
   SMarginView,
-  PanelView
+  PanelView,
+  DeleteButton
 } from '../Style.tsx'
 import itemSort from '../itemSort.tsx'
 import { Picker } from '@react-native-picker/picker';
@@ -422,13 +423,9 @@ function TuneListHeader({
           }}
           iconName='plus'
         />
-        <Button 
-          style={{
-            flex:1
-          }}
-          onPress={() => navigation.navigate("ExtrasMenu")}
-          iconName="dots-horizontal"
-        />
+              <DeleteButton style={{flex: 1}} onPress={() => {navigation.goBack();}}>
+          <ButtonText><Icon name="arrow-left-bold" size={30}/></ButtonText>
+        </DeleteButton>
     </View>
     }
     </View>
