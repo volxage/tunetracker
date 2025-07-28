@@ -53,6 +53,7 @@ import {BgView, SafeBgView} from './Style.tsx';
 import AsyncStorage from '@react-native-community/async-storage';
 import AccountDeletion from './components/AccountDeletion.tsx';
 import NewTuneSelector from './components/NewTuneSelector.tsx';
+import MainMenu from './components/MainMenu.tsx';
 
 
 const Stack = createNativeStackNavigator();
@@ -150,12 +151,13 @@ function App(): React.JSX.Element {
               <NavigationContainer>
                 <Stack.Navigator
                   screenOptions={{headerShown: false}}
-                  initialRouteName='TuneListDisplay'
+                  initialRouteName='MainMenu'
                 >
                   <Stack.Group screenOptions={{presentation: "modal"}}>
                     <Stack.Screen name="Register" component={Register}/>
                     <Stack.Screen name="NewTuneSelector" component={NewTuneSelector}/>
                   </Stack.Group>
+                  <Stack.Screen name="MainMenu" component={MainMenu}/>
                   <Stack.Screen name="Editor">
                     {(props) => <Editor
                       selectedTune={selectedTune as Tune}

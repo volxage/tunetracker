@@ -1,5 +1,7 @@
 import {useNavigation} from "@react-navigation/native";
-import {SafeBgView} from "../Style";
+import {SafeBgView, SMarginView, Title} from "../Style";
+import {Pressable} from "react-native";
+import {Button} from "../simple_components/Button";
 
 function FancyButton({}:{}){
 
@@ -53,11 +55,16 @@ export default function MainMenu({ }:{ }){
       text: "Setlist Builder",
       action: () => {}
     }
-
-
   ] as buttonStruct_t[]
+  const buttons = buttonStructs.map(btnStruct => 
+    <Button text={btnStruct.text} key={btnStruct.text} iconName={btnStruct.iconName} onPress={btnStruct.action}/>
+  )
   return(
     <SafeBgView>
+      <SMarginView>
+        <Title>Welcome to TuneTracker!</Title>
+        {buttons}
+      </SMarginView>
     </SafeBgView>
   );
 }
