@@ -16,6 +16,7 @@ import {
   ButtonText,
   DeleteButton,
   BgView,
+  SafeBgView,
 } from '../Style.tsx'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import Fuse from 'fuse.js';
@@ -296,7 +297,7 @@ export default function ComposerListDisplay({
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name={"ComposerListDisplay"} >
         {props => 
-          <SafeAreaView>
+          <SafeBgView>
             <FlatList
               data={displayComposers}
               extraData={selectedAttr}
@@ -326,7 +327,7 @@ export default function ComposerListDisplay({
                 </TouchableHighlight>
               )}
             />
-          </SafeAreaView>
+          </SafeBgView>
         }
     </Stack.Screen>
       <Stack.Screen name='ComposerEditor'>
