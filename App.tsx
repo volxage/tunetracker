@@ -35,7 +35,7 @@ import {
 
 import {standard, tune_draft, Status, standardDefaults, standard_composer} from './types.ts';
 import OnlineDB from './OnlineDB.tsx';
-import ExtrasMenu from './components/ExtrasMenu.tsx';
+import Settings from './components/Settings.tsx';
 import {RealmProvider, useQuery, useRealm, Realm} from '@realm/react';
 import Tune from './model/Tune.ts';
 import Composer from './model/Composer.ts';
@@ -186,9 +186,9 @@ function App(): React.JSX.Element {
                       </SafeBgView>
                     }
                   </Stack.Screen>
-                  <Stack.Screen name="ExtrasMenu">
+                  <Stack.Screen name="Settings">
                     {(props) => 
-                      <ExtrasMenu
+                      <Settings
                         toggleTheme={toggleTheme}
                       />
                     }

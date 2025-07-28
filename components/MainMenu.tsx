@@ -1,5 +1,5 @@
 import {useNavigation} from "@react-navigation/native";
-import {SafeBgView, SMarginView, Title} from "../Style";
+import {RowView, SafeBgView, SMarginView, Title} from "../Style";
 import {Pressable} from "react-native";
 import {Button} from "../simple_components/Button";
 
@@ -33,9 +33,20 @@ export default function MainMenu({ }:{ }){
       action: () => {navigation.navigate("PlaylistViewer")}
     },
     {
+      //TODO: Find better icon than "book-music"
+      iconName: "book-music",
+      text: "Setlist Builder",
+      action: () => {}
+    },
+    {
       iconName: "account",
       text: "Profile",
       action: () => {navigation.navigate("ProfileMenu")}
+    },
+    {
+      iconName: "cog",
+      text: "Settings",
+      action: () => {navigation.navigate("Settings")}
     },
     //TODO: Make menu for Queue or Practice that automatically suggests a low-confidence tune (or even composer!)
     //{
@@ -43,27 +54,29 @@ export default function MainMenu({ }:{ }){
     //  text: "Practice",
     //  action: () => {navigation.navigate("ProfileMenu")}
     //},
-    //TODO: Rename ExtrasMenu and fix it
   //{
   //  iconName: ,
   //  text: "Settings",
   //  action: () => {navigation.navigate("ProfileMenu")}
   //},
-    {
-      //TODO: Find better icon than "book-music"
-      iconName: "book-music",
-      text: "Setlist Builder",
-      action: () => {}
-    }
   ] as buttonStruct_t[]
   const buttons = buttonStructs.map(btnStruct => 
-    <Button text={btnStruct.text} key={btnStruct.text} iconName={btnStruct.iconName} onPress={btnStruct.action}/>
+    <Button text={btnStruct.text} key={btnStruct.text} iconName={btnStruct.iconName} onPress={btnStruct.action} style={{flex: 1, height: 100}}/>
   )
+  const rows = [];
+  for(let rowIndex = 0; rowIndex < buttons.length / 2; rowIndex++){
+    rows.push(
+      <RowView key={rowIndex}>
+        {buttons.at(rowIndex * 2)}
+        {buttons.at(rowIndex * 2 + 1)}
+      </RowView>
+    )
+  }
   return(
     <SafeBgView>
       <SMarginView>
         <Title>Welcome to TuneTracker!</Title>
-        {buttons}
+        {rows}
       </SMarginView>
     </SafeBgView>
   );
