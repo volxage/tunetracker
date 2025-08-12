@@ -1,7 +1,8 @@
 import {SafeAreaView, View} from "react-native";
 import {BgView, ButtonText, DeleteButton, RowView, SubDimText, SubText, TextInput, Title} from "../Style";
-import {createContext, useContext, useState} from "react";
+import {createContext, useContext, useEffect, useState} from "react";
 import {Button} from "../simple_components/Button";
+import httpToServer from "../http-to-server";
 
 type user_t = {
   userId: number,
@@ -18,10 +19,11 @@ enum Mode{
   HOST,
   WAITING,
   QUICK,
+  NORMAL,
   DONE
 }
 
-const SessionContext = createContext({} as session_t)
+const SessionContext = createContext({state: {} as session_t, fn: (() => {}) as Function})
 //modes:
 //1: Option to host, or enter host's code
 //2: Host mode, where you pick users to be in session
@@ -31,8 +33,11 @@ const SessionContext = createContext({} as session_t)
 //  Host gets an option to "wrap it up" and the best candidates are displayed.
 export default function SetlistBuilder({}:{}){
   const [mode, setMode] = useState(Mode.START);
+  const [session, setSession] = useState({} as session_t);
+  useEffect(() => {
+  }, [])
   return(
-    <SessionContext.Provider value={}>
+    <SessionContext.Provider value={{state: session, fn: setSession}}>
       <BgView>
         <SafeAreaView>
           <ModeParse mode={mode}/>
@@ -53,6 +58,14 @@ function ModeParse({mode}:{mode: Mode}){
 }
 
 function SessionStart({}:{}){
+  function submit(){
+    httpToServer.post("/setlists", {
+      name: "",
+      description: "",
+      open: "",
+      active: ""
+    })
+  }
   return(
     <View>
       <Button text="Host new session"/>
@@ -68,9 +81,21 @@ function SessionHost({}:{}){
   const session = useContext(SessionContext);
   return(
     <View>
-      <Title>Hosting session {session.sessionId}</Title>
-      <SubText>Tell your friends to enter the session number {session.sessionId} and join! Start when everyone's ready.</SubText>
+      <Title>Hosting session {session.state.sessionId}</Title>
+      <SubText>Tell your friends to enter the session number {session.state.sessionId} and join! Start when everyone's ready.</SubText>
       <Button text="Close invite and begin session"/>
     </View>
   )
+}
+function SessionWaiting({}:{}){
+
+}
+function SessionQuick({}:{}){
+
+}
+function SessionNormal({}:{}){
+
+}
+function SessionDone({}:{}){
+
 }
