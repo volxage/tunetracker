@@ -20,6 +20,7 @@ enum Mode{
   WAITING,
   QUICK,
   NORMAL,
+  NORMALFINALIZE,
   DONE
 }
 
@@ -42,7 +43,7 @@ export default function SetlistBuilder({}:{}){
         <SafeAreaView>
           <ModeParse mode={mode}/>
           <DeleteButton>
-            <ButtonText>Go Back</ButtonText>
+            <ButtonText>Exit</ButtonText>
           </DeleteButton>
         </SafeAreaView>
       </BgView>
@@ -53,6 +54,24 @@ function ModeParse({mode}:{mode: Mode}){
   switch(mode){
     case Mode.START: {
       return(<SessionStart/>);
+    }
+    case Mode.HOST: {
+      return(<SessionHost/>);
+    }
+    case Mode.WAITING: {
+      return(<SessionWaiting/>);
+    }
+    case Mode.QUICK: {
+      return(<SessionQuick/>);
+    }
+    case Mode.NORMAL: {
+      return (<SessionNormal/>);
+    }
+    case Mode.NORMALFINALIZE: {
+      return (<SessionNormalFinalize/>);
+    }
+    case Mode.DONE: {
+      return(<SessionDone/>);
     }
   }
 }
@@ -82,20 +101,62 @@ function SessionHost({}:{}){
   return(
     <View>
       <Title>Hosting session {session.state.sessionId}</Title>
-      <SubText>Tell your friends to enter the session number {session.state.sessionId} and join! Start when everyone's ready.</SubText>
+      <SubText>Tell your friends to enter the session number {session.state.sessionId} and join! Start when all players are in the session.</SubText>
       <Button text="Close invite and begin session"/>
     </View>
   )
 }
 function SessionWaiting({}:{}){
-
+  const session = useContext(SessionContext);
+  return(
+    <View>
+      <Title>Waiting for session {session.state.sessionId} to start</Title>
+      <SubText>Once all players are in the session, tell the host to start it!</SubText>
+    </View>
+  );
 }
 function SessionQuick({}:{}){
-
+  const session = useContext(SessionContext);
+  const [finalizing, setFinalizing] = useState(false);
+  if(!finalizing){
+    return(
+      <View>
+        <Title>Quick session mode</Title>
+        <SubText>NOT IMPLEMENTED YET</SubText>
+      </View>
+    );
+  }
+  return(
+    <View>
+      <Title>Host finalizing session</Title>
+      <SubText>Discuss with the other players to pick from the songs below. Because you're in quick mode, the host will need to finalize the session.</SubText>
+    </View>
+  );
 }
 function SessionNormal({}:{}){
-
+  const session = useContext(SessionContext);
+  return(
+    <View>
+      <Title>Session started</Title>
+      <SubText>NOT IMPLEMENTED YET</SubText>
+    </View>
+  );
+}
+function SessionNormalFinalize({}:{}){
+  //TODO: Add chat?
+  const session = useContext(SessionContext);
+  return(
+    <View>
+      <Title>Finalize Session</Title>
+      <SubText>NOT IMPLEMENTED YET</SubText>
+    </View>
+  );
 }
 function SessionDone({}:{}){
-
+  return(
+    <View>
+      <Title>Thanks for using TuneTracker!</Title>
+      <SubText>Here are your tunes for the session:</SubText>
+    </View>
+  );
 }
