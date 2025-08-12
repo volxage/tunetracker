@@ -36,7 +36,7 @@ export default function MainMenu({ }:{ }){
       //TODO: Find better icon than "book-music"
       iconName: "book-music",
       text: "Setlist Builder",
-      action: () => {}
+      action: () => {navigation.navigate("SetlistBuilder")}
     },
     {
       iconName: "account",

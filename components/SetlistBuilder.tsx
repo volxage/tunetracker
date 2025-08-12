@@ -1,8 +1,10 @@
 import {SafeAreaView, View} from "react-native";
-import {BgView, ButtonText, DeleteButton, RowView, SubDimText, SubText, TextInput, Title} from "../Style";
+import {ButtonText, DeleteButton, RowView, SafeBgView, SubDimText, SubText, TextInput, Title} from "../Style";
 import {createContext, useContext, useEffect, useState} from "react";
 import {Button} from "../simple_components/Button";
 import httpToServer from "../http-to-server";
+import {useTheme} from "styled-components";
+import {useNavigation} from "@react-navigation/native";
 
 type user_t = {
   userId: number,
@@ -11,6 +13,7 @@ type user_t = {
 }
 type session_t = {
   sessionId: number,
+  mode: Mode,
   users: user_t[]
 }
 
@@ -33,20 +36,31 @@ const SessionContext = createContext({state: {} as session_t, fn: (() => {}) as 
 //  Options: "I'd rather not" "Let's play it" "I don't know this tune"
 //  Host gets an option to "wrap it up" and the best candidates are displayed.
 export default function SetlistBuilder({}:{}){
-  const [mode, setMode] = useState(Mode.START);
-  const [session, setSession] = useState({} as session_t);
+  const [session, setSession] = useState({mode: Mode.START} as session_t);
+  function updateSession(key: keyof session_t, attr){
+    const newState = {} as session_t;
+    //Copy previous session state
+    let ky: keyof session_t;
+    for(ky in session){
+      newState[ky] = session[ky];
+    }
+    newState[key] = attr;
+    console.log(newState);
+    setSession(newState);
+  }
+  const navigation = useNavigation();
   useEffect(() => {
   }, [])
   return(
-    <SessionContext.Provider value={{state: session, fn: setSession}}>
-      <BgView>
+    <SessionContext.Provider value={{state: session, fn: updateSession}}>
+      <SafeBgView>
         <SafeAreaView>
-          <ModeParse mode={mode}/>
-          <DeleteButton>
+          <ModeParse mode={session.mode}/>
+          <DeleteButton onPress={() => {navigation.goBack();}}>
             <ButtonText>Exit</ButtonText>
           </DeleteButton>
         </SafeAreaView>
-      </BgView>
+      </SafeBgView>
     </SessionContext.Provider>
   )
 }
@@ -77,6 +91,9 @@ function ModeParse({mode}:{mode: Mode}){
 }
 
 function SessionStart({}:{}){
+  const theme = useTheme();
+  const [inputId, setInputId] = useState(0);
+  const session = useContext(SessionContext);
   function submit(){
     httpToServer.post("/setlists", {
       name: "",
@@ -87,11 +104,25 @@ function SessionStart({}:{}){
   }
   return(
     <View>
-      <Button text="Host new session"/>
-      <SubDimText>or...</SubDimText>
+      <Button text="Host new session" onPress={() => {
+        // TOOD:Request server to create session and get it's id
+        session.fn("mode", Mode.HOST)
+      }}/>
+      <SubDimText style={{textAlign: "center"}}>or...</SubDimText>
       <RowView>
-        <TextInput/>
-        <Button text="Join by ID"/>
+        <TextInput style={{borderColor: theme.detailText, borderWidth: 1, flex:2}}
+          keyboardType="numeric"
+          value={String(inputId)}
+          onChangeText={(text) => {
+            text = text.replace(/\D/g,'');
+            if(Number.isNaN(Number(text))){
+              text = "0"
+              console.error("Cannot parse number, perhaps non-numeric character snuck through?");
+            }
+            setInputId(Number(text));
+          }}
+        />
+        <Button text="Join by ID" style={{flex: 1}}/>
       </RowView>
     </View>
   )
@@ -102,7 +133,7 @@ function SessionHost({}:{}){
     <View>
       <Title>Hosting session {session.state.sessionId}</Title>
       <SubText>Tell your friends to enter the session number {session.state.sessionId} and join! Start when all players are in the session.</SubText>
-      <Button text="Close invite and begin session"/>
+      <Button text="Close invite and begin session" onPress={() => {session.fn("mode", Mode.QUICK)}}/>
     </View>
   )
 }

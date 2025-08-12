@@ -54,6 +54,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import AccountDeletion from './components/AccountDeletion.tsx';
 import NewTuneSelector from './components/NewTuneSelector.tsx';
 import MainMenu from './components/MainMenu.tsx';
+import SetlistBuilder from './components/SetlistBuilder.tsx';
 
 
 const Stack = createNativeStackNavigator();
@@ -170,6 +171,7 @@ function App(): React.JSX.Element {
                       <OuterImporter setSelectedTune={setSelectedTune} setNewTune={setNewTune}/>
                     }
                   </Stack.Screen>
+                  <Stack.Screen name="SetlistBuilder" component={SetlistBuilder}/>
                   <Stack.Screen name="TuneListDisplay">
                     {(props) =>
                       <SafeBgView>
