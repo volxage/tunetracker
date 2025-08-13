@@ -1,16 +1,13 @@
-import {SafeAreaView, View} from "react-native";
-import {ButtonText, DeleteButton, RowView, SafeBgView, SubDimText, SubText, TextInput, Title} from "../Style";
+import {FlatList, SafeAreaView, TouchableHighlight, View} from "react-native";
+import {ButtonText, DeleteButton, RowView, SafeBgView, SMarginView, SubBoldText, SubDimText, SubText, TextInput, Title} from "../Style";
 import {createContext, useContext, useEffect, useState} from "react";
 import {Button} from "../simple_components/Button";
 import httpToServer from "../http-to-server";
 import {useTheme} from "styled-components";
 import {useNavigation} from "@react-navigation/native";
+import {user_t} from "../types";
+import User from "../simple_components/User";
 
-type user_t = {
-  userId: number,
-  nickname: string,
-  nameShown: boolean
-}
 type session_t = {
   sessionId: number,
   mode: Mode,
@@ -36,7 +33,11 @@ const SessionContext = createContext({state: {} as session_t, fn: (() => {}) as 
 //  Options: "I'd rather not" "Let's play it" "I don't know this tune"
 //  Host gets an option to "wrap it up" and the best candidates are displayed.
 export default function SetlistBuilder({}:{}){
-  const [session, setSession] = useState({mode: Mode.START} as session_t);
+  const [session, setSession] = useState(
+    {
+      mode: Mode.START,
+      users: [{nickname: "User1"}, {nickname: "User2"}]
+    } as session_t);
   function updateSession(key: keyof session_t, attr){
     const newState = {} as session_t;
     //Copy previous session state
@@ -45,7 +46,6 @@ export default function SetlistBuilder({}:{}){
       newState[ky] = session[ky];
     }
     newState[key] = attr;
-    console.log(newState);
     setSession(newState);
   }
   const navigation = useNavigation();
@@ -132,7 +132,18 @@ function SessionHost({}:{}){
   return(
     <View>
       <Title>Hosting session {session.state.sessionId}</Title>
-      <SubText>Tell your friends to enter the session number {session.state.sessionId} and join! Start when all players are in the session.</SubText>
+      <SMarginView>
+        <SubText>Tell the other players to enter the session number:</SubText>
+        <Title>{session.state.sessionId}</Title>
+        <SubText>Start when all players are shown below in the session.</SubText>
+      </SMarginView>
+      <FlatList data={session.state.users} renderItem={({item}) => {
+        return(
+          <TouchableHighlight>
+            <User user={item}/>
+          </TouchableHighlight>
+        );
+      }}/>
       <Button text="Close invite and begin session" onPress={() => {session.fn("mode", Mode.QUICK)}}/>
     </View>
   )
@@ -153,14 +164,13 @@ function SessionQuick({}:{}){
     return(
       <View>
         <Title>Quick session mode</Title>
-        <SubText>NOT IMPLEMENTED YET</SubText>
       </View>
     );
   }
   return(
     <View>
       <Title>Host finalizing session</Title>
-      <SubText>Discuss with the other players to pick from the songs below. Because you're in quick mode, the host will need to finalize the session.</SubText>
+      <SubText>Discuss with the host to pick from the songs below. Because you're in quick mode, the host will need to finalize the session.</SubText>
     </View>
   );
 }

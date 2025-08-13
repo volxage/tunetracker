@@ -265,3 +265,8 @@ export const keyMap = new Map([
   ["bb", 10],
   ["b", 11],
 ])
+export type user_t = {
+  userId: number,
+  nickname: string,
+  nameShown: boolean
+}
