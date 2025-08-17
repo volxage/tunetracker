@@ -7,6 +7,8 @@ import {useTheme} from "styled-components";
 import {useNavigation} from "@react-navigation/native";
 import {user_t} from "../types";
 import User from "../simple_components/User";
+import {isAxiosError} from "axios";
+import OnlineDB from "../OnlineDB";
 
 type session_t = {
   sessionId: number,
@@ -38,14 +40,16 @@ export default function SetlistBuilder({}:{}){
       mode: Mode.START,
       users: [{nickname: "User1"}, {nickname: "User2"}]
     } as session_t);
-  function updateSession(key: keyof session_t, attr){
+  function updateSession(changes: session_t){
     const newState = {} as session_t;
     //Copy previous session state
-    let ky: keyof session_t;
-    for(ky in session){
-      newState[ky] = session[ky];
+    let key: keyof session_t;
+    for(key in session){
+      newState[key] = session[key];
     }
-    newState[key] = attr;
+    for(key in changes){
+      newState[key] = changes[key];
+    }
     setSession(newState);
   }
   const navigation = useNavigation();
@@ -55,6 +59,7 @@ export default function SetlistBuilder({}:{}){
     <SessionContext.Provider value={{state: session, fn: updateSession}}>
       <SafeBgView>
         <SafeAreaView>
+          <Title>Setlist Builder</Title>
           <ModeParse mode={session.mode}/>
           <DeleteButton onPress={() => {navigation.goBack();}}>
             <ButtonText>Exit</ButtonText>
@@ -94,6 +99,8 @@ function SessionStart({}:{}){
   const theme = useTheme();
   const [inputId, setInputId] = useState(0);
   const session = useContext(SessionContext);
+  const navigation = useNavigation();
+  const dispatch = useContext(OnlineDB.DbDispatchContext);
   function submit(){
     httpToServer.post("/setlists", {
       name: "",
@@ -106,7 +113,31 @@ function SessionStart({}:{}){
     <View>
       <Button text="Host new session" onPress={() => {
         // TOOD:Request server to create session and get it's id
-        session.fn("mode", Mode.HOST)
+        httpToServer.post('/setlists/', {
+          open: true,
+          active: false
+        }).then(res => {
+            console.log("Successful. Heres res:");
+            console.log(res);
+            //Extract session id from response
+            session.fn({"mode": Mode.HOST, "sessionId": res.data.id})
+        }).catch(err => {
+            console.error(err);
+            if(isAxiosError(err)){
+              if(err.response?.data.message === "Not logged in, or invalid session"){
+                //TODO: RESPONSE HANDLER!
+                OnlineDB.tryLogin(navigation, dispatch, 0).then(() =>{
+                  httpToServer.post('/setlists/', {
+                    open: true,
+                    active: false
+                  }).then(res => {
+                      //Extract session id from response
+                      session.fn({"mode": Mode.HOST, "sessionId": res.data.id})
+                    })
+                  })
+              }
+            }
+          })
       }}/>
       <SubDimText style={{textAlign: "center"}}>or...</SubDimText>
       <RowView>
@@ -122,7 +153,10 @@ function SessionStart({}:{}){
             setInputId(Number(text));
           }}
         />
-        <Button text="Join by ID" style={{flex: 1}}/>
+        <Button text="Join by ID" style={{flex: 1}} onPress={() => {
+
+        }}/>
+        <Title>Previous sessions:</Title>
       </RowView>
     </View>
   )
@@ -144,7 +178,16 @@ function SessionHost({}:{}){
           </TouchableHighlight>
         );
       }}/>
-      <Button text="Close invite and begin session" onPress={() => {session.fn("mode", Mode.QUICK)}}/>
+      <Button text="Close invite and begin session" onPress={() => {
+        httpToServer.post("/setlists", {
+          open: false,
+          active: true
+        }).then(res =>{
+            session.fn({"mode": Mode.QUICK})
+          }).catch(err => {
+            console.error("Failed to close and activate session");
+          })
+      }}/>
     </View>
   )
 }
@@ -160,6 +203,11 @@ function SessionWaiting({}:{}){
 function SessionQuick({}:{}){
   const session = useContext(SessionContext);
   const [finalizing, setFinalizing] = useState(false);
+  useEffect(() => {
+    httpToServer.get(`/setlists/gettunes/${session.state.sessionId}`);
+    console.log(session.state.sessionId);
+
+  },[session.state.sessionId]);
   if(!finalizing){
     return(
       <View>
