@@ -335,7 +335,11 @@ function SessionTuneList({}:{}){
   const tunes = sessionContext.state.tunes
   return(
     <View>
-      <FlatList data={tunes} renderItem={({index, item: tune}) => {
+      <FlatList data={tunes}
+        ListEmptyComponent={() => 
+          <SubDimText style={{textAlign: "center"}}>(Empty. Suggest a tune below!)</SubDimText>
+        }
+        renderItem={({index, item: tune}) => {
         return(<SessionTuneRender tune={tune}/>)
       }}/>
     </View>
