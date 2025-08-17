@@ -1,19 +1,25 @@
 import {FlatList, SafeAreaView, TouchableHighlight, View} from "react-native";
-import {ButtonText, DeleteButton, RowView, SafeBgView, SMarginView, SubBoldText, SubDimText, SubText, TextInput, Title} from "../Style";
+import {BgView, ButtonText, DeleteButton, RowView, SafeBgView, SMarginView, SubBoldText, SubDimText, SubText, Text, TextInput, Title} from "../Style";
 import {createContext, useContext, useEffect, useState} from "react";
 import {Button} from "../simple_components/Button";
 import httpToServer from "../http-to-server";
 import {useTheme} from "styled-components";
 import {useNavigation} from "@react-navigation/native";
-import {user_t} from "../types";
+import {standard, user_t} from "../types";
 import User from "../simple_components/User";
 import {isAxiosError} from "axios";
 import OnlineDB from "../OnlineDB";
+import {useQuery} from "@realm/react";
+import Tune from "../model/Tune";
+import dateDisplay from "../textconverters/dateDisplay";
+import Composer from "../model/Composer";
+import {BSON, OrderedCollection} from "realm";
 
 type session_t = {
   sessionId: number,
   mode: Mode,
-  users: user_t[]
+  users: user_t[],
+  tunes: standard[]
 }
 
 enum Mode{
@@ -117,8 +123,6 @@ function SessionStart({}:{}){
           open: true,
           active: false
         }).then(res => {
-            console.log("Successful. Heres res:");
-            console.log(res);
             //Extract session id from response
             session.fn({"mode": Mode.HOST, "sessionId": res.data.id})
         }).catch(err => {
@@ -205,13 +209,18 @@ function SessionQuick({}:{}){
   const [finalizing, setFinalizing] = useState(false);
   useEffect(() => {
     httpToServer.get(`/setlists/gettunes/${session.state.sessionId}`);
-    console.log(session.state.sessionId);
 
   },[session.state.sessionId]);
   if(!finalizing){
     return(
       <View>
         <Title>Quick session mode</Title>
+        <View>
+          <SubBoldText style={{textAlign: "center"}}>Setlist suggested tunes</SubBoldText>
+          <SessionTuneList/>
+          <SubBoldText style={{textAlign: "center"}}>Your tunes</SubBoldText>
+          <LocalTuneList/>
+        </View>
       </View>
     );
   }
@@ -246,6 +255,108 @@ function SessionDone({}:{}){
     <View>
       <Title>Thanks for using TuneTracker!</Title>
       <SubText>Here are your tunes for the session:</SubText>
+    </View>
+  );
+}
+
+function prettyPrint(object: unknown): string{
+  if (typeof object == "string") return object as string;
+  if (typeof object == "number") return JSON.stringify(object);
+  if (object instanceof Composer) return object.name;
+  if (Array.isArray(object) || object instanceof OrderedCollection) return object.map(obj => {return prettyPrint(obj)}).join(", ");
+  if (object instanceof Date){
+    if(dateDisplay(object) === dateDisplay(new Date())) return dateDisplay(object) + " (TODAY)"
+    return dateDisplay(object);
+  }
+  if (typeof object == "boolean") return object ? "Yes" : "No";
+  return "(Empty)";
+}
+function TuneRender({
+  tune,
+  addIgnoredTune
+}:{
+  tune: Tune,
+  addIgnoredTune: Function
+}){
+  const [marked, setMarked] = useState(false);
+  const theme = useTheme();
+  const [isExpanded, setIsExpanded] = useState(false);
+  return(
+    <TouchableHighlight onPress={() => {
+      if(!marked){
+        setIsExpanded(!isExpanded);
+      }
+    }}>
+      <BgView style={{backgroundColor: marked ? theme.panelBg : theme.bg, padding: 8}}>
+        <Text>{tune.title}</Text>
+        <SubText>{prettyPrint(tune["composers"])}</SubText>
+      {
+        isExpanded && 
+          <View>
+            <RowView>
+              <Button text="Suggest tune" style={{flex:1}}/>
+              <Button text="Ignore for now" style={{flex:1}} onPress={() => {addIgnoredTune(tune)}}/>
+            </RowView>
+          </View>
+      }
+      </BgView>
+    </TouchableHighlight>
+  );
+}
+function SessionTuneRender({
+  tune
+}:{
+  tune: standard
+}){
+  const theme = useTheme();
+  const [isExpanded, setIsExpanded] = useState(false);
+  return(
+    <TouchableHighlight onPress={() => {
+      setIsExpanded(!isExpanded);
+    }}>
+      <BgView>
+        <Text>{tune.title}</Text>
+        <SubText>{tune.Composers?.map(cmp => cmp.name).join(", ")}</SubText>
+      {
+        isExpanded && 
+          <View>
+            <RowView>
+              <Button text="Suggest tune" style={{flex:1}}/>
+              <Button text="Ignore for now" style={{flex:1}} onPress={() => {}}/>
+            </RowView>
+          </View>
+      }
+      </BgView>
+    </TouchableHighlight>
+  );
+}
+function SessionTuneList({}:{}){
+  const sessionContext = useContext(SessionContext);
+  const tunes = sessionContext.state.tunes
+  return(
+    <View>
+      <FlatList data={tunes} renderItem={({index, item: tune}) => {
+        return(<SessionTuneRender tune={tune}/>)
+      }}/>
+    </View>
+  )
+}
+function LocalTuneList({}:{}){
+  const allSongs = useQuery(Tune);
+  const [ignoreList, setIgnoreList] = useState([] as BSON.ObjectID[])
+  function addIgnoredTune(tune: Tune){
+    if(!ignoreList.some(id => id.equals(tune.id))){
+      setIgnoreList(ignoreList.concat(tune.id));
+    }
+  }
+  let displaySongs = allSongs.filtered("!(id IN $0)", ignoreList);
+  console.log(ignoreList);
+  return(
+    <View>
+      <SubDimText style={{textAlign: "center"}}>{ignoreList.length} ignored tunes</SubDimText>
+      <FlatList data={displaySongs} renderItem={({index, item: tune}) => {
+        return(<TuneRender tune={tune} addIgnoredTune={addIgnoredTune}/>)
+      }}/>
     </View>
   );
 }
