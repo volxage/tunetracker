@@ -161,8 +161,8 @@ function SessionStart({}:{}){
         <Button text="Join by ID" style={{flex: 1}} onPress={() => {
 
         }}/>
-        <Title>Previous sessions:</Title>
       </RowView>
+      <Title>Previous sessions:</Title>
     </View>
   )
 }
