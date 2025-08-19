@@ -44,7 +44,8 @@ export default function SetlistBuilder({}:{}){
   const [session, setSession] = useState(
     {
       mode: Mode.START,
-      users: [{nickname: "User1"}, {nickname: "User2"}]
+      users: [{nickname: "User1"}, {nickname: "User2"}],
+      tunes: []
     } as session_t);
   function updateSession(changes: session_t){
     const newState = {} as session_t;
@@ -273,28 +274,56 @@ function prettyPrint(object: unknown): string{
 }
 function TuneRender({
   tune,
-  addIgnoredTune
+  addIgnoredTune,
+  addAddedTune
 }:{
   tune: Tune,
-  addIgnoredTune: Function
+    addIgnoredTune: Function,
+    addAddedTune: Function
 }){
   const [marked, setMarked] = useState(false);
   const theme = useTheme();
   const [isExpanded, setIsExpanded] = useState(false);
+  const sessionContext = useContext(SessionContext);
+  const standards = useContext(OnlineDB.DbStateContext).standards;
   return(
     <TouchableHighlight onPress={() => {
-      if(!marked){
-        setIsExpanded(!isExpanded);
-      }
+      setIsExpanded(!isExpanded);
     }}>
       <BgView style={{backgroundColor: marked ? theme.panelBg : theme.bg, padding: 8}}>
-        <Text>{tune.title}</Text>
+        <RowView>
+          <Text>{tune.title}</Text>
+          <SubText style={{paddingLeft: 8, textAlignVertical: "center"}}>{tune.confidence}</SubText>
+        </RowView>
         <SubText>{prettyPrint(tune["composers"])}</SubText>
       {
         isExpanded && 
           <View>
             <RowView>
-              <Button text="Suggest tune" style={{flex:1}}/>
+                <Button text="Suggest tune" style={{flex:1}} onPress={() => {
+                  if(tune.dbId){
+                    //TODO: Handle errors for both functions
+                    httpToServer.post('/setlists/addtune', {
+                      setlistId: sessionContext.state.sessionId,
+                      tuneId: tune.dbId,
+                      score: 100,
+                      index: sessionContext.state.tunes.length
+                    }).then(res => {
+                        console.log(res.data);
+                        addAddedTune(tune);
+                        sessionContext.fn({"tunes":
+                          sessionContext.state.tunes.concat(OnlineDB.getStandardById(res.data.SetlistTuneTuneId))
+                        })
+                        //TODO: Use below function after getting pinged from server.
+                    //httpToServer.get(`/setlists/gettunes/${sessionContext.state.sessionId}`).then(res => {
+                    //  addAddedTune(tune);
+                    //  sessionContext.fn({"tunes": res.data})
+                    //});
+                    });
+                  }else{
+                    //TODO: Find way to upload tune as just title and composer for compatibility with unuploaded tunes
+                  }
+                }}/>
               <Button text="Ignore for now" style={{flex:1}} onPress={() => {addIgnoredTune(tune)}}/>
             </RowView>
           </View>
@@ -321,9 +350,10 @@ function SessionTuneRender({
         isExpanded && 
           <View>
             <RowView>
-              <Button text="Suggest tune" style={{flex:1}}/>
-              <Button text="Ignore for now" style={{flex:1}} onPress={() => {}}/>
+              <Button text="I'd rather not." style={{flex:1, borderColor: theme.pending}}/>
+              <Button text="Let's play it!" style={{flex:1}}/>
             </RowView>
+            <Button text="I don't know this tune" style={{flex:1, borderColor: theme.delete}}/>
           </View>
       }
       </BgView>
@@ -348,18 +378,32 @@ function SessionTuneList({}:{}){
 function LocalTuneList({}:{}){
   const allSongs = useQuery(Tune);
   const [ignoreList, setIgnoreList] = useState([] as BSON.ObjectID[])
+  const [addedList, setAddedList] = useState([] as number[]) //standard ids
   function addIgnoredTune(tune: Tune){
     if(!ignoreList.some(id => id.equals(tune.id))){
       setIgnoreList(ignoreList.concat(tune.id));
     }
   }
-  let displaySongs = allSongs.filtered("!(id IN $0)", ignoreList);
-  console.log(ignoreList);
+  function addAddedTune(tune: Tune){
+    if(tune.dbId){
+      if(!addedList.some(dbId => dbId === tune.dbId)){
+        setAddedList(addedList.concat(tune.dbId));
+      }
+    }else{
+      //TODO: handle non-uploaded suggested tunes to be hidden
+    }
+  }
+  let displaySongs = allSongs.filtered("!(id IN $0)", ignoreList)
+    .filtered("!(dbId IN $0)", addedList)
+    .sorted("confidence", true);
   return(
     <View>
-      <SubDimText style={{textAlign: "center"}}>{ignoreList.length} ignored tunes</SubDimText>
+      {
+        ignoreList.length > 0 && 
+          <SubDimText style={{textAlign: "center"}} onPress={() => {setIgnoreList([])}}>{ignoreList.length} ignored tunes, tap to show all</SubDimText>
+      }
       <FlatList data={displaySongs} renderItem={({index, item: tune}) => {
-        return(<TuneRender tune={tune} addIgnoredTune={addIgnoredTune}/>)
+        return(<TuneRender tune={tune} addIgnoredTune={addIgnoredTune} addAddedTune={addAddedTune}/>)
       }}/>
     </View>
   );
