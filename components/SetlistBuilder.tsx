@@ -7,7 +7,7 @@ import {useTheme} from "styled-components";
 import {useNavigation} from "@react-navigation/native";
 import {standard, user_t} from "../types";
 import User from "../simple_components/User";
-import {isAxiosError} from "axios";
+import {AxiosError, isAxiosError} from "axios";
 import OnlineDB from "../OnlineDB";
 import {useQuery} from "@realm/react";
 import Tune from "../model/Tune";
@@ -108,6 +108,17 @@ function SessionStart({}:{}){
   const session = useContext(SessionContext);
   const navigation = useNavigation();
   const dispatch = useContext(OnlineDB.DbDispatchContext);
+  const [prevSessions, setPrevSessions] = useState([]);
+  useEffect(() => {
+    httpToServer.get("/setlists/").then(res => {
+      setPrevSessions(res.data);
+    }).catch(err => {
+      if(err instanceof AxiosError){
+        console.log(err.response?.data)
+        console.log(JSON.stringify(err));
+      }
+    })
+  },[session.state.sessionId]);
   function submit(){
     httpToServer.post("/setlists", {
       name: "",
