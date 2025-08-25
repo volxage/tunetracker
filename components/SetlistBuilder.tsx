@@ -32,6 +32,18 @@ enum Mode{
   DONE
 }
 
+type online_session_t = {
+  id: number,
+  name: string,
+  description: string
+  open: boolean,
+  active: boolean,
+}
+type prev_sessions_t = {
+  joined: online_session_t[],
+  hosted: online_session_t[]
+}
+
 const SessionContext = createContext({state: {} as session_t, fn: (() => {}) as Function})
 //modes:
 //1: Option to host, or enter host's code
@@ -108,9 +120,29 @@ function SessionStart({}:{}){
   const session = useContext(SessionContext);
   const navigation = useNavigation();
   const dispatch = useContext(OnlineDB.DbDispatchContext);
-  const [prevSessions, setPrevSessions] = useState([]);
+  const [prevSessions, setPrevSessions] = useState({joined: [], hosted: []} as prev_sessions_t);
+  const [owned, setOwned] = useState(false);
+  console.log(prevSessions.joined);
+  const JoinedItems = prevSessions.joined.map(item => 
+  {
+    return (
+      <View>
+        <Text>{item.name}</Text>
+        <SubText>{item.description}</SubText>
+        <SubDimText>{item.id}</SubDimText>
+      </View>
+    )
+  })
+  const Hosteditems = prevSessions.hosted.map(item => 
+    <View>
+      <Text>{item.name}</Text>
+      <SubText>{item.description}</SubText>
+      <SubDimText>{item.id}</SubDimText>
+    </View>
+  )
   useEffect(() => {
     httpToServer.get("/setlists/").then(res => {
+      console.log(res.data);
       setPrevSessions(res.data);
     }).catch(err => {
       if(err instanceof AxiosError){
@@ -174,6 +206,26 @@ function SessionStart({}:{}){
         }}/>
       </RowView>
       <Title>Previous sessions:</Title>
+      <SubText>Showing {owned ? "owned" : "joined"} Setlists</SubText>
+      <Button text={`${owned ? "Joined" : "Joined"} setlists`} onPress={() => {setOwned(!owned)}}/>
+      {
+        owned ? 
+          <FlatList data={prevSessions.hosted} renderItem={({item}) =>
+            <SMarginView>
+              <Text>{item.name}</Text>
+              <SubText>{item.description || "(No description)"}</SubText>
+              <SubDimText>{item.id}</SubDimText>
+            </SMarginView>
+          }/>
+          :
+          <FlatList data={prevSessions.joined} renderItem={({item}) =>
+            <SMarginView>
+              <Text>{item.name}</Text>
+              <SubText>{item.description || "(No description)"}</SubText>
+              <SubDimText>{item.id}</SubDimText>
+            </SMarginView>
+          }/>
+      }
     </View>
   )
 }
