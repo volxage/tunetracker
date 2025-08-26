@@ -31,6 +31,13 @@ enum Mode{
   NORMALFINALIZE,
   DONE
 }
+enum ServerMode{
+  WAITING,
+  DONE,
+  QUICK,
+  NORMAL,
+  NORMALFINALIZE,
+}
 
 type online_session_t = {
   id: number,
@@ -56,10 +63,11 @@ export default function SetlistBuilder({}:{}){
   const [session, setSession] = useState(
     {
       mode: Mode.START,
-      users: [{nickname: "User1"}, {nickname: "User2"}],
-      tunes: []
+      users: [{nickname: "User1", id: -1}, {nickname: "User2", id: -2}],
+      tunes: [],
+      sessionId: -1
     } as session_t);
-  function updateSession(changes: session_t){
+  function updateSession(changes: session_t, toServer = false){
     const newState = {} as session_t;
     //Copy previous session state
     let key: keyof session_t;
@@ -69,7 +77,13 @@ export default function SetlistBuilder({}:{}){
     for(key in changes){
       newState[key] = changes[key];
     }
-    setSession(newState);
+    if(toServer){
+      httpToServer.post("/setlists", {changes}).then(res => {
+        setSession(newState);
+      })
+    }else{
+      setSession(newState);
+    }
   }
   const navigation = useNavigation();
   useEffect(() => {
@@ -122,27 +136,10 @@ function SessionStart({}:{}){
   const dispatch = useContext(OnlineDB.DbDispatchContext);
   const [prevSessions, setPrevSessions] = useState({joined: [], hosted: []} as prev_sessions_t);
   const [owned, setOwned] = useState(false);
-  console.log(prevSessions.joined);
-  const JoinedItems = prevSessions.joined.map(item => 
-  {
-    return (
-      <View>
-        <Text>{item.name}</Text>
-        <SubText>{item.description}</SubText>
-        <SubDimText>{item.id}</SubDimText>
-      </View>
-    )
-  })
-  const Hosteditems = prevSessions.hosted.map(item => 
-    <View>
-      <Text>{item.name}</Text>
-      <SubText>{item.description}</SubText>
-      <SubDimText>{item.id}</SubDimText>
-    </View>
-  )
   useEffect(() => {
     httpToServer.get("/setlists/").then(res => {
-      console.log(res.data);
+      const data = res.data as prev_sessions_t;
+      data.joined = data.joined.filter(st => !data.hosted.some(hst => hst.id === st.id))
       setPrevSessions(res.data);
     }).catch(err => {
       if(err instanceof AxiosError){
@@ -165,7 +162,7 @@ function SessionStart({}:{}){
         // TOOD:Request server to create session and get it's id
         httpToServer.post('/setlists/', {
           open: true,
-          active: false
+          active: false,
         }).then(res => {
             //Extract session id from response
             session.fn({"mode": Mode.HOST, "sessionId": res.data.id})
@@ -206,8 +203,8 @@ function SessionStart({}:{}){
         }}/>
       </RowView>
       <Title>Previous sessions:</Title>
-      <SubText>Showing {owned ? "owned" : "joined"} Setlists</SubText>
-      <Button text={`${owned ? "Joined" : "Joined"} setlists`} onPress={() => {setOwned(!owned)}}/>
+      <SubBoldText>Showing {owned ? "owned" : "joined"} Setlists</SubBoldText>
+      <Button text={`Show ${owned ? "Joined" : "Hosted"} setlists`} onPress={() => {setOwned(!owned)}}/>
       {
         owned ? 
           <FlatList data={prevSessions.hosted} renderItem={({item}) =>
