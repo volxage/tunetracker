@@ -136,7 +136,7 @@ function SessionStart({}:{}){
   const navigation = useNavigation();
   const dispatch = useContext(OnlineDB.DbDispatchContext);
   const [prevSessions, setPrevSessions] = useState({joined: [], hosted: []} as prev_sessions_t);
-  const [owned, setOwned] = useState(false);
+  const [owned, setOwned] = useState(true);
   useEffect(() => {
     httpToServer.get("/setlists/").then(res => {
       const data = res.data as prev_sessions_t;
@@ -212,7 +212,7 @@ function SessionStart({}:{}){
             <SMarginView>
               <Text>{item.name}</Text>
               <SubText>{item.description || "(No description)"}</SubText>
-              <SubDimText>{item.id}</SubDimText>
+              <SubDimText>ID: {item.id}</SubDimText>
             </SMarginView>
           }/>
           :
@@ -220,9 +220,15 @@ function SessionStart({}:{}){
             <SMarginView>
               <Text>{item.name}</Text>
               <SubText>{item.description || "(No description)"}</SubText>
-              <SubDimText>{item.id}</SubDimText>
+              <SubDimText>ID: {item.id}</SubDimText>
             </SMarginView>
-          }/>
+          }
+          ListEmptyComponent={() => 
+            <View>
+              <SubText>No setlists here. Tap above if you are looking for setlists that you <SubBoldText>hosted/created.</SubBoldText></SubText>
+            </View>
+          }
+          />
       }
     </View>
   )
