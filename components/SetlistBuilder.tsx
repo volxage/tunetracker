@@ -1,4 +1,4 @@
-import {FlatList, SafeAreaView, TouchableHighlight, View} from "react-native";
+import {FlatList, Pressable, SafeAreaView, TouchableHighlight, View} from "react-native";
 import {BgView, ButtonText, DeleteButton, RowView, SafeBgView, SMarginView, SubBoldText, SubDimText, SubText, Text, TextInput, Title} from "../Style";
 import {createContext, useContext, useEffect, useState} from "react";
 import {Button} from "../simple_components/Button";
@@ -40,12 +40,34 @@ enum ServerMode{
   NORMALFINALIZE,
 }
 
+//Mostly the same with some exceptions
+const HostModeMap = new Map<ServerMode, Mode>([
+  [ServerMode.WAITING, Mode.HOST],
+  [ServerMode.DONE, Mode.DONE],
+  [ServerMode.QUICK, Mode.QUICK],
+  //TODO: Investigate
+  [ServerMode.QUICKFINALIZE, Mode.QUICK],
+  [ServerMode.NORMAL, Mode.NORMAL],
+  [ServerMode.NORMALFINALIZE, Mode.NORMALFINALIZE]
+]);
+
+//Almost entirely the same
+const PlayerModeMap = new Map<ServerMode, Mode>([
+  [ServerMode.WAITING, Mode.WAITING],
+  [ServerMode.DONE, Mode.DONE],
+  [ServerMode.QUICK, Mode.QUICK],
+  //TODO: Investigate
+  [ServerMode.QUICKFINALIZE, Mode.QUICK],
+  [ServerMode.NORMAL, Mode.NORMAL],
+  [ServerMode.NORMALFINALIZE, Mode.NORMALFINALIZE]
+]);
 type online_session_t = {
   id: number,
   name: string,
   description: string
   open: boolean,
   active: boolean,
+  mode: ServerMode
 }
 type prev_sessions_t = {
   joined: online_session_t[],
@@ -164,6 +186,7 @@ function SessionStart({}:{}){
         httpToServer.post('/setlists/', {
           open: true,
           active: false,
+          mode: ServerMode.WAITING
         }).then(res => {
             //Extract session id from response
             session.fn({"mode": Mode.HOST, "sessionId": res.data.id})
@@ -209,19 +232,32 @@ function SessionStart({}:{}){
       {
         owned ? 
           <FlatList data={prevSessions.hosted} renderItem={({item}) =>
-            <SMarginView>
-              <Text>{item.name}</Text>
-              <SubText>{item.description || "(No description)"}</SubText>
-              <SubDimText>ID: {item.id}</SubDimText>
-            </SMarginView>
+            <Pressable onPress={() => {
+              console.log("prevSession:");
+              console.log(item);
+              let mode = HostModeMap.get(item.mode);
+              session.fn({
+                sessionId: item.id,
+                name: item.name,
+                mode: mode
+              })
+            }}>
+              <SMarginView>
+                <Text>{item.name}</Text>
+                <SubText>{item.description || "(No description)"}</SubText>
+                <SubDimText>ID: {item.id}</SubDimText>
+              </SMarginView>
+            </Pressable>
           }/>
           :
           <FlatList data={prevSessions.joined} renderItem={({item}) =>
-            <SMarginView>
-              <Text>{item.name}</Text>
-              <SubText>{item.description || "(No description)"}</SubText>
-              <SubDimText>ID: {item.id}</SubDimText>
-            </SMarginView>
+            <Pressable>
+              <SMarginView>
+                <Text>{item.name}</Text>
+                <SubText>{item.description || "(No description)"}</SubText>
+                <SubDimText>ID: {item.id}</SubDimText>
+              </SMarginView>
+            </Pressable>
           }
           ListEmptyComponent={() => 
             <View>
