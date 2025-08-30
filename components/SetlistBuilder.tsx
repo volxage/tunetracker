@@ -233,8 +233,6 @@ function SessionStart({}:{}){
         owned ? 
           <FlatList data={prevSessions.hosted} renderItem={({item}) =>
             <Pressable onPress={() => {
-              console.log("prevSession:");
-              console.log(item);
               let mode = HostModeMap.get(item.mode);
               session.fn({
                 sessionId: item.id,
@@ -251,7 +249,14 @@ function SessionStart({}:{}){
           }/>
           :
           <FlatList data={prevSessions.joined} renderItem={({item}) =>
-            <Pressable>
+            <Pressable onPress={() => {
+              let mode = PlayerModeMap.get(item.mode);
+              session.fn({
+                sessionId: item.id,
+                name: item.name,
+                mode: mode
+              })
+            }}>
               <SMarginView>
                 <Text>{item.name}</Text>
                 <SubText>{item.description || "(No description)"}</SubText>
