@@ -35,6 +35,7 @@ enum ServerMode{
   WAITING,
   DONE,
   QUICK,
+  QUICKFINALIZE,
   NORMAL,
   NORMALFINALIZE,
 }
@@ -51,7 +52,7 @@ type prev_sessions_t = {
   hosted: online_session_t[]
 }
 
-const SessionContext = createContext({state: {} as session_t, fn: (() => {}) as Function})
+const SessionContext = createContext({state: {tunes: [], users: [], mode: Mode.START, sessionId: 0} as session_t, fn: (() => {}) as Function})
 //modes:
 //1: Option to host, or enter host's code
 //2: Host mode, where you pick users to be in session
@@ -249,9 +250,9 @@ function SessionHost({}:{}){
           active: true
         }).then(res =>{
             session.fn({"mode": Mode.QUICK})
-          }).catch(err => {
-            console.error("Failed to close and activate session");
-          })
+        }).catch(err => {
+          console.error("Failed to close and activate session");
+        })
       }}/>
     </View>
   )
@@ -269,8 +270,9 @@ function SessionQuick({}:{}){
   const session = useContext(SessionContext);
   const [finalizing, setFinalizing] = useState(false);
   useEffect(() => {
-    httpToServer.get(`/setlists/gettunes/${session.state.sessionId}`);
-
+    httpToServer.get(`/setlists/gettunes/${session.state.sessionId}`).then(res => {
+      session.fn({"tunes": res.data})
+    })
   },[session.state.sessionId]);
   if(!finalizing){
     return(
@@ -282,6 +284,7 @@ function SessionQuick({}:{}){
           <SubBoldText style={{textAlign: "center"}}>Your tunes</SubBoldText>
           <LocalTuneList/>
         </View>
+        <Button text="FINALIZE"/>
       </View>
     );
   }
@@ -379,7 +382,10 @@ function TuneRender({
                     //  addAddedTune(tune);
                     //  sessionContext.fn({"tunes": res.data})
                     //});
-                    });
+                    }).catch(err => {
+                        console.error(JSON.stringify(err));
+                        console.log(sessionContext.state)
+                      });
                   }else{
                     //TODO: Find way to upload tune as just title and composer for compatibility with unuploaded tunes
                   }
@@ -439,6 +445,7 @@ function LocalTuneList({}:{}){
   const allSongs = useQuery(Tune);
   const [ignoreList, setIgnoreList] = useState([] as BSON.ObjectID[])
   const [addedList, setAddedList] = useState([] as number[]) //standard ids
+  const session = useContext(SessionContext);
   function addIgnoredTune(tune: Tune){
     if(!ignoreList.some(id => id.equals(tune.id))){
       setIgnoreList(ignoreList.concat(tune.id));
@@ -454,8 +461,9 @@ function LocalTuneList({}:{}){
     }
   }
   let displaySongs = allSongs.filtered("!(id IN $0)", ignoreList)
-    .filtered("!(dbId IN $0)", addedList)
-    .sorted("confidence", true);
+  .filtered("!(dbId IN $0)", addedList)
+  .filtered("!(dbId IN $0)", session.state.tunes.map(tn => tn.id))
+  .sorted("confidence", true);
   return(
     <View>
       {
