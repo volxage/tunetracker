@@ -117,8 +117,19 @@ export default function SetlistBuilder({}:{}){
         <SafeAreaView>
           <Title>Setlist Builder</Title>
           <ModeParse mode={session.mode}/>
+          {
+            session.mode !== Mode.START && 
+            <DeleteButton onPress={() => {updateSession({
+              mode: Mode.START,
+              users: [{nickname: "User1", id: -1}, {nickname: "User2", id: -2}],
+              tunes: [],
+              sessionId: -1
+            })}}>
+              <ButtonText>Back</ButtonText>
+            </DeleteButton>
+          }
           <DeleteButton onPress={() => {navigation.goBack();}}>
-            <ButtonText>Exit</ButtonText>
+            <ButtonText>Exit to Menu</ButtonText>
           </DeleteButton>
         </SafeAreaView>
       </SafeBgView>
