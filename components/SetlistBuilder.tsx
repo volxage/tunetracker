@@ -292,12 +292,15 @@ function SessionHost({}:{}){
         );
       }}/>
       <Button text="Close invite and begin session" onPress={() => {
-        httpToServer.post("/setlists", {
+        httpToServer.post("/setlists/update", {
           open: false,
-          active: true
+          active: true,
+          setlistId: session.state.sessionId,
+          mode: Mode.QUICK
         }).then(res =>{
             session.fn({"mode": Mode.QUICK})
         }).catch(err => {
+          console.log(err);
           console.error("Failed to close and activate session");
         })
       }}/>
