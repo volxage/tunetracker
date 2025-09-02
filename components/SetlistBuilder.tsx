@@ -234,6 +234,9 @@ function SessionStart({}:{}){
           <FlatList data={prevSessions.hosted} renderItem={({item}) =>
             <Pressable onPress={() => {
               let mode = HostModeMap.get(item.mode);
+              if(typeof mode === "undefined"){
+                mode = Mode.HOST;
+              }
               session.fn({
                 sessionId: item.id,
                 name: item.name,
@@ -251,6 +254,9 @@ function SessionStart({}:{}){
           <FlatList data={prevSessions.joined} renderItem={({item}) =>
             <Pressable onPress={() => {
               let mode = PlayerModeMap.get(item.mode);
+              if(typeof mode === "undefined"){
+                mode = Mode.WAITING;
+              }
               session.fn({
                 sessionId: item.id,
                 name: item.name,
