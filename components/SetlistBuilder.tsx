@@ -75,6 +75,39 @@ type prev_sessions_t = {
 }
 
 const SessionContext = createContext({state: {tunes: [], users: [], mode: Mode.START, sessionId: 0} as session_t, fn: (() => {}) as Function})
+
+enum ServerFunction{
+  "ADDTUNE",
+  "MODESWITCH",
+  "USERJOIN",
+  "FINALIZEUPDATE",
+  "LOGINREQUEST"
+}
+//Server needs to know these things:
+//What mode the user THINKS is active (to ensure user doesn't accidentally send bad message)
+//Function for the server to complete
+//Payload (preferrably one data type or simple array?)
+type socket_client_message_t = {
+  sessionId: number,
+  mode: ServerMode,
+  type: ServerFunction,
+  payload: any
+}
+//Resuse ServerFunctions for both inbound and outbound?
+
+//User needs to know these things:
+//What mode the server is on, in case the user has an outdated mode somehow
+//What type of data the server is sending
+//The payload
+type socket_server_message_t = {
+  sessionId: number,
+  mode: ServerMode,
+  type: ServerFunction,
+  payload: any
+}
+
+const WSContext = createContext({} as WebSocket)
+//const WSContext = createContext(new WebSocket("wss://api.jhilla.org/tunetracker/setlists"))
 //modes:
 //1: Option to host, or enter host's code
 //2: Host mode, where you pick users to be in session
@@ -109,30 +142,60 @@ export default function SetlistBuilder({}:{}){
     }
   }
   const navigation = useNavigation();
+  const [ws, setWs] = useState({} as WebSocket);
   useEffect(() => {
+    //Hopefully only open one websocket!
+    if(ws.OPEN){
+      console.error("Attempted double websocket");
+      ws.close();
+    }
+    const newWs = new WebSocket("wss://api.jhilla.org/tunetracker/setlists");
+    ws.onopen = function(){
+      ws.send("TUNE TRACKER TO SERVER, COME IN??")
+    }
+    ws.onmessage = function(rs){
+      console.log("WE GOT A MESSAGE!");
+      console.log(rs.data);
+    }
+    ws.onerror = e => {
+      // an error occurred
+      console.error("An error occured...");
+      console.log(e.message);
+    };
+    ws.onclose = e => {
+      // connection closed
+      console.log("Closing.");
+      console.log(e.code, e.reason);
+    };
+    setWs(newWs);
   }, [])
   return(
     <SessionContext.Provider value={{state: session, fn: updateSession}}>
-      <SafeBgView>
-        <SafeAreaView>
-          <Title>Setlist Builder</Title>
-          <ModeParse mode={session.mode}/>
-          {
-            session.mode !== Mode.START && 
-            <DeleteButton onPress={() => {updateSession({
-              mode: Mode.START,
-              users: [{nickname: "User1", id: -1}, {nickname: "User2", id: -2}],
-              tunes: [],
-              sessionId: -1
-            })}}>
-              <ButtonText>Back</ButtonText>
+      <WSContext.Provider value={ws}>
+        <SafeBgView>
+          <SafeAreaView>
+            <Title>Setlist Builder</Title>
+            <ModeParse mode={session.mode}/>
+            {
+              session.mode !== Mode.START && 
+                <DeleteButton onPress={() => {updateSession({
+                  mode: Mode.START,
+                  users: [{nickname: "User1", id: -1}, {nickname: "User2", id: -2}],
+                  tunes: [],
+                  sessionId: -1
+                })}}>
+                  <ButtonText>Back</ButtonText>
+                </DeleteButton>
+            }
+            <DeleteButton onPress={() => {
+              ws.close();
+              navigation.goBack();
+            }}>
+              <ButtonText>Exit to Menu</ButtonText>
             </DeleteButton>
-          }
-          <DeleteButton onPress={() => {navigation.goBack();}}>
-            <ButtonText>Exit to Menu</ButtonText>
-          </DeleteButton>
-        </SafeAreaView>
-      </SafeBgView>
+          </SafeAreaView>
+        </SafeBgView>
+      </WSContext.Provider>
     </SessionContext.Provider>
   )
 }
