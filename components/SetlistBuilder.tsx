@@ -171,6 +171,7 @@ export default function SetlistBuilder({}:{}){
         console.log(e.code, e.reason);
         if(e.code !== 0){
           console.log("Unexpected ws error, reopening");
+          createNewWs();
         }
       };
       return newWs;
