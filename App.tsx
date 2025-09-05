@@ -19,7 +19,7 @@
  */
 
 
-import React, {useEffect, useLayoutEffect, useReducer, useState} from 'react';
+import React, {useContext, useEffect, useLayoutEffect, useReducer, useState} from 'react';
 import {NavigationContainer, useNavigation} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
@@ -47,7 +47,7 @@ import {translateAttrFromStandardTune} from './DraftReducers/utils/translate.ts'
 import Register from './components/Register.tsx';
 import ProfileMenu from './components/ProfileMenu.tsx';
 import SplashScreen from 'react-native-splash-screen';
-import {ThemeProvider} from 'styled-components';
+import {ThemeProvider, useTheme} from 'styled-components';
 import {light, dark} from './Themes.tsx';
 import {BgView, SafeBgView} from './Style.tsx';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -55,6 +55,9 @@ import AccountDeletion from './components/AccountDeletion.tsx';
 import NewTuneSelector from './components/NewTuneSelector.tsx';
 import MainMenu from './components/MainMenu.tsx';
 import SetlistBuilder from './components/SetlistBuilder.tsx';
+import Login from './components/Login.tsx';
+import httpToServer from './http-to-server.ts';
+import {Axios, AxiosError} from 'axios';
 
 
 const Stack = createNativeStackNavigator();
@@ -104,45 +107,9 @@ function migration(oldRealm: Realm, newRealm: Realm){
 function App(): React.JSX.Element {
   const [dbState, dbDispatch] = useReducer(OnlineDB.reducer, {composers: [] as standard_composer[], standards: [] as standard[], status: Status.Failed, googleUser: undefined, appleUser: undefined, email: undefined});
   const [theme, setTheme] = useState(dark);
-  const [selectedTune, setSelectedTune]: [Tune | unknown, Function] = useState();
-  const [selectedTunes, setSelectedTunes]: [Tune[], Function] = useState([]);
-  const [newTune, setNewTune] = useState(false);
-  function toggleTheme(){
-    if(theme === dark){
-      try {
-        AsyncStorage.setItem('theme', JSON.stringify(light));
-      } catch (e) {
-        console.error("Error saving theme");
-      }
-      setTheme(light);
-    }else{
-      try {
-        AsyncStorage.setItem('theme', JSON.stringify(dark));
-      } catch (e) {
-        console.error("Error saving theme");
-      }
-      setTheme(dark);
-    }
-  }
   useEffect(() => {
     SplashScreen.hide();
   }, [])
-  useEffect(() => {
-    console.log("App open")
-    try{
-      AsyncStorage.getItem("theme").then(thm => {
-        if(thm !== null){
-          setTheme(JSON.parse(thm));
-        }else{
-          setTheme(dark);
-        }
-      })
-    }catch(e){
-      console.error("Error reading ");
-      setTheme(dark);
-    }
-    OnlineDB.updateDispatch(dbDispatch);
-  }, []);
   return(
     <ThemeProvider theme={theme}>
       <OnlineDB.DbDispatchContext.Provider value={dbDispatch}>
@@ -150,77 +117,8 @@ function App(): React.JSX.Element {
           <BgView style={{flex: 1}}>
             <RealmProvider schema={[Tune, Composer, Playlist]} schemaVersion={10} onMigration={migration}>
               <NavigationContainer>
-                <Stack.Navigator
-                  screenOptions={{headerShown: false}}
-                  initialRouteName='MainMenu'
-                >
-                  <Stack.Group screenOptions={{presentation: "modal"}}>
-                    <Stack.Screen name="Register" component={Register}/>
-                    <Stack.Screen name="NewTuneSelector" component={NewTuneSelector}/>
-                  </Stack.Group>
-                  <Stack.Screen name="MainMenu" component={MainMenu}/>
-                  <Stack.Screen name="Editor">
-                    {(props) => <Editor
-                      selectedTune={selectedTune as Tune}
-                      newTune={newTune}
-                      setNewTune={setNewTune}
-                    />}
-                  </Stack.Screen>
-                  <Stack.Screen name="Importer">
-                    {(props) => 
-                      <OuterImporter setSelectedTune={setSelectedTune} setNewTune={setNewTune}/>
-                    }
-                  </Stack.Screen>
-                  <Stack.Screen name="SetlistBuilder" component={SetlistBuilder}/>
-                  <Stack.Screen name="TuneListDisplay">
-                    {(props) =>
-                      <SafeBgView>
-                        <View>
-                          <TuneListDisplay
-                            setSelectedTune={setSelectedTune}
-                            setNewTune={setNewTune}
-                            allowNewTune={true}
-                            selectMode={false}
-                            selectedTunes={selectedTunes}
-                            setSelectedTunes={setSelectedTunes}
-                          />
-                        </View>
-                      </SafeBgView>
-                    }
-                  </Stack.Screen>
-                  <Stack.Screen name="Settings">
-                    {(props) => 
-                      <Settings
-                        toggleTheme={toggleTheme}
-                      />
-                    }
-                  </Stack.Screen>
-                  <Stack.Screen name="AccountDeletion">
-                    {(props) => 
-                      <AccountDeletion/>
-                    }
-                  </Stack.Screen>
-                  <Stack.Screen name="ProfileMenu" component={ProfileMenu}/>
-                  <Stack.Screen name="PlaylistViewer">
-                    {(props) =>
-                      <SafeBgView>
-                        <View style={{flex:1}}>
-                          <PlaylistViewer/>
-                        </View>
-                      </SafeBgView>
-                    }
-                  </Stack.Screen>
-                  <Stack.Screen name="PlaylistImporter">
-                    {(props) =>
-                      <SafeBgView>
-                        <View style={{flex:1}}>
-                          <PlaylistImporter
-                          />
-                        </View>
-                      </SafeBgView>
-                    }
-                  </Stack.Screen>
-                </Stack.Navigator>
+                <InnerNavContainer setTheme={setTheme}>
+                </InnerNavContainer>
               </NavigationContainer>
             </RealmProvider>
           </BgView>
@@ -301,5 +199,139 @@ function OuterImporter({setSelectedTune, setNewTune}:{setSelectedTune: Function,
         }}/>
     </SafeBgView>
   )
+}
+function InnerNavContainer({setTheme}:{setTheme: Function}){
+  //The only reason this exists is to allow the axios interceptor to reach the login navigation screen.
+  const [selectedTune, setSelectedTune]: [Tune | unknown, Function] = useState();
+  const [selectedTunes, setSelectedTunes]: [Tune[], Function] = useState([]);
+  const dbDispatch = useContext(OnlineDB.DbDispatchContext);
+  const [newTune, setNewTune] = useState(false);
+  const navigation = useNavigation();
+  const http = httpToServer;
+  const theme = useTheme();
+  useEffect(
+    function(){
+      console.log("INITIAL INTERCEPTOR EFFECT, if this is called more then once then the interceptors will be broken!");
+      http.interceptors.response.use(
+        function onFulfilled(res){
+          return res;
+        },
+        function onRejected(err){
+          if(err instanceof AxiosError){
+            if(err.response?.status === 401){
+              navigation.navigate("Login")
+            }
+          }
+          return Promise.reject(err);
+        }
+      );
+    },[])
+  useEffect(() => {
+    console.log("App open")
+    try{
+      AsyncStorage.getItem("theme").then(thm => {
+        if(thm !== null){
+          setTheme(JSON.parse(thm));
+        }else{
+          setTheme(dark);
+        }
+      })
+    }catch(e){
+      console.error("Error reading ");
+      setTheme(dark);
+    }
+    OnlineDB.updateDispatch(dbDispatch);
+  }, []);
+  function toggleTheme(){
+    if(theme === dark){
+      try {
+        AsyncStorage.setItem('theme', JSON.stringify(light));
+      } catch (e) {
+        console.error("Error saving theme");
+      }
+      setTheme(light);
+    }else{
+      try {
+        AsyncStorage.setItem('theme', JSON.stringify(dark));
+      } catch (e) {
+        console.error("Error saving theme");
+      }
+      setTheme(dark);
+    }
+  }
+  return(
+    <Stack.Navigator
+      screenOptions={{headerShown: false}}
+      initialRouteName='MainMenu'
+    >
+      <Stack.Group screenOptions={{presentation: "modal"}}>
+        <Stack.Screen name="Login" component={Login}/>
+        <Stack.Screen name="Register" component={Register}/>
+        <Stack.Screen name="NewTuneSelector" component={NewTuneSelector}/>
+      </Stack.Group>
+      <Stack.Screen name="MainMenu" component={MainMenu}/>
+      <Stack.Screen name="Editor">
+        {(props) => <Editor
+          selectedTune={selectedTune as Tune}
+          newTune={newTune}
+          setNewTune={setNewTune}
+        />}
+      </Stack.Screen>
+      <Stack.Screen name="Importer">
+        {(props) => 
+          <OuterImporter setSelectedTune={setSelectedTune} setNewTune={setNewTune}/>
+        }
+      </Stack.Screen>
+      <Stack.Screen name="SetlistBuilder" component={SetlistBuilder}/>
+      <Stack.Screen name="TuneListDisplay">
+        {(props) =>
+          <SafeBgView>
+            <View>
+              <TuneListDisplay
+                setSelectedTune={setSelectedTune}
+                setNewTune={setNewTune}
+                allowNewTune={true}
+                selectMode={false}
+                selectedTunes={selectedTunes}
+                setSelectedTunes={setSelectedTunes}
+              />
+            </View>
+          </SafeBgView>
+        }
+      </Stack.Screen>
+      <Stack.Screen name="Settings">
+        {(props) => 
+          <Settings
+            toggleTheme={toggleTheme}
+          />
+        }
+      </Stack.Screen>
+      <Stack.Screen name="AccountDeletion">
+        {(props) => 
+          <AccountDeletion/>
+        }
+      </Stack.Screen>
+      <Stack.Screen name="ProfileMenu" component={ProfileMenu}/>
+      <Stack.Screen name="PlaylistViewer">
+        {(props) =>
+          <SafeBgView>
+            <View style={{flex:1}}>
+              <PlaylistViewer/>
+            </View>
+          </SafeBgView>
+        }
+      </Stack.Screen>
+      <Stack.Screen name="PlaylistImporter">
+        {(props) =>
+          <SafeBgView>
+            <View style={{flex:1}}>
+              <PlaylistImporter
+              />
+            </View>
+          </SafeBgView>
+        }
+      </Stack.Screen>
+    </Stack.Navigator>
+  );
 }
 export default App;
