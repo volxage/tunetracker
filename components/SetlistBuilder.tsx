@@ -77,11 +77,11 @@ type prev_sessions_t = {
 const SessionContext = createContext({state: {tunes: [], users: [], mode: Mode.START, sessionId: 0} as session_t, fn: (() => {}) as Function})
 
 enum ServerFunction{
-  "ADDTUNE",
-  "MODESWITCH",
-  "USERJOIN",
-  "FINALIZEUPDATE",
-  "LOGINREQUEST"
+  addTune = "ADDTUNE",
+  modeSwitch = "MODESWITCH",
+  userJoin = "USERJOIN",
+  finalizeUpdate = "FINALIZEUPDATE",
+  loginRequest = "LOGINREQUEST"
 }
 //Server needs to know these things:
 //What mode the user THINKS is active (to ensure user doesn't accidentally send bad message)
@@ -144,30 +144,39 @@ export default function SetlistBuilder({}:{}){
   const navigation = useNavigation();
   const [ws, setWs] = useState({} as WebSocket);
   useEffect(() => {
+    function createNewWs(){
+      if(ws.OPEN){
+        console.error("Double websocket");
+        ws.close(0, "Closing setlist builder");
+      }
+      const newWs = new WebSocket("wss://api.jhilla.org/tunetracker/setlists");
+      newWs.onopen = function(){
+      }
+      newWs.onmessage = function(rs){
+        console.log("WS Message recieved");
+        console.log(rs.data);
+        const data = JSON.parse(rs.data) as socket_server_message_t;
+        if(data.type === ServerFunction.loginRequest){
+          console.log("Login request recieved");
+        }
+      }
+      newWs.onerror = e => {
+        // an error occurred
+        console.error("An error occured...");
+        console.log(e.message);
+      };
+      newWs.onclose = e => {
+        // connection closed
+        console.log("Closing.");
+        console.log(e.code, e.reason);
+        if(e.code !== 0){
+          console.log("Unexpected ws error, reopening");
+        }
+      };
+      return newWs;
+    }
     //Hopefully only open one websocket!
-    if(ws.OPEN){
-      console.error("Attempted double websocket");
-      ws.close();
-    }
-    const newWs = new WebSocket("wss://api.jhilla.org/tunetracker/setlists");
-    ws.onopen = function(){
-      ws.send("TUNE TRACKER TO SERVER, COME IN??")
-    }
-    ws.onmessage = function(rs){
-      console.log("WE GOT A MESSAGE!");
-      console.log(rs.data);
-    }
-    ws.onerror = e => {
-      // an error occurred
-      console.error("An error occured...");
-      console.log(e.message);
-    };
-    ws.onclose = e => {
-      // connection closed
-      console.log("Closing.");
-      console.log(e.code, e.reason);
-    };
-    setWs(newWs);
+    setWs(createNewWs);
   }, [])
   return(
     <SessionContext.Provider value={{state: session, fn: updateSession}}>
@@ -502,7 +511,6 @@ function TuneRender({
                       score: 100,
                       index: sessionContext.state.tunes.length
                     }).then(res => {
-                        console.log(res.data);
                         addAddedTune(tune);
                         sessionContext.fn({"tunes":
                           sessionContext.state.tunes.concat(OnlineDB.getStandardById(res.data.SetlistTuneTuneId))
@@ -513,8 +521,7 @@ function TuneRender({
                     //  sessionContext.fn({"tunes": res.data})
                     //});
                     }).catch(err => {
-                        console.error(JSON.stringify(err));
-                        console.log(sessionContext.state)
+                        console.log(err);
                       });
                   }else{
                     //TODO: Find way to upload tune as just title and composer for compatibility with unuploaded tunes
