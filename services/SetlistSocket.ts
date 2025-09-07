@@ -54,8 +54,8 @@ export default class SetlistSocket{
     };
     this.ws.onclose = (e) => {
       if(e.code !== 100){
-        console.log("Unexpected socket closure, reopening in a second");
-        setTimeout(this.open, 1000)
+        console.log("Unexpected socket closure, reopening");
+        setTimeout(() => {this.connect()}, 1000)
       }else{
         console.log("Code was 100, socket closure accepted");
       }
