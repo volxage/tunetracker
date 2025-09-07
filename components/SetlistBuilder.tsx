@@ -14,6 +14,7 @@ import Tune from "../model/Tune";
 import dateDisplay from "../textconverters/dateDisplay";
 import Composer from "../model/Composer";
 import {BSON, OrderedCollection} from "realm";
+import SetlistSocket from "../services/SetlistSocket";
 
 type session_t = {
   sessionId: number,
@@ -22,7 +23,7 @@ type session_t = {
   tunes: standard[]
 }
 
-enum Mode{
+export enum Mode{
   START,
   HOST,
   WAITING,
@@ -31,7 +32,7 @@ enum Mode{
   NORMALFINALIZE,
   DONE
 }
-enum ServerMode{
+export enum ServerMode{
   WAITING,
   DONE,
   QUICK,
@@ -76,37 +77,15 @@ type prev_sessions_t = {
 
 const SessionContext = createContext({state: {tunes: [], users: [], mode: Mode.START, sessionId: 0} as session_t, fn: (() => {}) as Function})
 
-enum ServerFunction{
+export enum ServerFunction{
   addTune = "ADDTUNE",
   modeSwitch = "MODESWITCH",
   userJoin = "USERJOIN",
   finalizeUpdate = "FINALIZEUPDATE",
   loginRequest = "LOGINREQUEST"
 }
-//Server needs to know these things:
-//What mode the user THINKS is active (to ensure user doesn't accidentally send bad message)
-//Function for the server to complete
-//Payload (preferrably one data type or simple array?)
-type socket_client_message_t = {
-  sessionId: number,
-  mode: ServerMode,
-  type: ServerFunction,
-  payload: any
-}
-//Resuse ServerFunctions for both inbound and outbound?
 
-//User needs to know these things:
-//What mode the server is on, in case the user has an outdated mode somehow
-//What type of data the server is sending
-//The payload
-type socket_server_message_t = {
-  sessionId: number,
-  mode: ServerMode,
-  type: ServerFunction,
-  payload: any
-}
-
-const WSContext = createContext({} as WebSocket)
+const WSContext = createContext({} as SetlistSocket)
 //const WSContext = createContext(new WebSocket("wss://api.jhilla.org/tunetracker/setlists"))
 //modes:
 //1: Option to host, or enter host's code
@@ -142,68 +121,16 @@ export default function SetlistBuilder({}:{}){
     }
   }
   const navigation = useNavigation();
-  const [ws, setWs] = useState({} as WebSocket);
-  useEffect(function(){
-    function createNewWs(){
-      if(ws.OPEN){
-        console.error("Double websocket");
-        ws.close(1, "Closing setlist builder");
-      }
-      const newWs = new WebSocket("wss://api.jhilla.org/tunetracker/setlists");
-      newWs.onopen = function(){
-        console.log("Socket open");
-      }
-      newWs.onmessage = function(rs){
-        console.log("WS Message recieved");
-        console.log(rs.data);
-        const data = JSON.parse(rs.data) as socket_server_message_t;
-        if(data.type === ServerFunction.loginRequest){
-          console.log("Login request recieved");
-          navigation.navigate("Login")
-        }
-      }
-      newWs.onerror = e => {
-        // an error occurred
-        console.log("A ws error occured...");
-        console.log(e.message);
-      };
-      newWs.onclose = e => {
-        // connection closed
-        console.log("Closing.");
-        console.log(e.code, e.reason);
-        if(e.code !== 100){
-          console.log("Unexpected ws error, reopening");
-          createNewWs();
-        }
-      };
-      return newWs;
-    }
-    //Hopefully only open one websocket!
-    setWs(createNewWs);
-  }, [])
-  useFocusEffect(
-    React.useCallback(() => {
-      const onBackPress = () => {
-        console.log("Exiting setlist builder");
-        if(ws.close){
-          ws.close(100, "Exiting SetlistBuilder")
-        }else{
-          console.warn("No websocket close function, did it ever open?");
-        }
-        return false;
-      };
-
-      const subscription = BackHandler.addEventListener(
-        'hardwareBackPress',
-        onBackPress
-      );
-
-      return () => subscription.remove();
-    }, [ws])
-  );
+  const [ss, setSs]: [SetlistSocket | undefined, Function] = useState(undefined);
+  useEffect(() => {
+    const newSS = new SetlistSocket(navigation);
+    setSs(newSS);
+    //On dismount, RN should close server socket class
+    return newSS.disconnect;
+  },[]);
   return(
     <SessionContext.Provider value={{state: session, fn: updateSession}}>
-      <WSContext.Provider value={ws}>
+      <WSContext.Provider value={ss}>
         <SafeBgView>
           <SafeAreaView>
             <Title>Setlist Builder</Title>
@@ -220,7 +147,7 @@ export default function SetlistBuilder({}:{}){
                 </DeleteButton>
             }
             <DeleteButton onPress={() => {
-              ws.close(100, "Leaving SetlistBuilder");
+              ss.disconnect();
               navigation.goBack();
             }}>
               <ButtonText>Exit to Menu</ButtonText>
