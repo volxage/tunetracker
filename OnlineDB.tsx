@@ -64,14 +64,12 @@ async function getUserToken(): Promise<string>{
       await GoogleSignin.signInSilently().then(async res => {
         if(res.type === "success"){
           console.log("Successful silent signin");
-          console.log(res.data.idToken);
           return res.data.idToken;
         }else{
           console.log("Unsuccessful silent signin");
           await GoogleSignin.signIn().then(res => {
             if(res.type === "success"){
               console.log("Successful first-time signin");
-              console.log(res.data.idToken);
               return res.data.idToken;
             }else{
               throw new Error("Signin error");

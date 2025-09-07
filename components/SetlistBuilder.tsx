@@ -1,10 +1,10 @@
-import {FlatList, Pressable, SafeAreaView, TouchableHighlight, View} from "react-native";
+import {BackHandler, FlatList, Pressable, SafeAreaView, TouchableHighlight, View} from "react-native";
 import {BgView, ButtonText, DeleteButton, RowView, SafeBgView, SMarginView, SubBoldText, SubDimText, SubText, Text, TextInput, Title} from "../Style";
-import {createContext, useContext, useEffect, useState} from "react";
+import React, {createContext, useContext, useEffect, useState} from "react";
 import {Button} from "../simple_components/Button";
 import httpToServer from "../http-to-server";
 import {useTheme} from "styled-components";
-import {useNavigation} from "@react-navigation/native";
+import {useFocusEffect, useNavigation} from "@react-navigation/native";
 import {standard, user_t} from "../types";
 import User from "../simple_components/User";
 import {AxiosError, isAxiosError} from "axios";
@@ -143,14 +143,15 @@ export default function SetlistBuilder({}:{}){
   }
   const navigation = useNavigation();
   const [ws, setWs] = useState({} as WebSocket);
-  useEffect(() => {
+  useEffect(function(){
     function createNewWs(){
       if(ws.OPEN){
         console.error("Double websocket");
-        ws.close(0, "Closing setlist builder");
+        ws.close(1, "Closing setlist builder");
       }
       const newWs = new WebSocket("wss://api.jhilla.org/tunetracker/setlists");
       newWs.onopen = function(){
+        console.log("Socket open");
       }
       newWs.onmessage = function(rs){
         console.log("WS Message recieved");
@@ -158,18 +159,19 @@ export default function SetlistBuilder({}:{}){
         const data = JSON.parse(rs.data) as socket_server_message_t;
         if(data.type === ServerFunction.loginRequest){
           console.log("Login request recieved");
+          navigation.navigate("Login")
         }
       }
       newWs.onerror = e => {
         // an error occurred
-        console.error("An error occured...");
+        console.log("A ws error occured...");
         console.log(e.message);
       };
       newWs.onclose = e => {
         // connection closed
         console.log("Closing.");
         console.log(e.code, e.reason);
-        if(e.code !== 0){
+        if(e.code !== 100){
           console.log("Unexpected ws error, reopening");
           createNewWs();
         }
@@ -179,6 +181,26 @@ export default function SetlistBuilder({}:{}){
     //Hopefully only open one websocket!
     setWs(createNewWs);
   }, [])
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        console.log("Exiting setlist builder");
+        if(ws.close){
+          ws.close(100, "Exiting SetlistBuilder")
+        }else{
+          console.warn("No websocket close function, did it ever open?");
+        }
+        return false;
+      };
+
+      const subscription = BackHandler.addEventListener(
+        'hardwareBackPress',
+        onBackPress
+      );
+
+      return () => subscription.remove();
+    }, [ws])
+  );
   return(
     <SessionContext.Provider value={{state: session, fn: updateSession}}>
       <WSContext.Provider value={ws}>
@@ -198,7 +220,7 @@ export default function SetlistBuilder({}:{}){
                 </DeleteButton>
             }
             <DeleteButton onPress={() => {
-              ws.close();
+              ws.close(100, "Leaving SetlistBuilder");
               navigation.goBack();
             }}>
               <ButtonText>Exit to Menu</ButtonText>
@@ -243,6 +265,7 @@ function SessionStart({}:{}){
   const dispatch = useContext(OnlineDB.DbDispatchContext);
   const [prevSessions, setPrevSessions] = useState({joined: [], hosted: []} as prev_sessions_t);
   const [owned, setOwned] = useState(true);
+  const dbState = useContext(OnlineDB.DbStateContext);
   useEffect(() => {
     httpToServer.get("/setlists/").then(res => {
       const data = res.data as prev_sessions_t;
@@ -254,7 +277,7 @@ function SessionStart({}:{}){
         console.log(JSON.stringify(err));
       }
     })
-  },[session.state.sessionId]);
+  },[session.state.sessionId, dbState.email]);
   function submit(){
     httpToServer.post("/setlists", {
       name: "",
