@@ -224,23 +224,7 @@ function SessionStart({}:{}){
         }).then(res => {
             //Extract session id from response
             session.fn({"mode": Mode.HOST, "sessionId": res.data.id})
-        }).catch(err => {
-            console.error(err);
-            if(isAxiosError(err)){
-              if(err.response?.data.message === "Not logged in, or invalid session"){
-                //TODO: RESPONSE HANDLER!
-                OnlineDB.tryLogin(navigation, dispatch, 0).then(() =>{
-                  httpToServer.post('/setlists/', {
-                    open: true,
-                    active: false
-                  }).then(res => {
-                      //Extract session id from response
-                      session.fn({"mode": Mode.HOST, "sessionId": res.data.id})
-                    })
-                  })
-              }
-            }
-          })
+        })
       }}/>
       <SubDimText style={{textAlign: "center"}}>or...</SubDimText>
       <RowView>
@@ -274,7 +258,8 @@ function SessionStart({}:{}){
               session.fn({
                 sessionId: item.id,
                 name: item.name,
-                mode: mode
+                mode: mode,
+                tunes: [],
               })
             }}>
               <SMarginView>
@@ -294,7 +279,8 @@ function SessionStart({}:{}){
               session.fn({
                 sessionId: item.id,
                 name: item.name,
-                mode: mode
+                mode: mode,
+                tunes: []
               })
             }}>
               <SMarginView>
@@ -361,6 +347,8 @@ function SessionQuick({}:{}){
   const [finalizing, setFinalizing] = useState(false);
   useEffect(() => {
     httpToServer.get(`/setlists/gettunes/${session.state.sessionId}`).then(res => {
+      console.log(`Tunes for sess id: ${session.state.sessionId}`);
+      console.log(res.data);
       session.fn({"tunes": res.data})
     })
   },[session.state.sessionId]);
