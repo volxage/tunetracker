@@ -28,6 +28,8 @@ type socket_server_message_t = {
 export default class SetlistSocket{
   ws: WebSocket | undefined = undefined
   navigation: any = undefined
+  status = "Disconnected"
+  listeners: Function[] = []
   constructor(navigation: any){
     //Hopefully shouldn't be an issue as this service should only last within a component's focus
     this.navigation = navigation
@@ -35,8 +37,9 @@ export default class SetlistSocket{
   }
   open(){
     this.ws = new WebSocket("wss://api.jhilla.org/tunetracker/setlists");
-    this.ws.onopen = function(){
+    this.ws.onopen = () => {
       console.log("Socket open");
+      this.updateListeners("Connected");
     }
     this.ws.onmessage = (rs) =>{
       console.log("WS Message recieved");
@@ -56,6 +59,7 @@ export default class SetlistSocket{
     this.ws.onclose = (e) => {
       if(e.code !== 100){
         console.log("Unexpected socket closure, reopening");
+        this.updateListeners("Reconnecting in 1 second")
         setTimeout(() => {this.connect()}, 1000)
       }else{
         console.log("Code was 100, socket closure accepted");
@@ -63,6 +67,7 @@ export default class SetlistSocket{
     }
   }
   connect(){
+    this.updateListeners("Connecting")
     if(typeof this.ws === "undefined" || (this.ws && this.ws.readyState === 3)){
       console.log("socket closed or undefined");
       if(typeof this.ws === "undefined"){
@@ -75,5 +80,17 @@ export default class SetlistSocket{
   }
   disconnect(){
     if(typeof this.ws !== "undefined"){this.ws.close(100); delete this.ws; console.log("Closed socket");}
+  }
+  addListener(listener: Function){
+    this.listeners.push(listener)
+  }
+  clearListeners(){
+    this.listeners = [];
+  }
+  updateListeners(st: string){
+    this.status = st
+    for(const list of this.listeners){
+      list(st);
+    }
   }
 }

@@ -94,7 +94,7 @@ export enum ClientFunction{
   joinSession = "JOINSESSION"
 }
 
-const WSContext = createContext({} as SetlistSocket)
+const WSContext = createContext(undefined as SetlistSocket | undefined)
 //const WSContext = createContext(new WebSocket("wss://api.jhilla.org/tunetracker/setlists"))
 //modes:
 //1: Option to host, or enter host's code
@@ -141,32 +141,49 @@ export default function SetlistBuilder({}:{}){
     <SessionContext.Provider value={{state: session, fn: updateSession}}>
       <WSContext.Provider value={ss}>
         <SafeBgView>
-          <SafeAreaView>
-            <Title>Setlist Builder</Title>
-            <ModeParse mode={session.mode}/>
-            {
-              session.mode !== Mode.START && 
-                <DeleteButton onPress={() => {updateSession({
-                  mode: Mode.START,
-                  users: [{nickname: "User1", id: -1}, {nickname: "User2", id: -2}],
-                  tunes: [],
-                  sessionId: -1
-                })}}>
-                  <ButtonText>Back</ButtonText>
-                </DeleteButton>
-            }
-            <DeleteButton onPress={() => {
-              ss.disconnect();
+          <Title>Setlist Builder</Title>
+          <SocketStatus/>
+          <ModeParse mode={session.mode}/>
+          {
+            session.mode !== Mode.START && 
+              <DeleteButton onPress={() => {updateSession({
+                mode: Mode.START,
+                users: [{nickname: "User1", id: -1}, {nickname: "User2", id: -2}],
+                tunes: [],
+                sessionId: -1
+              })}}>
+                <ButtonText>Back</ButtonText>
+              </DeleteButton>
+          }
+          <DeleteButton 
+            onPress={() => {
               navigation.goBack();
-            }}>
-              <ButtonText>Exit to Menu</ButtonText>
-            </DeleteButton>
-          </SafeAreaView>
+            }}
+          >
+            <ButtonText>Exit to Menu</ButtonText>
+          </DeleteButton>
         </SafeBgView>
       </WSContext.Provider>
     </SessionContext.Provider>
   )
 }
+function SocketStatus(){
+  const ws = useContext(WSContext);
+  const [status, setStatus] = useState("DIsconnected");
+  const theme = useTheme();
+  useEffect(function(){
+    ws?.clearListeners();
+    ws?.addListener(setStatus);
+  },[ws]);
+  return(
+    <View>
+      <View style={{alignSelf: "center"}}>
+        <SubBoldText style={{textAlign: "center", paddingHorizontal: 8, backgroundColor: theme.panelBg}}>{status}</SubBoldText>
+      </View>
+    </View>
+  );
+}
+
 function ModeParse({mode}:{mode: Mode}){
   switch(mode){
     case Mode.START: {
@@ -260,6 +277,7 @@ function SessionStart({}:{}){
         owned ? 
           <FlatList data={prevSessions.hosted} renderItem={({item}) =>
             <Pressable onPress={() => {
+              console.log(item);
               let mode = HostModeMap.get(item.mode);
               if(typeof mode === "undefined"){
                 mode = Mode.HOST;
