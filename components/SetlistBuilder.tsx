@@ -80,9 +80,18 @@ const SessionContext = createContext({state: {tunes: [], users: [], mode: Mode.S
 export enum ServerFunction{
   addTune = "ADDTUNE",
   modeSwitch = "MODESWITCH",
-  userJoin = "USERJOIN",
+  userChange = "USERCHANGE",
   finalizeUpdate = "FINALIZEUPDATE",
   loginRequest = "LOGINREQUEST"
+}
+
+export enum ClientFunction{
+  addTune = "ADDTUNE",
+  modeSwitch = "MODESWITCH",
+  userChange = "USERCHANGE",
+  finalizeUpdate = "FINALIZEUPDATE",
+  loginRequest = "LOGINREQUEST",
+  joinSession = "JOINSESSION"
 }
 
 const WSContext = createContext({} as SetlistSocket)
@@ -484,7 +493,9 @@ function SessionTuneRender({
   return(
     <TouchableHighlight onPress={() => {
       setIsExpanded(!isExpanded);
-    }}>
+    }}
+      style={{padding: 8}}
+    >
       <BgView>
         <Text>{tune.title}</Text>
         <SubText>{tune.Composers?.map(cmp => cmp.name).join(", ")}</SubText>

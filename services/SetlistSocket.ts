@@ -1,4 +1,4 @@
-import {ServerFunction, ServerMode} from "../components/SetlistBuilder";
+import {ClientFunction, ServerFunction, ServerMode} from "../components/SetlistBuilder";
 
 
 
@@ -9,7 +9,7 @@ import {ServerFunction, ServerMode} from "../components/SetlistBuilder";
 type socket_client_message_t = {
   sessionId: number,
   mode: ServerMode,
-  type: ServerFunction,
+  type: ClientFunction,
   payload: any
 }
 //Resuse ServerFunctions for both inbound and outbound?
@@ -22,7 +22,8 @@ type socket_server_message_t = {
   sessionId: number,
   mode: ServerMode,
   type: ServerFunction,
-  payload: any
+  payload: any,
+  error?: string
 }
 export default class SetlistSocket{
   ws: WebSocket | undefined = undefined

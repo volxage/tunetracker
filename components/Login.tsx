@@ -3,11 +3,12 @@ import {ButtonText, DeleteButton, SafeBgView, SubDimText, Title} from "../Style"
 import ResponseHandler from "../services/ResponseHandler";
 import {Button} from "../simple_components/Button";
 import OnlineDB from "../OnlineDB";
-import {useContext} from "react";
+import {useContext, useEffect} from "react";
 import {useNavigation} from "@react-navigation/native";
 
 export default function Login({}:{}){
   const dbDispatch = useContext(OnlineDB.DbDispatchContext);
+  const dbState = useContext(OnlineDB.DbStateContext);
   const navigation = useNavigation();
   return(
     <SafeBgView style={{justifyContent: "center"}}>
