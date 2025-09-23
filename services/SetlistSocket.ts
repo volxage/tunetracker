@@ -93,4 +93,17 @@ export default class SetlistSocket{
       list(st);
     }
   }
+  joinSetlist(id: number){
+    const msg: socket_client_message_t = {
+      sessionId: id,
+      type: ClientFunction.joinSession
+    }
+    if(this.ws){
+      this.ws.send(msg)
+      //Server will send response, maybe handle the successful join or error in the listener?
+    }
+  }
+//modeChange(mode: ServerMode){
+
+//}
 }
