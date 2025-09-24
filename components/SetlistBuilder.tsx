@@ -252,7 +252,6 @@ function SessionStart({}:{}){
   return(
     <View>
       <Button text="Host new session" onPress={() => {
-        // TOOD:Request server to create session and get it's id
         httpToServer.post('/setlists/', {
           open: true,
           active: false,

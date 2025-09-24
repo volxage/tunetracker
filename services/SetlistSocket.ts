@@ -126,6 +126,9 @@ export default class SetlistSocket{
       if(attr === "serverMode"){
         if(isHost){
           let mode = HostModeMap.get(st[attr]);
+          if( st.serverMode === null ){
+            mode = Mode.HOST;
+          }
           if(!mode){
             console.error("Invalid host mode conversion");
             mode = Mode.START;
@@ -133,8 +136,11 @@ export default class SetlistSocket{
           this.status["mode"] = mode;
         }else{
           let mode = PlayerModeMap.get(st[attr]);
+          if( st.serverMode === null ){
+            mode = Mode.WAITING;
+          }
           if(!mode){
-            console.error("Invalid host mode conversion");
+            console.error("Invalid player mode conversion");
             mode = Mode.START;
           }
           this.status["mode"] = mode;
