@@ -42,7 +42,7 @@ export enum ServerMode{
 }
 
 //Mostly the same with some exceptions
-const HostModeMap = new Map<ServerMode, Mode>([
+export const HostModeMap = new Map<ServerMode, Mode>([
   [ServerMode.WAITING, Mode.HOST],
   [ServerMode.DONE, Mode.DONE],
   [ServerMode.QUICK, Mode.QUICK],
@@ -53,7 +53,7 @@ const HostModeMap = new Map<ServerMode, Mode>([
 ]);
 
 //Almost entirely the same
-const PlayerModeMap = new Map<ServerMode, Mode>([
+export const PlayerModeMap = new Map<ServerMode, Mode>([
   [ServerMode.WAITING, Mode.WAITING],
   [ServerMode.DONE, Mode.DONE],
   [ServerMode.QUICK, Mode.QUICK],
@@ -82,7 +82,8 @@ export enum ServerFunction{
   modeSwitch = "MODESWITCH",
   userChange = "USERCHANGE",
   finalizeUpdate = "FINALIZEUPDATE",
-  loginRequest = "LOGINREQUEST"
+  loginRequest = "LOGINREQUEST",
+  allInfo = "ALLINFO",
 }
 
 export enum ClientFunction{
@@ -121,6 +122,8 @@ export default function SetlistBuilder({}:{}){
     for(key in changes){
       newState[key] = changes[key];
     }
+    console.log("New state:");
+    console.log(JSON.stringify(newState));
     if(toServer){
       httpToServer.post("/setlists", {changes}).then(res => {
         setSession(newState);
@@ -134,6 +137,7 @@ export default function SetlistBuilder({}:{}){
   useEffect(() => {
     const newSS = new SetlistSocket(navigation);
     setSs(newSS);
+    newSS.addListener(updateSession);
     //On dismount, RN should close server socket class
     return newSS.disconnect;
   },[]);
@@ -169,11 +173,16 @@ export default function SetlistBuilder({}:{}){
 }
 function SocketStatus(){
   const ws = useContext(WSContext);
-  const [status, setStatus] = useState("DIsconnected");
+  const [status, setStatus] = useState("Not initialized");
   const theme = useTheme();
+  function socketUpdateListener(change){
+    if(change.text){
+      setStatus(change.text);
+    }
+    //Otherwise the change doesn't matter here. Should probably give socket a separate listener for this.
+  }
   useEffect(function(){
-    ws?.clearListeners();
-    ws?.addListener(setStatus);
+    ws?.addListener(socketUpdateListener);
   },[ws]);
   return(
     <View>
@@ -219,6 +228,7 @@ function SessionStart({}:{}){
   const [prevSessions, setPrevSessions] = useState({joined: [], hosted: []} as prev_sessions_t);
   const [owned, setOwned] = useState(true);
   const dbState = useContext(OnlineDB.DbStateContext);
+  const ws = useContext(WSContext);
   useEffect(() => {
     httpToServer.get("/setlists/").then(res => {
       const data = res.data as prev_sessions_t;
@@ -277,17 +287,12 @@ function SessionStart({}:{}){
         owned ? 
           <FlatList data={prevSessions.hosted} renderItem={({item}) =>
             <Pressable onPress={() => {
-              console.log(item);
               let mode = HostModeMap.get(item.mode);
               if(typeof mode === "undefined"){
                 mode = Mode.HOST;
               }
-              session.fn({
-                sessionId: item.id,
-                name: item.name,
-                mode: mode,
-                tunes: [],
-              })
+              //Below should trigger a response from the server that'll open the setlist.
+              ws?.joinSetlist(item.id);
             }}>
               <SMarginView>
                 <Text>{item.name}</Text>
