@@ -74,6 +74,13 @@ type prev_sessions_t = {
   joined: online_session_t[],
   hosted: online_session_t[]
 }
+type tune_fragment_t = {
+  title: string,
+  composer: string,
+  key: string,
+  tempo: number,
+  id: number
+}
 
 const SessionContext = createContext({state: {tunes: [], users: [], mode: Mode.START, sessionId: 0} as session_t, fn: (() => {}) as Function})
 
