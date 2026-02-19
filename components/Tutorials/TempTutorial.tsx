@@ -15,9 +15,8 @@ export default function TempTutorial({
     <SafeBgView>
       <ScrollView>
         <Text>TUTORIAL:</Text>
-        <SubText>Note: We are working on an interactive tutorial for a more useful demonstration.</SubText>
         <Text>Tune List / Main Menu</Text>
-        <SubText>Below is the first thing you see when you open the app.</SubText>
+        <SubText>This is the first thing you see when you open the app.</SubText>
         <SubText>You can search by title or composer in the search bar, and select a playlist to show what songs belong to it.</SubText>
         <SubText>You can sort tunes by either pressing the dropdown initially labeled "Title" in the middle-left.</SubText>
         <SubText><Icon size={30} name="music"/>: Sort by melody confidence</SubText>

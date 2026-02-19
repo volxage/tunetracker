@@ -7,8 +7,8 @@ export default function NewTuneSelector({}: {}){
   return(
     <SafeBgView>
       <Text>ADD TUNE</Text>
-      <SubText>Press "Import" to import tune information from TuneTracker. (Recommneded) </SubText>
-      <SubText>Press "New" to create a tune that doesn't exist on our servers yet. (You will not be required to publish your tune to the server if you don't want to.)</SubText>
+      <SubText>Press "Import" to import a tune from TuneTracker. (Recommneded) </SubText>
+      <SubText>Press "New" to create a tune that doesn't exist on our app yet. (You don't have to publish your tune to TuneTracker if you don't want to.)</SubText>
       <Button text="Import" onPress={() => {navigation.goBack(); navigation.navigate("Importer")}}/>
       <Button text="New" onPress={() => {navigation.goBack(); navigation.navigate("Editor")}}/>
       <DeleteButton onPress={() => {navigation.goBack();}}><ButtonText>Go back</ButtonText></DeleteButton>

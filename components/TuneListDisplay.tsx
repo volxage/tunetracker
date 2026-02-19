@@ -521,7 +521,7 @@ export default function TuneListDisplay({
       }
       ListEmptyComponent={
         <BgView style={{flex: 1}}>
-          <SubText>Click the blue database icon to download a tune from tunetracker.jhilla.org, or click the plus icon to make a new one!</SubText>
+          <SubText>There are no tunes yet. Tap the plus icon to add a tune!</SubText>
         </BgView>
       }
       renderItem={({item, index, separators}) => (
