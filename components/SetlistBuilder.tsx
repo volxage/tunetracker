@@ -21,7 +21,7 @@ type session_t = {
   mode: Mode,
   users: user_t[],
   tunes: standard[],
-  fragments: tune_fragment_t
+  fragments: tune_fragment_t[]
 }
 
 export enum Mode{
@@ -123,8 +123,8 @@ export default function SetlistBuilder({}:{}){
     for(key in changes){
       newState[key] = changes[key];
     }
-    console.log("New state:");
-    console.log(JSON.stringify(newState));
+  //console.log("New state:");
+  //console.log(JSON.stringify(newState));
     if(toServer){
       httpToServer.post("/setlists", {changes}).then(res => {
         setSession(newState);
@@ -291,7 +291,7 @@ function SessionStart({}:{}){
               if(typeof mode === "undefined"){
                 mode = Mode.HOST;
               }
-              //Below should trigger a response from the server that'll open the setlist.
+              //Below triggers server to send ALLINFO to client
               ws?.joinSetlist(item.id);
             }}>
               <SMarginView>
@@ -475,7 +475,7 @@ function TuneRender({
             <RowView>
                 <Button text="Suggest tune" style={{flex:1}} onPress={() => {
                   if(tune.dbId){
-                    //TODO: Handle errors for both functions
+                    //TODO: REPLACE WITH SOCKET CALL
                     httpToServer.post('/setlists/addtune', {
                       setlistId: sessionContext.state.sessionId,
                       tuneId: tune.dbId,
@@ -513,6 +513,7 @@ function SessionTuneRender({
 }){
   const theme = useTheme();
   const [isExpanded, setIsExpanded] = useState(false);
+  const ss = useContext(WSContext);
   return(
     <TouchableHighlight onPress={() => {
       setIsExpanded(!isExpanded);
@@ -526,10 +527,22 @@ function SessionTuneRender({
         isExpanded && 
           <View>
             <RowView>
-              <Button text="I'd rather not." style={{flex:1, borderColor: theme.pending}}/>
-              <Button text="Let's play it!" style={{flex:1}}/>
+                <Button text="I'd rather not." style={{flex:1, borderColor: theme.pending}}
+                  onPress={function(){
+                    ss?.addTune(tune, 50);
+                  }}
+                />
+                <Button text="Let's play it!"
+                  onPress={function(){
+                    ss?.addTune(tune, 100);
+                  }}
+                />
             </RowView>
-            <Button text="I don't know this tune" style={{flex:1, borderColor: theme.delete}}/>
+              <Button text="I don't know this tune" style={{flex:1, borderColor: theme.delete}}
+                onPress={function(){
+                  ss?.addTune(tune, 0);
+                }}
+              />
           </View>
       }
       </BgView>

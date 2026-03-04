@@ -1,5 +1,5 @@
 import {ClientFunction, HostModeMap, Mode, PlayerModeMap, ServerFunction, ServerMode} from "../components/SetlistBuilder";
-import {user_t} from "../types";
+import {standard, tune_fragment_t, user_t} from "../types";
 
 
 
@@ -32,7 +32,9 @@ type status_t = {
   serverMode: ServerMode,
   mode: Mode,
   users: any[],
-  tunes: any[],
+  tunes: standard[],
+  fragments: tune_fragment_t[],
+  sessionId: number,
   hostId: number,
   isHost: boolean
 }
@@ -70,6 +72,14 @@ export default class SetlistSocket{
         }
         case ServerFunction.allInfo: {
           this.updateListeners(data.payload);
+          break;
+        }
+        case ServerFunction.addTune: {
+          console.log("Tune addage received");
+          const {tunes, fragments}: {tunes: standard[], fragments: tune_fragment_t[]} = data.payload; 
+          this.updateListeners({tunes, fragments})
+          console.log(tunes);
+          break;
         }
       }
     }
@@ -161,6 +171,13 @@ export default class SetlistSocket{
     if(this.ws){
       this.ws.send(JSON.stringify(msg));
       //Server will send response, maybe handle the successful join or error in the listener?
+    }
+  }
+  addTune(tune: standard | tune_fragment_t, score: number){
+    const msg: socket_client_message_t = {
+      sessionId: this.status,
+      mode: this.status.mode,
+
     }
   }
 //modeChange(mode: ServerMode){
