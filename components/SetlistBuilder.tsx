@@ -5,7 +5,7 @@ import {Button} from "../simple_components/Button";
 import httpToServer from "../http-to-server";
 import {useTheme} from "styled-components";
 import {useFocusEffect, useNavigation} from "@react-navigation/native";
-import {standard, user_t} from "../types";
+import {standard, tune_fragment_t, user_t} from "../types";
 import User from "../simple_components/User";
 import {AxiosError, isAxiosError} from "axios";
 import OnlineDB from "../OnlineDB";
@@ -20,7 +20,8 @@ type session_t = {
   sessionId: number,
   mode: Mode,
   users: user_t[],
-  tunes: standard[]
+  tunes: standard[],
+  fragments: tune_fragment_t
 }
 
 export enum Mode{
@@ -73,13 +74,6 @@ type online_session_t = {
 type prev_sessions_t = {
   joined: online_session_t[],
   hosted: online_session_t[]
-}
-type tune_fragment_t = {
-  title: string,
-  composer: string,
-  key: string,
-  tempo: number,
-  id: number
 }
 
 const SessionContext = createContext({state: {tunes: [], users: [], mode: Mode.START, sessionId: 0} as session_t, fn: (() => {}) as Function})
@@ -576,6 +570,7 @@ function LocalTuneList({}:{}){
       //TODO: handle non-uploaded suggested tunes to be hidden
     }
   }
+  console.log(session.state)
   let displaySongs = allSongs.filtered("!(id IN $0)", ignoreList)
   .filtered("!(dbId IN $0)", addedList)
   .filtered("!(dbId IN $0)", session.state.tunes.map(tn => tn.id))

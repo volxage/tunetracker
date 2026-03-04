@@ -4,6 +4,13 @@ import Composer from "./model/Composer"
 import Tune from "./model/Tune"
 import {Platform} from "react-native"
 
+export type tune_fragment_t = {
+  title: string,
+  composer: string,
+  key: string,
+  tempo: number,
+  id: number
+}
 export type tune_draft = {
   "title"?: string
   "alternativeTitle"?: string
