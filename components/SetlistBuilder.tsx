@@ -506,6 +506,7 @@ function TuneRender({
     </TouchableHighlight>
   );
 }
+//TODO: fix typing of passed tune, it should include SetlistTune with score and index!
 function SessionTuneRender({
   tune
 }:{
@@ -514,6 +515,9 @@ function SessionTuneRender({
   const theme = useTheme();
   const [isExpanded, setIsExpanded] = useState(false);
   const ss = useContext(WSContext);
+  const score = tune.SetlistTune.score;
+  const index = tune.SetlistTune.index;
+  const isScoredByUser = false;
   return(
     <TouchableHighlight onPress={() => {
       setIsExpanded(!isExpanded);
@@ -523,28 +527,34 @@ function SessionTuneRender({
       <BgView>
         <Text>{tune.title}</Text>
         <SubText>{tune.Composers?.map(cmp => cmp.name).join(", ")}</SubText>
-      {
-        isExpanded && 
-          <View>
-            <RowView>
-                <Button text="I'd rather not." style={{flex:1, borderColor: theme.pending}}
-                  onPress={function(){
-                    ss?.addTune(tune, 50);
-                  }}
-                />
-                <Button text="Let's play it!"
-                  onPress={function(){
-                    ss?.addTune(tune, 100);
-                  }}
-                />
-            </RowView>
-              <Button text="I don't know this tune" style={{flex:1, borderColor: theme.delete}}
-                onPress={function(){
-                  ss?.addTune(tune, 0);
-                }}
-              />
-          </View>
-      }
+        <SubText style={{color: score === 100 ? theme.on : theme.text}}>{"Combined score: " + score}</SubText>
+        {isScoredByUser && <SubText>You said:</SubText>}
+        {
+          isExpanded && 
+            <>
+              {
+                <View>
+                  <RowView>
+                    <Button text="I'd rather not." style={{flex:1, borderColor: theme.pending}}
+                      onPress={function(){
+                        ss?.addTune(tune, 50);
+                      }}
+                    />
+                    <Button text="Let's play it!"
+                      onPress={function(){
+                        ss?.addTune(tune, 100);
+                      }}
+                    />
+                  </RowView>
+                  <Button text="I don't know this tune" style={{flex:1, borderColor: theme.delete}}
+                    onPress={function(){
+                      ss?.addTune(tune, 0);
+                    }}
+                  />
+                </View>
+              }
+            </>
+        }
       </BgView>
     </TouchableHighlight>
   );
@@ -583,7 +593,6 @@ function LocalTuneList({}:{}){
       //TODO: handle non-uploaded suggested tunes to be hidden
     }
   }
-  console.log(session.state)
   let displaySongs = allSongs.filtered("!(id IN $0)", ignoreList)
   .filtered("!(dbId IN $0)", addedList)
   .filtered("!(dbId IN $0)", session.state.tunes.map(tn => tn.id))
