@@ -61,16 +61,16 @@ import {BgView} from '../Style.tsx';
 import {useTheme} from 'styled-components';
 const selectionAttrs = new Map<string, string>([
   ["title", "Title"],
-  ["alternativeTitle", "Alternative Title"],
   ["composers", "Composer(s)"],
+  ["confidence", "Confidence"],
   ["form", "Form"],
 //  ["notableRecordings", "Notable recordings"],
   ["mainKey", "Main Key"],
   //  ["keyCenters", "Key(s)"],
   ["mainStyle", "Main Style"],
   ["mainTempo", "Main Tempo"],
+  ["alternativeTitle", "Alternative Title"],
 //  ["contrafacts", "Contrafacts"],
-  ["confidence", "General Confidence"],
   ["melodyConfidence", "Melody Confidence"],
   ["formConfidence", "Form Confidence"],
   ["soloConfidence", "Solo Confidence"],
@@ -300,92 +300,70 @@ function TuneListHeader({
   return(
     <PanelView>
       <View style={{flexDirection: 'row', borderBottomWidth:1}}>
-        <View style={{flex:1}}>
-        <Picker
-          selectedValue={selectedPlaylist}
-          onValueChange={(value) => headerInputStates.setSelectedPlaylist(value)}
-          itemStyle={{color: theme.text}}
-        >
-          {
-            allPlaylists.map(playlist => 
-              <Picker.Item label={playlist.title} value={playlist.title} key={playlist.id.toString()}
-                style={{color: theme.text, backgroundColor: theme.panelBg, fontSize: 20, fontWeight: 200}}
-              />
-            )
-          }
-          <Picker.Item label="No playlist" value={playlist_enum.AllTunes}
-            style={{color: theme.text, backgroundColor: theme.panelBg, fontSize: 20, fontWeight: 200}}
-          />
-        </Picker>
-        </View>
-    {
-      <View style={{flex:1}}>
-        <Picker
-          selectedValue={selectedAttr}
-          onValueChange={(value) => {headerInputStates.setSelectedAttr(value)}}
-          numberOfLines={2}
-          itemStyle={{color: theme.text}}
-        >
-        {
-          selectedAttrItems.map(val => 
-          <Picker.Item label={val.label} value={val.value} key={val.value}
-            style={{color: theme.text, backgroundColor: theme.panelBg, fontSize: 20, fontWeight: 200}}
-          />
-          )
-        }
-        </Picker>
-      </View>
-    }
+        <RowView style={{flex:1}}>
+          <SubText style={{flex:1, textAlignVertical: "center", margin: 4}}><Icon name="format-list-bulleted" size={22}/></SubText>
+          <Picker
+            selectedValue={selectedPlaylist}
+            onValueChange={(value) => headerInputStates.setSelectedPlaylist(value)}
+            itemStyle={{color: theme.text}}
+            style={{flex:8}}
+          >
+            {
+              allPlaylists.map(playlist => 
+                <Picker.Item label={playlist.title} value={playlist.title} key={playlist.id.toString()}
+                  style={{color: theme.text, backgroundColor: theme.panelBg, fontSize: 20, fontWeight: 200}}
+                />
+              )
+            }
+            <Picker.Item label="No playlist" value={playlist_enum.AllTunes}
+              style={{color: theme.text, backgroundColor: theme.panelBg, fontSize: 20, fontWeight: 200}}
+            />
+          </Picker>
+        </RowView>
+        <RowView style={{flex:1}}>
+          <SubText style={{flex:1, textAlignVertical: "center", margin:4}}><Icon name="sort" size={22}/></SubText>
+          <Picker
+            selectedValue={selectedAttr}
+            onValueChange={(value) => {headerInputStates.setSelectedAttr(value)}}
+            numberOfLines={2}
+            itemStyle={{color: theme.text}}
+            style={{flex:8}}
+          >
+            {
+              selectedAttrItems.map(val => 
+                <Picker.Item label={val.label} value={val.value} key={val.value}
+                  style={{color: theme.text, backgroundColor: theme.panelBg, fontSize: 20, fontWeight: 200}}
+                />
+              )
+            }
+          </Picker>
+        </RowView>
     </View>
-    <View style={{flexDirection: 'row', alignItems: 'center', borderBottomWidth:1}}>
-      <View style={{flex: 5}}>
+    <View style={{flexDirection: 'row', borderBottomWidth:1}}>
+      <RowView style={{flex: 1}}>
+        <SubText style={{textAlignVertical: "center", margin: 4}}><Icon name="magnify" size={22}/></SubText>
         <TextInput
           placeholder={"Search"}
           placeholderTextColor={theme.text}
           onChangeText={(text) => {headerInputStates.setSearch(text)}}
         />
-      </View>
-      <Button
-        style={{
-          flex:1,
-          borderColor: theme.melodyConf
-        }}
-        iconName='music'
-        onPress={() => {
-          headerInputStates.setSelectedAttr("melodyConfidence");
-        }}/>
-      <Button
-        style={{
-          flex:1,
-          borderColor: theme.formConf
-        }}
-        onPress={() => {
-          headerInputStates.setSelectedAttr("formConfidence");
-        }}
-        iconName='file-music-outline'
-      />
-      <Button
-        style={{
-          flex:1,
-          borderColor: theme.soloConf
-        }}
-        onPress={() => {
-          headerInputStates.setSelectedAttr("soloConfidence");
-        }}
-        iconName='alpha-s-circle-outline'
-      />
-      <Button
-        style={{
-          flex:1,
-          borderColor: theme.lyricsConf
-        }}
-        onPress={() => {
-          headerInputStates.setSelectedAttr("lyricsConfidence");
-        }}
-        iconName='script-text'
-      />
+      </RowView>
+        <RowView style={{flex:1}}>
+          <Button
+            text={selectedAttr === "title" ? "Sort by Composers" : "Sort by Title"}
+            style={{flex:1}}
+            onPress={() =>{
+              if(selectedAttr === "title"){
+                headerInputStates.setSelectedAttr("composers")
+              }else{
+                headerInputStates.setSelectedAttr("title")
+              }
+            }}
+          />
+      </RowView>
     </View>
-    <View style={{flexDirection: "row", flex: 3}}>
+    <RowView>
+      <RowView style={{flex: 2}}>
       <Button
         style={{
           flex:1,
@@ -409,29 +387,32 @@ function TuneListHeader({
           headerInputStates.setListReversed(!headerInputStates.listReversed)
         }}
         iconName='menu-swap'
-      />
-      {
-        headerInputStates.allowNewTune &&
-        <View style={{flexDirection: "row", flex: 2}}>
-          <Button style={{flex:1}} onPress={() => {
-            const tn: tune_draft = {};
-            headerInputStates.setSelectedTune(tn);
-            setNewTune(true);
+          />
+      </RowView>
+        <View style={{flex:2}}>
+        {
+          headerInputStates.allowNewTune &&
+            <View style={{flexDirection: "row", flex: 1}}>
+              <Button style={{flex:1}} onPress={() => {
+                const tn: tune_draft = {};
+                headerInputStates.setSelectedTune(tn);
+                setNewTune(true);
 
-            navigation.navigate("NewTuneSelector");
-          }}
-          iconName='plus'
-        />
-        <Button 
-          style={{
-            flex:1
-          }}
-          onPress={() => navigation.navigate("ExtrasMenu")}
-          iconName="dots-horizontal"
-        />
-    </View>
-    }
-    </View>
+                navigation.navigate("NewTuneSelector");
+              }}
+                iconName='plus'
+              />
+              <Button 
+                style={{
+                  flex:1
+                }}
+                onPress={() => navigation.navigate("ExtrasMenu")}
+                iconName="dots-horizontal"
+              />
+            </View>
+        }
+      </View>
+    </RowView>
   </PanelView>
 );
 }
@@ -488,10 +469,18 @@ export default function TuneListDisplay({
       });
   }
   if(selectMode){
-    const selected = displaySongs.filtered("id IN $0", selectedTunes.map(s => s.id));
-    const deselected = displaySongs.filtered("!(id IN $0)", selectedTunes.map(s => s.id))
-    displaySongs = [...selected, ...deselected]
-    selectedIds = selected.map(tn => tn.id);
+    if(displaySongs instanceof List || displaySongs instanceof Results){
+      selectedIds = selectedTunes.map(tn => tn.id);
+      const selected = displaySongs.filtered("id IN $0", selectedIds);
+      const deselected = displaySongs.filtered("!(id IN $0)", selectedIds)
+      displaySongs = [...selected, ...deselected]
+    }else{
+      selectedIds = selectedTunes.map(s => s.id)
+      displaySongs = [
+        ...(displaySongs.filter(song => selectedIds.includes(song.id))),
+        ...(displaySongs.filter(song => !selectedIds.includes(song.id)))
+      ]
+    }
   }
 
   const headerInputStates = 
