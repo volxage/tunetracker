@@ -210,8 +210,9 @@ async function updateDispatch(dispatch: Function){
       successFlag = 0;
     }
   }
+  console.log(`Success flag is ${successFlag}`);
   if(!successFlag){
-    setStatus(Status.Failed);
+    dispatch({type: "setStatus", value: Status.Failed});
   }
 }
 function addListener(listener: Function){
