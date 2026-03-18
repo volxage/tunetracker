@@ -1,5 +1,7 @@
 package com.tunetracker
 
+import android.os.Bundle
+import org.devio.rn.splashscreen.SplashScreen
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
@@ -19,4 +21,10 @@ class MainActivity : ReactActivity() {
    */
   override fun createReactActivityDelegate(): ReactActivityDelegate =
       DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled)
+
+  // Kotlin
+  override fun onCreate(savedInstanceState: Bundle?){
+    SplashScreen.show(this);   // Show splash screen defined in you android `styles.xml`
+    super.onCreate(savedInstanceState)
+  }
 }
