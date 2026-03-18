@@ -17,5 +17,22 @@ buildscript {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
     }
 }
+allprojects {
+  repositories {
+    google()
+    mavenCentral()
+    maven {
+      url = uri(project(":react-native-async-storage_async-storage").file("local_repo"))
+    }
+  }
+}
+subprojects {
+    configurations.all {
+        resolutionStrategy {
+            force 'androidx.core:core:1.13.1'
+            exclude group: 'com.android.support'
+        }
+    }
+}
 
 apply plugin: "com.facebook.react.rootproject"
