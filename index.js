@@ -7,3 +7,26 @@ import App from './App';
 import { name as appName } from './app.json';
 
 AppRegistry.registerComponent(appName, () => App);
+
+if(Platform.OS === "android"){
+  GoogleSignin.configure({
+    webClientId: webSigningCert,
+  })
+}
+
+Navigation.registerComponent('com.myApp.WelcomeScreen', () => App);
+Navigation.events().registerAppLaunchedListener(() => {
+  Navigation.setRoot({
+    root: {
+      stack: {
+        children: [
+          {
+            component: {
+              name: 'com.myApp.WelcomeScreen'
+            }
+          }
+        ]
+      }
+    }
+  })
+})
