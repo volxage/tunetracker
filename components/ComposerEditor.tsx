@@ -8,11 +8,11 @@ import {
   SafeBgView,
 } from '../Style.tsx'
 import {
-  SafeAreaView,
   FlatList,
   View,
   TouchableHighlight,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import TypeField from './TypeField.tsx';
 import {composer, standard, standard_composer} from '../types.ts';

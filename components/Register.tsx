@@ -1,4 +1,4 @@
-import {Platform, SafeAreaView, View} from "react-native";
+import {Platform, View} from "react-native";
 import {ButtonText, SubText, Text, TextInput} from "../Style";
 import {useContext, useEffect, useState} from "react";
 import OnlineDB from "../OnlineDB";
@@ -7,6 +7,7 @@ import {useNavigation} from "@react-navigation/native";
 import {AxiosError} from "axios";
 import {User} from "@react-native-google-signin/google-signin";
 import { Button } from "../simple_components/Button";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 function register(token: string, nickname: string, navigation: any, login: Function, counter: number = 0){
   if(counter > 10){

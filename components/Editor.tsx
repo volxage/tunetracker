@@ -12,11 +12,11 @@ import {
   SubDimText,
 } from '../Style.tsx'
 import {
-  SafeAreaView,
   FlatList,
   View,
   TouchableHighlight,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import TypeField from './TypeField.tsx';
 import {tune_draft, standard, miniEditorAttrs, editorAttrs, confidenceAttrs, tune_draft_extras} from '../types.ts';

@@ -1,7 +1,9 @@
 
 // Copyright 2024 Jonathan Hilliard
 import {Picker} from '@react-native-picker/picker';
-import {PixelRatio} from 'react-native';
+import {FlatList, PixelRatio} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import {useTheme} from 'styled-components';
 import styled from 'styled-components/native'
 
 const minButtonSize = PixelRatio.getPixelSizeForLayoutSize(24);
@@ -77,10 +79,14 @@ export const SMarginView = styled.View`
   background-color: ${({ theme }) => theme.bg};
   margin: 16px;
 `;
-export const SafeBgView = styled.SafeAreaView`
-  background-color: ${({ theme }) => theme.bg};
-  flex:1
-`
+export function SafeBgView({children}){
+  const theme = useTheme();
+  return(
+    <SafeAreaView style={{flex:1, backgroundColor: theme.bg}}>
+      {children}
+    </SafeAreaView>
+  )
+}
 export const PanelView = styled.View`
   background-color: ${({theme}) => theme.panelBg};
 `

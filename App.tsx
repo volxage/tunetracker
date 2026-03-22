@@ -28,7 +28,6 @@ import TuneListDisplay from './components/TuneListDisplay.tsx';
 import Editor from './components/Editor.tsx';
 import Importer from './components/Importer.tsx';
 import {
-  SafeAreaView,
   View,
 } from 'react-native';
 
@@ -52,6 +51,7 @@ import {BgView, SafeBgView} from './Style.tsx';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AccountDeletion from './components/AccountDeletion.tsx';
 import NewTuneSelector from './components/NewTuneSelector.tsx';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 
 
 const Stack = createNativeStackNavigator();
@@ -125,31 +125,33 @@ function App(): React.JSX.Element {
     <ThemeProvider theme={theme}>
       <OnlineDB.DbDispatchContext.Provider value={dbDispatch}>
         <OnlineDB.DbStateContext.Provider value={dbState}>
-          <BgView style={{flex: 1}}>
-          <RealmProvider schema={[Tune, Composer, Playlist]} schemaVersion={9} onMigration={migration}>
-              <NavigationContainer>
-                <MainMenu 
-                  toggleTheme={() => {
-                    if(theme === dark){
-                      try {
-                        AsyncStorage.setItem('theme', JSON.stringify(light));
-                      } catch (e) {
-                        console.error("Error saving theme");
+          <SafeAreaProvider>
+            <BgView style={{flex: 1}}>
+              <RealmProvider schema={[Tune, Composer, Playlist]} schemaVersion={9} onMigration={migration}>
+                <NavigationContainer>
+                  <MainMenu 
+                    toggleTheme={() => {
+                      if(theme === dark){
+                        try {
+                          AsyncStorage.setItem('theme', JSON.stringify(light));
+                        } catch (e) {
+                          console.error("Error saving theme");
+                        }
+                        setTheme(light);
+                      }else{
+                        try {
+                          AsyncStorage.setItem('theme', JSON.stringify(dark));
+                        } catch (e) {
+                          console.error("Error saving theme");
+                        }
+                        setTheme(dark);
                       }
-                      setTheme(light);
-                    }else{
-                      try {
-                        AsyncStorage.setItem('theme', JSON.stringify(dark));
-                      } catch (e) {
-                        console.error("Error saving theme");
-                      }
-                      setTheme(dark);
-                    }
-                  }}
-                />
-              </NavigationContainer>
-            </RealmProvider>
-          </BgView>
+                    }}
+                  />
+                </NavigationContainer>
+              </RealmProvider>
+            </BgView>
+          </SafeAreaProvider>
         </OnlineDB.DbStateContext.Provider>
       </OnlineDB.DbDispatchContext.Provider>
     </ThemeProvider>

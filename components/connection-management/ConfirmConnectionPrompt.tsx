@@ -13,7 +13,6 @@ import {useQuery, useRealm} from "@realm/react";
 import Composer from "../../model/Composer";
 import Tune from "../../model/Tune";
 import DraftSummary, {ExistingDbDraftSummary, ItemSummary} from "../../simple_components/DraftSummary";
-import {SafeAreaView} from "react-native";
 import {ScrollView} from "react-native";
 
 //TODO: Highlight what is different!
