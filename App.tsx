@@ -42,7 +42,6 @@ import Composer from './model/Composer.ts';
 import Playlist from './model/Playlist.ts';
 import {BSON} from 'realm';
 import PlaylistViewer from './components/PlaylistViewer.tsx';
-import PlaylistImporter from './components/PlaylistImporter.tsx';
 import {translateAttrFromStandardTune} from './DraftReducers/utils/translate.ts';
 import Register from './components/Register.tsx';
 import ProfileMenu from './components/ProfileMenu.tsx';
@@ -50,7 +49,7 @@ import SplashScreen from 'react-native-splash-screen';
 import {ThemeProvider, useTheme} from 'styled-components';
 import {light, dark} from './Themes.tsx';
 import {BgView, SafeBgView} from './Style.tsx';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import AccountDeletion from './components/AccountDeletion.tsx';
 import NewTuneSelector from './components/NewTuneSelector.tsx';
 import MainMenu from './components/MainMenu.tsx';
@@ -317,16 +316,6 @@ function InnerNavContainer({setTheme}:{setTheme: Function}){
           <SafeBgView>
             <View style={{flex:1}}>
               <PlaylistViewer/>
-            </View>
-          </SafeBgView>
-        }
-      </Stack.Screen>
-      <Stack.Screen name="PlaylistImporter">
-        {(props) =>
-          <SafeBgView>
-            <View style={{flex:1}}>
-              <PlaylistImporter
-              />
             </View>
           </SafeBgView>
         }
