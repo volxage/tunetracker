@@ -1,4 +1,4 @@
-import {FlatList, SafeAreaView, TouchableHighlight, View} from "react-native";
+import {FlatList, TouchableHighlight, View} from "react-native";
 import {Title, Text, SubText, DeleteButton, ButtonText, SafeBgView} from "../Style";
 import {useQuery, useRealm, Realm} from "@realm/react";
 import Playlist from "../model/Playlist";
@@ -20,10 +20,10 @@ export default function PlaylistViewer(
   const Stack = createNativeStackNavigator();
   const [tuneToEdit, setTuneToEdit] = useState();
   const [selectedPlaylist, setSelectedPlaylist] = useState(allPlaylists.length > 0 ? allPlaylists[0] : undefined)
-  const navigation = useNavigation() as any;
+  const navigation = useNavigation();
   const realm = useRealm();
   return(
-    <Stack.Navigator screenOptions={{headerShown: false}}>
+    <Stack.Navigator screenOptions={{headerShown: false}} id="PlaylistViewerNavigator">
       <Stack.Screen name={"PlaylistViewerUnwrapped"} >
         {props => <SafeBgView>
           <Title>Playlists</Title>
@@ -39,7 +39,7 @@ export default function PlaylistViewer(
                     }
                   )
                   setSelectedPlaylist(pl);
-                  navigation.navigate("PlaylistEditor");
+                  props.navigation.navigate("PlaylistEditor");
                 });
               }}
             />
@@ -65,7 +65,7 @@ export default function PlaylistViewer(
                 console.assert(typeof selectedPlaylist !== "undefined",
                   "Selected playlist in PlaylistViewer is undefined");
                 setSelectedPlaylist(item);
-                navigation.navigate("PlaylistEditor");
+                props.navigation.navigate("PlaylistEditor");
               }}
             >
               <View>
@@ -81,16 +81,16 @@ export default function PlaylistViewer(
       <Stack.Screen name={"PlaylistEditor"}>
         {props => <SafeBgView style={{flex: 1}}>
           <PlaylistEditor playlist={selectedPlaylist as Playlist} setTuneToEdit={setTuneToEdit}/>
-      </SafeBgView>}
-    </Stack.Screen>
- <Stack.Screen name="Editor">
-   {(props) => <Editor
-     prettyAttrs={editorAttrs}
-     selectedTune={tuneToEdit as unknown as Tune}
-     newTune={false}
-     setNewTune={() => {}}
-   />}
-    </Stack.Screen>
-  </Stack.Navigator>
-);
+        </SafeBgView>}
+      </Stack.Screen>
+      <Stack.Screen name="Editor">
+        {(props) => <Editor
+          prettyAttrs={editorAttrs}
+          selectedTune={tuneToEdit as unknown as Tune}
+          newTune={false}
+          setNewTune={() => {}}
+        />}
+      </Stack.Screen>
+    </Stack.Navigator>
+  );
 }
