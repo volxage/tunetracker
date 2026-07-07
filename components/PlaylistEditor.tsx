@@ -7,13 +7,11 @@ import {useState} from "react";
 import TuneListDisplay from "./TuneListDisplay";
 import Tune from "../model/Tune";
 import {List} from "realm";
-import RNFS from "react-native-fs";
 import Share from "react-native-share";
 import buff from "buffer";
 import {useNavigation} from "@react-navigation/native";
 import {tune_draft} from "../types";
 import OnlineDB from "../OnlineDB";
-const tmpPlaylistPath = RNFS.TemporaryDirectoryPath + "/tmp_playlist.json";
 
 
 type playlist_submission = {
