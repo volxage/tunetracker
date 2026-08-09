@@ -9,7 +9,6 @@ import appleAuth from "@invertase/react-native-apple-authentication";
 let standards: standard[] = [];
 let composers: standard_composer[] = [];
 let status = Status.Waiting
-let attemptNo = 0;
 const statusListeners = new Set<Function>();
 
 type appleUser = {
@@ -64,12 +63,14 @@ async function getUserToken(): Promise<string>{
       await GoogleSignin.signInSilently().then(async res => {
         if(res.type === "success"){
           console.log("Successful silent signin");
+          console.log(res.data.idToken);
           return res.data.idToken;
         }else{
           console.log("Unsuccessful silent signin");
           await GoogleSignin.signIn().then(res => {
             if(res.type === "success"){
               console.log("Successful first-time signin");
+              console.log(res.data.idToken);
               return res.data.idToken;
             }else{
               throw new Error("Signin error");
@@ -178,36 +179,41 @@ async function login(dispatch: Function, counter=0): Promise<string>{
 }
 
 
-function updateDispatch(dispatch: Function){
+async function updateDispatch(dispatch: Function){
   console.log("Updating dispatch (Fetching standards and composers)");
   dispatch({type: "setStatus", value: Status.Waiting});
-  fetchTunes().then(res => {
-    //Janky workaround until we get a better idea of how promises work
-    if(res){
-      dispatch({type: "updateStandards", value: res});
-    }else{
-
-      console.log("Response from fetchTunes not valid");
-      dispatch({type: "updateStandards", value: standards});
-    }
-    fetchComposers().then(res => {
-      if(res){
-        dispatch({type: "updateComposers", value: res});
+  let counter = 0;
+  let successFlag = 0;
+  while(!successFlag && counter < 6){
+    successFlag = 1;
+    try{
+      const standardsRes = await fetchTunes();
+      if(standardsRes){
+        dispatch({type: "updateStandards", value: standardsRes});
+      }else{
+        console.log("Response from fetchTunes invalid.");
+        successFlag = 0;
+      }
+      const composersRes = await fetchComposers();
+      if(composersRes){
+        dispatch({type: "updateComposers", value: composersRes});
         dispatch({type: "setStatus", value: Status.Complete});
       }else{
         console.log("Response from fetchComposers not valid");
         dispatch({type: "updateComposers", value: composers});
+        successFlag = 0;
       }
-    }).catch(err => {
+    }catch(err){
+      console.log(`Error from attempt ${counter}:`);
       console.log(err);
-      dispatch({type: "setStatus", value: Status.Failed});
-      return err;
-    })
-  }).catch(err => {
-    console.log(err);
+      counter += 1
+      successFlag = 0;
+    }
+  }
+  console.log(`Success flag is ${successFlag}`);
+  if(!successFlag){
     dispatch({type: "setStatus", value: Status.Failed});
-    return err;
-  })
+  }
 }
 function addListener(listener: Function){
   statusListeners.add(listener);
@@ -219,48 +225,37 @@ function setStatus(newStatus: Status){
   }
   status = newStatus;
 }
-function fetchComposers(counter=0): Promise<standard_composer[]>{
+function fetchComposers(): Promise<standard_composer[]>{
   return new Promise( (resolve, reject) => {
-    if(counter > 6){
-      setStatus(Status.Failed);
-      reject("Too many attempts");
-    }
     fetch("https://api.jhilla.org/tunetracker/composers", {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       }
-    }).then(
-      (response) => {
-        //console.log('response');
-        if(response.ok){
-          response.json().then(json => {
-            composers = (json as standard_composer[]);
-            setStatus(Status.Complete);
+    })
+      .then(
+        (response) => {
+          //console.log('response');
+          if(response.ok){
+            response.json().then(json => {
+              composers = (json as standard_composer[]);
+              setStatus(Status.Complete);
               resolve(composers);
-          }).catch(reason => {
-            //console.error("ERROR:");
-            //console.error(reason);
-            resolve(fetchComposers(counter + 1));
-          });
-        }else{
-          resolve(fetchComposers(counter + 1));
+            })
+          }else{
+            reject("Response not OK")
+          }
         }
-      }
-    ).catch(reason => {
-      //console.error("ERROR on sending http request");
-      //console.error(reason);
-      resolve(fetchComposers(counter + 1));
-    });
+      )
+      .catch(
+        err => {
+          reject(err)
+        }
+      )
   });
 }
-async function fetchTunes(counter=0): Promise<standard[]>{
-  attemptNo = counter;
+async function fetchTunes(): Promise<standard[]>{
   return new Promise<standard[]>( (resolve, reject) => {
-    if(counter > 6){
-      setStatus(Status.Failed);
-      reject("Failed 6 times");
-    }
     fetch("https://api.jhilla.org/tunetracker/tunes", {
       method: 'GET',
       headers: {
@@ -274,17 +269,18 @@ async function fetchTunes(counter=0): Promise<standard[]>{
             standards = (json as standard[]);
             setStatus(Status.Complete);
             resolve(standards);
-          }).catch(reason => {
-            resolve(fetchTunes(counter + 1));
           });
         }else{
-          resolve(fetchTunes(counter + 1));
+          reject("Response not ok")
         }
       }
-    ).catch(reason => {
-      resolve(fetchTunes(counter + 1));
-    })
-    }
+      )
+      .catch(
+        err => {
+          reject(err)
+        }
+      )
+  }
   );
 }
 
@@ -399,7 +395,6 @@ export default {
   },
   getTuneDraft,
   getComposerDraft,
-  getAttemptNo(){return attemptNo},
   updateDispatch,
   googleSignOut
 }
