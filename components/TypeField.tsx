@@ -8,7 +8,8 @@ import {
   SubText,
   BgView,
   SMarginView,
-  SubDimText
+  SubDimText,
+  RowView
 } from '../Style.tsx'
 import { Button } from '../simple_components/Button.tsx';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
@@ -51,7 +52,7 @@ function TypeField({
   const [icon, setIcon] = useState();
   const [bool, setBool] = useState(attr as boolean)
   useEffect(() => {
-    Icon.getImageSource('circle', 26, 'white')
+    Icon.getImageSource('circle', 26, theme.text || "grey")
       .then(setIcon);
   }, []);
   type keyOfEitherDraft = keyof (tune_draft | composer)
@@ -302,18 +303,32 @@ function TypeField({
     return(
       <View style={{padding: 8}}>
         <Title>{attrName.toUpperCase()}</Title>
+        <SubText style={{alignSelf:"center"}}>{attr}%</SubText>
         <Slider
           minimumValue={0}
           maximumValue={100}
-          step={1}
+          step={10}
           value={attr as number}
           onSlidingComplete={(value) => {handleSetCurrentItem(attrKey, value)}}
           thumbImage={icon}
-          style={{marginVertical: 20, marginHorizontal: 16, backgroundColor: "black"}}
+          style={{marginVertical: 20, marginHorizontal: 16}}
           minimumTrackTintColor='cadetblue'
           maximumTrackTintColor='gray'
           thumbTintColor={theme.text || "gray"}
         />
+          <RowView style={{marginHorizontal: 16, marginVertical: -8}}>
+            <View>
+              <SubText style={{alignSelf: "left"}}>
+                <Icon name="emoticon-happy-outline" size={26}/>
+              </SubText>
+            </View>
+            <View style={{flex:1}}></View>
+            <View>
+              <SubText style={{ alignSelf: "right"}}>
+                <Icon name="emoticon-sad-outline" size={26}/>
+              </SubText>
+          </View>
+        </RowView>
       </View>
     );
   }

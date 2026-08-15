@@ -10,6 +10,7 @@ import {
   SubBoldText,
   Title,
   SubDimText,
+  RowView,
 } from '../Style.tsx'
 import {
   SafeAreaView,
@@ -68,7 +69,7 @@ export default function Editor({
   }
 
   useEffect(() => {
-    Icon.getImageSource('circle', 26, 'white')
+    Icon.getImageSource('circle', 26, theme.text || "grey")
       .then(setIcon);
     dispatch({type: "set_to_selected", selectedItem: selectedTune});
     if(selectedTune instanceof Tune){
@@ -154,18 +155,32 @@ export default function Editor({
                                   setConfidenceExpanded(!confidenceExpanded);
                                 }}/>
                             </View>
+                            <SubText style={{textAlign: "center"}}>{state.currentDraft.confidence}%</SubText>
                             <Slider
                               minimumValue={0}
                               maximumValue={100}
-                              step={1}
+                              step={10}
                               value={state.currentDraft.confidence}
                               onSlidingComplete={(value) => {handleSetCurrentTune("confidence", value)}}
-                              style={{marginVertical: 20, marginHorizontal: 16, backgroundColor: "black"}}
+                              style={{marginVertical: 20, marginHorizontal: 16}}
                               minimumTrackTintColor='cadetblue'
                               maximumTrackTintColor='gray'
                               thumbTintColor={theme.text || "gray"}
                               thumbImage={icon}
                             />
+                            <RowView style={{marginHorizontal: 16, marginVertical: -8}}>
+                              <View>
+                                <SubText style={{alignSelf: "left"}}>
+                                  <Icon name="emoticon-happy-outline" size={26}/>
+                                </SubText>
+                              </View>
+                              <View style={{flex:1}}></View>
+                              <View>
+                                <SubText style={{ alignSelf: "right"}}>
+                                  <Icon name="emoticon-sad-outline" size={26}/>
+                                </SubText>
+                            </View>
+                          </RowView>
                           </View>
                       }
                     </SMarginView>
