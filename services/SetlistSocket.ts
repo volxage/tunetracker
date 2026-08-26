@@ -55,17 +55,17 @@ export default class SetlistSocket{
       this.updateListeners({text: "Connected"});
     }
     this.ws.onmessage = (rs) =>{
-      console.log("WS Message recieved");
+      console.log("WS Message recieved by service");
       console.log(rs.data);
       const data = JSON.parse(rs.data) as socket_server_message_t;
       switch(data.type){
         case ServerFunction.loginRequest: {
-          console.log("Login request recieved");
+          console.log("Login request recieved by service");
           this.navigation.navigate("Login")
           break;
         }
         case ServerFunction.userChange: {
-          console.log("User change recieved");
+          console.log("User change recieved by service");
           const users: user_t[] = data.payload;
           this.updateListeners({users});
           break;
@@ -75,7 +75,7 @@ export default class SetlistSocket{
           break;
         }
         case ServerFunction.addTune: {
-          console.log("Tune addage received");
+          console.log("Tune addage received by service");
           const {tunes, fragments}: {tunes: standard[], fragments: tune_fragment_t[]} = data.payload; 
           this.updateListeners({tunes, fragments})
           console.log(tunes);
